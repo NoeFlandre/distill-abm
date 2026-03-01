@@ -63,19 +63,28 @@ uv run distill-abm run \
 
 ### Evidence Artifacts and Examples
 
-- Plot artifact example: `results/pipeline/mean-incum.png`
-- Stats image artifact example (`stats-image` mode): `results/pipeline/mean-incum_stats.png`
-- Report artifact: `results/pipeline/report.csv`
+- Runtime artifacts:
+  - Plot artifact (`plot` mode): `results/pipeline/mean-incum.png`
+  - Stats image artifact (`stats-image` mode): `results/pipeline/mean-incum_stats.png`
+  - Report artifact: `results/pipeline/report.csv`
+
+Embedded examples:
+
+Plot example (`plot` mode):
+
+![Plot example](docs/assets/plot_example.png)
+
+Stats table image example (`stats-image` mode):
+
+![Stats table image example](docs/assets/stats_table_example.png)
 
 Stats markdown table example (used in `stats-markdown` and `plot+stats` modes):
 
-```markdown
 | time_step | mean | std | min | max | median |
 | --- | --- | --- | --- | --- | --- |
 | 0 | 1.5000 | 0.5000 | 1.0000 | 2.0000 | 1.5000 |
 | 1 | 2.5000 | 0.5000 | 2.0000 | 3.0000 | 2.5000 |
 | 2 | 3.5000 | 0.5000 | 3.0000 | 4.0000 | 3.5000 |
-```
 
 The stats table always includes, per time step: `mean`, `std`, `min`, `max`, and `median`.
 
