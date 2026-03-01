@@ -44,6 +44,7 @@ def test_cli_run_pipeline(tmp_path: Path) -> None:
             "mean-incum",
             "--metric-description",
             "weekly milk",
+            "--skip-summarization",
         ],
     )
 

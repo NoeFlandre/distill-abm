@@ -18,7 +18,8 @@
   - qualitative score parsing
   - DoE ANOVA contribution analysis
 - `distill_abm.pipeline`:
-  - end-to-end orchestration from CSV -> plot -> LLM -> scoring
+  - end-to-end orchestration from CSV -> plot -> LLM -> (optional BART/BERT summarization) -> scoring
+  - no-summarization baseline mode via CLI `--skip-summarization`
 - `distill_abm.legacy`:
   - notebook function loader with source provenance and priority ordering
   - compatibility wrappers preserving notebook-era function names

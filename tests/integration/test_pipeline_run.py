@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from distill_abm.configs.models import PromptsConfig
 from distill_abm.llm.adapters.base import LLMAdapter, LLMRequest, LLMResponse
 from distill_abm.pipeline.run import PipelineInputs, run_pipeline
@@ -46,4 +48,76 @@ def test_run_pipeline_creates_artifacts(tmp_path: Path) -> None:
 
     assert result.plot_path.exists()
     assert result.report_csv.exists()
+    assert adapter.calls == 2
+
+
+def test_run_pipeline_skip_summarization_bypasses_model_summarizers(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bart", lambda _text: "should-not-run")
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bert", lambda _text: "should-not-run")
+
+    adapter = FakeAdapter()
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            skip_summarization=True,
+        ),
+        prompts=PromptsConfig(
+            context_prompt="Context {parameters} {documentation}",
+            trend_prompt="Trend {description}",
+        ),
+        adapter=adapter,
+    )
+
+    assert result.trend_response == "resp-2"
+    assert adapter.calls == 2
+
+
+def test_run_pipeline_uses_bart_bert_summaries_when_enabled(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bart", lambda text: f"bart::{text}")
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bert", lambda text: f"bert::{text}")
+
+    adapter = FakeAdapter()
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            skip_summarization=False,
+        ),
+        prompts=PromptsConfig(
+            context_prompt="Context {parameters} {documentation}",
+            trend_prompt="Trend {description}",
+        ),
+        adapter=adapter,
+    )
+
+    assert result.trend_response == "bart::resp-2\nbert::resp-2"
     assert adapter.calls == 2
