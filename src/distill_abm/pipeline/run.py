@@ -1,0 +1,120 @@
+"""Pipeline orchestration from CSV ingestion to scored report export."""
+
+from __future__ import annotations
+
+import base64
+import csv
+from pathlib import Path
+
+from pydantic import BaseModel
+
+from distill_abm.configs.models import PromptsConfig
+from distill_abm.eval.metrics import SummaryScores, score_summary
+from distill_abm.ingest.csv_ingest import load_simulation_csv
+from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMRequest
+from distill_abm.summarize.text import clean_markdown_symbols, strip_think_prefix
+from distill_abm.viz.plots import plot_metric_bundle
+
+
+class PipelineInputs(BaseModel):
+    """Defines required inputs so CLI calls stay predictable and testable."""
+
+    csv_path: Path
+    parameters_path: Path
+    documentation_path: Path
+    output_dir: Path
+    model: str
+    metric_pattern: str
+    metric_description: str
+
+
+class PipelineResult(BaseModel):
+    """Returns generated artifacts to callers without leaking internal state."""
+
+    plot_path: Path
+    report_csv: Path
+    context_response: str
+    trend_response: str
+    token_f1: float
+    bleu: float
+    meteor: float
+    rouge1: float
+    rouge2: float
+    rouge_l: float
+    flesch_reading_ease: float
+
+
+def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAdapter) -> PipelineResult:
+    """Executes the notebook-equivalent workflow through pure Python components."""
+    frame = load_simulation_csv(inputs.csv_path)
+    inputs.output_dir.mkdir(parents=True, exist_ok=True)
+    plot_path = plot_metric_bundle(frame, inputs.metric_pattern, inputs.output_dir, "Simulation trend", "value")
+    context_prompt = _context_prompt(inputs, prompts)
+    context = _invoke_adapter(adapter, model=inputs.model, prompt=context_prompt)
+    trend_prompt = prompts.trend_prompt.format(description=inputs.metric_description, context=context)
+    trend = _invoke_adapter(adapter, model=inputs.model, prompt=trend_prompt, image_b64=_encode_image(plot_path))
+    scores = score_summary(reference=context, candidate=trend)
+    report_csv = _write_report(inputs.output_dir, context, trend, scores)
+    return PipelineResult(
+        plot_path=plot_path,
+        report_csv=report_csv,
+        context_response=context,
+        trend_response=trend,
+        token_f1=scores.token_f1,
+        bleu=scores.bleu,
+        meteor=scores.meteor,
+        rouge1=scores.rouge1,
+        rouge2=scores.rouge2,
+        rouge_l=scores.rouge_l,
+        flesch_reading_ease=scores.flesch_reading_ease,
+    )
+
+
+def _context_prompt(inputs: PipelineInputs, prompts: PromptsConfig) -> str:
+    parameters = inputs.parameters_path.read_text(encoding="utf-8")
+    documentation = inputs.documentation_path.read_text(encoding="utf-8")
+    return prompts.context_prompt.format(parameters=parameters, documentation=documentation)
+
+
+def _invoke_adapter(adapter: LLMAdapter, model: str, prompt: str, image_b64: str | None = None) -> str:
+    request = LLMRequest(model=model, messages=[LLMMessage(role="user", content=prompt)], image_b64=image_b64)
+    response = adapter.complete(request)
+    return clean_markdown_symbols(strip_think_prefix(response.text))
+
+
+def _encode_image(path: Path) -> str:
+    data = path.read_bytes()
+    return base64.b64encode(data).decode("utf-8")
+
+
+def _write_report(output_dir: Path, context: str, trend: str, scores: SummaryScores) -> Path:
+    report_path = output_dir / "report.csv"
+    with report_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(
+            [
+                "context_response",
+                "trend_response",
+                "token_f1",
+                "bleu",
+                "meteor",
+                "rouge1",
+                "rouge2",
+                "rouge_l",
+                "flesch_reading_ease",
+            ]
+        )
+        writer.writerow(
+            [
+                context,
+                trend,
+                scores.token_f1,
+                scores.bleu,
+                scores.meteor,
+                scores.rouge1,
+                scores.rouge2,
+                scores.rouge_l,
+                scores.flesch_reading_ease,
+            ]
+        )
+    return report_path

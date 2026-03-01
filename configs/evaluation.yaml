@@ -1,0 +1,2 @@
+use_legacy_metrics: true
+use_token_f1: true

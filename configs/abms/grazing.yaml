@@ -1,0 +1,9 @@
+name: grazing
+metric_pattern: grass-density
+metric_description: grazing pressure and vegetation regeneration dynamics
+plot_descriptions:
+  - mean grass density over time
+  - livestock pressure dynamics
+  - regeneration cycles
+  - variability across runs
+  - long-run equilibrium

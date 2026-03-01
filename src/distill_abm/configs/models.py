@@ -1,0 +1,58 @@
+"""Typed configuration models used across the pipeline."""
+
+from __future__ import annotations
+
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+ProviderName = Literal["openai", "anthropic", "ollama", "janus", "echo"]
+
+
+class ModelEntry(BaseModel):
+    """Defines provider-specific runtime options loaded from YAML."""
+
+    provider: ProviderName
+    model: str
+    base_url: str | None = None
+    api_key_env: str | None = None
+
+
+class ModelsConfig(BaseModel):
+    """Maps model aliases to concrete provider and model definitions."""
+
+    models: dict[str, ModelEntry]
+
+
+class PromptsConfig(BaseModel):
+    """Stores editable prompt templates to avoid notebook hardcoding."""
+
+    context_prompt: str
+    trend_prompt: str
+    style_features: dict[str, str] = Field(default_factory=dict)
+
+
+class ABMConfig(BaseModel):
+    """Defines case-study-specific defaults extracted from notebook workflows."""
+
+    name: str
+    metric_pattern: str
+    metric_description: str
+    plot_descriptions: list[str]
+    default_input_csv: str | None = None
+    default_parameters_txt: str | None = None
+    default_documentation_txt: str | None = None
+
+
+class EvaluationConfig(BaseModel):
+    """Defines default evaluation behavior for summary scoring."""
+
+    use_legacy_metrics: bool = True
+    use_token_f1: bool = True
+
+
+class LoggingConfig(BaseModel):
+    """Provides centralized runtime logging settings."""
+
+    level: str = "INFO"
+    format: str = "%(asctime)s %(levelname)s %(name)s %(message)s"
