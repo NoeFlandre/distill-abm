@@ -43,6 +43,10 @@ def run(
     model: Annotated[str, typer.Option()] = "echo-model",
     metric_pattern: Annotated[str, typer.Option()] = "mean",
     metric_description: Annotated[str, typer.Option()] = "simulation trend",
+    skip_summarization: Annotated[
+        bool,
+        typer.Option(help="Skip BART/BERT summarization and keep the full LLM report text."),
+    ] = False,
     abm: Annotated[str | None, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = None,
 ) -> None:
     """Runs one end-to-end pipeline execution from CSV to scored report."""
@@ -61,6 +65,7 @@ def run(
             model=model,
             metric_pattern=metric_pattern,
             metric_description=metric_description,
+            skip_summarization=skip_summarization,
         ),
         prompts=prompts,
         adapter=adapter,

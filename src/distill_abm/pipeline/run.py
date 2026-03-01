@@ -12,6 +12,7 @@ from distill_abm.configs.models import PromptsConfig
 from distill_abm.eval.metrics import SummaryScores, score_summary
 from distill_abm.ingest.csv_ingest import load_simulation_csv
 from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMRequest
+from distill_abm.summarize.models import summarize_with_bart, summarize_with_bert
 from distill_abm.summarize.text import clean_markdown_symbols, strip_think_prefix
 from distill_abm.viz.plots import plot_metric_bundle
 
@@ -26,6 +27,7 @@ class PipelineInputs(BaseModel):
     model: str
     metric_pattern: str
     metric_description: str
+    skip_summarization: bool = False
 
 
 class PipelineResult(BaseModel):
@@ -52,7 +54,8 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     context_prompt = _context_prompt(inputs, prompts)
     context = _invoke_adapter(adapter, model=inputs.model, prompt=context_prompt)
     trend_prompt = prompts.trend_prompt.format(description=inputs.metric_description, context=context)
-    trend = _invoke_adapter(adapter, model=inputs.model, prompt=trend_prompt, image_b64=_encode_image(plot_path))
+    trend_raw = _invoke_adapter(adapter, model=inputs.model, prompt=trend_prompt, image_b64=_encode_image(plot_path))
+    trend = _summarize_report_text(trend_raw, skip_summarization=inputs.skip_summarization)
     scores = score_summary(reference=context, candidate=trend)
     report_csv = _write_report(inputs.output_dir, context, trend, scores)
     return PipelineResult(
@@ -118,3 +121,16 @@ def _write_report(output_dir: Path, context: str, trend: str, scores: SummarySco
             ]
         )
     return report_path
+
+
+def _summarize_report_text(text: str, skip_summarization: bool) -> str:
+    if skip_summarization:
+        return text
+    try:
+        bart = summarize_with_bart(text).strip()
+        bert = summarize_with_bert(text).strip()
+    except Exception:
+        # Keep direct-report mode as a robust fallback when summarizers are unavailable.
+        return text
+    combined = "\n".join(part for part in [bart, bert] if part)
+    return combined if combined else text

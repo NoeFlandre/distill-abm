@@ -34,6 +34,16 @@ uv run distill-abm run \
   --model gpt-4o
 ```
 
+Run no-summarization baseline (skip BART/BERT summarization and keep direct LLM report text):
+
+```bash
+uv run distill-abm run \
+  --csv-path path/to/reduced.csv \
+  --parameters-path path/to/params.txt \
+  --documentation-path path/to/docs.txt \
+  --skip-summarization
+```
+
 Run DoE ANOVA analysis:
 
 ```bash
@@ -41,6 +51,22 @@ uv run distill-abm analyze-doe \
   --input-csv path/to/FinalResultsYesNo.csv \
   --output-csv results/doe/anova_factorial_contributions.csv
 ```
+
+## Docker
+
+```bash
+docker build -t distill-abm .
+docker run --rm distill-abm
+```
+
+## CI
+
+- GitHub Actions workflow at `.github/workflows/ci.yml`
+- Runs on push and pull request:
+  - `ruff check .`
+  - `black --check .`
+  - `mypy src tests`
+  - `pytest`
 
 ## Parity policy
 
