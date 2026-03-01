@@ -29,6 +29,18 @@ class PromptsConfig(BaseModel):
 
     context_prompt: str
     trend_prompt: str
+    coverage_eval_prompt: str = (
+        "Evaluate summary coverage on a 1-5 scale.\n"
+        "Source context:\n{source}\n\n"
+        "Summary:\n{summary}\n\n"
+        "Return 'Coverage score: <1-5>' and brief reasoning."
+    )
+    faithfulness_eval_prompt: str = (
+        "Evaluate summary faithfulness on a 1-5 scale.\n"
+        "Source context:\n{source}\n\n"
+        "Summary:\n{summary}\n\n"
+        "Return 'Faithfulness score: <1-5>' and brief reasoning."
+    )
     style_features: dict[str, str] = Field(default_factory=dict)
 
 

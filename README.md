@@ -61,6 +61,37 @@ uv run distill-abm run \
   --skip-summarization
 ```
 
+Run qualitative evaluation (Coverage/Faithfulness scored by LLM):
+
+```bash
+# coverage from summary + source text
+uv run distill-abm evaluate-qualitative \
+  --summary-text "Generated ABM summary..." \
+  --source-text "ABM context and evidence..." \
+  --metric coverage \
+  --provider openai \
+  --model gpt-4o
+
+# faithfulness with optional source image for multimodal models
+uv run distill-abm evaluate-qualitative \
+  --summary-text "Generated ABM summary..." \
+  --source-text "ABM context and evidence..." \
+  --metric faithfulness \
+  --source-image-path results/pipeline/mean-incum.png \
+  --provider openai \
+  --model gpt-4o
+```
+
+Expected output JSON:
+
+```json
+{
+  "score": 4,
+  "reasoning": "Coverage score: 4. Most key dynamics and turning points are captured.",
+  "model": "gpt-4o"
+}
+```
+
 ### Evidence Artifacts and Examples
 
 - Runtime artifacts:
