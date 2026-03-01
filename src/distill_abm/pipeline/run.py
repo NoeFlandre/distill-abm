@@ -5,7 +5,9 @@ from __future__ import annotations
 import base64
 import csv
 from pathlib import Path
+from typing import Literal
 
+import pandas as pd
 from pydantic import BaseModel
 
 from distill_abm.configs.models import PromptsConfig
@@ -14,7 +16,14 @@ from distill_abm.ingest.csv_ingest import load_simulation_csv
 from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMRequest
 from distill_abm.summarize.models import summarize_with_bart, summarize_with_bert
 from distill_abm.summarize.text import clean_markdown_symbols, strip_think_prefix
-from distill_abm.viz.plots import plot_metric_bundle
+from distill_abm.viz.plots import (
+    generate_stats_table,
+    plot_metric_bundle,
+    render_stats_table_image,
+    render_stats_table_markdown,
+)
+
+EvidenceMode = Literal["plot", "stats-markdown", "stats-image", "plot+stats"]
 
 
 class PipelineInputs(BaseModel):
@@ -28,6 +37,7 @@ class PipelineInputs(BaseModel):
     metric_pattern: str
     metric_description: str
     skip_summarization: bool = False
+    evidence_mode: EvidenceMode = "plot"
 
 
 class PipelineResult(BaseModel):
@@ -37,6 +47,8 @@ class PipelineResult(BaseModel):
     report_csv: Path
     context_response: str
     trend_response: str
+    stats_markdown: str | None = None
+    stats_image_path: Path | None = None
     token_f1: float
     bleu: float
     meteor: float
@@ -51,10 +63,29 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     frame = load_simulation_csv(inputs.csv_path)
     inputs.output_dir.mkdir(parents=True, exist_ok=True)
     plot_path = plot_metric_bundle(frame, inputs.metric_pattern, inputs.output_dir, "Simulation trend", "value")
+    stats_table = generate_stats_table(frame, include_pattern=inputs.metric_pattern)
+    stats_markdown = render_stats_table_markdown(stats_table)
+    stats_image_path = _write_stats_image_if_needed(
+        stats_table=stats_table,
+        output_dir=inputs.output_dir,
+        include_pattern=inputs.metric_pattern,
+        evidence_mode=inputs.evidence_mode,
+    )
     context_prompt = _context_prompt(inputs, prompts)
     context = _invoke_adapter(adapter, model=inputs.model, prompt=context_prompt)
-    trend_prompt = prompts.trend_prompt.format(description=inputs.metric_description, context=context)
-    trend_raw = _invoke_adapter(adapter, model=inputs.model, prompt=trend_prompt, image_b64=_encode_image(plot_path))
+    trend_prompt = _build_trend_prompt(
+        prompts=prompts,
+        metric_description=inputs.metric_description,
+        context=context,
+        evidence_mode=inputs.evidence_mode,
+        stats_markdown=stats_markdown,
+    )
+    image_b64 = _encode_image_for_evidence(
+        evidence_mode=inputs.evidence_mode,
+        plot_path=plot_path,
+        stats_image_path=stats_image_path,
+    )
+    trend_raw = _invoke_adapter(adapter, model=inputs.model, prompt=trend_prompt, image_b64=image_b64)
     trend = _summarize_report_text(trend_raw, skip_summarization=inputs.skip_summarization)
     scores = score_summary(reference=context, candidate=trend)
     report_csv = _write_report(inputs.output_dir, context, trend, scores)
@@ -63,6 +94,8 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         report_csv=report_csv,
         context_response=context,
         trend_response=trend,
+        stats_markdown=stats_markdown,
+        stats_image_path=stats_image_path,
         token_f1=scores.token_f1,
         bleu=scores.bleu,
         meteor=scores.meteor,
@@ -134,3 +167,44 @@ def _summarize_report_text(text: str, skip_summarization: bool) -> str:
         return text
     combined = "\n".join(part for part in [bart, bert] if part)
     return combined if combined else text
+
+
+def _build_trend_prompt(
+    prompts: PromptsConfig,
+    metric_description: str,
+    context: str,
+    evidence_mode: EvidenceMode,
+    stats_markdown: str,
+) -> str:
+    base = prompts.trend_prompt.format(description=metric_description, context=context)
+    if evidence_mode in {"stats-markdown", "plot+stats"}:
+        return f"{base}\n\nStats table:\n{stats_markdown}"
+    return base
+
+
+def _write_stats_image_if_needed(
+    stats_table: pd.DataFrame,
+    output_dir: Path,
+    include_pattern: str,
+    evidence_mode: EvidenceMode,
+) -> Path | None:
+    if evidence_mode != "stats-image":
+        return None
+    path = output_dir / f"{_slug(include_pattern)}_stats.png"
+    return render_stats_table_image(stats_table, path)
+
+
+def _encode_image_for_evidence(
+    evidence_mode: EvidenceMode,
+    plot_path: Path,
+    stats_image_path: Path | None,
+) -> str | None:
+    if evidence_mode in {"plot", "plot+stats"}:
+        return _encode_image(plot_path)
+    if evidence_mode == "stats-image" and stats_image_path is not None:
+        return _encode_image(stats_image_path)
+    return None
+
+
+def _slug(pattern: str) -> str:
+    return pattern.strip().replace(" ", "_").replace("/", "_").lower()

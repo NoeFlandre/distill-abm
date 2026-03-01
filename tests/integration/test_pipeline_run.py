@@ -18,6 +18,17 @@ class FakeAdapter(LLMAdapter):
         return LLMResponse(provider="fake", model=request.model, text=f"resp-{self.calls}", raw={})
 
 
+class CapturingAdapter(LLMAdapter):
+    provider = "capture"
+
+    def __init__(self) -> None:
+        self.requests: list[LLMRequest] = []
+
+    def complete(self, request: LLMRequest) -> LLMResponse:
+        self.requests.append(request)
+        return LLMResponse(provider="capture", model=request.model, text="captured-response", raw={})
+
+
 def test_run_pipeline_creates_artifacts(tmp_path: Path) -> None:
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
@@ -121,3 +132,105 @@ def test_run_pipeline_uses_bart_bert_summaries_when_enabled(tmp_path: Path, monk
 
     assert result.trend_response == "bart::resp-2\nbert::resp-2"
     assert adapter.calls == 2
+
+
+def test_run_pipeline_stats_markdown_mode_uses_text_only_evidence(tmp_path: Path) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+    adapter = CapturingAdapter()
+
+    run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            skip_summarization=True,
+            evidence_mode="stats-markdown",
+        ),
+        prompts=PromptsConfig(
+            context_prompt="Context {parameters} {documentation}",
+            trend_prompt="Trend {description}",
+        ),
+        adapter=adapter,
+    )
+
+    assert len(adapter.requests) == 2
+    trend_request = adapter.requests[-1]
+    assert trend_request.image_b64 is None
+    assert "| time_step | mean | std | min | max | median |" in trend_request.user_prompt()
+
+
+def test_run_pipeline_stats_image_mode_uses_table_image(tmp_path: Path) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+    adapter = CapturingAdapter()
+
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            skip_summarization=True,
+            evidence_mode="stats-image",
+        ),
+        prompts=PromptsConfig(
+            context_prompt="Context {parameters} {documentation}",
+            trend_prompt="Trend {description}",
+        ),
+        adapter=adapter,
+    )
+
+    assert len(adapter.requests) == 2
+    trend_request = adapter.requests[-1]
+    assert trend_request.image_b64 is not None
+    assert result.stats_image_path is not None
+    assert result.stats_image_path.exists()
+
+
+def test_run_pipeline_plot_plus_stats_uses_plot_image_and_markdown(tmp_path: Path) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+    adapter = CapturingAdapter()
+
+    run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            skip_summarization=True,
+            evidence_mode="plot+stats",
+        ),
+        prompts=PromptsConfig(
+            context_prompt="Context {parameters} {documentation}",
+            trend_prompt="Trend {description}",
+        ),
+        adapter=adapter,
+    )
+
+    trend_request = adapter.requests[-1]
+    assert trend_request.image_b64 is not None
+    assert "| time_step | mean | std | min | max | median |" in trend_request.user_prompt()

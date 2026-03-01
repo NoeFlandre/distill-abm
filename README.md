@@ -34,6 +34,22 @@ uv run distill-abm run \
   --model gpt-4o
 ```
 
+Run evidence ablations for reviewer comparisons:
+
+```bash
+# plot-only (image)
+uv run distill-abm run ... --evidence-mode plot
+
+# stats-only (markdown table in prompt)
+uv run distill-abm run ... --evidence-mode stats-markdown
+
+# stats-only (table image for multimodal input)
+uv run distill-abm run ... --evidence-mode stats-image
+
+# plot + stats (plot image + markdown stats table in prompt)
+uv run distill-abm run ... --evidence-mode "plot+stats"
+```
+
 Run no-summarization baseline (skip BART/BERT summarization and keep direct LLM report text):
 
 ```bash
@@ -41,8 +57,27 @@ uv run distill-abm run \
   --csv-path path/to/reduced.csv \
   --parameters-path path/to/params.txt \
   --documentation-path path/to/docs.txt \
+  --evidence-mode "plot+stats" \
   --skip-summarization
 ```
+
+### Evidence Artifacts and Examples
+
+- Plot artifact example: `results/pipeline/mean-incum.png`
+- Stats image artifact example (`stats-image` mode): `results/pipeline/mean-incum_stats.png`
+- Report artifact: `results/pipeline/report.csv`
+
+Stats markdown table example (used in `stats-markdown` and `plot+stats` modes):
+
+```markdown
+| time_step | mean | std | min | max | median |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 1.5000 | 0.5000 | 1.0000 | 2.0000 | 1.5000 |
+| 1 | 2.5000 | 0.5000 | 2.0000 | 3.0000 | 2.5000 |
+| 2 | 3.5000 | 0.5000 | 3.0000 | 4.0000 | 3.5000 |
+```
+
+The stats table always includes, per time step: `mean`, `std`, `min`, `max`, and `median`.
 
 Run DoE ANOVA analysis:
 

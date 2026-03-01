@@ -20,6 +20,7 @@
 - `distill_abm.pipeline`:
   - end-to-end orchestration from CSV -> plot -> LLM -> (optional BART/BERT summarization) -> scoring
   - no-summarization baseline mode via CLI `--skip-summarization`
+  - evidence ablation modes via CLI `--evidence-mode`: `plot`, `stats-markdown`, `stats-image`, `plot+stats`
 - `distill_abm.legacy`:
   - notebook function loader with source provenance and priority ordering
   - compatibility wrappers preserving notebook-era function names

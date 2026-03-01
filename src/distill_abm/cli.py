@@ -10,7 +10,7 @@ import typer
 from distill_abm.configs.loader import load_abm_config, load_prompts_config
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.llm.factory import create_adapter
-from distill_abm.pipeline.run import PipelineInputs, run_pipeline
+from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, run_pipeline
 
 app = typer.Typer(help="Run ABM distillation workflows without notebooks.")
 
@@ -43,6 +43,10 @@ def run(
     model: Annotated[str, typer.Option()] = "echo-model",
     metric_pattern: Annotated[str, typer.Option()] = "mean",
     metric_description: Annotated[str, typer.Option()] = "simulation trend",
+    evidence_mode: Annotated[
+        EvidenceMode,
+        typer.Option(help="Evidence provided to trend analysis: plot, stats-markdown, stats-image, or plot+stats."),
+    ] = "plot",
     skip_summarization: Annotated[
         bool,
         typer.Option(help="Skip BART/BERT summarization and keep the full LLM report text."),
@@ -65,6 +69,7 @@ def run(
             model=model,
             metric_pattern=metric_pattern,
             metric_description=metric_description,
+            evidence_mode=evidence_mode,
             skip_summarization=skip_summarization,
         ),
         prompts=prompts,
