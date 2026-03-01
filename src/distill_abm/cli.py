@@ -9,6 +9,7 @@ import typer
 
 from distill_abm.configs.loader import load_abm_config, load_prompts_config
 from distill_abm.eval.doe_full import analyze_factorial_anova
+from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
 from distill_abm.llm.factory import create_adapter
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, run_pipeline
 
@@ -91,6 +92,42 @@ def analyze_doe(
     if result is None:
         raise typer.Exit(code=1)
     typer.echo(f"wrote: {output_csv}")
+
+
+@app.command("evaluate-qualitative")
+def evaluate_qualitative(
+    summary_text: Annotated[str, typer.Option(help="Generated summary text to evaluate.")],
+    source_text: Annotated[str, typer.Option(help="Source context text used as qualitative reference.")],
+    metric: Annotated[QualitativeMetric, typer.Option(help="Which qualitative metric to score.")],
+    source_image_path: Annotated[
+        Path | None,
+        typer.Option(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            help="Optional plot or evidence image for vision-capable models.",
+        ),
+    ] = None,
+    prompts_path: Annotated[
+        Path,
+        typer.Option(exists=True),
+    ] = Path("configs/prompts.yaml"),
+    provider: Annotated[str, typer.Option()] = "echo",
+    model: Annotated[str, typer.Option()] = "echo-model",
+) -> None:
+    """Evaluates coverage or faithfulness with an LLM and returns JSON output."""
+    prompts = load_prompts_config(prompts_path)
+    adapter = create_adapter(provider=provider, model=model)
+    result = evaluate_qualitative_score(
+        summary=summary_text,
+        source=source_text,
+        metric=metric,
+        model=model,
+        prompts=prompts,
+        adapter=adapter,
+        source_image_path=source_image_path,
+    )
+    typer.echo(result.model_dump_json())
 
 
 def main() -> None:

@@ -8,6 +8,24 @@ trend_prompt: |
   Describe trends in detail, including key time steps and values.
   Metric description: {description}
   Context: {context}
+coverage_eval_prompt: |
+  Evaluate summary coverage on a 1-5 scale.
+  Source context:
+  {source}
+
+  Summary:
+  {summary}
+
+  Return "Coverage score: <1-5>" and brief reasoning.
+faithfulness_eval_prompt: |
+  Evaluate summary faithfulness on a 1-5 scale.
+  Source context:
+  {source}
+
+  Summary:
+  {summary}
+
+  Return "Faithfulness score: <1-5>" and brief reasoning.
 style_features:
   role: You are an expert in agent-based modeling and statistics.
   insight_mode: Keep interpretation objective and concise.

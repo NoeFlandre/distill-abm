@@ -32,6 +32,21 @@ trend_prompt: "trend {description}"
     assert "{parameters}" in config.context_prompt
 
 
+def test_load_prompts_config_includes_qualitative_templates(tmp_path: Path) -> None:
+    content = """
+context_prompt: "context {parameters} {documentation}"
+trend_prompt: "trend {description}"
+coverage_eval_prompt: "Evaluate coverage from source: {source} summary: {summary}"
+faithfulness_eval_prompt: "Evaluate faithfulness from source: {source} summary: {summary}"
+"""
+    path = tmp_path / "prompts.yaml"
+    path.write_text(content, encoding="utf-8")
+
+    config = load_prompts_config(path)
+    assert "{source}" in config.coverage_eval_prompt
+    assert "{summary}" in config.faithfulness_eval_prompt
+
+
 def test_invalid_yaml_raises_config_error(tmp_path: Path) -> None:
     path = tmp_path / "broken.yaml"
     path.write_text("models:\n  a: [", encoding="utf-8")

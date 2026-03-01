@@ -1,8 +1,11 @@
+import json
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from distill_abm.cli import app
+from distill_abm.llm.adapters.base import LLMAdapter, LLMRequest, LLMResponse
 
 runner = CliRunner()
 
@@ -97,3 +100,58 @@ def test_cli_run_pipeline_stats_markdown_mode(tmp_path: Path) -> None:
 
     assert result.exit_code == 0
     assert (output_dir / "report.csv").exists()
+
+
+class QualFakeAdapter(LLMAdapter):
+    provider = "fake"
+
+    def complete(self, request: LLMRequest) -> LLMResponse:
+        _ = request
+        return LLMResponse(
+            provider="fake",
+            model="fake-model",
+            text="Coverage score: 3. Reasoning: Most core dynamics are represented.",
+            raw={},
+        )
+
+
+def test_cli_evaluate_qualitative_outputs_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    prompts = tmp_path / "prompts.yaml"
+    prompts.write_text(
+        "\n".join(
+            [
+                'context_prompt: "Context {parameters} {documentation}"',
+                'trend_prompt: "Trend {description}"',
+                'coverage_eval_prompt: "Evaluate coverage. Source: {source} Summary: {summary}"',
+                'faithfulness_eval_prompt: "Evaluate faithfulness. Source: {source} Summary: {summary}"',
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr("distill_abm.cli.create_adapter", lambda provider, model: QualFakeAdapter())
+    result = runner.invoke(
+        app,
+        [
+            "evaluate-qualitative",
+            "--summary-text",
+            "This is a generated summary.",
+            "--source-text",
+            "This is source context.",
+            "--metric",
+            "coverage",
+            "--provider",
+            "fake",
+            "--model",
+            "fake-model",
+            "--prompts-path",
+            str(prompts),
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["score"] == 3
+    assert payload["reasoning"].startswith("Coverage score")
+    assert payload["model"] == "fake-model"
