@@ -1,0 +1,37 @@
+{
+  "sliders": [
+    {"name": "init-foragers","min_value": 0.0,"max_value": 100.0,"value": 20},
+    {"name": "processing-cost-males","min_value": 0.0,"max_value": 20.0,"value": 6},
+    {"name": "food-value-males","min_value": 5.0,"max_value": 100.0,"value": 30},
+    {"name": "maximum-lifespan","min_value": 0.0,"max_value": 12000.0,"value": 10220},
+    {"name": "processing-cost-females","min_value": 0.0,"max_value": 20.0,"value": 3},
+    {"name": "food-value-females","min_value": 5.0,"max_value": 100.0,"value": 27},
+    {"name": "init-prey","min_value": 0.0,"max_value": 1000.0,"value": 250},
+    {"name": "internal-mortality","min_value": 0.0,"max_value": 0.2,"value": 0.025},
+    {"name": "age-of-senescence","min_value": 0.0,"max_value": 10000.0,"value": 7300},
+    {"name": "ticks-per-year","min_value": 0.0,"max_value": 720.0,"value": 365},
+    {"name": "animals-gain-from-food","min_value": 0.0,"max_value": 10.0,"value": 1.5},
+    {"name": "animals-starvation-threshold","min_value": 0.0,"max_value": 100.0,"value": 25},
+    {"name": "animals-movement-cost","min_value": 0.0,"max_value": 10.0,"value": 1},
+    {"name": "foragers-movement-cost","min_value": 0.0,"max_value": 10.0,"value": 1},
+    {"name": "grass-proportion","min_value": 0.0,"max_value": 1.0,"value": 0.33},
+    {"name": "external-mortality","min_value": 0.0,"max_value": 0.2,"value": 0.0025},
+    {"name": "birth-spacing","min_value": 0.0,"max_value": 1000.0,"value": 730},
+    {"name": "foraging-radius","min_value": 1.0,"max_value": 100.0,"value": 6},
+    {"name": "food-value-calf","min_value": 0.0,"max_value": 20.0,"value": 3},
+    {"name": "seasonality","min_value": 0.0,"max_value": 1.0,"value": 0.8},
+    {"name": "regrowth-time","min_value": 0.0,"max_value": 365.0,"value": 3}
+  ],
+  "switches": [
+    {"name": "stop-at-max-ticks","true_value": false,"false_value": true,"default_value": true,"value": true},
+    {"name": "stop-at-max-herd-size","true_value": true,"false_value": true,"default_value": true,"value": false},
+    {"name": "grass-growth","true_value": false,"false_value": true,"default_value": true,"value": true},
+    {"name": "keep-initial-grass-pattern","true_value": false,"false_value": true,"default_value": true,"value": true},
+    {"name": "imortal-foragers","true_value": false,"false_value": true,"default_value": true,"value": true},
+    {"name": "food-storage","true_value": false,"false_value": true,"default_value": true,"value": true}
+  ],
+  "monitors": [
+    {"name": "Males","reporter": "length (filter [ ?1 -> ?1 = 1 ] prey-list)","x": 0,"y": 1,"width": 11},
+    {"name": "Females","reporter": "length (filter [ ?1 -> ?1 = 2 ] prey-list)","x": 0,"y": 1,"width": 11}
+  ]
+}

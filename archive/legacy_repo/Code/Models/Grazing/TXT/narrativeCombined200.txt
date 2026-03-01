@@ -1,0 +1,32 @@
+We have 31 parameters:
+  - number-households, from 1.0 to 100.0. We set it to 60.
+  - satisficing-threshold, from 0.0 to 100.0. We set it to 0.
+  - satisficing-trials, from 0.0 to 100.0. We set it to 21.
+  - knowledge-radius, from 0.0 to 5.0. We set it to 1.
+  - resting-threshold, from 0.0 to 1.0. We set it to 0.1.
+  - intrinsic-preference, from 0.0 to 1.0. We set it to 0.
+  - social-susceptibility, from 0.0 to 1.0. We set it to 0.
+  - global-rain?. We set it to True.
+  - start-on-homepatch?. We set it to True.
+  - resting?. We set it to False.
+  - homog-behav-types?. We set it to True.
+  - extension-model?. We set it to True.
+  - SL2-strategy-switch?. We set it to False.
+  - risk-mode?. We set it to True.
+  - behavioral-type. We set it to E-RO.
+  - number-SAT. We set it to 0.
+  - number-E-RO. We set it to 20.
+  - number-TRAD. We set it to 0.
+  - b. We set it to 0.
+  - number-MAX. We set it to 0.
+  - rain-mean. We set it to 200.
+  - risk-att-init. We set it to 0.5.
+  - gr1. We set it to 0.5.
+  - number-E-LBD. We set it to 20.
+  - gr2. We set it to 0.1.
+  - number-E-RO-SL1. We set it to 20.
+  - timesteps. We set it to 100.
+  - w. We set it to 0.8.
+  - number-random. We set it to 0.
+  - livestock-init. We set it to 90.
+  - rain-std. We set it to 100.

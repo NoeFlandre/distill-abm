@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling>=1.24.2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "distill-abm"
+version = "0.1.0"
+description = "Production pipeline for ABM-to-LLM distillation workflows."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.8.2",
+  "pyyaml>=6.0.2",
+  "pandas>=2.2.2",
+  "matplotlib>=3.9.2",
+  "typer>=0.12.3",
+]
+
+[project.optional-dependencies]
+llm = [
+  "openai>=1.40.0",
+  "anthropic>=0.34.0",
+  "ollama>=0.3.3",
+  "requests>=2.32.3",
+]
+metrics = [
+  "nltk>=3.9.1",
+  "rouge-score>=0.1.2",
+  "textstat>=0.7.4",
+]
+dev = [
+  "pytest>=8.3.2",
+  "black>=24.8.0",
+  "ruff>=0.6.9",
+  "mypy>=1.11.2",
+  "nbformat>=5.10.4",
+  "pandas-stubs>=2.2.2.240807",
+  "types-PyYAML>=6.0.12.20240917",
+]
+
+[project.scripts]
+distill-abm = "distill_abm.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/distill_abm"]
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["archive"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "RUF"]
+ignore = ["RUF012"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+filterwarnings = [
+  "ignore:For backward compatibility, 'str' dtypes are included by select_dtypes when 'object' dtype is specified.*",
+  "ignore:is_categorical_dtype is deprecated and will be removed in a future version.*",
+]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+warn_unused_configs = true
+mypy_path = "src"
+packages = ["distill_abm"]
+
+[[tool.mypy.overrides]]
+module = [
+  "anthropic",
+  "nltk.*",
+  "nbformat",
+  "ollama",
+  "openai",
+  "requests",
+  "rouge_score",
+  "textstat",
+  "unidecode",
+]
+ignore_missing_imports = true

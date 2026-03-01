@@ -1,0 +1,17 @@
+name: milk_consumption
+metric_pattern: mean-incum
+metric_description: average weekly whole milk consumption per agent
+plot_descriptions:
+  - average weekly whole milk consumption per agent
+  - average weekly skimmed and semi-skimmed milk consumption per agent
+  - total number of whole milk choices
+  - total number of skimmed or semi-skimmed choices
+  - total milk choices made by all agents
+  - mean whole milk quantity consumed
+  - mean skimmed/semi-skimmed quantity consumed
+  - mean whole-milk habit factor
+  - mean skimmed/semi-skimmed habit factor
+  - mean choice function deviation
+  - mean health value deviation
+  - mean environmental value deviation
+default_input_csv: Code/Models/Milk Consumption/CSV/reducedmilk.csv

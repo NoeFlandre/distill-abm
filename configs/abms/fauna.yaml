@@ -1,0 +1,9 @@
+name: fauna
+metric_pattern: count-species
+metric_description: species abundance dynamics across repeated fauna simulations
+plot_descriptions:
+  - total species abundance over time
+  - predator-prey balance evolution
+  - extinction and recovery phases
+  - variability across runs
+  - stabilization dynamics

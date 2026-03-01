@@ -1,0 +1,178 @@
+%% 
+%% Copyright 2007-2024 Elsevier Ltd
+%% 
+%% This file is part of the 'Elsarticle Bundle'.
+%% ---------------------------------------------
+%% 
+%% It may be distributed under the conditions of the LaTeX Project Public
+%% License, either version 1.3 of this license or (at your option) any
+%% later version.  The latest version of this license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 1999/12/01 or later.
+%% 
+%% The list of all files belonging to the 'Elsarticle Bundle' is
+%% given in the file `manifest.txt'.
+%% 
+%% Template article for Elsevier's document class `elsarticle'
+%% with numbered style bibliographic references
+%% SP 2008/03/01
+%% $Id: elsarticle-template-num.tex 249 2024-04-06 10:51:24Z rishi $
+%%
+\documentclass[preprint,12pt]{elsarticle}
+
+%% Use the option review to obtain double line spacing
+%% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
+
+%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
+%% for a journal layout:
+%% \documentclass[final,1p,times]{elsarticle}
+%% \documentclass[final,1p,times,twocolumn]{elsarticle}
+%% \documentclass[final,3p,times]{elsarticle}
+%% \documentclass[final,3p,times,twocolumn]{elsarticle}
+%% \documentclass[final,5p,times]{elsarticle}
+%% \documentclass[final,5p,times,twocolumn]{elsarticle}
+
+%% For including figures, graphicx.sty has been loaded in
+%% elsarticle.cls. If you prefer to use the old commands
+%% please give \usepackage{epsfig}
+
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+%% The amsmath package provides various useful equation environments.
+\usepackage{amsmath}
+%% The amsthm package provides extended theorem environments
+%% \usepackage{amsthm}
+
+%% The lineno packages adds line numbers. Start line numbering with
+%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+%% for the whole article with \linenumbers.
+%% \usepackage{lineno}
+
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{ragged2e}
+\usepackage[most]{tcolorbox}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\journal{Simulation Modelling Practice and Theory}
+
+\begin{document}
+
+\begin{frontmatter}
+
+%% Title, authors and addresses
+
+%% use the tnoteref command within \title for footnotes;
+%% use the tnotetext command for theassociated footnote;
+%% use the fnref command within \author or \affiliation for footnotes;
+%% use the fntext command for theassociated footnote;
+%% use the corref command within \author for corresponding author footnotes;
+%% use the cortext command for theassociated footnote;
+%% use the ead command for the email address,
+%% and the form \ead[url] for the home page:
+%% \title{Title\tnoteref{label1}}
+%% \tnotetext[label1]{}
+%% \author{Name\corref{cor1}\fnref{label2}}
+ \ead{*pgiabban@odu.edu}
+%% \ead[url]{home page}
+%% \fntext[label2]{}
+%% \cortext[cor1]{}
+%% \affiliation{organization={},
+%%             addressline={},
+%%             city={},
+%%             postcode={},
+%%             state={},
+%%             country={}}
+%% \fntext[label3]{}
+
+\title{Supplementary Material}
+
+\end{frontmatter}
+
+%% Add \usepackage{lineno} before \begin{document} and uncomment 
+%% following line to enable line numbers
+%% \linenumbers
+
+%% main text
+%%
+
+\begin{tcolorbox}[ 
+    breakable, colback=white!95!gray, colframe=black, title=Prompt 1 : \texttt{text} is a feature from the design of experiment. \textit{text} is a part of the prompt changing according to the model and the experiment,  label=box:prompt1]
+\texttt{You are an expert in Consumer Behavior without any statistics background.}\\
+
+Your goal is to explain an agent-based model. Your explanation must include the context of the model, its goals, and key parameters. For each parameter, include the range of values (if provided) and the value that we have set. Do not write any summary or conclusion.\\
+
+\textit{We have 16 parameters:}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textit{memory-lifetime, from $1.0$ to $10.0$. We set it to $5$.}
+    \item \textit{alt-health-mean-initial, from $1.0$ to $3.0$. We set it to $1.69$.}
+    \item \textit{habit-threshold, from $1.0$ to $10.0$. We set it to $2$.}
+    \item \textit{p-interact, from $0.0$ to $1.0$. We set it to $0.3$.}
+    \item \textit{social-susceptibility, from $0.0$ to $1.0$. We set it to $0.2$.}
+    \item \textit{incumbent-initial-habit, from $0.0$ to $10.0$. We set it to $10$.}
+    \item \textit{alt-env-mean-initial, from $0.0$ to $3.0$. We set it to $1.12$.}
+    \item \textit{social-blindness, from $0.0$ to $1.0$. We set it to $0.51$.}
+    \item \textit{justification, from $0.0$ to $1.0$. We set it to $0.61$.}
+    \item \textit{cognitive-dissonance-threshold, from $0.0$ to $1.0$. We set it to $0.15$.}
+    \item \textit{network-parameter, from $2.0$ to $10.0$. We set it to $8$.}
+    \item \textit{number-of-agents. We set it to $1000$.}
+    \item \textit{habit-on?. We set it to \textit{True}.}
+    \item \textit{network-type. We set it to \textit{"watts-strogatz"}.}
+    \item \textit{norms. We set it to \textit{True}.}
+    \item \textit{social-conformity. We set it to $0.28$.}\\
+\end{itemize}
+
+The context and goals of the model are as follows.\\
+
+\textit{The overall objective of the agent-based model is to reproduce adoption behaviours of milk consumption by the British public (1974-2005), by replicating individual preferences and decision factors. Specifically, the goal of the model is to explore the influence of perception, habits and social influence in an individual’s decision-making process of milk choice. The model looks to replicate the substitution of whole milk for skimmed and semi-skimmed milk from the 1970s onwards. The main outcome reported here is the average weekly consumption of each milk type per person. The simulation uses both a theoretical grounding and empirical data to inform the ABM, with calibration performed against observed macro level data.}
+
+\textit{In particular, the study conducts an experiment to compare the performance of two model variants in reproducing overserved milk consumption trends. These variants present different mechanisms for how agents become disposed to consider their choices, representing a threshold based, and a probability-based approach.
+Decision-making follows a basic structure of: agent perception of choice characteristics, the triggering, or not, of disposition to consider alternatives, a set of scored choice functions made up of the perceived characteristics and modulated by habit and social influence, and finally, choice evaluation where agents consider the impact of their choices and may adjust their future decisions.}
+
+\textit{The agents in the model represent adult consumers who occupy a random position in an information environment. Each agent has a disposition to consider alternative milk choices. Two disposition mechanisms are tested in the model, a threshold-based approach, and a probability-based approach. Each agent makes a choice of milk selection based on a function for each alternative, made up of the perceived health and environmental characterises of each choice. These are computed at the initialisation of the simulation and then calculated at each time step. An agent’s milk choice function is modified by habit, social influence, and evaluation of previous choices. Agents ascribe different relative importance to each constituent part of the choice function (health factors and environmental factors). If the disposition requirement has been met, consumption of each milk type is split proportionately by the size of each choice function, modulated by the other influences. If not, agents keep their existing choice.}
+
+\textit{Agents (n=1,000) start with an existing choice based on the dominant position of whole milk versus skimmed varieties in 1974 (start year of the data). All agents are part of a social network. Each agent in the network can sense and be influenced by the choice function of each milk alternative for other agents in their network. Links between agents are unidirectional, and influence occurs as a function of interaction probability, with the degree of influence characterised by agent susceptibility. Social norms are globally perceived by agents and impact the weightings of the choice function
+Setup and Go.}
+
+\textit{Monitors:}
+
+\textit{Two monitors track the number of turtles that have consume mostly whole-milk (incumbent initial choice) or skimmed/semi-skimmed milk (alternative initial choice).}
+
+\textit{Plots:}
+
+\textit{One plot shows the percentage of majority whole milk or skimmed/semi-skimmed milk consumers.}
+
+\textit{The second plots the average consumption of each milk type over time. This is the data that the calibration exercise uses to try and replicate observed consmption data.}
+
+\textit{Parameters:}
+
+\textit{12 paraemters that governs whether an agent will consider changing its milk type, and how much of each milk type an agent will consume. We refer viewers to the manuscript based on this model for further details.
+The appearance of a crossover in the types of milk consumed and the shape of the curves over time.}
+
+\end{tcolorbox}
+
+\newpage
+
+\vspace*{-2cm}
+\begin{tcolorbox}[colback=white!95!gray, colframe=black, title=Prompt 2 : \texttt{text} is a feature from the design of experiment. \textit{text} is a part of the prompt changing according to the model and the experiment,  label=box:prompt2]
+\texttt{You are an expert in Consumer Behavior with a statistics background}\\
+
+We have a plot from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot, mentioning key time steps and values taken by the metric in the plot, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot or any visual in your description. If a plot has very simple dynamics, simply state them without expanding.\\
+
+\texttt{Here is an example of the style of the report: The total number of earthquakes recorded in the region starts at $5,000$ then it declines rapidly over the first $400$ time steps. This initial decline could be attributed to the depletion of immediate stress points within the fault lines, as the most susceptible areas release their pent-up energy early in the simulation. It increases briefly at around $500$ steps, likely due to the aftershocks and secondary stress points being triggered as the system seeks a new equilibrium. The simulation ends with the number of earthquakes near zero, indicating that the majority of the stress has been released and the system has stabilized.\\}
+
+\texttt{The total seismic activity follows the same pattern, starting at $10,000$ events and declining steadily. This steady decline reflects a systematic reduction in seismic energy over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance across simulation runs in the first $100$ steps, but deviations become noticeable afterward. This suggests that while the initial reactions to stress are highly predictable, as time progresses, the system's complexity introduces more variability. This variability could be due to differences in secondary stress points and the non-linear nature of seismic energy release over time}.\\
+
+\texttt{When summarizing trends, provide brief insights about their implications for decision makers.}\\
+
+\textit{The attachment is the plot representing the average weekly consumption of whole milk per agent}
+\end{tcolorbox}
+
+\end{document}
+
+\endinput
+%%
+%% End of file `elsarticle-template-num.tex'.

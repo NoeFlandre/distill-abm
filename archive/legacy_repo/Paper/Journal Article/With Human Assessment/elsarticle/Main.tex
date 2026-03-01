@@ -1,0 +1,818 @@
+%% 
+%% Copyright 2007-2024 Elsevier Ltd
+%% 
+%% This file is part of the 'Elsarticle Bundle'.
+%% ---------------------------------------------
+%% 
+%% It may be distributed under the conditions of the LaTeX Project Public
+%% License, either version 1.3 of this license or (at your option) any
+%% later version.  The latest version of this license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 1999/12/01 or later.
+%% 
+%% The list of all files belonging to the 'Elsarticle Bundle' is
+%% given in the file `manifest.txt'.
+%% 
+%% Template article for Elsevier's document class `elsarticle'
+%% with numbered style bibliographic references
+%% SP 2008/03/01
+%% $Id: elsarticle-template-num.tex 249 2024-04-06 10:51:24Z rishi $
+%%
+\documentclass[preprint,12pt]{elsarticle}
+
+%% Use the option review to obtain double line spacing
+%% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
+
+%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
+%% for a journal layout:
+%% \documentclass[final,1p,times]{elsarticle}
+%% \documentclass[final,1p,times,twocolumn]{elsarticle}
+%% \documentclass[final,3p,times]{elsarticle}
+%% \documentclass[final,3p,times,twocolumn]{elsarticle}
+%% \documentclass[final,5p,times]{elsarticle}
+%% \documentclass[final,5p,times,twocolumn]{elsarticle}
+
+%% For including figures, graphicx.sty has been loaded in
+%% elsarticle.cls. If you prefer to use the old commands
+%% please give \usepackage{epsfig}
+
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+%% The amsmath package provides various useful equation environments.
+\usepackage{amsmath}
+%% The amsthm package provides extended theorem environments
+%% \usepackage{amsthm}
+
+%% The lineno packages adds line numbers. Start line numbering with
+%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+%% for the whole article with \linenumbers.
+%% \usepackage{lineno}
+
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{ragged2e}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+
+
+
+
+\journal{Simulation Modelling Practice and Theory}
+
+\begin{document}
+
+\begin{frontmatter}
+
+%% Title, authors and addresses
+
+%% use the tnoteref command within \title for footnotes;
+%% use the tnotetext command for theassociated footnote;
+%% use the fnref command within \author or \affiliation for footnotes;
+%% use the fntext command for theassociated footnote;
+%% use the corref command within \author for corresponding author footnotes;
+%% use the cortext command for theassociated footnote;
+%% use the ead command for the email address,
+%% and the form \ead[url] for the home page:
+%% \title{Title\tnoteref{label1}}
+%% \tnotetext[label1]{}
+%% \author{Name\corref{cor1}\fnref{label2}}
+ \ead{*pgiabban@odu.edu}
+%% \ead[url]{home page}
+%% \fntext[label2]{}
+%% \cortext[cor1]{}
+%% \affiliation{organization={},
+%%             addressline={},
+%%             city={},
+%%             postcode={},
+%%             state={},
+%%             country={}}
+%% \fntext[label3]{}
+
+\title{Distilling the Complexity of Agent-Based Simulations into Textual Explanations via Large Language Models
+}
+
+%% use optional labels to link authors explicitly to addresses:
+
+\affiliation[label1]{organization={IMT Mines Alès},
+            addressline={6 Avenue de Clavières},
+            city={Alès},
+            postcode={30100},
+            state={Occitanie},
+            country={France}}
+            
+\affiliation[label2]{organization={Old Dominion University},
+            addressline={5115 Hampton Blvd},
+            city={Norfolk},
+            postcode={23529},
+            state={VA},
+            country={USA}}
+
+
+\author{Noé Y. Flandre\textsuperscript{a,b}, Philippe J. Giabbanelli\textsuperscript{b}*}
+
+
+%% Author affiliation
+%\affiliation{organization={ODU \& Software Engineering, Miami University},%Department and Organization
+            %addressline={501 E High St}, 
+           % city={Oxford},
+           % postcode={45056}, 
+           % state={OH},
+           % country={USA}}
+
+%% Abstract
+\begin{abstract}
+Explanatory modeling is essential for transforming complex simulation outcomes into understandable narratives that support decision-making, especially among non-experts. This study addresses the challenge of conveying Agent-Based Model (ABM) simulation outcomes in a comprehensive and accessible manner. Given the scalability issues and complexity of ABM data, we propose a novel approach leveraging Large Language Models (LLMs), specifically GPT-4o and Claude 3.5 Sonnet, to generate clear, unbiased reports. Our methodology involves extracting static and dynamic data from NetLogo simulations, generating context and trend analyses through optimized prompt engineering, and summarizing the results using both extractive and abstractive techniques. We evaluate the generated reports through qualitative and quantitative methods, including human assessments and automated metrics. Our findings demonstrate the potential of LLMs in enhancing the interpretability of ABM outputs, thus aiding policymakers in making informed decisions.
+\end{abstract}
+
+
+%%Graphical abstract
+\begin{graphicalabstract}
+%\includegraphics{grabs}
+\end{graphicalabstract}
+
+%%Research highlights
+\begin{highlights}
+\item \textcolor{violet}{Three to five bullet points, 85 characters max each including spaces}
+
+\item Employed optimized prompt engineering techniques for effective report generation.
+\item Used extractive and abstractive summarization methods to condense explanations.
+\end{highlights}
+
+%% Keywords
+\begin{keyword}
+\textcolor{violet}{1 to 7 keywords} \sep Agent-Based Modeling \sep Claude \sep Decision-Making \sep GPT \sep Large Language Models \sep NetLogo \sep Simulation
+\end{keyword}
+
+\end{frontmatter}
+
+%% Add \usepackage{lineno} before \begin{document} and uncomment 
+%% following line to enable line numbers
+%% \linenumbers
+
+%% main text
+%%
+
+%% Use \section commands to start a section
+\section{Introduction}
+\label{sec1}
+%% Labels are used to cross-reference an item using \ref command.
+
+Explanatory modeling plays a crucial role in interpreting complex simulation outcomes, transforming raw data into understandable narratives that can inform decision-making. This approach is particularly beneficial for policymakers who may not have the technical expertise to interpret raw simulation data directly and therefore might be less able to put the model's insights into practice \cite{Zellner2022}.\\
+
+Agent-based modeling (ABM) simulates interactions of agents to assess their effects on the system as a whole. These models are increasingly used and successful across many domains including ecological and socio-ecological systems \cite{Achter2024} \cite{DeAngelis2019}, sociology \cite{Bianchi2015} or political decision making \cite{Qiu2020}. 
+
+
+ The challenge lies in conveying the simulation outcomes in a manner that is both comprehensive and accessible. Agent-based models are powerful tools for understanding complex systems, but their results can be challenging to communicate due to the difficulties in analyzing and interpreting the multidimensional output data \cite{Lee2015}. This difficulty is exacerbated when trying to communicate findings \cite{An2020}, particularly to non-experts who need to make informed decisions based on these outcomes.\cite{Papadopoulou2018}\\
+
+As the complexity of the simulation increases, so does the amount of data generated, making it harder to distill this information into concise, yet comprehensive insights, requiring always more sophisticated analytical approaches \cite{Lee2015}. Hence, our goal is to generate clear and concise reports from ABM simulations, at a level of readability and details that would be appropriate for non-modeling experts. \cite{Sun2016}.
+
+In this paper, we propose a novel approach to generate reports from ABM simulations. Since Large Language Models (LLMs) have demonstrated significant potential in generating explanations and supporting decision-making in complex domains FIND REFERENCES RELATED TO SIMULATION, we employ this technology to generate clear explanations from ABM's output. \\
+
+The remainder of this paper is organized as follows. In Section \ref{sec2}, we provide background information, including related work on agent-based modeling and explanatory models. In Section \ref{sec3}, we detail our methodology, including the processes of data extraction, report generation, and our evaluation methods, both qualitative and quantitative. Our results are presented in Section \ref{sec4}, followed by a discussion of our findings in Section \ref{sec5}. Finally, we provide concluding remarks in Section \ref{sec6}.
+
+\section{Background}
+\label{sec2}
+
+\subsection{Simulation Outputs of Agent-Based Models}
+
+
+Agent-Based Models (ABMs) generate a significant amount of data by simulating interactions among individual agents within a system. Indeed fields like agent-based traffic simulation are already implementing methods to tackle the large scale simulation and successfully developed solutions used at a production level \cite{Graur2021}. Systems like LAMBDA are already demonstrating the ability to manage and analyze large-scale datasets generated by multi-agent systems, effectively addressing data volume challenges in practical applications \cite{Sun2024}. These interactions result in complex datasets, necessitating the transformation of raw data into comprehensible formats, typically through visualizations or statistical summaries, to support decision-making by non-experts \cite{Lee2015}. This process is essential, as the sheer volume and complexity of the data produced by ABMs can overwhelm users, making it difficult to extract actionable insights directly from the raw outputs \cite{Sun2016}.\\
+
+\subsection{LLMs and Simulation}
+
+Large Language Models (LLMs) have been increasingly used in various simulation tasks, particularly in the development of simulation models using tools such as Netlogo \cite{Frydenlund2024}. These models, such as GPT-4 and Claude 3.5 Sonnet, have demonstrated significant potential in generating explanations and supporting decision-making in complex domains. For instance, they facilitate collaboration between computer scientists and domain experts, enhancing the interpretability and utility of simulation outcomes \cite{Gurcan2024}. LLMs have also been utilized in environmental modeling, providing sophisticated analyses and projections \cite{Kim2024}, and in agent-based simulations to add narrative depth and realism \cite{Aoki2023}.
+
+Recent research by Akhavan and Jalali (2024) provides a systematic approach for integrating generative AI across the simulation research continuum, emphasizing the importance of using these tools to complement rather than replace critical thinking in simulation modeling \cite{Akhavan2024}. Additionally, Ghaffarzadegan et al. (2023) illustrate the potential of Generative Agent-Based Modeling (GABM) in capturing social system dynamics by coupling mechanistic models with LLMs, showcasing how these models can represent human decision-making in social settings \cite{Ghaffarzadegan2023}. Furthermore, Hosseinichimeh et al. (2024) developed the System Dynamics Bot (SD Bot), which uses LLMs to automate the creation of causal loop diagrams from textual data, demonstrating how these models can improve the efficiency of system dynamics modeling \cite{Hosseinichimeh2024}.
+
+Recent research underscores the capability of LLMs to accelerate the development of system dynamics simulations, aiding in tasks such as model creation, error identification, and translation into executable code. For example, GPT-4 has been used to enhance the construction and refinement of system dynamics models, making the process more efficient and reducing human error \cite{duPlooy2023}. These models can process and interpret large datasets, making them suitable for explaining simulation outcomes. Prior research has primarily explored LLMs' capabilities at a conceptual level, highlighting their potential but not fully implementing practical solutions for generating clear and actionable explanations from simulation data \cite{Giabbanelli2024}.
+
+\subsection{Explaining and Summarizing in LLMs}
+
+The task of explaining complex models using LLMs has shown success across various domains. However, the output from LLMs can often be too verbose for practical use, necessitating summarization. Executive summaries typically require concise and focused content yet powerful for the readers to take action \cite{Kho2022}, often coming down to 1 or 2 pages with no more than 1000 words \cite{Brodsky2018}, and this can be achieved through either extractive or abstractive summarization techniques. Extractive summarization selects key sentences from the text, whereas abstractive summarization generates new sentences that convey the core ideas succinctly. Notable models for these tasks include BERT (Bidirectional Encoder Representations from Transformers) \cite{AbdelSalam2022} for extractive summarization and BART (Bidirectional and Auto-Regressive Transformers) for abstractive summarization \cite{Lewis2020}. Both methods aim to distill large volumes of text into more manageable and readable forms, making the information accessible to a broader audience.\\
+
+\subsection{LLMs in Practice : Prompt Engineering and Evaluation}
+
+Effective prompt engineering is critical for leveraging the capabilities of LLMs in generating high-quality explanations \cite{Chen2024}. Rather than relying on random attempts, prompts must be carefully designed to include essential elements such as roles, examples, and insights. This structured approach ensures that the generated content is relevant and informative \cite{White2023}. Evaluating the results produced by LLMs involves both quantitative and qualitative methods. Quantitative analyses often use metrics such as BLEU, METEOR, and ROUGE, which are standard in summarization tasks, to compare the generated content against a ground truth \cite{Papineni2002, Lin2004}. Additionally, readability can be assessed using the Flesch Readability Score \cite{Cooperman2024}. Qualitative evaluation involves human readers who assess the content based on criteria such as faithfulness and coverage. Given the variability among raters, it is crucial to provide training to ensure consistent and reliable evaluations \cite{Naismith2023}.\\ By using the Cohen's Kappa, we can determine whether our raters are reaching an agreement or not and thus let them independently rate our reports. \\
+
+BLEU (Bilingual Evaluation Understudy) measures the precision of n-grams in the generated text compared to a reference text, using a scale from 0 to 1, where higher scores indicate better quality. Prior studies showed performances reaching 24.58\% for this metric on summaries from BART \cite{Myla2024} and 63\% from BERT \cite{Caparros-Laiz2023} . METEOR (Metric for Evaluation of Translation with Explicit ORdering) evaluates translation quality based on precision, recall, and alignment, producing scores ranging from 0 to 1, with higher scores representing better quality. Peers have already obtained  results for this metrics on text summarized using BART (73.72\%) \cite{Myla2024} along with BERT (33\%) \cite{Roy2023}. ROUGE (Recall-Oriented Understudy for Gisting Evaluation) measures recall by comparing the overlap of n-grams between the generated text and reference texts. It includes several variants, such as ROUGE-N (measuring n-gram overlap), ROUGE-L (measuring longest common subsequence), and ROUGE-W (measuring weighted longest common subsequence), with scores typically ranging from 0 to 1, where higher scores indicate better performance. Prior works display results for ROUGE-1 that are approximately of 26.60 for BERT summaries and of 52.53 for BART summaries \cite{Guo2021}, for ROUGE-2 results approach 11.11 for BERT summaries and 21.83 for BART summaries  \cite{Guo2021}, and lastly for ROUGE-L we have 24.29 for BERT and 49.75 for BART  \cite{Guo2021}.   The Flesch Readability Score assesses the ease of reading a text based on sentence length and word syllable count, with scores ranging from 0 to 100. Higher scores indicate easier readability, with 90-100 being easily understandable by an average 11-year-old student, and 0-30 being best understood by university graduates. Previous studies on LLM have shown a Flesch Reading Score between 24.88 and 58.01 \cite{Wang2023}. Cohen's Kappa is a statistical measure used to evaluate inter-rater reliability for qualitative (categorical) items. It accounts for the possibility of the agreement occurring by chance. The Kappa score ranges from -1 to 1, where 1 indicates perfect agreement, 0 indicates no agreement beyond chance, and negative values indicate agreement less than chance. Previous studies claim a kappa between 0.93 \cite{Naismith2023} and 0.48 \cite{Gomez2023}. \\
+
+Qualitative assessment frequently relies on human evaluators, although there is ongoing research attempting to extend this to Large Language Models (LLMs) \cite{Song2024}. When dealing with a large volume of outcomes, it often necessitates the involvement of multiple individuals. Previous studies have established a structured process to ensure consistency and reliability \cite{Naismith2023} : initially, a first batch of outcomes is collaboratively rated to establish a standard. Subsequently, another batch is independently rated by pairs of raters to measure interrater agreement using Cohen's Kappa. Finally, the remaining results are individually rated, assuming a satisfactory level of interrater agreement has been achieved. A common challenge encountered is the high variability in Cohen's Kappa values, indicating inconsistent agreement among raters. To address this, researchers are increasingly defining detailed rubrics to enhance precision and clarity in ratings. Two predominant approaches are often employed: descriptive rubrics \cite{Moore2023}, which provide detailed criteria for each level of performance, and holistic rubrics \cite{Naismith2023}, which offer a single overall score based on a general impression of performance. These rubrics aim to standardize the evaluation process, reduce variability, and ensure more reliable and consistent assessments across different raters.
+
+
+%% Use \subsubsection, \paragraph, \subparagraph commands to 
+%% start 3rd, 4th and 5th level sections.
+%% Refer following link for more details.
+%% https://en.wikibooks.org/wiki/LaTeX/Document_Structure#Sectioning_commands
+
+\section{Methods}
+\label{sec3}
+
+%% Use \subsection commands to start a subsection.
+\subsection{Overview}
+\label{subsec1}
+
+%% Use figure environment to create figures
+%% Refer following link for more details.
+%% https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
+\begin{figure}[h]%% placement specifier
+%% Use \includegraphics command to insert graphic files. Place graphics files in 
+%% working directory.
+\includegraphics[scale=0.39]{Picture 2.png} %% Use \caption command for figure caption and label.
+\caption{Our procedure consists in three main parts. Each part is explained in turn, in a dedicated subsection}\label{fig1}
+%% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
+\label{fig:overview}
+\end{figure}
+
+
+
+
+
+\begin{table}[h!]
+\label{table:libs}
+\noindent % Ensure no indentation
+\begin{tabular}{|>{\RaggedRight\arraybackslash}p{2.3cm}|>{\RaggedRight\arraybackslash}p{5cm}|>{\RaggedRight\arraybackslash}p{4.8cm}|}
+\hline
+\textbf{Parts} & \textbf{Use} & \textbf{Python Library} \\
+\hline
+\multirow{2}{4cm}{\parbox{4cm}{\textbf{Data} \\ \textbf{Extraction}}} & Running the simulation & pynetlogo (0.5.2) \\
+& Extracting the static data & re (2.2.1), json (2.0.9) \\
+\hline
+\multirow{6}{4cm}{\parbox{4cm}{\textbf{Report} \\ \textbf{Generation}}} & Plotting the data & pandas (1.5.3), matplotlib (3.8.3) \\
+& Generating explanations & openai (1.14.3), anthropic (0.29.0) \\
+& Converting image to base64 & base64 (python 3.10.9) \\
+& Combining prompt features & itertools (python 3.10.9) \\
+& Summarizing & transformers (4.41.2) \\
+\hline
+\textbf{Evaluation} & Scoring & nltk (3.7), rouge\_score (0.1.2) \\
+\hline
+\end{tabular}
+\caption{Python Libraries used including their role in our method}
+\end{table}
+
+Our methods are divided into three main parts (Figure \ref{fig:overview}). First, the Agent-Based Model is specified in NetLogo (subsection \ref{subsec2}). Given a set of parameters, we run several simulations to obtain results from the model. We also extract data from the NetLogo file: we parse the documentation, the Graphical User Interface (GUI), and the comments from the code. Then we generate a report using this information (subsection \ref{subsec3}). GPT-4o and Claude 3.5 Sonnet are used to generate both a context and a trend analysis, then a summarization algorithm reduces the number of paragraphs to the length suitable for a report. We optimize the prompt engineering process using a systematic design of experiments to ensure the generated reports are both accurate and informative. Finally we evaluate the report (subsection \ref{subsec4}) by using a qualitative method, and a quantitative method relying on a ground truth for certain metrics. 
+
+
+\subsection{Data Extraction}
+\label{subsec2}
+
+
+Data extraction involved processing NetLogo simulation files. Our research uses three well documented social agent based models from the website Comses.net. These files were categorized into dynamic and static components.\\
+
+The dynamic data consisted in parameters we could modify. Thanks to this part of the file, we were able to run the simulations and retrieve the data using pynetlogo (Table \ref{table:libs}). Therefore, we have set the initial parameters, the metrics to follow throughout the experiment, the halting condition and ran the experiment. For example a parameter could be $number\-of\-agents = 1,000$, a metric could be “mean [incum-quantity] of turtles” and a halting condition could be $max\_ticks =73,000$. This would mean that the experiment starts with $1,000$ agents, for a maximum of $73,000$ ticks during which we will measure the mean quantity of whole milk consumed by agents. All the results were then exported into CSV format for further analysis.\\
+
+From the static data, we extracted the documentation, the GUI (the modifiable elements and their range of values) and the comments from the code using regular expressions (Table \ref{table:libs}). While parsing the documentation, we made sure to not include the default content from Netlogo files that were left unfilled and we also made sure to remove urls as it was subject to hallucinations from the LLMs. From the GUI, we have made sure to only pick relevant information (i.e the minimum and maximum value as well as the value set for the experiment). This content was saved into JSON files and plays an essential role in giving context to the simulation for the following explanations. 
+
+\subsection{Report Generation}
+\label{subsec3}
+
+
+The report was designed to synthetize the extracted data into meaningful explanations. We specifically used GPT-4o and Claude 3.5 Sonnet as they are both ranked 1st and 2nd in the ChatBot Arena \cite{ChatLM2024} (rank on 1st July 2024).\\
+
+The first step was to give context to the simulation. Since the JSON files provide the extracted context  (Section 3.2), we appended this information to the prompt given to the LLM (Prompt \ref{box:prompt1}). We specified to the LLM that the generated paragraph should include the context of the simulation, its goals and the key parameters set for the experiment in a way for the reader to catch the experiment conditions.
+
+The second step was to describe the data from the simulation. To do so, we used the CSV file to plot the different metrics. With the help of GPT-4o and Claude 3.5 Sonnet's vision capabilities, we then gave these plots to the LLM and generated  explanations. We optimized the prompt engineering by using a systematic design of experiments known as $2^k$ factorial design, where $k$ is the number of features considered in the prompt (Prompt \ref{box:prompt2}). That is, we automatically generate a series of prompts and record their effect in order to (i) find the best prompt and (ii) assess which parts of a prompt contribute to its effectiveness. Here, we used $k=3$ features:\\
+
+
+\begin{itemize}
+    \item use of a role (also named a persona) \cite{White2023} \cite{Stahl2024} (example : “You are an expert in Consumer Behavior”)
+    \item an example of expected style, as we already showed that examples in prompts can provide better outcomes in several fields, like causal maps \cite{Giabbanelli202444}  (for instance : “ The total number of earthquakes recorded in the region starts at $5,000$ then it declines rapidly over the first $400$ time steps. This initial decline could be attributed to the depletion of immediate stress points within the fault lines, as the most susceptible areas release their pent-up energy early in the simulation. It increases briefly at around $500$ steps, likely due to the aftershocks and secondary stress points being triggered as the system seeks a new equilibrium. The simulation ends with the number of earthquakes near zero, indicating that the majority of the stress has been released and the system has stabilized.
+
+    The total seismic activity follows the same pattern, starting at $10,000$ events and declining steadily. This steady decline reflects a systematic reduction in seismic energy over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance across simulation runs in the first $100$ steps, but deviations become noticeable afterward. This suggests that while the initial reactions to stress are highly predictable, as time progresses, the system's complexity introduces more variability. This variability could be due to differences in secondary stress points and the non-linear nature of seismic energy release over time.“) 
+    \item “insights” \textcolor{red}{that might need a reference}( “When summarizing trends, provide brief insights about their implications for decision makers.”). 
+\end{itemize}
+
+
+
+
+\begin{tcolorbox}[colback=white!95!gray, colframe=black, title=Prompt 1 : \texttt{text} is a feature from the design of experiment. \textit{text} is a part of the prompt changing according to the model and the experiment. Complete prompts can be found in the supplementary material file. , label=box:prompt1]
+\texttt{Role.}\\
+
+Your goal is to explain an agent-based model. Your explanation must include the context of the model, its goals, and key parameters. For each parameter, include the range of values (if provided) and the value that we have set. Do not write any summary or conclusion.\\
+
+\textit{Parameters}\\
+
+
+The context and goals of the model are as follows. \textit{documentation}
+
+\end{tcolorbox}
+
+
+Once the context and the trend analysis were generated, we needed to remove some unnecessary symbols for the report to only contain relevant information. That’s why we deleted all the “\#” and “ * ” symbols found in the API response due to the Markdown format it uses.\\
+
+In a way to gather all this data into a report, we then used an algorithm to summarize these explanations into $4$ paragraphs. For this we distinguished two types of algorithms either extractive or abstractive. \\
+
+Extractive summarization techniques function by identifying and extracting salient sentences from a source document to generate a concise representation. This approach prioritizes factual content and offers computational efficiency, making it well-suited for summarizing informative texts. In our case we leveraged the BERT \cite{Miller2019}(Bidirectional Encoder Representations from Transformers) algorithm.  \\
+
+In contrast to extractive summarization, abstractive summarization techniques aim to capture the essential meaning of a source document and produce a concise representation using novel phrasings and potentially new sentences. As part of this type of algorithms, we chose to leverage BART \cite{Lewis2020} (Bidirectional and Autoregressive Transformers for Pre-training). \\
+
+Both these methods were giving us a summmary for the context and one for every plot from the trend analysis (i.e between $10$ and $14$ summaries for the trend analysis). To finally get an organized report we had to gather these summaries into paragraphs. This was done by making sure that the context summary would be a paragraph on its own, and that the following summaries would be equally distributed within $3$ paragraphs.\\
+
+Additionally, the summaries from BERT would not always contain a upper case letter at the beginning of each sentence, which then required a post processing algorithm to go through these summaries and replace the lower case letters by upper case ones. Moreover, we found out that some text within the CSV would not be displayed properly on certain devices, which is the reason we ultimately give the CSV as an input to an algorithm removing all the non-unicode characters. Some other post processing modifications were required on the summaries, especially on the one from BERT concerning punctuation, spaces in parenthesis, or hyphens. \\
+
+The final report is the concatenation of the context followed by the data analysis paragraphs, for a total length of 4 paragraphs.\\
+
+\vspace*{-2cm}
+\begin{tcolorbox}[colback=white!95!gray, colframe=black, title=Prompt 2 : \texttt{text} is a feature from the design of experiment. \textit{text} is a part of the prompt changing according to the model and the experiment. Complete prompts can be found in the supplementary material file.,  label=box:prompt2]
+\texttt{Role.}\\
+
+We have a plot from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot, mentioning key time steps and values taken by the metric in the plot, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot or any visual in your description. If a plot has very simple dynamics, simply state them without expanding.\\
+
+\texttt{Example.}\\
+
+\texttt{Insights.}\\
+
+\textit{The attachment is the plot representing the average weekly consumption of whole milk per agent}
+\end{tcolorbox}
+
+
+
+
+\subsection{Evaluation}
+\label{subsec4}
+
+
+Our evaluation method is divided into two procedures. \\
+
+First, using a well known method, human readers perform a qualitative evaluation by ranking the generated reports according to two different criteria (faithfulness, coverage) using the 5-point Likert scale \cite{Fischer2022} \cite{Li2022} \cite{Gatt2018}. Since LLM generations often involve a large amount of output, it is common to manually assess only a random sample of these results. Indeed such sampling techniques are used in several fields when it comes to evaluation, like the performance of LLMs in machine translation, \cite{Hendy2023}, evaluation of LLMs capabilities \cite{openai2024} or even the use of GPT to answer questions about patient data from electronic health records \cite{Vatsal2024}. That is why we asked our raters to independently assess a random sample of \textcolor{violet}{INSERT NUMBER} reports out of $96$. We first taught our raters how to assess reports according to faithfulness and coverage on an unrelated model from our study. We then asked them to independently assess 6 examples from our models and ultimately computed their interrater agreement using the Cohen's Kappa metric \cite{Brake2024}. The results were : \\
+
+\[
+\kappa_{\text{Coverage}} = 1
+\]
+
+\[
+\kappa_{\text{Faithfulness}} = 0.333
+\] \\
+
+After we supervised a meeting with the raters for them to justify their assessment and come to an agreement on a number for the cases they rated differently, several general observations were made. There were discrepancies in the interpretation of metrics, with confusion over specific values and steps, and a lack of precision in describing trends. The raters often disagreed on the scoring, but occasionally reached consensus after discussion. \\ \textcolor{violet}{TO BE CONTINUED}
+
+
+The second part of our evaluation is an automated quantitative process, consisting of two parts. A first set of metrics is using a ground truth reference we wrote based on the simulation data, representing a report we would expect in the best case. The metrics using this reference are BLEU \cite{Zhang2024} \cite{Papineni2002} \cite{Brown2024}, METEOR \cite{Brown2024}, ROUGE-1, ROUGE-2, ROUGE-L \cite{Zhang2024} \cite{Lin2004} \cite{Brown2024}. The second part of our quantitative method does not use a reference; rather, it focuses on the readability of the report and thus evaluates it based on the Flesch Readability Score \cite{Cooperman2024}.
+
+
+
+
+
+
+\section{Results}
+\label{sec4}
+
+\subsection{Quantitative Results}
+
+\subsubsection{Performance of Language Models}
+
+We evaluated the performance of two leading language models, GPT-4o and Claude 3.5 Sonnet, in generating comprehensive and objective explanations from Agent-Based Model (ABM) outputs. The automated metrics used for evaluation include BLEU, METEOR, ROUGE-1, ROUGE-2, ROUGE-L, and Flesch Reading Ease scores. These metrics provide insights into the quality, accuracy, and readability of the generated texts.
+
+\begin{table}[h]
+\centering
+\label{table:llm_comparison}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{LLM}  & \textbf{BLEU} & \textbf{MET} & \textbf{R-1} & \textbf{R-2} & \textbf{R-L} & \textbf{FRE} \\ 
+\hline
+Claude & 0.04259 & 0.23371 & 0.44485 & 0.12047 & 0.18548 & 51.28 \\
+GPT    & 0.04853 & 0.24594 & 0.45972 & 0.12972 & 0.18904 & 46.73 \\
+\hline
+\end{tabular}
+\caption{Comparison of Automated Metrics for Different Language Models}
+\end{table}
+
+The GPT model consistently outperformed the Claude model across all quality and accuracy metrics (Table \ref{table:llm_comparison}) (BLEU, METEOR, ROUGE-1, ROUGE-2, ROUGE-L). However, the text generated by Claude was found to be slightly more readable according to the Flesch Reading Ease score. This indicates that while GPT provides more accurate and comprehensive explanations, Claude may be preferred for simpler, more accessible texts.
+
+\subsubsection{Impact of Experimental Design Factors}
+
+To further understand the influence of different prompt engineering strategies, we evaluated the combined impact of three factors: the use of a role (persona), the inclusion of an example of expected style, and the provision of insights. The results are summarized in the following table.
+
+\begin{table}[h]
+\centering
+\label{table:design_experiment_combined}
+\begin{tabular}{|l|l|l|c|c|c|c|c|c|}
+\hline
+\textbf{Role} & \textbf{Ex} & \textbf{Ins} & \textbf{BLEU} & \textbf{MET} & \textbf{R-1} & \textbf{R-2} & \textbf{R-L} & \textbf{FRE} \\ 
+\hline
+No  & No  & No  & 0.04601 & 0.23648 & 0.44899 & 0.12390 & 0.18723 & 49.26 \\
+No  & No  & Yes & 0.04351 & 0.23871 & 0.45070 & 0.12293 & 0.18674 & 46.86 \\
+No  & Yes & No  & 0.04761 & 0.24094 & 0.45388 & 0.12727 & 0.18778 & 51.16 \\
+No  & Yes & Yes & 0.04511 & 0.24317 & 0.45558 & 0.12630 & 0.18729 & 48.75 \\
+Yes & No  & No  & 0.04601 & 0.23648 & 0.44899 & 0.12390 & 0.18723 & 49.26 \\
+Yes & No  & Yes & 0.04351 & 0.23871 & 0.45070 & 0.12293 & 0.18674 & 46.86 \\
+Yes & Yes & No  & 0.04761 & 0.24094 & 0.45388 & 0.12727 & 0.18778 & 51.16 \\
+Yes & Yes & Yes & 0.04511 & 0.24317 & 0.45558 & 0.12630 & 0.18729 & 48.75 \\
+\hline
+\end{tabular}
+\caption{Comparison of Automated Metrics by Combined Design of Experiment Factors}
+
+\end{table}
+
+The results indicate that including examples and insights generally improves the performance of the language models across most metrics (Table \ref{table:design_experiment_combined}). The role (persona) feature had a less significant impact, suggesting that the clarity and specificity provided by examples and actionable insights are more critical in generating high-quality explanations.
+
+\subsection{Qualitative Results}
+
+
+\section{Discussion}
+\label{sec5}
+
+\subsection{Challenges and Future Directions}
+
+While the integration of LLMs with simulation outputs shows great promise, there are significant challenges to address. These include improving the accuracy and relevance of explanations, handling the variability in input data, and ensuring the interpretability of model outputs while handling LLM's hallucinations. Future research should focus on developing robust frameworks for integrating LLMs with simulation models, enhancing prompt engineering techniques, and establishing standardized evaluation metrics to consistently measure the performance of LLMs in generating explanations. Furthermore, leveraging advances in retrieval-augmented generation and fine-tuning methods could enhance the applicability of LLMs in diverse simulation contexts.
+
+\section{Conclusion}
+\label{sec6}
+
+\newpage
+
+\section{Glossary}
+\label{glossary}
+
+\begin{description}
+    \item[ABM:] Agent-Based Modeling, a discrete simulation technique where individual entities (agents) interact with each other and with their environment.
+    \item[NetLogo:] A simulation environment for agent-based modeling.
+\end{description}
+
+
+
+
+%% For citations use: 
+%%       \cite{<label>} ==> [1]
+
+%%
+
+%% If you have bib database file and want bibtex to generate the
+%% bibitems, please use
+%%
+%%  \bibliographystyle{elsarticle-num} 
+%%  \bibliography{<your bibdatabase>}
+
+%% else use the following coding to input the bibitems directly in the
+%% TeX file.
+
+%% Refer following link for more details about bibliography and citations.
+%% https://en.wikibooks.org/wiki/LaTeX/Bibliography_Management
+
+\begin{thebibliography}{00}
+
+
+\bibitem{Sun2016}
+Zhanli Sun, Iris Lorscheid, James D. Millington, Steffen Lauf, Nicholas R. Magliocca, Jürgen Groeneveld, Stefano Balbi, Henning Nolzen, Birgit Müller, Jule Schulze, Carsten M. Buchmann,
+Simple or complicated agent-based models? A complicated issue,
+Environmental Modelling & Software, Volume 86, Pages 56-67 (2016), Page 60.
+\href{https://doi.org/10.1016/j.envsoft.2016.09.006}{https://doi.org/10.1016/j.envsoft.2016.09.006}
+
+\bibitem{Song2024}
+Yishen Song, Qianta Zhu, Huaibo Wang, and Qinhua Zheng,
+Automated Essay Scoring and Revising Based on Open-Source Large Language Models,
+IEEE Transactions on Learning Technologies, Volume 17, Pages 45-57 (2024), Page 50.
+\href{https://doi.org/10.1109/TLT.2024.3396873}{https://doi.org/10.1109/TLT.2024.3396873}
+
+
+
+\bibitem{Guo2021}
+Y. Guo, W. Qiu, Y. Wang, and T. Cohen,
+Automated Lay Language Summarization of Biomedical Scientific Reviews,
+Proceedings of the Thirty-Fifth AAAI Conference on Artificial Intelligence (AAAI-21), pages 160-168,
+2021.
+\href{https://www.aaai.org/AAAI21Papers/AAAI-7630.GuoY.pdf}{https://www.aaai.org/AAAI21Papers/AAAI-7630.GuoY.pdf}
+
+\bibitem{Caparros-Laiz2023}
+Camilo Caparrós-Laiz, José Antonio García-Díaz, and Rafael Valencia-García,
+Evaluating Extractive Automatic Text Summarization Techniques in Spanish,
+Facultad de Informática, Universidad de Murcia, 30100 Murcia, Spain,
+2023.
+\href{https://doi.org/10.1007/978-3-030-88262-4_6}{https://doi.org/10.1007/978-3-030-88262-4_6}
+
+\bibitem{Hosseinichimeh2024}
+N. Hosseinichimeh, A. Majumdar, R. Williams, and N. Ghaffarzadegan,
+From text to map: a system dynamics bot for constructing causal loop diagrams,
+System Dynamics Review, vol. 40, no. 3, 2024,
+doi: 10.1002/sdr.1782,
+\href{https://onlinelibrary.wiley.com/doi/10.1002/sdr.1782}{https://onlinelibrary.wiley.com/doi/10.1002/sdr.1782}.
+
+
+
+\bibitem{Ghaffarzadegan2023}
+N. Ghaffarzadegan, A. Majumdar, R. Williams, and N. Hosseinichimeh,
+Generative Agent-Based Modeling: Unveiling Social System Dynamics through Coupling Mechanistic Models with Generative Artificial Intelligence,
+arXiv preprint arXiv:2309.11456, 2023,
+doi: 10.48550/arXiv.2309.11456,
+\href{https://arxiv.org/abs/2309.11456}{https://arxiv.org/abs/2309.11456}.
+
+
+\bibitem{Roy2023}
+S. S. Roy and R. E. Mercer,
+Generating Extractive and Abstractive Summaries in Parallel from Scientific Articles Incorporating Citing Statements,
+Proceedings of The 4th New Frontiers in Summarization Workshop, pages 75–86,
+December 6, 2023.
+\href{https://www.aclweb.org/anthology/2023.newsum.1.8}{https://www.aclweb.org/anthology/2023.newsum.1.8}
+
+\bibitem{Aoki2023}
+N. Aoki, N. Mori, and M. Okada,
+"Analysis of LLM-Based Narrative Generation Using the Agent-Based Simulation,"
+in \textit{Proceedings of the 2023 15th International Congress on Advanced Applied Informatics Winter (IIAI-AAI-Winter)}, IEEE, pp. 284-289, 2023.
+\href{https://doi.org/10.1109/IIAI-AAI-WINTER61682.2023.00059}{https://doi.org/10.1109/IIAI-AAI-WINTER61682.2023.00059}
+
+
+\bibitem{Myla2024}
+S. D. Myla, R. Saini, and N. Kapoor,
+Auto Text Summarization in Natural Language Processing: Review,
+Proceedings of the 2nd International Conference on Intelligent Data Communication Technologies and Internet of Things (IDCIoT-2024), pages 1258-1267,
+2024.
+\href{https://doi.org/10.1109/IDCIOT59759.2024.10467376}{https://doi.org/10.1109/IDCIOT59759.2024.10467376}
+
+
+\bibitem{Naismith2023}
+B. Naismith, P. Mulcaire, and J. Burstein,
+Automated Evaluation of Written Discourse Coherence Using GPT-4,
+Proceedings of the 18th Workshop on Innovative Use of NLP for Building Educational Applications (BEA 2023), pages 394–403, 2023,
+\href{https://www.aclweb.org/anthology/2023.bea-1.32.pdf}{https://www.aclweb.org/anthology/2023.bea-1.32.pdf}.
+
+
+\bibitem{Qiu2020}
+L. Qiu and R. Phang,
+Agent-Based Modeling in Political Decision Making,
+Oxford Research Encyclopedia of Politics,
+doi: 10.1093/acrefore/9780190228637.013.913, 2020.
+\href{https://doi.org/10.1093/acrefore/9780190228637.013.913}{https://doi.org/10.1093/acrefore/9780190228637.013.913}
+
+\bibitem{Naismith2023}
+B. Naismith, P. Mulcaire, and J. Burstein,
+Automated Evaluation of Written Discourse Coherence Using GPT-4,
+Proceedings of the 18th Workshop on Innovative Use of NLP for Building Educational Applications (BEA 2023), pages 394-403,
+July 13, 2023.
+\href{https://doi.org/10.48550/arXiv.2303.08774}{https://doi.org/10.48550/arXiv.2303.08774}
+
+
+\bibitem{Papadopoulou2018}
+L. Papadopoulou, K. McEntaggart, J. Etienne, 
+Communicating scientific uncertainty in advice provision to decision-makers: Review of approaches and recommendations for UK Statutory Nature Conservation Bodies,
+JNCC Report No. 617 (2018).
+\href{https://hub.jncc.gov.uk/assets/533a9f57-189b-41b3-872c-424fd8f6ec15}{https://hub.jncc.gov.uk/assets/533a9f57-189b-41b3-872c-424fd8f6ec15}
+
+
+
+\bibitem{Lee2015}
+Ju-Sung Lee, Tatiana Filatova, Arika Ligmann-Zielinska, Behrooz Hassani-Mahmooei, Forrest Stonedahl, Iris Lorscheid, Alexey Voinov, Gary Polhill, Zhanli Sun, Dawn C. Parker,
+The Complexities of Agent-Based Modeling Output Analysis,
+Journal of Artificial Societies and Social Simulation, Vol. 18, Iss. 4, (2015).
+\href{https://doi.org/10.18564/jasss.2897}{https://doi.org/10.18564/jasss.2897}
+
+
+\bibitem{Gomez2023}
+C. Gómez-Rodríguez and P. Williams,
+A Confederacy of Models: A Comprehensive Evaluation of LLMs on Creative Writing,
+arXiv preprint arXiv:2310.08433,
+2023.
+\href{https://doi.org/10.48550/arXiv.2310.08433}{https://doi.org/10.48550/arXiv.2310.08433}
+
+\bibitem{Gurcan2024}
+Ö. Gürcan,
+LLM-Augmented Agent-Based Modelling for Social Simulations: Challenges and Opportunities,
+Proceedings of the HHAI 2024: Hybrid Human AI Systems for the Social Good, pages 134-144,
+2024.
+\href{https://doi.org/10.3233/FAIA240190}{https://doi.org/10.3233/FAIA240190}
+
+
+\bibitem{Giabbanelli2024}
+Philippe J. Giabbanelli, Jose J. Padilla, and Ameeta Agrawal,
+Broadening Access to Simulations for End-Users via Large Language Models: Challenges and Opportunities,
+Proceedings of the 2024 Winter Simulation Conference.
+\href{https://doi.org/10.5281/zenodo.10552705}{https://doi.org/10.5281/zenodo.10552705}
+
+
+\bibitem{Fischer2022}
+Tim Fischer, Steffen Remus, Chris Biemann,
+Measuring Faithfulness of Abstractive Summaries,
+Proceedings of the 18th Conference on Natural Language Processing (KONVENS 2022), Pages 57-73.
+\href{https://aclanthology.org/2022.konvens-1.8.pdf}{https://aclanthology.org/2022.konvens-1.8.pdf}
+
+
+\bibitem{Hendy2023}
+Amr Hendy, Mohamed Abdelrehim, Amr Sharaf, Vikas Raunak, Mohamed Gabr, Hitokazu Matsushita, Young Jin Kim, Mohamed Afify, Hany Hassan Awadalla,
+How Good Are GPT Models at Machine Translation? A Comprehensive Evaluation,
+arXiv preprint arXiv:2302.09210v1 (2023). 
+\href{https://doi.org/10.48550/arXiv.2302.09210}{https://doi.org/10.48550/arXiv.2302.09210}
+
+\bibitem{Kho2022}
+Vallens Kho,
+\textit{McKinsey Executive Summaries: Short but Powerful},
+Writing for University and Beyond: A Journal of First Year Writing at UTM, Volume 2, Issue 1, 2022.
+
+
+
+\bibitem{openai2024}
+OpenAI,
+\textit{GPT-4 Technical Report},
+arXiv preprint arXiv:2303.08774v6, 2024.
+\href{https://arxiv.org/abs/2303.08774v6}{https://arxiv.org/abs/2303.08774v6}
+
+\bibitem{DeAngelis2019}
+D.L. DeAngelis and S.G. Diaz,
+"Decision-making in agent-based modeling: A current review and future prospectus",
+Frontiers in Ecology and Evolution, vol. 6, art. 237, 2019.
+\href{https://doi.org/10.3389/fevo.2018.00237}{https://doi.org/10.3389/fevo.2018.00237}
+
+
+\bibitem{Vatsal2024}
+Shubham Vatsal, Ayush Singh, Shabnam Tafreshi, 
+Can GPT Improve the State of Prior Authorization via Guideline Based Automated Question Answering?,
+arXiv preprint arXiv:2402.18419v1 (2024).
+\href{https://doi.org/10.48550/arXiv.2402.18419}{https://doi.org/10.48550/arXiv.2402.18419}
+
+\bibitem{An2020}
+Li An, Volker Grimm, and Billie L. Turner II,
+Meeting Grand Challenges in Agent-Based Models,
+Journal of Artificial Societies and Social Simulation, 2020.
+\href{https://doi.org/10.18564/jasss.4012}{https://doi.org/10.18564/jasss.4012}
+
+\bibitem{Gatt2018}
+A. Gatt, E. Krahmer,
+Survey of the state of the art in natural language generation: Core tasks, applications and evaluation,
+Journal of Artificial Intelligence Research, 2018.
+\href{https://doi.org/10.1613/jair.6150}{https://doi.org/10.1613/jair.6150}
+
+\bibitem{White2023}
+Jules White, Quchen Fu, Sam Hays, Michael Sandborn, Carlos Olea, Henry Gilbert, Ashraf Elnashar, Jesse Spencer-Smith, Douglas C. Schmidt,
+A Prompt Pattern Catalog to Enhance Prompt Engineering with ChatGPT,
+arXiv preprint arXiv:2302.11382, (2023).
+\href{https://arxiv.org/abs/2302.11382}{https://arxiv.org/abs/2302.11382}
+
+\bibitem{Chen2024}
+B. Chen, Z. Zhang, N. Langrené, and S. Zhu,
+Unleashing the potential of prompt engineering in Large Language Models: a comprehensive review,
+arXiv preprint arXiv:2310.14735, 2024,
+doi: 10.48550/arXiv.2310.14735,
+\href{https://arxiv.org/abs/2310.14735}{https://arxiv.org/abs/2310.14735}.
+
+\bibitem{Akhavan2024}
+A. Akhavan and M. S. Jalali,
+Generative AI and simulation modeling: how should you (not) use large language models like ChatGPT,
+System Dynamics Review, vol. 40, no. 3, 2024,
+doi: 10.1002/sdr.1773,
+\href{https://onlinelibrary.wiley.com/doi/10.1002/sdr.1773}{https://onlinelibrary.wiley.com/doi/10.1002/sdr.1773}.
+
+
+\bibitem{Sun2024}
+M. Sun, R. Han, B. Jiang, H. Qi, D. Sun, Y. Yuan, and J. Huang,
+LAMBDA: A Large Model Based Data Agent,
+arXiv preprint arXiv:2407.17535, 2024,
+doi: 10.48550/arXiv.2407.17535,
+\href{https://arxiv.org/abs/2407.17535}{https://arxiv.org/abs/2407.17535}.
+
+\bibitem{Frydenlund2024}
+E. Frydenlund, J. Martínez, J. J. Padilla, K. Palacio, and D. Shuttleworth,
+Modeler in a box: how can large language models aid in the simulation modeling process?,
+Simulation: Transactions of the Society for Modeling and Simulation International, vol. 100, no. 7, pp. 727-749, 2024,
+doi: 10.1177/00375497241239360,
+\href{https://doi.org/10.1177/00375497241239360}{https://doi.org/10.1177/00375497241239360}.
+
+
+\bibitem{Li2022}
+W. Li, W. Wu, M. Chen, J. Liu, X. Xiao, H. Wu,
+Faithfulness in natural language generation: A systematic survey of analysis, evaluation and optimization methods,
+arXiv preprint arXiv:2203.05227, 2022.
+\href{https://arxiv.org/abs/2203.05227}{https://arxiv.org/abs/2203.05227}
+
+\bibitem{Moore2023}
+Steven Moore, Huy A. Nguyen, Tianying Chen, and John Stamper,
+Assessing the Quality of Multiple-Choice Questions Using GPT-4 and Rule-Based Methods,
+In: Viberg, O., Jivet, I., Muñoz-Merino, P.J., Perifanou, M., Papathoma, T. (eds) Responsive and Sustainable Educational Futures. EC-TEL 2023. Lecture Notes in Computer Science, vol 14200. Springer, Cham. 
+Pages 229-245 (2023), Page 240.
+\href{https://doi.org/10.1007/978-3-031-42682-7_14}{https://doi.org/10.1007/978-3-031-42682-7_14}
+
+\bibitem{Wang2023}
+Zhenhua Wang, Guang Xu, and Ming Ren,
+"LLM-Generated Natural Language Meets Scaling Laws: New Explorations and Data Augmentation Methods,"
+School of Information Resource Management, Renmin University of China, and School of Computing, National University of Singapore,
+Pages 1-18 (2023), Page 7.
+\href{https://arxiv.org/pdf/2407.00322.pdf}{https://arxiv.org/pdf/2407.00322.pdf}
+
+
+\bibitem{Achter2024}
+S. Achter, M. Borit, C. Cottineau, M. Meyer, J. G. Polhill, and V. Radchuk,
+"How to conduct more systematic reviews of agent-based models and foster theory development - Taking stock and looking ahead",
+Environmental Modelling and Software, vol. 173, p. 105867, 2024.
+\href{https://doi.org/10.1016/j.envsoft.2023.105867}{https://doi.org/10.1016/j.envsoft.2023.105867}
+
+
+\bibitem{Miller2019}
+D. Miller,
+Leveraging BERT for extractive text summarization on lectures,
+arXiv preprint arXiv:1906.04165, 2019.
+\href{https://arxiv.org/abs/1906.04165}{https://arxiv.org/abs/1906.04165}
+
+\bibitem{Bianchi2015}
+F. Bianchi and F. Squazzoni,
+Agent-based models in sociology,
+WIREs Computational Statistics 2015.7:284-306,
+doi: 10.1002/wics.1356,
+\href{https://onlinelibrary.wiley.com/doi/10.1002/wics.1356}{https://onlinelibrary.wiley.com/doi/10.1002/wics.1356}.
+
+\bibitem{Brodsky2018}
+Lauren N. Brodsky,
+\textit{How to Write an Executive Summary},
+Harvard Kennedy School Communications Program, 2018.
+\href{https://www.hkscommprog.org}{https://www.hkscommprog.org}
+
+
+\bibitem{Kim2024}
+S. Kim and D. Chang,
+A Framework for Multi-LLM Agent-Based Modeling in Social-Ecological Systems for Environmental Decision-Making through Conversational Experiments,
+Workshop on the Ostrom Workshop – WOW7 Conference, Indiana University, Bloomington, IN, June 19-21, 2024,
+\href{https://dlc.dlib.indiana.edu/dlc/items/09493491-1960-47f7-9667-3817a61f2716}{https://dlc.dlib.indiana.edu/dlc/items/09493491-1960-47f7-9667-3817a61f2716}.
+
+
+\bibitem{Lewis2020}
+M. Lewis, Y. Liu, N. Goyal, M. Ghazvininejad, A. Mohamed, O. Levy, V. Stoyanov, L. Zettlemoyer,
+BART: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension,
+In: Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, 2020, pp. 7871-7880.
+
+\bibitem{Giabbanelli202444}
+P. J. Giabbanelli, N. Witkowicz,
+Generative AI for systems thinking: Can a GPT question-answering system turn text into the causal maps produced by human readers?,
+In: Proceedings of the 57th Hawaii International Conference on System Sciences, 2024, pp. 7540-7549.
+
+\bibitem{Brake2024}
+Nathan Brake and Thomas Schaaf,
+Comparing Two Model Designs for Clinical Note Generation; Is an LLM a Useful Evaluator of Consistency?,
+arXiv preprint arXiv:2404.06503, (2024).
+\href{https://arxiv.org/abs/2404.06503}{https://arxiv.org/abs/2404.06503}
+
+\bibitem{Stahl2024}
+Maja Stahl, Leon Biermann, Andreas Nehring, Henning Wachsmuth,
+Exploring LLM Prompting Strategies for Joint Essay Scoring and Feedback Generation,
+arXiv preprint arXiv:2404.15845, (2024).
+\href{https://arxiv.org/abs/2404.15845}{https://arxiv.org/abs/2404.15845}
+
+
+\bibitem{Zhang2024}
+Xiaoyu Zhang, Yishan Li, Jiayin Wang, Bowen Sun, Weizhi Ma, Peijie Sun, Min Zhang,
+Large Language Models as Evaluators for Recommendation Explanations,
+arXiv preprint arXiv:2404.06503, (2024).
+\href{https://arxiv.org/abs/2404.06503}{https://arxiv.org/abs/2404.06503}
+
+\bibitem{Papineni2002}
+Kishore Papineni, Salim Roukos, Todd Ward, Wei-Jing Zhu,
+BLEU: A Method for Automatic Evaluation of Machine Translation,
+In Proceedings of the 40th Annual Meeting of the Association for Computational Linguistics (ACL 2002), pages 311-318, Philadelphia, USA, (2002).
+\href{https://aclanthology.org/P02-1040}{https://aclanthology.org/P02-1040}
+
+\bibitem{Zellner2022}
+M. L. Zellner, D. Milz, L. Lyons, C. Hoch, J. Radinsky,
+Finding the balance between simplicity and realism in participatory modeling for environmental planning,
+Environmental Modelling & Software 157:105481, (2022).
+\href{https://doi.org/10.1016/j.envsoft.2022.105481}{https://doi.org/10.1016/j.envsoft.2022.105481}
+
+ \bibitem{Graur2021}
+Dan Graur, Rodrigo Bruno, Joschka Bischoff, Marcel Rieser, Wolfgang Scherr, Torsten Hoefler, Gustavo Alonso,
+Hermes: Enabling efficient large-scale simulation in MATSim,
+In Procedia Computer Science, Volume 184, pages 635-641, (2021).
+\href{https://www.sciencedirect.com/science/article/pii/S1877050921007158}{https://www.sciencedirect.com/science/article/pii/S1877050921007158}
+
+
+
+\bibitem{Lin2004}
+Chin-Yew Lin,
+ROUGE: A Package for Automatic Evaluation of Summaries,
+In Proceedings of the 42nd Annual Meeting of the Association for Computational Linguistics (ACL 2004), pages 74-81, Barcelona, Spain, (2004).
+\href{https://aclanthology.org/W04-1013}{https://aclanthology.org/W04-1013}
+
+\bibitem{Brown2024}
+Nik Bear Brown,
+Enhancing Trust in LLMs: Algorithms for Comparing and Interpreting LLMs,
+arXiv preprint arXiv:2406.01943, (2024).
+\href{https://arxiv.org/abs/2406.01943}{https://arxiv.org/abs/2406.01943}
+
+\bibitem{Cooperman2024}
+Steven R. Cooperman, Roberto A. Brandao,
+Investigating the proficiency of an AI tool in summarizing foot and ankle literature: A quantitative, qualitative and accuracy analysis,
+Foot & Ankle Surgery: Techniques, Reports & Cases, Volume 4, Page 100384 (2024).
+\href{https://doi.org/10.1016/j.fastrc.2024.100384}{https://doi.org/10.1016/j.fastrc.2024.100384}
+
+\bibitem{ChatLM2024}
+LMSYS,
+Chat with LLMs,
+(2024).
+\href{https://chat.lmsys.org/?leaderboard}{https://chat.lmsys.org/?leaderboard}
+
+\bibitem{duPlooy2023} C. du Plooy and R. Oosthuizen, AI Usefulness in Systems Modelling and Simulation: GPT-4 Application, South African Journal of Industrial Engineering, vol. 34, no. 3, pp. 286-303, Nov. 2023, doi: 10.7166/34-3-2944, \href{http://dx.doi.org//10.7166/34-3-2944}{http://dx.doi.org//10.7166/34-3-2944}. 
+
+
+\bibitem{AbdelSalam2022}
+S. Abdel-Salam and A. Rafea,
+Performance Study on Extractive Text Summarization Using BERT Models,
+Information, vol. 13, no. 67, 2022,
+doi: 10.3390/info13020067,
+\href{https://doi.org/10.3390/info13020067}{https://doi.org/10.3390/info13020067}.
+
+
+
+\end{thebibliography}
+
+
+\end{document}
+
+\endinput
+%%
+%% End of file `elsarticle-template-num.tex'.

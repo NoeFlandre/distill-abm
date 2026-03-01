@@ -1,0 +1,13 @@
+models:
+  gpt4o:
+    provider: openai
+    model: gpt-4o
+  claude_sonnet:
+    provider: anthropic
+    model: claude-3-sonnet-20240229
+  deepseek_r1:
+    provider: ollama
+    model: deepseek-r1
+  janus_pro:
+    provider: janus
+    model: janus-pro

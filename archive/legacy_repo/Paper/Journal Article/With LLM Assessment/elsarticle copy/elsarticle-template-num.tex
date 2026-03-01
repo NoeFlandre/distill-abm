@@ -1,0 +1,459 @@
+%% 
+%% Copyright 2007-2024 Elsevier Ltd
+%% 
+%% This file is part of the 'Elsarticle Bundle'.
+%% ---------------------------------------------
+%% 
+%% It may be distributed under the conditions of the LaTeX Project Public
+%% License, either version 1.3 of this license or (at your option) any
+%% later version.  The latest version of this license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 1999/12/01 or later.
+%% 
+%% The list of all files belonging to the 'Elsarticle Bundle' is
+%% given in the file `manifest.txt'.
+%% 
+%% Template article for Elsevier's document class `elsarticle'
+%% with numbered style bibliographic references
+%% SP 2008/03/01
+%% $Id: elsarticle-template-num.tex 249 2024-04-06 10:51:24Z rishi $
+%%
+\documentclass[preprint,12pt]{elsarticle}
+
+%% Use the option review to obtain double line spacing
+%% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
+
+%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
+%% for a journal layout:
+%% \documentclass[final,1p,times]{elsarticle}
+%% \documentclass[final,1p,times,twocolumn]{elsarticle}
+%% \documentclass[final,3p,times]{elsarticle}
+%% \documentclass[final,3p,times,twocolumn]{elsarticle}
+%% \documentclass[final,5p,times]{elsarticle}
+%% \documentclass[final,5p,times,twocolumn]{elsarticle}
+
+%% For including figures, graphicx.sty has been loaded in
+%% elsarticle.cls. If you prefer to use the old commands
+%% please give \usepackage{epsfig}
+
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+%% The amsmath package provides various useful equation environments.
+\usepackage{amsmath}
+%% The amsthm package provides extended theorem environments
+%% \usepackage{amsthm}
+
+%% The lineno packages adds line numbers. Start line numbering with
+%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+%% for the whole article with \linenumbers.
+%% \usepackage{lineno}
+
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{ragged2e}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+
+
+
+\journal{Simulation Modelling Practice and Theory}
+
+\begin{document}
+
+\begin{frontmatter}
+
+%% Title, authors and addresses
+
+%% use the tnoteref command within \title for footnotes;
+%% use the tnotetext command for theassociated footnote;
+%% use the fnref command within \author or \affiliation for footnotes;
+%% use the fntext command for theassociated footnote;
+%% use the corref command within \author for corresponding author footnotes;
+%% use the cortext command for theassociated footnote;
+%% use the ead command for the email address,
+%% and the form \ead[url] for the home page:
+%% \title{Title\tnoteref{label1}}
+%% \tnotetext[label1]{}
+%% \author{Name\corref{cor1}\fnref{label2}}
+ \ead{*pgiabban@odu.edu}
+%% \ead[url]{home page}
+%% \fntext[label2]{}
+%% \cortext[cor1]{}
+%% \affiliation{organization={},
+%%             addressline={},
+%%             city={},
+%%             postcode={},
+%%             state={},
+%%             country={}}
+%% \fntext[label3]{}
+
+\title{How to transform simulation outcomes into clear, unbiased explanations that support decision-making activities among non-experts?
+}
+
+%% use optional labels to link authors explicitly to addresses:
+
+\affiliation[label1]{organization={IMT Mines Alès},
+            addressline={6 Avenue de Clavières},
+            city={Alès},
+            postcode={30100},
+            state={Occitanie},
+            country={France}}
+            
+\affiliation[label2]{organization={Old Dominion University},
+            addressline={5115 Hampton Blvd},
+            city={Norfolk},
+            postcode={23529},
+            state={VA},
+            country={USA}}
+
+
+\author{Noé Y. Flandre\textsuperscript{a,b}, Philippe J. Giabbanelli\textsuperscript{b}*}
+
+
+%% Author affiliation
+%\affiliation{organization={ODU \& Software Engineering, Miami University},%Department and Organization
+            %addressline={501 E High St}, 
+           % city={Oxford},
+           % postcode={45056}, 
+           % state={OH},
+           % country={USA}}
+
+%% Abstract
+\begin{abstract}
+%% Text of abstract
+Abstract text.
+\end{abstract}
+
+%%Graphical abstract
+\begin{graphicalabstract}
+%\includegraphics{grabs}
+\end{graphicalabstract}
+
+%%Research highlights
+\begin{highlights}
+\item \textcolor{violet}{Highlights should consist of 3 to 5 bullet points, each a maximum of 85 characters, including spaces.}
+\item Research highlight 1
+\item Research highlight 2
+\end{highlights}
+
+%% Keywords
+\begin{keyword}
+\textcolor{violet}{1 to 7 keywords} \sep Agent-Based Modeling \sep Large Language Models \sep Simulation  \sep NetLogo \sep Decision-Making
+\end{keyword}
+\end{frontmatter}
+
+%% Add \usepackage{lineno} before \begin{document} and uncomment 
+%% following line to enable line numbers
+%% \linenumbers
+
+%% main text
+%%
+
+%% Use \section commands to start a section
+\section{Introduction}
+\label{sec1}
+%% Labels are used to cross-reference an item using \ref command.
+
+Explanatory modeling plays a crucial role in interpreting complex simulation outcomes, transforming raw data into understandable narratives that can inform decision-making. This approach is particularly beneficial for policymakers who may not have the technical expertise to interpret raw simulation data directly.\\
+
+In the context of agent-based modeling (ABM), which simulates interactions of agents to assess their effects on the system as a whole, the challenge lies in conveying the simulation outcomes in a manner that is both comprehensive and accessible. Agent-based models are powerful tools for understanding complex systems, but the results they generate can be difficult to communicate \cite{Sun2016}. This difficulty is exacerbated when trying to communicate findings to non-experts who need to make informed decisions based on these outcomes.\\
+
+One of the primary issues with explanatory models derived from ABM results is scalability \cite{Bosmans2021}. As the complexity of the simulation increases, so does the amount of data generated, making it harder to distill this information into concise, yet comprehensive insights, requiring always more sophisticated analytical approaches \cite{Lee2015}. Hence, our goal is to generate clear and concise reports from ABM simulations that are easily interpretable by non-experts, as they are more convincing to practitioners \cite{Sun2016}. It is important to note that some authors already worked on creating narratives from ABMs outcomes, especially in a way to promote empathy among decision makers \cite{Anonymized2024}. However these endeavors primarily focused on crafting first-person journey narratives, frequently employing a richly literary style. \\
+
+In this paper, we propose a novel approach to generate reports from ABM simulations. Since Large Language Models (LLMs) have demonstrated significant potential in generating explanations and supporting decision-making in complex domains such as healthcare \cite{Umerenkov2023} \cite{McLean2024} or democratic processes \cite{Yang2024}, we employ this technology, specifically GPT-4o and Claude 3.5 Sonnet, to generate comprehensive, clear and objective explanations from ABM's output.\\
+
+The remainder of this paper is organized as follows. In Section \ref{sec2}, we provide the background information, including related work on agent-based modeling and explanatory models. In Section \ref{sec3}, we detail our methodology, including the processes of data extraction, report generation, and our evaluation methods, both qualitative and quantitative. Our results are presented in Section \ref{sec4}, followed by a discussion of our findings in Section \ref{sec5}. Finally, we provide concluding remarks in Section \ref{sec6}.
+
+\section{Background}
+\label{sec2}
+
+
+%% Use \subsubsection, \paragraph, \subparagraph commands to 
+%% start 3rd, 4th and 5th level sections.
+%% Refer following link for more details.
+%% https://en.wikibooks.org/wiki/LaTeX/Document_Structure#Sectioning_commands
+
+\section{Methods}
+\label{sec3}
+
+%% Use \subsection commands to start a subsection.
+\subsection{Overview}
+\label{subsec1}
+
+%% Use figure environment to create figures
+%% Refer following link for more details.
+%% https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
+\begin{figure}[h]%% placement specifier
+%% Use \includegraphics command to insert graphic files. Place graphics files in 
+%% working directory.
+\includegraphics[scale=0.85]{Picture 1.png} %% Use \caption command for figure caption and label.
+\caption{Our procedure consists in three main parts. Each part is explained in turn, in a dedicated subsection}\label{fig1}
+%% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
+\label{fig:overview}
+\end{figure}
+
+
+\begin{table}[h!]
+\label{table:libs}
+\noindent % Ensure no indentation
+\begin{tabular}{|>{\RaggedRight\arraybackslash}p{2.3cm}|>{\RaggedRight\arraybackslash}p{5cm}|>{\RaggedRight\arraybackslash}p{4.8cm}|}
+\hline
+\textbf{Parts} & \textbf{Use} & \textbf{Python Library} \\
+\hline
+\multirow{2}{4cm}{\parbox{4cm}{\textbf{Data} \\ \textbf{Extraction}}} & Running the simulation & pynetlogo (0.5.2) \\
+& Extracting the static data & re (2.2.1), json (2.0.9) \\
+\hline
+\multirow{6}{4cm}{\parbox{4cm}{\textbf{Report} \\ \textbf{Generation}}} & Plotting the data & pandas (1.5.3), matplotlib (3.8.3) \\
+& Generating explanations & openai (1.14.3), anthropic (0.29.0) \\
+& Converting image to base64 & base64 (python 3.10.9) \\
+& Combining prompt features & itertools (python 3.10.9) \\
+& Summarizing & transformers (4.41.2) \\
+\hline
+\textbf{Evaluation} & Scoring & nltk (3.7), rouge\_score (0.1.2) \\
+\hline
+\end{tabular}
+\caption{Python Libraries used including their role in our method}
+\end{table}
+
+Our methods are divided into three main parts (Figure \ref{fig:overview}). First, the Agent-Based Model is specified in NetLogo (subsection \ref{subsec2}). Given a set of parameters, we run several simulations to obtain results from the model. We also extract data from the NetLogo file: we parse the documentation, the Graphical User Interface (GUI), and the comments from the code. Then we generate a report using this information (subsection \ref{subsec3}). GPT-4o and Claude 3.5 Sonnet are used to generate both a context and a trend analysis, then a summarization algorithm reduces the number of paragraphs to the length suitable for a report. We optimize the prompt engineering process using a systematic design of experiments to ensure the generated reports are both accurate and informative. Finally we evaluate the report (subsection \ref{subsec4}) by using a qualitative method, and a quantitative method relying on a ground truth for certain metrics. 
+
+
+\subsection{Data Extraction}
+\label{subsec2}
+
+
+Data extraction involved processing NetLogo simulation files. Our research uses three well documented social agent based models from the website Comses.net. These files were categorized into dynamic and static components.\\
+
+The dynamic data consisted in parameters we could modify. Thanks to this part of the file, we were able to run the simulations and retrieve the data using pynetlogo (Table \ref{table:libs}). Therefore, we have set the initial parameters, the metrics to follow throughout the experiment, the halting condition and ran the experiment. For example a parameter could be $number\-of\-agents = 1,000$, a metric could be “mean [incum-quantity] of turtles” and a halting condition could be $max\_ticks =73,000$. This would mean that the experiment starts with $1,000$ agents, for a maximum of $73,000$ ticks during which we will measure the mean quantity of whole milk consumed by agents. All the results were then exported into CSV format for further analysis.\\
+
+From the static data, we extracted the documentation, the GUI (the modifiable elements and their range of values) and the comments from the code using regular expressions. While parsing the documentation, we made sure to not include the default content from Netlogo files that were left unfilled and we also made sure to remove urls. From the GUI, we have made sure to only pick relevant information (i.e the minimum and maximum value as well as the value set for the experiment). This content was saved into JSON files and plays an essential role in giving context to the simulation for the following explanations. 
+
+\subsection{Report Generation}
+\label{subsec3}
+
+
+The report was designed to synthetize the extracted data into meaningful explanations.\\
+
+The first step was to give context to the simulation. Since the JSON files provide the extracted context  (Section 3.2), we appended this information to the prompt given to the LLM (Prompt \ref{box:prompt1}). We specified to the LLM that the generated paragraph should include the context of the simulation, its goals and the key parameters set for the experiment in a way for the reader to catch the experiment conditions.
+
+The second step was to describe the data from the simulation. To do so, we used the CSV file to plot the different metrics. With the help of GPT-4o and Claude 3.5 Sonnet's vision capabilities, we then gave these plots to the LLM and generated  explanations. We optimized the prompt engineering by using a systematic design of experiments known as $2^k$ factorial design, where $k$ is the number of features considered in the prompt (Prompt \ref{box:prompt2}). That is, we automatically generate a series of prompts and record their effect in order to (i) find the best prompt and (ii) assess which parts of a prompt contribute to its effectiveness. Here, we used $k=3$ features:\\
+
+
+\begin{itemize}
+    \item use of a role ( example : “You are an expert in Consumer Behavior”)
+    \item an example of expected style ( for instance : “ The total number of earthquakes recorded in the region starts at $5,000$ then it declines rapidly over the first $400$ time steps. This initial decline could be attributed to the depletion of immediate stress points within the fault lines, as the most susceptible areas release their pent-up energy early in the simulation. It increases briefly at around $500$ steps, likely due to the aftershocks and secondary stress points being triggered as the system seeks a new equilibrium. The simulation ends with the number of earthquakes near zero, indicating that the majority of the stress has been released and the system has stabilized.
+
+    The total seismic activity follows the same pattern, starting at $10,000$ events and declining steadily. This steady decline reflects a systematic reduction in seismic energy over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance across simulation runs in the first $100$ steps, but deviations become noticeable afterward. This suggests that while the initial reactions to stress are highly predictable, as time progresses, the system's complexity introduces more variability. This variability could be due to differences in secondary stress points and the non-linear nature of seismic energy release over time.“) 
+    \item “insights” ( “When summarizing trends, provide brief insights about their implications for decision makers.”). 
+\end{itemize}
+
+
+
+
+\begin{tcolorbox}[colback=white!95!gray, colframe=black, title=Prompt 1 : \textcolor{red}{text} is a feature from the design of experiment. \textit{text} is a part of the prompt changing according to the model and the experiment,  label=box:prompt1]
+\textcolor{red}{You are an expert in Consumer Behavior without any statistics background.}\\
+
+Your goal is to explain an agent-based model. Your explanation must include the context of the model, its goals, and key parameters. For each parameter, include the range of values (if provided) and the value that we have set. Do not write any summary or conclusion.\\
+
+\textit{We have 16 parameters:}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textit{memory-lifetime, from $1.0$ to $10.0$. We set it to $5$.}
+    \item \textit{alt-health-mean-initial, from $1.0$ to $3.0$. We set it to $1.69$.}
+    \item \textit{habit-threshold, from $1.0$ to $10.0$. We set it to $2$.}
+    \item \textit{p-interact, from $0.0$ to $1.0$. We set it to $0.3$.}
+    \item \textit{social-susceptibility, from $0.0$ to $1.0$. We set it to $0.2$.}
+    \item \textit{incumbent-initial-habit, from $0.0$ to $10.0$. We set it to $10$.}
+    \item \textit{alt-env-mean-initial, from $0.0$ to $3.0$. We set it to $1.12$.}
+    \item \textit{social-blindness, from $0.0$ to $1.0$. We set it to $0.51$.}
+    \item \textit{justification, from $0.0$ to $1.0$. We set it to $0.61$.}
+    \item \textit{cognitive-dissonance-threshold, from $0.0$ to $1.0$. We set it to $0.15$.}
+    \item \textit{network-parameter, from $2.0$ to $10.0$. We set it to $8$.}
+    \item \textit{number-of-agents. We set it to $1000$.}
+    \item \textit{habit-on?. We set it to \textit{True}.}
+    \item \textit{network-type. We set it to \textit{"watts-strogatz"}.}
+    \item \textit{norms. We set it to \textit{True}.}
+    \item \textit{social-conformity. We set it to $0.28$.}\\
+\end{itemize}
+
+The context and goals of the model are as follows. \textit{documentation}
+
+\end{tcolorbox}
+
+
+Once the context and the trend analysis were generated, we needed to remove some unnecessary symbols for the report to only contain relevant information. That’s why we deleted all the “\#” and “ * ” symbols found in the API response due to the Markdown format it uses.\\
+
+In a way to gather all this data into a report, we then used an algorithm to summarize these explanations into $3$ paragraphs. For this we distinguished two types of algorithms either extractive or abstractive. \\
+
+Extractive summarization techniques function by identifying and extracting salient sentences from a source document to generate a concise representation. This approach prioritizes factual content and offers computational efficiency, making it well-suited for summarizing informative texts. In our case we leveraged the BERT (Bidirectional Encoder Representations from Transformers) algorithm.  \\
+
+In contrast to extractive summarization, abstractive summarization techniques aim to capture the essential meaning of a source document and produce a concise representation using novel phrasings and potentially new sentences. As part of this type of algorithms, we chose to leverage BART (Bidirectional and Autoregressive Transformers for Pre-training). \\
+
+Both these methods were giving us a summmary for the context and one for every plot from the trend analysis (i.e between $10$ and $14$ summaries for the trend analysis). To finally get an organized report we had to gather these summaries into paragraphs. This was done by making sure that the context summary would be a paragraph on its own, and that the following summaries would be equally distributed within $3$ paragraphs.\\
+
+Additionally, the summaries from BERT would not always contain a upper case letter at the beginning of each sentence, which then required a post processing algorithm to go through these summaries and replace the lower case letters by upper case ones. Moreover, we found out that some text within the CSV would not be displayed properly on certain devices, which is the reason we ultimately give the CSV as an input to an algorithm removing all the non-unicode characters. Some other post processing modifications were required on the summaries, especially on the one from BERT concerning punctuation, spaces in parenthesis, or hyphens. \\
+
+The final report is the concatenation of the context followed by the data analysis paragraphs, for a total length of 4 paragraphs.\\
+
+\vspace*{-2cm}
+\begin{tcolorbox}[colback=white!95!gray, colframe=black, title=Prompt 2 : \textcolor{red}{text} is a feature from the design of experiment. \textit{text} is a part of the prompt changing according to the model and the experiment,  label=box:prompt2]
+\textcolor{red}{You are an expert in Consumer Behavior with a statistics background}\\
+
+We have a plot from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot, mentioning key time steps and values taken by the metric in the plot, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot or any visual in your description. If a plot has very simple dynamics, simply state them without expanding.\\
+
+\textcolor{red}{Here is an example of the style of the report: “ The total number of earthquakes recorded in the region starts at $5,000$ then it declines rapidly over the first $400$ time steps. This initial decline could be attributed to the depletion of immediate stress points within the fault lines, as the most susceptible areas release their pent-up energy early in the simulation. It increases briefly at around $500$ steps, likely due to the aftershocks and secondary stress points being triggered as the system seeks a new equilibrium. The simulation ends with the number of earthquakes near zero, indicating that the majority of the stress has been released and the system has stabilized.\\}
+
+\textcolor{red}{The total seismic activity follows the same pattern, starting at $10,000$ events and declining steadily. This steady decline reflects a systematic reduction in seismic energy over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance across simulation runs in the first $100$ steps, but deviations become noticeable afterward. This suggests that while the initial reactions to stress are highly predictable, as time progresses, the system's complexity introduces more variability. This variability could be due to differences in secondary stress points and the non-linear nature of seismic energy release over time.”}.\\
+
+\textcolor{red}{When summarizing trends, provide brief insights about their implications for decision makers.}\\
+
+\textit{The attachment is the plot representing the average weekly consumption of whole milk per agent}
+
+
+\end{tcolorbox}
+
+
+
+
+\subsection{Evaluation}
+\label{subsec4}
+
+
+Our evaluation method is divided into two procedures. \\
+
+First, using a well known method, human readers perform a qualitative evaluation by ranking the generated reports according to two different criteria (faithfulness, coverage) using the 5-point Likert scale \cite{Fischer2022}. Since LLM generations often involve a large amount of output, it is common to manually assess only a random sample of these results. Indeed such sampling techniques are used in several fields when it comes to evaluation, like the performance of LLMs in machine translation, \cite{Hendy2023}, evaluation of LLMs capabilities \cite{openai2024} or even the use of GPT to answer questions about patient data from electronic health records \cite{Vatsal2024}. That is why we asked our raters to independently assess a random sample of \textcolor{red}{INSERT NUMBER} reports out of $96$.  \\
+
+
+The second part of our evaluation is an automated quantitative process, consisting of two parts. A first set of metrics is using a ground truth reference we wrote based on the simulation data, representing a report we would expect in the best case. The metrics using this reference are BLEU, METEOR, ROUGE-1, ROUGE-2, ROUGE-L. The second part of our quantitative method does not use a reference; rather, it focuses on the readability of the report and thus evaluates it based on the Flesch Readability Score.
+
+
+
+
+
+
+\section{Results}
+\label{sec4}
+
+
+\section{Discussion}
+\label{sec5}
+
+\section{Conclusion}
+\label{sec6}
+
+\newpage
+
+\section{Glossary}
+\label{glossary}
+
+\begin{description}
+    \item[ABM:] Agent-Based Modeling, a discrete simulation technique where individual entities (agents) interact with each other and with their environment.
+    \item[NetLogo:] A simulation environment for agent-based modeling.
+\end{description}
+
+
+
+
+%% For citations use: 
+%%       \cite{<label>} ==> [1]
+
+%%
+
+%% If you have bib database file and want bibtex to generate the
+%% bibitems, please use
+%%
+%%  \bibliographystyle{elsarticle-num} 
+%%  \bibliography{<your bibdatabase>}
+
+%% else use the following coding to input the bibitems directly in the
+%% TeX file.
+
+%% Refer following link for more details about bibliography and citations.
+%% https://en.wikibooks.org/wiki/LaTeX/Bibliography_Management
+
+\begin{thebibliography}{00}
+
+
+\bibitem{Sun2016}
+Zhanli Sun, Iris Lorscheid, James D. Millington, Steffen Lauf, Nicholas R. Magliocca, Jürgen Groeneveld, Stefano Balbi, Henning Nolzen, Birgit Müller, Jule Schulze, Carsten M. Buchmann,
+Simple or complicated agent-based models? A complicated issue,
+Environmental Modelling & Software, Volume 86, Pages 56-67 (2016), Page 60.
+\href{https://doi.org/10.1016/j.envsoft.2016.09.006}{https://doi.org/10.1016/j.envsoft.2016.09.006}
+
+
+\bibitem{Bosmans2021}
+Stig Bosmans, Improving Scalability of Large Scale Agent-Based Simulations, PhD Thesis, University of Antwerp, (2021).
+\href{https://hdl.handle.net/10067/1847140151162165141}{https://hdl.handle.net/10067/1847140151162165141}
+
+\bibitem{Lee2015}
+Ju-Sung Lee, Tatiana Filatova, Arika Ligmann-Zielinska, Behrooz Hassani-Mahmooei, Forrest Stonedahl, Iris Lorscheid, Alexey Voinov, Gary Polhill, Zhanli Sun, Dawn C. Parker,
+The Complexities of Agent-Based Modeling Output Analysis,
+Journal of Artificial Societies and Social Simulation, Vol. 18, Iss. 4, (2015).
+\href{https://doi.org/10.18564/jasss.2897}{https://doi.org/10.18564/jasss.2897}
+
+\bibitem{Anonymized2024}
+Anonymized,
+Promoting Empathy in Decision-Making by Turning Agent-Based Models into Stories Using Large Language Models,
+Simulation, 2024.
+\href{https://doi.org/10.5281/zenodo.10552705}{https://doi.org/10.5281/zenodo.10552705}
+
+
+
+\bibitem{Umerenkov2023}
+D. Umerenkov, G. Zubkova, A. Nesterov,
+Deciphering Diagnoses: How Large Language Models Explanations Influence Clinical Decision Making,
+arXiv preprint arXiv:2310.01708v1 (2023).
+\href{https://doi.org/10.48550/arXiv.2310.01708}{https://doi.org/10.48550/arXiv.2310.01708}
+
+\bibitem{McLean2024}
+Aaron Lawson McLean, Yonghui Wu, Anna C. Lawson McLean, Vagelis Hristidis,
+"Large language models as decision aids in neuro-oncology: a review of shared decision-making applications",
+Journal of Cancer Research and Clinical Oncology, vol. 150, pp. 139-152, 2024.
+\href{https://doi.org/10.1007/s00432-024-05673-x}{https://doi.org/10.1007/s00432-024-05673-x}.
+
+\bibitem{Yang2024}
+Joshua C. Yang, Damian Dailisan, Marcin Korecki, Carina I. Hausladen, Dirk Helbing, 
+LLM Voting: Human Choices and AI Collective Decision-Making,
+arXiv preprint arXiv:2402.01766v2 (2024).
+\href{https://arxiv.org/abs/2402.01766v2}{https://arxiv.org/abs/2402.01766v2}
+
+\bibitem{Fischer2022}
+Tim Fischer, Steffen Remus, Chris Biemann,
+Measuring Faithfulness of Abstractive Summaries,
+Proceedings of the 18th Conference on Natural Language Processing (KONVENS 2022), Pages 57-73.
+\href{https://konvens.org/proceedings/2022/2022.konvens-1.8.pdf}{https://konvens.org/proceedings/2022/2022.konvens-1.8.pdf}
+
+
+\bibitem{Hendy2023}
+Amr Hendy, Mohamed Abdelrehim, Amr Sharaf, Vikas Raunak, Mohamed Gabr, Hitokazu Matsushita, Young Jin Kim, Mohamed Afify, Hany Hassan Awadalla,
+How Good Are GPT Models at Machine Translation? A Comprehensive Evaluation,
+arXiv preprint arXiv:2302.09210v1 (2023). 
+\href{https://doi.org/10.48550/arXiv.2302.09210}{https://doi.org/10.48550/arXiv.2302.09210}
+
+
+\bibitem{openai2024}
+OpenAI,
+\textit{GPT-4 Technical Report},
+arXiv preprint arXiv:2303.08774v6, 2024.
+\href{https://arxiv.org/abs/2303.08774v6}{https://arxiv.org/abs/2303.08774v6}
+
+\bibitem{Vatsal2024}
+Shubham Vatsal, Ayush Singh, Shabnam Tafreshi, 
+Can GPT Improve the State of Prior Authorization via Guideline Based Automated Question Answering?,
+arXiv preprint arXiv:2402.18419v1 (2024).
+\href{https://doi.org/10.48550/arXiv.2402.18419}{https://doi.org/10.48550/arXiv.2402.18419}
+
+
+
+
+\end{thebibliography}
+
+
+\end{document}
+
+\endinput
+%%
+%% End of file `elsarticle-template-num.tex'.

@@ -1,0 +1,13 @@
+context_prompt: |
+  Your goal is to explain an agent-based model.
+  Include model context, goals, and parameter settings.
+  Parameters: {parameters}
+  Documentation: {documentation}
+trend_prompt: |
+  We have a plot from repeated simulations of an agent-based model.
+  Describe trends in detail, including key time steps and values.
+  Metric description: {description}
+  Context: {context}
+style_features:
+  role: You are an expert in agent-based modeling and statistics.
+  insight_mode: Keep interpretation objective and concise.

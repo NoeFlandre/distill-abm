@@ -1,0 +1,40 @@
+from pathlib import Path
+
+import pytest
+
+from distill_abm.configs.loader import ConfigError, load_models_config, load_prompts_config
+
+
+def test_load_models_config(tmp_path: Path) -> None:
+    content = """
+models:
+  openai:
+    provider: openai
+    model: gpt-4o
+"""
+    path = tmp_path / "models.yaml"
+    path.write_text(content, encoding="utf-8")
+
+    config = load_models_config(path)
+    assert config.models["openai"].provider == "openai"
+    assert config.models["openai"].model == "gpt-4o"
+
+
+def test_load_prompts_config(tmp_path: Path) -> None:
+    content = """
+context_prompt: "context {parameters} {documentation}"
+trend_prompt: "trend {description}"
+"""
+    path = tmp_path / "prompts.yaml"
+    path.write_text(content, encoding="utf-8")
+
+    config = load_prompts_config(path)
+    assert "{parameters}" in config.context_prompt
+
+
+def test_invalid_yaml_raises_config_error(tmp_path: Path) -> None:
+    path = tmp_path / "broken.yaml"
+    path.write_text("models:\n  a: [", encoding="utf-8")
+
+    with pytest.raises(ConfigError):
+        load_models_config(path)
