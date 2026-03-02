@@ -26,4 +26,3 @@ Provide functional continuity between legacy notebook workflows and production p
 - Notebook-first dispatch is used only where wrappers are deterministic and safe to call in production flows.
 - If notebook callables are missing or raise at runtime, compat wrappers fall back to refactored implementations; this preserves availability but can change legacy output formatting in edge cases.
 - Loader execution is AST-restricted (imports, literal-like assignments, defs/classes), so notebook side effects outside that subset are not executed.
-- Qualitative notebook prompts contain long in-notebook examples; production defaults preserve the scoring objective and output format but omit those large embedded exemplars.
