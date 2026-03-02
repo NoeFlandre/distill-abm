@@ -65,3 +65,7 @@ def test_repository_prompts_follow_notebook_wording() -> None:
     assert "rate a report based on its faithfulness with respect to an input context and input plots" in (
         config.faithfulness_eval_prompt
     )
+    assert "Image used for the example" in config.coverage_eval_prompt
+    assert "Image used for the example" in config.faithfulness_eval_prompt
+    assert "The main car brand used by agents is Toyota." in config.coverage_eval_prompt
+    assert "The main car brand used by agents is Toyota." in config.faithfulness_eval_prompt
