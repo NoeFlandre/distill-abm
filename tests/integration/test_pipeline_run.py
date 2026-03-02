@@ -234,3 +234,52 @@ def test_run_pipeline_plot_plus_stats_uses_plot_image_and_markdown(tmp_path: Pat
     trend_request = adapter.requests[-1]
     assert trend_request.image_b64 is not None
     assert "| time_step | mean | std | min | max | median |" in trend_request.user_prompt()
+
+
+def test_run_pipeline_applies_notebook_style_prompt_parts_and_plot_description(tmp_path: Path) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+    adapter = CapturingAdapter()
+
+    run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            skip_summarization=True,
+            evidence_mode="plot",
+            plot_description="PLOT DESCRIPTION",
+        ),
+        prompts=PromptsConfig(
+            context_prompt="Context block:\n{parameters}\n{documentation}",
+            trend_prompt="Trend block:\n{description}\n{context}",
+            style_features={
+                "role": "ROLE",
+                "example": "EXAMPLE",
+                "insights": "INSIGHTS",
+            },
+        ),
+        adapter=adapter,
+    )
+
+    assert len(adapter.requests) == 2
+    context_request = adapter.requests[0]
+    trend_request = adapter.requests[1]
+
+    assert context_request.user_prompt().startswith("ROLE\n\nContext block:")
+    assert "p=1" in context_request.user_prompt()
+    assert "doc" in context_request.user_prompt()
+
+    user_prompt = trend_request.user_prompt()
+    assert user_prompt.startswith("ROLE\n\nTrend block:")
+    assert "\n\nEXAMPLE" in user_prompt
+    assert "\n\nINSIGHTS" in user_prompt
+    assert user_prompt.endswith("PLOT DESCRIPTION")
