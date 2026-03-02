@@ -44,6 +44,10 @@ def run(
     model: Annotated[str, typer.Option()] = "echo-model",
     metric_pattern: Annotated[str, typer.Option()] = "mean",
     metric_description: Annotated[str, typer.Option()] = "simulation trend",
+    plot_description: Annotated[
+        str | None,
+        typer.Option(help="Optional notebook-style description of the plotted metric."),
+    ] = None,
     evidence_mode: Annotated[
         EvidenceMode,
         typer.Option(help="Evidence provided to trend analysis: plot, stats-markdown, stats-image, or plot+stats."),
@@ -60,6 +64,8 @@ def run(
         abm_config = load_abm_config(Path("configs/abms") / f"{abm}.yaml")
         metric_pattern = abm_config.metric_pattern
         metric_description = abm_config.metric_description
+        if plot_description is None and abm_config.plot_descriptions:
+            plot_description = abm_config.plot_descriptions[0]
     adapter = create_adapter(provider=provider, model=model)
     result = run_pipeline(
         inputs=PipelineInputs(
@@ -70,6 +76,7 @@ def run(
             model=model,
             metric_pattern=metric_pattern,
             metric_description=metric_description,
+            plot_description=plot_description,
             evidence_mode=evidence_mode,
             skip_summarization=skip_summarization,
         ),

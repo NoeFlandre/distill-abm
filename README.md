@@ -34,6 +34,12 @@ uv run distill-abm run \
   --model gpt-4o
 ```
 
+Notebook-style plot description can be explicitly overridden:
+
+```bash
+uv run distill-abm run ... --plot-description "The attachment is the plot representing ..."
+```
+
 Run evidence ablations for reviewer comparisons:
 
 ```bash
@@ -150,6 +156,10 @@ docker run --rm distill-abm
   - non-`archives` notebooks
   - non-checkpoint notebooks
   - non-`copy` notebook filenames
+- Pipeline prompt assembly mirrors notebook structure:
+  - context prompt: optional `style_features.role` + context template
+  - trend prompt: optional `style_features.role`, trend template, optional `style_features.example`, optional `style_features.insights`, then plot description
+  - ABM runs (`--abm`) use the first `plot_descriptions` entry by default (overridable via `--plot-description`)
 - `distill_abm.legacy.compat` dispatches notebook-first for selected deterministic helpers and falls back to refactored package implementations when notebook loading/calls fail.
 - `tests/regression/test_notebook_equivalence.py` validates behavior parity for migrated core utilities.
 - `tests/regression/test_notebook_function_coverage.py` ensures every notebook function name is accounted for in the new codebase (`distill_abm.legacy.compat`) or explicitly exempted.

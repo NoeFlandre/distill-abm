@@ -36,6 +36,7 @@ class PipelineInputs(BaseModel):
     model: str
     metric_pattern: str
     metric_description: str
+    plot_description: str | None = None
     skip_summarization: bool = False
     evidence_mode: EvidenceMode = "plot"
 
@@ -77,6 +78,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         prompts=prompts,
         metric_description=inputs.metric_description,
         context=context,
+        plot_description=inputs.plot_description,
         evidence_mode=inputs.evidence_mode,
         stats_markdown=stats_markdown,
     )
@@ -109,7 +111,11 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
 def _context_prompt(inputs: PipelineInputs, prompts: PromptsConfig) -> str:
     parameters = inputs.parameters_path.read_text(encoding="utf-8")
     documentation = inputs.documentation_path.read_text(encoding="utf-8")
-    return prompts.context_prompt.format(parameters=parameters, documentation=documentation)
+    base = prompts.context_prompt.format(parameters=parameters, documentation=documentation)
+    role = prompts.style_features.get("role", "").strip()
+    if role:
+        return f"{role}\n\n{base}"
+    return base
 
 
 def _invoke_adapter(adapter: LLMAdapter, model: str, prompt: str, image_b64: str | None = None) -> str:
@@ -173,13 +179,28 @@ def _build_trend_prompt(
     prompts: PromptsConfig,
     metric_description: str,
     context: str,
+    plot_description: str | None,
     evidence_mode: EvidenceMode,
     stats_markdown: str,
 ) -> str:
-    base = prompts.trend_prompt.format(description=metric_description, context=context)
+    parts: list[str] = []
+    role = prompts.style_features.get("role", "").strip()
+    if role:
+        parts.append(role)
+    parts.append(prompts.trend_prompt.format(description=metric_description, context=context))
+    example = prompts.style_features.get("example", "").strip()
+    if example:
+        parts.append(example)
+    insights = prompts.style_features.get("insights", "").strip()
+    if insights:
+        parts.append(insights)
+    if plot_description:
+        stripped = plot_description.strip()
+        if stripped:
+            parts.append(stripped)
     if evidence_mode in {"stats-markdown", "plot+stats"}:
-        return f"{base}\n\nStats table:\n{stats_markdown}"
-    return base
+        parts.append(f"Stats table:\n{stats_markdown}")
+    return "\n\n".join(parts)
 
 
 def _write_stats_image_if_needed(

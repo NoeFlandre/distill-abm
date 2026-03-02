@@ -53,3 +53,15 @@ def test_invalid_yaml_raises_config_error(tmp_path: Path) -> None:
 
     with pytest.raises(ConfigError):
         load_models_config(path)
+
+
+def test_repository_prompts_follow_notebook_wording() -> None:
+    config = load_prompts_config(Path("configs/prompts.yaml"))
+    assert "Do not write any summary or conclusion." in config.context_prompt
+    assert "Do not refer to the plot or any visual in your description." in config.trend_prompt
+    assert "rate a report based on its coverage with respect to an input context and input plots" in (
+        config.coverage_eval_prompt
+    )
+    assert "rate a report based on its faithfulness with respect to an input context and input plots" in (
+        config.faithfulness_eval_prompt
+    )
