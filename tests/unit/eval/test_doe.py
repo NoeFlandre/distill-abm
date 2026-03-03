@@ -27,3 +27,16 @@ def test_identify_factors_and_metrics() -> None:
     factors, metrics = identify_factors_and_metrics(frame)
     assert "Model" in factors
     assert "Score" in metrics
+
+
+def test_identify_factors_preserves_column_order() -> None:
+    frame = pd.DataFrame(
+        {
+            "LLM": ["GPT", "Claude", "DeepSeek"],
+            "Role": ["Yes", "No", "Yes"],
+            "Example": ["No", "Yes", "No"],
+            "BLEU": [0.1, 0.2, 0.3],
+        }
+    )
+    factors, _ = identify_factors_and_metrics(frame)
+    assert factors == ["LLM", "Role", "Example"]
