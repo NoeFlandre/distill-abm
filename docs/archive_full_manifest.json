@@ -7,7 +7,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -18,7 +18,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -29,7 +29,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -40,7 +40,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -505,10 +505,10 @@
     "sha256": "696423dce711887793b5ba7d9026f2f28b2fccb8fc6408c2031da9b9a8b818c0",
     "size_bytes": 165,
     "extension": ".pptx",
-    "classification": "human_ground_truth",
-    "action": "migrate",
-    "target_path": "tests/fixtures/notebook_parity/human_reference/~$PresentationRaters.pptx",
-    "rationale": "Human-scored references used for evaluation parity.",
+    "classification": "historical_nonruntime",
+    "action": "retain_record_only",
+    "target_path": null,
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -943,7 +943,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -980,7 +980,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -1043,7 +1043,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -1186,7 +1186,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -1815,7 +1815,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -1826,7 +1826,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -2310,7 +2310,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -2420,7 +2420,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -2442,7 +2442,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -2849,7 +2849,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -2860,7 +2860,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -4877,7 +4877,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -4921,7 +4921,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -5548,7 +5548,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -5570,7 +5570,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -5922,7 +5922,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -5933,7 +5933,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -6472,7 +6472,7 @@
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {

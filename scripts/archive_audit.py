@@ -50,6 +50,13 @@ def _classify(path: Path) -> tuple[Classification, Action, str | None, str]:
     rel = path.as_posix()
     ext = path.suffix.lower()
     rel_code = rel.split("archive/legacy_repo/Code/", 1)[1] if "archive/legacy_repo/Code/" in rel else rel
+    if path.name == ".DS_Store" or path.name.startswith("~$"):
+        return (
+            "historical_nonruntime",
+            "retain_record_only",
+            None,
+            "Temporary/editor artifact retained only for historical traceability.",
+        )
     if "/Evaluation/Human Assessment/" in rel:
         target = "tests/fixtures/notebook_parity/human_reference/" + rel.split("/Evaluation/Human Assessment/", 1)[1]
         return ("human_ground_truth", "migrate", target, "Human-scored references used for evaluation parity.")

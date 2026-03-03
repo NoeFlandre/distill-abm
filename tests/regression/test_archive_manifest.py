@@ -34,3 +34,13 @@ def test_archive_manifest_has_no_unresolved_required_mappings() -> None:
         if action == "migrate":
             assert target_path is not None and str(target_path).strip()
             assert Path(str(target_path)).exists()
+
+
+def test_archive_manifest_migrate_targets_exclude_junk_temp_files() -> None:
+    rows = json.loads(Path("docs/archive_full_manifest.json").read_text(encoding="utf-8"))
+    for row in rows:
+        if row["action"] != "migrate":
+            continue
+        filename = Path(row["path"]).name
+        assert filename != ".DS_Store"
+        assert not filename.startswith("~$")

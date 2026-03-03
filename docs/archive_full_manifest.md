@@ -3,15 +3,15 @@
 - Total files: 591
 - Classification counts:
   - `experiment_setting`: 38
-  - `historical_nonruntime`: 330
-  - `human_ground_truth`: 33
+  - `historical_nonruntime`: 331
+  - `human_ground_truth`: 32
   - `legacy_visualization`: 184
   - `prompt_reference`: 6
 - Action counts:
   - `archive_separately`: 184
   - `discard_with_rationale`: 39
-  - `migrate`: 77
-  - `retain_record_only`: 291
+  - `migrate`: 76
+  - `retain_record_only`: 292
 - Unresolved mappings: 0
 
 ## Sample Rows
@@ -63,7 +63,7 @@
 | `archive/legacy_repo/Code/Evaluation/Human Assessment/Rubrics/Rubrics.pptx` | `human_ground_truth` | `migrate` | `tests/fixtures/notebook_parity/human_reference/Rubrics/Rubrics.pptx` |
 | `archive/legacy_repo/Code/Evaluation/Human Assessment/Rubrics/Table main.tex` | `human_ground_truth` | `migrate` | `tests/fixtures/notebook_parity/human_reference/Rubrics/Table main.tex` |
 | `archive/legacy_repo/Code/Evaluation/Human Assessment/Rubrics/Tian EDM LLM 2024.pdf` | `human_ground_truth` | `migrate` | `tests/fixtures/notebook_parity/human_reference/Rubrics/Tian EDM LLM 2024.pdf` |
-| `archive/legacy_repo/Code/Evaluation/Human Assessment/~$PresentationRaters.pptx` | `human_ground_truth` | `migrate` | `tests/fixtures/notebook_parity/human_reference/~$PresentationRaters.pptx` |
+| `archive/legacy_repo/Code/Evaluation/Human Assessment/~$PresentationRaters.pptx` | `historical_nonruntime` | `retain_record_only` | `-` |
 | `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/.ipynb_checkpoints/Final Sheet-checkpoint.ipynb` | `historical_nonruntime` | `discard_with_rationale` | `-` |
 | `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet/updated_structured_data.csv` | `historical_nonruntime` | `retain_record_only` | `-` |
 | `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet/updated_structured_data2.csv` | `historical_nonruntime` | `retain_record_only` | `-` |
