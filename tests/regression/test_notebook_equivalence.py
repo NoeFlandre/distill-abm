@@ -175,3 +175,157 @@ def test_external_wrapper_paths_are_mockable(monkeypatch: pytest.MonkeyPatch) ->
     assert compat.get_response_with_pdf_and_images("question", "paper.pdf", ["x.png"]) == "ok"
     assert calls[-1] == ("question\npdf-body", "img-b64")
     assert compat.summarize_text_with_models("hello") == {"bart": "bart::hello", "bert": "bert::hello"}
+
+
+def test_notebook_parity_for_qualitative_csv_appenders(tmp_path: Path) -> None:
+    notebook_append_faith = get_notebook_function("append_faithfulness_score")
+    notebook_append_cov = get_notebook_function("append_coverage_score")
+
+    faith_input = tmp_path / "faith_input.csv"
+    faith_notebook_out = tmp_path / "faith_notebook.csv"
+    faith_compat_out = tmp_path / "faith_compat.csv"
+    pd.DataFrame({"LLM Faithfulness Raw Response": ["Faithfulness score: 5", "Faithfulness score: 3"]}).to_csv(
+        faith_input, index=False
+    )
+
+    notebook_append_faith(faith_input, faith_notebook_out)
+    compat.append_faithfulness_score(faith_input, faith_compat_out)
+
+    notebook_faith_df = pd.read_csv(faith_notebook_out)
+    compat_faith_df = pd.read_csv(faith_compat_out)
+    assert compat_faith_df.equals(notebook_faith_df)
+
+    cov_input = tmp_path / "cov_input.csv"
+    cov_notebook_out = tmp_path / "cov_notebook.csv"
+    cov_compat_out = tmp_path / "cov_compat.csv"
+    pd.DataFrame({"LLM Coverage Raw Response": ["Coverage score: 4", "Coverage score: 2"]}).to_csv(
+        cov_input, index=False, sep=";"
+    )
+
+    notebook_append_cov(cov_input, cov_notebook_out)
+    compat.append_coverage_score(cov_input, cov_compat_out)
+
+    notebook_cov_df = pd.read_csv(cov_notebook_out)
+    compat_cov_df = pd.read_csv(cov_compat_out)
+    assert compat_cov_df.equals(notebook_cov_df)
+
+
+def test_notebook_parity_for_analyze_factorial_contributions_fallback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csv_path = tmp_path / "anova.csv"
+    pd.DataFrame(
+        {
+            "Role": ["Yes", "Yes", "No", "No"],
+            "Example": ["Yes", "No", "Yes", "No"],
+            "BLEU": [0.1, 0.2, 0.3, 0.4],
+            "ROUGE-1": [0.2, 0.4, 0.6, 0.8],
+        }
+    ).to_csv(csv_path, index=False)
+    notebook_out = tmp_path / "nb_anova.csv"
+    fallback_out = tmp_path / "fallback_anova.csv"
+
+    notebook_analyze = get_notebook_function("analyze_factorial_contributions")
+    notebook_df = notebook_analyze(csv_path, notebook_out, 2, 2)
+
+    def raise_missing(_name: str) -> FunctionType:
+        raise KeyError("missing")
+
+    monkeypatch.setattr("distill_abm.legacy.notebook_loader.get_notebook_function", raise_missing)
+    fallback_df = compat.analyze_factorial_contributions(csv_path, fallback_out, repetitions=2, max_interaction_order=2)
+    assert fallback_df is not None
+    assert notebook_df is not None
+
+    notebook_sorted = notebook_df.sort_values("Feature").reset_index(drop=True)
+    fallback_sorted = fallback_df.sort_values("Feature").reset_index(drop=True)
+    assert list(fallback_sorted.columns) == list(notebook_sorted.columns)
+    for column in fallback_sorted.columns:
+        if column == "Feature":
+            assert fallback_sorted[column].tolist() == notebook_sorted[column].tolist()
+        else:
+            assert fallback_sorted[column].tolist() == pytest.approx(notebook_sorted[column].tolist())
+
+
+def test_notebook_parity_for_sheet_helpers_fallback(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    input_df = pd.DataFrame(
+        {
+            "Combination Description": ["role + example + insights"],
+            "Summary (BART) Reduced": ["bart output"],
+            "Summary (BERT) Reduced": ["bert output"],
+            "Context Prompt": ["context prompt"],
+            "BLEU (BART)": [0.1],
+            "METEOR (BART)": [0.2],
+            "ROUGE-1 (BART)": [0.3],
+            "ROUGE-2 (BART)": [0.4],
+            "ROUGE-L (BART)": [0.5],
+            "Flesch Reading Ease (BART)": [40.0],
+            "BLEU (BERT)": [0.6],
+            "METEOR (BERT)": [0.7],
+            "ROUGE-1 (BERT)": [0.8],
+            "ROUGE-2 (BERT)": [0.9],
+            "ROUGE-L (BERT)": [1.0],
+            "Flesch Reading Ease (BERT)": [41.0],
+        }
+    )
+    structured_df = pd.DataFrame(
+        {
+            "Case study": ["Milk", "Milk"],
+            "Summary": ["BART", "BERT"],
+            "LLM": ["GPT", "GPT"],
+            "Role": ["Yes", "Yes"],
+            "Example": ["Yes", "Yes"],
+            "Insight": ["Yes", "Yes"],
+            "Output": ["", ""],
+            "Input": ["", ""],
+            "BLEU": [0.0, 0.0],
+            "METEOR": [0.0, 0.0],
+            "ROUGE-1": [0.0, 0.0],
+            "ROUGE-2": [0.0, 0.0],
+            "ROUGE-L": [0.0, 0.0],
+            "Flesch Reading Ease": [0.0, 0.0],
+            "Faithfulness (GPT)": ["", ""],
+        }
+    )
+
+    notebook_update = get_notebook_function("update_structured_df")
+    notebook_structured = structured_df.copy()
+    notebook_updated = notebook_update(input_df.copy(), notebook_structured, "Milk", "GPT")
+    assert notebook_updated is None
+
+    def raise_missing(_name: str) -> FunctionType:
+        raise KeyError("missing")
+
+    monkeypatch.setattr("distill_abm.legacy.notebook_loader.get_notebook_function", raise_missing)
+    fallback_updated = compat.update_structured_df(input_df.copy(), structured_df.copy(), "Milk", "GPT")
+    assert fallback_updated.equals(notebook_structured)
+
+    structured_path = tmp_path / "structured.csv"
+    yes_no_path = tmp_path / "yes_no.csv"
+    notebook_out = tmp_path / "notebook_filled.csv"
+    fallback_out = tmp_path / "fallback_filled.csv"
+    fallback_updated.to_csv(structured_path, index=False)
+    pd.DataFrame(
+        {
+            "Case study": ["Milk"],
+            "Summary": ["BART"],
+            "LLM": ["GPT"],
+            "Role": ["Yes"],
+            "Example": ["Yes"],
+            "Insight": ["Yes"],
+            "Final LLM Faithfulness Score": [4],
+        }
+    ).to_csv(yes_no_path, index=False, sep=";")
+
+    notebook_fill = get_notebook_function("fill_faithfulness_scores")
+    notebook_fill(str(structured_path), str(yes_no_path), str(notebook_out))
+    fallback_df = compat.fill_faithfulness_scores(
+        frame=None,
+        structured_data_path=structured_path,
+        yes_no_path=yes_no_path,
+        output_path=fallback_out,
+    )
+
+    notebook_filled = pd.read_csv(notebook_out)
+    fallback_filled = pd.read_csv(fallback_out)
+    assert fallback_filled.equals(notebook_filled)
+    assert fallback_df.equals(notebook_filled)

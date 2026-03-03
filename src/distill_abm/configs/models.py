@@ -72,3 +72,28 @@ class LoggingConfig(BaseModel):
 
     level: str = "INFO"
     format: str = "%(asctime)s %(levelname)s %(name)s %(message)s"
+
+
+class NotebookLLMDefaults(BaseModel):
+    """Captures notebook-era model invocation defaults."""
+
+    openai_model: str = "gpt-4o"
+    anthropic_model: str = "claude-3-5-sonnet-20241022"
+    max_tokens: int = 1000
+    temperature: float = 0.5
+
+
+class NotebookDoEDefaults(BaseModel):
+    """Captures notebook DoE helper defaults."""
+
+    repetitions: int = 3
+    max_interaction_order: int = 2
+
+
+class NotebookExperimentSettings(BaseModel):
+    """Stores canonical notebook experiment references and defaults."""
+
+    llm_defaults: NotebookLLMDefaults
+    doe_defaults: NotebookDoEDefaults
+    qualitative_example_text_dir: str
+    human_reference_dir: str

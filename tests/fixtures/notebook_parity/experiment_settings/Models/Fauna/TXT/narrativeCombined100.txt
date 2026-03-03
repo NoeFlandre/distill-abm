@@ -1,0 +1,30 @@
+We have 29 parameters:
+  - init-foragers, from 0.0 to 100.0. We set it to 20.
+  - processing-cost-males, from 0.0 to 20.0. We set it to 6.
+  - food-value-males, from 5.0 to 100.0. We set it to 30.
+  - maximum-lifespan, from 0.0 to 12000.0. We set it to 10220.
+  - processing-cost-females, from 0.0 to 20.0. We set it to 3.
+  - food-value-females, from 5.0 to 100.0. We set it to 27.
+  - init-prey, from 0.0 to 1000.0. We set it to 250.
+  - internal-mortality, from 0.0 to 0.2. We set it to 0.025.
+  - age-of-senescence, from 0.0 to 10000.0. We set it to 7300.
+  - ticks-per-year, from 0.0 to 720.0. We set it to 365.
+  - animals-gain-from-food, from 0.0 to 10.0. We set it to 1.5.
+  - animals-starvation-threshold, from 0.0 to 100.0. We set it to 25.
+  - animals-movement-cost, from 0.0 to 10.0. We set it to 1.
+  - foragers-movement-cost, from 0.0 to 10.0. We set it to 1.
+  - grass-proportion, from 0.0 to 1.0. We set it to 0.33.
+  - external-mortality, from 0.0 to 0.2. We set it to 0.0025.
+  - birth-spacing, from 0.0 to 1000.0. We set it to 730.
+  - foraging-radius, from 1.0 to 100.0. We set it to 6.
+  - food-value-calf, from 0.0 to 20.0. We set it to 3.
+  - seasonality, from 0.0 to 1.0. We set it to 0.8.
+  - regrowth-time, from 0.0 to 365.0. We set it to 3.
+  - stop-at-max-ticks. We set it to True.
+  - stop-at-max-herd-size. We set it to False.
+  - grass-growth. We set it to True.
+  - keep-initial-grass-pattern. We set it to True.
+  - imortal-foragers. We set it to True.
+  - food-storage. We set it to True.
+  - max-ticks. We set it to 73000.
+  - max-herd-size. We set it to 500.

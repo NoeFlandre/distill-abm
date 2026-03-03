@@ -7,6 +7,8 @@ Production Python package for ABM-to-LLM distillation, extracted from legacy not
 - `src/distill_abm/` - main production codebase
 - `tests/` - unit, integration, e2e, and notebook-regression tests
 - `configs/` - YAML configs for models, prompts, ABMs, evaluation, logging
+- `configs/notebook_prompt_reference.yaml` - canonical notebook prompt/reference capture with provenance
+- `configs/notebook_experiment_settings.yaml` - preserved notebook experiment defaults (LLM + DoE)
 - `archive/legacy_repo/` - full legacy repository snapshot (notebooks + assets)
 - `docs/` - architecture and parity documentation
 
@@ -152,6 +154,8 @@ docker run --rm distill-abm
 ## Parity policy
 
 - Legacy notebooks are preserved under `archive/legacy_repo/`.
+- `docs/archive_full_manifest.json` provides a file-by-file migration classification and action trail for all archive assets.
+- Notebook prompt sources are preserved in `configs/notebook_prompt_reference.yaml`, with runtime prompts in `configs/prompts.yaml` regression-locked to it.
 - `distill_abm.legacy.notebook_loader` builds a callable registry from notebooks and prefers sources in this order:
   - non-`archives` notebooks
   - non-checkpoint notebooks
@@ -168,5 +172,6 @@ docker run --rm distill-abm
 
 - Notebook execution is intentionally restricted to safe AST node types in the loader; some notebook side-effects are not replayed.
 - Fallback behavior for complex legacy DoE CSV writers (`return_csv`, `return_csv_2`) aims for robustness but may differ in formatting if notebook execution is unavailable.
+- Default LLM request temperature is set to `0.5` for notebook-aligned generation behavior.
 
 See `docs/PARITY.md` for details.

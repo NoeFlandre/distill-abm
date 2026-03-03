@@ -10,6 +10,8 @@ Provide functional continuity between legacy notebook workflows and production p
 2. `distill_abm.legacy.notebook_loader` builds a runtime function registry from notebooks and records provenance (`get_notebook_source_path`), preferring non-archive, non-checkpoint, non-copy sources (case-insensitive).
 3. `tests/regression/test_notebook_equivalence.py` compares notebook functions directly against package implementations, including deterministic DoE helper parity and mock-based regression checks for external-call wrappers.
 4. `tests/regression/test_notebook_function_coverage.py` parses all notebook function definitions from `archive/legacy_repo/Code` and asserts every function is represented in the compatibility surface or explicitly exempt (`main`).
+5. `docs/archive_full_manifest.json` provides file-level classification/action mapping for every archived artifact (runtime, prompt references, human ground truth, experiment settings, or historical-only).
+6. `tests/regression/test_prompt_reference_equivalence.py` locks runtime prompts against `configs/notebook_prompt_reference.yaml`.
 
 ## Scope
 
@@ -20,6 +22,7 @@ Provide functional continuity between legacy notebook workflows and production p
   - context: `role` (optional) + context template
   - trend: `role` (optional) + trend template + `example` (optional) + `insights` (optional) + plot description
   - ABM selection injects the first notebook plot description by default
+- LLM request defaults preserve notebook-style generation settings, including `temperature=0.5`.
 
 ## Explicit limits
 

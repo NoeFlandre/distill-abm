@@ -8,7 +8,14 @@ from typing import Any
 import yaml
 from pydantic import ValidationError
 
-from distill_abm.configs.models import ABMConfig, EvaluationConfig, LoggingConfig, ModelsConfig, PromptsConfig
+from distill_abm.configs.models import (
+    ABMConfig,
+    EvaluationConfig,
+    LoggingConfig,
+    ModelsConfig,
+    NotebookExperimentSettings,
+    PromptsConfig,
+)
 
 
 class ConfigError(RuntimeError):
@@ -58,3 +65,10 @@ def load_logging_config(path: Path) -> LoggingConfig:
         return LoggingConfig.model_validate(_read_yaml(path))
     except ValidationError as exc:
         raise ConfigError(f"invalid logging config at {path}: {exc}") from exc
+
+
+def load_notebook_experiment_settings(path: Path) -> NotebookExperimentSettings:
+    try:
+        return NotebookExperimentSettings.model_validate(_read_yaml(path))
+    except ValidationError as exc:
+        raise ConfigError(f"invalid notebook experiment settings config at {path}: {exc}") from exc

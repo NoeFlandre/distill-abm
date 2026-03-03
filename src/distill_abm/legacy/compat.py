@@ -59,6 +59,25 @@ from distill_abm.viz.plots import plot_metric_bundle
 
 T = TypeVar("T")
 
+_SUMMARY_METRICS_MAPPING: dict[str, dict[str, str]] = {
+    "Summary (BART) Reduced": {
+        "BLEU (BART)": "BLEU",
+        "METEOR (BART)": "METEOR",
+        "ROUGE-1 (BART)": "ROUGE-1",
+        "ROUGE-2 (BART)": "ROUGE-2",
+        "ROUGE-L (BART)": "ROUGE-L",
+        "Flesch Reading Ease (BART)": "Flesch Reading Ease",
+    },
+    "Summary (BERT) Reduced": {
+        "BLEU (BERT)": "BLEU",
+        "METEOR (BERT)": "METEOR",
+        "ROUGE-1 (BERT)": "ROUGE-1",
+        "ROUGE-2 (BERT)": "ROUGE-2",
+        "ROUGE-L (BERT)": "ROUGE-L",
+        "Flesch Reading Ease (BERT)": "Flesch Reading Ease",
+    },
+}
+
 
 def _call_notebook_first(name: str, fallback: Callable[..., T], *args: Any, **kwargs: Any) -> T:
     try:
@@ -200,12 +219,24 @@ def should_skip_row(row: dict[str, Any], column_name: str) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
 
-def append_faithfulness_score(response_text: str) -> str:
-    return extract_faithfulness_score(response_text)
+def append_faithfulness_score(response_or_input_csv: str | Path, output_csv: str | Path | None = None) -> str | Path:
+    if output_csv is None:
+        return extract_faithfulness_score(str(response_or_input_csv))
+    frame = pd.read_csv(response_or_input_csv)
+    frame["LLM Faithfulness Score"] = frame["LLM Faithfulness Raw Response"].apply(extract_faithfulness_score)
+    output = Path(output_csv)
+    frame.to_csv(output, index=False)
+    return output
 
 
-def append_coverage_score(response_text: str) -> str:
-    return extract_coverage_score(response_text)
+def append_coverage_score(response_or_input_csv: str | Path, output_csv: str | Path | None = None) -> str | Path:
+    if output_csv is None:
+        return extract_coverage_score(str(response_or_input_csv))
+    frame = pd.read_csv(response_or_input_csv, sep=";")
+    frame["LLM Coverage Score"] = frame["LLM Coverage Raw Response"].apply(extract_coverage_score)
+    output = Path(output_csv)
+    frame.to_csv(output, index=False)
+    return output
 
 
 def increment_score(score: int | float | str) -> int:
@@ -274,24 +305,111 @@ def create_collage(image_paths: list[str | Path], output_path: str | Path, colum
     return Path(output_path)
 
 
-def update_structured_df(
-    input_df: pd.DataFrame, structured_df: pd.DataFrame, case_study: str, llm: str
+def _update_structured_df_fallback(
+    input_df: pd.DataFrame,
+    structured_df: pd.DataFrame,
+    case_study: str,
+    llm: str,
 ) -> pd.DataFrame:
     output = structured_df.copy()
-    rows = input_df[(input_df.get("Case study") == case_study) & (input_df.get("LLM") == llm)]
-    if rows.empty:
-        return output
-    for column in rows.columns:
-        if column in output.columns:
-            output.loc[:, column] = rows.iloc[0][column]
+    for summary_type, metric_mapping in _SUMMARY_METRICS_MAPPING.items():
+        if summary_type not in input_df.columns:
+            continue
+        summary_model = summary_type.split(" ")[1].strip("()")
+        for _, row in input_df.iterrows():
+            combination_desc = str(row.get("Combination Description", ""))
+            lowered = combination_desc.lower()
+            role = "Yes" if "role" in lowered else "No"
+            example = "Yes" if "example" in lowered else "No"
+            insight = "Yes" if "insights" in lowered else "No"
+            filter_condition = (
+                (output["Case study"] == case_study)
+                & (output["Summary"] == summary_model)
+                & (output["LLM"] == llm)
+                & (output["Role"] == role)
+                & (output["Example"] == example)
+                & (output["Insight"] == insight)
+            )
+            output.loc[filter_condition, "Output"] = row.get(summary_type, "")
+            if "Context Prompt" in row:
+                output.loc[filter_condition, "Input"] = row.get("Context Prompt", "")
+            for metric_column, target_column in metric_mapping.items():
+                if metric_column in row and target_column in output.columns:
+                    output.loc[filter_condition, target_column] = row[metric_column]
     return output
 
 
-def fill_faithfulness_scores(frame: pd.DataFrame, source_column: str = "Faithfulness (GPT)") -> pd.DataFrame:
+def update_structured_df(
+    input_df: pd.DataFrame,
+    structured_df: pd.DataFrame,
+    case_study: str,
+    llm: str,
+) -> pd.DataFrame:
+    return _call_notebook_first(
+        "update_structured_df",
+        _update_structured_df_fallback,
+        input_df,
+        structured_df,
+        case_study,
+        llm,
+    )
+
+
+def _fill_faithfulness_scores_frame_fallback(
+    frame: pd.DataFrame,
+    source_column: str = "Faithfulness (GPT)",
+) -> pd.DataFrame:
     out = frame.copy()
     if source_column in out.columns:
         out[source_column] = out[source_column].fillna("")
     return out
+
+
+def _fill_faithfulness_scores_files_fallback(
+    structured_data_path: str | Path,
+    yes_no_path: str | Path,
+    output_path: str | Path,
+) -> pd.DataFrame:
+    structured = pd.read_csv(structured_data_path, sep=",")
+    yes_no = pd.read_csv(yes_no_path, sep=";")
+    required_columns = [
+        "Case study",
+        "Summary",
+        "LLM",
+        "Role",
+        "Example",
+        "Insight",
+        "Final LLM Faithfulness Score",
+    ]
+    missing = [column for column in required_columns if column not in yes_no.columns]
+    if missing:
+        raise ValueError(f"Columns {missing} not found in Yes-No CSV.")
+    merged = pd.merge(
+        structured,
+        yes_no[required_columns],
+        on=required_columns[:-1],
+        how="left",
+    )
+    merged["Faithfulness (GPT)"] = merged["Final LLM Faithfulness Score"]
+    merged.drop(columns=["Final LLM Faithfulness Score"], inplace=True)
+    merged.to_csv(output_path, index=False, sep=",")
+    return merged
+
+
+def fill_faithfulness_scores(
+    frame: pd.DataFrame | None = None,
+    source_column: str = "Faithfulness (GPT)",
+    structured_data_path: str | Path = "Final Sheet/updated_structured_data.csv",
+    yes_no_path: str | Path = "Results/Yes-No Format.csv",
+    output_path: str | Path = "Final Sheet/updated_structured_data_filled.csv",
+) -> pd.DataFrame:
+    if frame is not None:
+        return _fill_faithfulness_scores_frame_fallback(frame, source_column=source_column)
+    return _fill_faithfulness_scores_files_fallback(
+        structured_data_path=structured_data_path,
+        yes_no_path=yes_no_path,
+        output_path=output_path,
+    )
 
 
 def preprocess_for_factorial(frame: pd.DataFrame) -> pd.DataFrame:
@@ -314,12 +432,90 @@ def add_interactions(frame: pd.DataFrame, columns: list[str], max_order: int = 2
     return out
 
 
+def _analyze_factorial_contributions_fallback(
+    csv_path: str | Path,
+    output_csv: str | Path,
+    repetitions: int = 3,
+    max_interaction_order: int = 2,
+) -> pd.DataFrame | None:
+    def _effect_values(series: pd.Series) -> pd.Series:
+        numeric = pd.to_numeric(series, errors="coerce")
+        if numeric.notna().any():
+            return numeric.fillna(0.0)
+        lowered = series.astype(str).str.strip().str.lower()
+        mapped = lowered.map(
+            {
+                "yes": 1.0,
+                "no": -1.0,
+                "bart": 1.0,
+                "bert": -1.0,
+                "gpt": 1.0,
+                "claude": -1.0,
+                "deepseek": 0.0,
+            }
+        )
+        return mapped.fillna(0.0)
+
+    frame = pd.read_csv(csv_path)
+    factorial = frame.copy()
+    factor_columns = get_factor_columns(factorial)
+    metric_columns = [
+        column
+        for column in factorial.columns
+        if column not in factor_columns and pd.api.types.is_numeric_dtype(factorial[column])
+    ]
+    if factor_columns:
+        avg_df = factorial.groupby(factor_columns).mean(numeric_only=True).reset_index()
+    else:
+        group_size = max(int(repetitions), 1)
+        avg_df = factorial.groupby(factorial.index // group_size).mean(numeric_only=True).reset_index(drop=True)
+    avg_df = add_interactions(avg_df, factor_columns, max_order=max_interaction_order)
+    effect_columns = factor_columns + [column for column in avg_df.columns if "_AND_" in column]
+    design_size = 1
+    for column in factor_columns:
+        design_size *= 3 if column == "LLM" else 2
+    results: list[dict[str, str | float]] = []
+    for metric in metric_columns:
+        metric_values = pd.to_numeric(avg_df[metric], errors="coerce").fillna(0.0)
+        effects = {
+            column: (_effect_values(avg_df[column]) * metric_values).sum() / design_size for column in effect_columns
+        }
+        sst = sum(value**2 for value in effects.values()) * design_size
+        for effect, value in effects.items():
+            contribution = (value**2 * design_size * 100) / sst if sst != 0 else 0.0
+            results.append({"Feature": effect, "Metric": metric, "Contribution": contribution})
+    output_df = (
+        pd.DataFrame(results)
+        .pivot(index="Feature", columns="Metric", values="Contribution")
+        .reset_index()
+        .rename_axis(None, axis=1)
+    )
+    expected_features = set(factor_columns)
+    if max_interaction_order >= 2:
+        for combination in combinations(factor_columns, 2):
+            expected_features.add("_AND_".join(combination))
+    for feature in expected_features:
+        if feature not in output_df["Feature"].values:
+            output_df = pd.concat([output_df, pd.DataFrame({"Feature": [feature]})], ignore_index=True)
+    output_df = output_df.fillna(0).sort_values("Feature")
+    output_df.to_csv(output_csv, index=False)
+    return output_df
+
+
 def analyze_factorial_contributions(
     csv_path: str | Path,
     output_csv: str | Path,
+    repetitions: int = 3,
     max_interaction_order: int = 2,
 ) -> pd.DataFrame | None:
-    return analyze_factorial_anova(Path(csv_path), Path(output_csv), max_interaction_order=max_interaction_order)
+    return _call_notebook_first(
+        "analyze_factorial_contributions",
+        _analyze_factorial_contributions_fallback,
+        csv_path,
+        output_csv,
+        repetitions,
+        max_interaction_order,
+    )
 
 
 def read_csv_to_df(csv_path: str | Path) -> pd.DataFrame:
