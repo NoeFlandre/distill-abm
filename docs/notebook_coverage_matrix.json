@@ -1,0 +1,851 @@
+[
+  {
+    "name": "add_interactions",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "analyze_factorial_anova",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+      "archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/eval/doe_full.py"
+    ]
+  },
+  {
+    "name": "analyze_factorial_contributions",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "analyze_image_with_janus",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "append_analysis_to_csv",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "append_coverage_score",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "append_faithfulness_score",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "append_to_csv",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "append_to_csv2",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "calculate_sst",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "calculate_sums_and_sst",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "capitalize_sentences",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/summarize/postprocess.py"
+    ]
+  },
+  {
+    "name": "chunk_text",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/summarize/legacy.py",
+      "src/distill_abm/summarize/text.py"
+    ]
+  },
+  {
+    "name": "clean_context_response",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py",
+      "src/distill_abm/summarize/legacy.py"
+    ]
+  },
+  {
+    "name": "clean_json_content",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/ingest/netlogo.py"
+    ]
+  },
+  {
+    "name": "clean_name",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+      "archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/eval/doe.py"
+    ]
+  },
+  {
+    "name": "clean_non_unicode",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/summarize/postprocess.py"
+    ]
+  },
+  {
+    "name": "clean_statsmodels_feature_name",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+      "archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/eval/doe.py"
+    ]
+  },
+  {
+    "name": "clean_symbols",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py",
+      "src/distill_abm/summarize/legacy.py"
+    ]
+  },
+  {
+    "name": "compute_results",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "compute_scores",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/6.Scoring-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/6.Scoring-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/6.Scoring.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/eval/legacy_scores.py"
+    ]
+  },
+  {
+    "name": "create_collage",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "create_factorial_design",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "encode_image",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "extract_code",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/ingest/netlogo.py"
+    ]
+  },
+  {
+    "name": "extract_coverage_score",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/eval/qualitative.py"
+    ]
+  },
+  {
+    "name": "extract_documentation",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/ingest/netlogo.py"
+    ]
+  },
+  {
+    "name": "extract_faithfulness_score",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/eval/qualitative.py"
+    ]
+  },
+  {
+    "name": "extract_parameters",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/ingest/netlogo.py"
+    ]
+  },
+  {
+    "name": "extract_text_from_pdf",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "fill_faithfulness_scores",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "format_json_oneline",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/ingest/netlogo.py"
+    ]
+  },
+  {
+    "name": "generate_response",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "get_factor_columns",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "get_llm_response",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "get_llm_response2",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "get_llm_response_no_image",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "get_response_with_images",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "get_response_with_pdf_and_images",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "identify_factors_and_metrics",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+      "archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/eval/doe.py"
+    ]
+  },
+  {
+    "name": "load_example_files",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "load_existing_rows",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "main",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+      "archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Fauna/6.Scoring-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/6.Scoring-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/6.Scoring.ipynb"
+    ],
+    "in_compat": false,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/cli.py"
+    ]
+  },
+  {
+    "name": "modify_scores",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/3. Adding 1 point to the answers.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "plot_columns",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Grazing/2. Plotting the data.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/2. Plotting the Data.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "prepare_conversation",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "preprocess_for_factorial",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "process_csv",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "process_documentation",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "read_and_parse_csv",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "read_csv_to_df",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "remove_default_elements",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/ingest/netlogo.py"
+    ]
+  },
+  {
+    "name": "remove_evaluating_suffix",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "remove_hyphens_after_punctuation",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/summarize/postprocess.py"
+    ]
+  },
+  {
+    "name": "remove_sentences_with_www",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/summarize/postprocess.py"
+    ]
+  },
+  {
+    "name": "remove_space_before_dot",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/summarize/postprocess.py"
+    ]
+  },
+  {
+    "name": "remove_unnecessary_punctuation",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/summarize/postprocess.py"
+    ]
+  },
+  {
+    "name": "remove_unnecessary_spaces_in_parentheses",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/summarize/postprocess.py"
+    ]
+  },
+  {
+    "name": "remove_urls",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/ingest/netlogo.py"
+    ]
+  },
+  {
+    "name": "return_csv",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "return_csv_2",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "setup_janus_model",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "should_skip_row",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/eval/qualitative.py",
+      "src/distill_abm/legacy/compat.py"
+    ]
+  },
+  {
+    "name": "summarize_text",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/summarize/legacy.py"
+    ]
+  },
+  {
+    "name": "update_parameters",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+      "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+      "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/ingest/netlogo.py"
+    ]
+  },
+  {
+    "name": "update_structured_df",
+    "notebook_paths": [
+      "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/.ipynb_checkpoints/Final Sheet-checkpoint.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet.ipynb",
+      "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet.ipynb"
+    ],
+    "in_compat": true,
+    "in_src": true,
+    "src_modules": [
+      "src/distill_abm/legacy/compat.py"
+    ]
+  }
+]

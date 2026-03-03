@@ -163,6 +163,7 @@ def test_run_pipeline_stats_markdown_mode_uses_text_only_evidence(tmp_path: Path
     )
 
     assert len(adapter.requests) == 2
+    assert all(request.temperature == 0.5 for request in adapter.requests)
     trend_request = adapter.requests[-1]
     assert trend_request.image_b64 is None
     assert "| time_step | mean | std | min | max | median |" in trend_request.user_prompt()

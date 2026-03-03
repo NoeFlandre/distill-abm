@@ -1,0 +1,83 @@
+{
+    "sliders": [
+        {
+            "name": "number-households",
+            "min_value": 1.0,
+            "max_value": 100.0
+        },
+        {
+            "name": "satisficing-threshold",
+            "min_value": 0.0,
+            "max_value": 100.0
+        },
+        {
+            "name": "satisficing-trials",
+            "min_value": 0.0,
+            "max_value": 100.0
+        },
+        {
+            "name": "knowledge-radius",
+            "min_value": 0.0,
+            "max_value": 5.0
+        },
+        {
+            "name": "resting-threshold",
+            "min_value": 0.0,
+            "max_value": 1.0
+        },
+        {
+            "name": "intrinsic-preference",
+            "min_value": 0.0,
+            "max_value": 1.0
+        },
+        {
+            "name": "social-susceptibility",
+            "min_value": 0.0,
+            "max_value": 1.0
+        }
+    ],
+    "switches": [
+        {
+            "name": "global-rain?",
+            "true_value": false,
+            "false_value": true,
+            "default_value": true
+        },
+        {
+            "name": "start-on-homepatch?",
+            "true_value": false,
+            "false_value": true,
+            "default_value": true
+        },
+        {
+            "name": "resting?",
+            "true_value": true,
+            "false_value": true,
+            "default_value": true
+        },
+        {
+            "name": "homog-behav-types?",
+            "true_value": true,
+            "false_value": true,
+            "default_value": true
+        },
+        {
+            "name": "extension-model?",
+            "true_value": false,
+            "false_value": true,
+            "default_value": true
+        },
+        {
+            "name": "SL2-strategy-switch?",
+            "true_value": true,
+            "false_value": true,
+            "default_value": true
+        },
+        {
+            "name": "risk-mode?",
+            "true_value": false,
+            "false_value": true,
+            "default_value": true
+        }
+    ]
+}

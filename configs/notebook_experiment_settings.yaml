@@ -1,0 +1,10 @@
+llm_defaults:
+  openai_model: gpt-4o
+  anthropic_model: claude-3-5-sonnet-20241022
+  max_tokens: 1000
+  temperature: 0.5
+doe_defaults:
+  repetitions: 3
+  max_interaction_order: 2
+qualitative_example_text_dir: configs/notebook_prompt_assets/Evaluation/Qualitative Assessment using LLMs/Examples/Text
+human_reference_dir: tests/fixtures/notebook_parity/human_reference/All Results
