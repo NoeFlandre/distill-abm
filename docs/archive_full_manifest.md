@@ -1,26 +1,17 @@
 # Archive Full Manifest
 
-- Total files: 172
+- Total files: 163
 - Classification counts:
-  - `historical_nonruntime`: 166
+  - `historical_nonruntime`: 157
   - `prompt_reference`: 6
 - Action counts:
-  - `migrate`: 172
+  - `migrate`: 163
 - Unresolved mappings: 0
 
 ## Sample Rows
 
 | path | classification | action | target_path |
 | --- | --- | --- | --- |
-| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet/updated_structured_data.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Archives/Final Sheet/updated_structured_data.csv` |
-| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet/updated_structured_data2.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Archives/Final Sheet/updated_structured_data2.csv` |
-| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Archives/Final Sheet.ipynb` |
-| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Structure/structured_data.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Archives/Structure/structured_data.csv` |
-| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/structured_data.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Archives/structured_data.csv` |
-| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet/updated_structured_data.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Final Sheet/updated_structured_data.csv` |
-| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet/updated_structured_data_filled.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Final Sheet/updated_structured_data_filled.csv` |
-| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Final Sheet.ipynb` |
-| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Structure/structured_data.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Structure/structured_data.csv` |
 | `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb` |
 | `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb` |
 | `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb` |
@@ -62,3 +53,12 @@
 | `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/2-Copy1.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/2-Copy1.png` |
 | `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/3-Copy1.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/3-Copy1.png` |
 | `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/4-Copy1.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/4-Copy1.png` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/5-Copy1.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/5-Copy1.png` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/6-Copy1.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/6-Copy1.png` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/7-Copy1.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/7-Copy1.png` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/8-Copy1.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/8-Copy1.png` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/9-Copy1.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Fauna/9-Copy1.png` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Grazing/Picture 1.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Grazing/Picture 1.png` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Grazing/Picture 10.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Grazing/Picture 10.png` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Grazing/Picture 2.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Grazing/Picture 2.png` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Grazing/Picture 3.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/Sample to rate/Images/Grazing/Picture 3.png` |
