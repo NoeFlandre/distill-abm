@@ -33,8 +33,8 @@ def encode_image(image_path: str | Path) -> str | None:
 
 
 def get_llm_response(prompt: str, base64_image: str | None = None) -> str:
-    adapter = EchoAdapter(model="legacy-echo")
-    req = LLMRequest(model="legacy-echo", messages=[LLMMessage(role="user", content=prompt)], image_b64=base64_image)
+    adapter = EchoAdapter(model="compat-echo")
+    req = LLMRequest(model="compat-echo", messages=[LLMMessage(role="user", content=prompt)], image_b64=base64_image)
     return adapter.complete(req).text
 
 

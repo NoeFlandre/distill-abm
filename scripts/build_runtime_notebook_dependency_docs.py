@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from distill_abm.legacy.notebook_loader import required_notebook_dependencies_by_path  # noqa: E402
+from distill_abm.reference.notebook_loader import required_notebook_dependencies_by_path  # noqa: E402
 
 JSON_OUT = ROOT / "docs/runtime_notebook_dependencies.json"
 MD_OUT = ROOT / "docs/runtime_notebook_dependencies.md"

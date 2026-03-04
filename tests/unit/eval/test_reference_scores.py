@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from distill_abm.eval.legacy_scores import compute_scores
+from distill_abm.eval.reference_scores import compute_scores
 
 
 def test_compute_scores_shape() -> None:

@@ -6,7 +6,7 @@ from collections import Counter
 
 from pydantic import BaseModel
 
-from distill_abm.eval.legacy_scores import compute_scores
+from distill_abm.eval.reference_scores import compute_scores
 
 
 class SummaryScores(BaseModel):
@@ -33,17 +33,17 @@ def score_summary(reference: str, candidate: str) -> SummaryScores:
     precision = _safe_divide(overlap, len(cand_tokens))
     recall = _safe_divide(overlap, len(ref_tokens))
     f1 = _safe_divide(2 * precision * recall, precision + recall)
-    legacy = compute_scores(reference, candidate)
+    reference_scores = compute_scores(reference, candidate)
     return SummaryScores(
         token_f1=f1,
         precision=precision,
         recall=recall,
-        bleu=legacy.bleu,
-        meteor=legacy.meteor,
-        rouge1=legacy.rouge1,
-        rouge2=legacy.rouge2,
-        rouge_l=legacy.rouge_l,
-        flesch_reading_ease=legacy.flesch_reading_ease,
+        bleu=reference_scores.bleu,
+        meteor=reference_scores.meteor,
+        rouge1=reference_scores.rouge1,
+        rouge2=reference_scores.rouge2,
+        rouge_l=reference_scores.rouge_l,
+        flesch_reading_ease=reference_scores.flesch_reading_ease,
         reference_length=len(ref_tokens),
         candidate_length=len(cand_tokens),
     )

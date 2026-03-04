@@ -9,7 +9,6 @@ import distill_abm.compat as compat
 from distill_abm.eval.doe import clean_name, clean_statsmodels_feature_name, identify_factors_and_metrics
 from distill_abm.eval.qualitative import extract_coverage_score, extract_faithfulness_score, should_skip_row
 from distill_abm.ingest.netlogo import remove_default_elements, remove_urls
-from distill_abm.summarize.legacy import clean_context_response, clean_symbols
 from distill_abm.summarize.postprocess import (
     capitalize_sentences,
     remove_hyphens_after_punctuation,
@@ -17,6 +16,7 @@ from distill_abm.summarize.postprocess import (
     remove_unnecessary_punctuation,
     remove_unnecessary_spaces_in_parentheses,
 )
+from distill_abm.summarize.reference_text import clean_context_response, clean_symbols
 
 
 def test_core_text_utility_regressions() -> None:

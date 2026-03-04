@@ -63,8 +63,8 @@ from distill_abm.compat.compat_scoring import (
 from distill_abm.compat.compat_text import capitalize, clean_context_response, clean_symbols, should_skip_row
 from distill_abm.eval.doe import clean_name, clean_statsmodels_feature_name, identify_factors_and_metrics
 from distill_abm.eval.doe_full import analyze_factorial_anova
-from distill_abm.eval.legacy_scores import compute_scores
 from distill_abm.eval.qualitative import extract_coverage_score, extract_faithfulness_score
+from distill_abm.eval.reference_scores import compute_scores
 from distill_abm.ingest.netlogo import (
     clean_json_content,
     extract_code,
@@ -77,7 +77,6 @@ from distill_abm.ingest.netlogo import (
     update_parameters,
 )
 from distill_abm.pipeline.run import run_pipeline
-from distill_abm.summarize.legacy import chunk_text, summarize_text
 from distill_abm.summarize.models import summarize_with_bart, summarize_with_bert
 from distill_abm.summarize.postprocess import (
     capitalize_sentences,
@@ -88,6 +87,7 @@ from distill_abm.summarize.postprocess import (
     remove_unnecessary_punctuation,
     remove_unnecessary_spaces_in_parentheses,
 )
+from distill_abm.summarize.reference_text import chunk_text, summarize_text
 
 
 def get_llm_response(prompt: str, base64_image: str | None = None) -> str:

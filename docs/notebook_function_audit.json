@@ -1,1110 +1,1110 @@
 [
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
     "kind": "function",
     "qualname": "read_csv_to_df",
     "lineno": 2
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
     "kind": "function",
     "qualname": "read_and_parse_csv",
     "lineno": 7
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
     "kind": "function",
     "qualname": "create_factorial_design",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
     "kind": "function",
     "qualname": "calculate_sums_and_sst",
     "lineno": 2
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
     "kind": "function",
     "qualname": "calculate_sst",
     "lineno": 13
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
     "kind": "function",
     "qualname": "compute_results",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
     "kind": "function",
     "qualname": "remove_evaluating_suffix",
     "lineno": 2
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
     "kind": "function",
     "qualname": "return_csv",
     "lineno": 13
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
     "kind": "function",
     "qualname": "return_csv_2",
     "lineno": 46
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
     "kind": "function",
     "qualname": "preprocess_for_factorial",
     "lineno": 10
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
     "kind": "function",
     "qualname": "get_factor_columns",
     "lineno": 33
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
     "kind": "function",
     "qualname": "add_interactions",
     "lineno": 45
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
     "kind": "function",
     "qualname": "analyze_factorial_contributions",
     "lineno": 57
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 120
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
     "kind": "function",
     "qualname": "clean_name",
     "lineno": 14
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
     "kind": "function",
     "qualname": "identify_factors_and_metrics",
     "lineno": 25
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
     "kind": "function",
     "qualname": "clean_statsmodels_feature_name",
     "lineno": 91
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
     "kind": "function",
     "qualname": "analyze_factorial_anova",
     "lineno": 97
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 258
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/DoE.ipynb",
     "kind": "function",
     "qualname": "clean_name",
     "lineno": 14
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/DoE.ipynb",
     "kind": "function",
     "qualname": "identify_factors_and_metrics",
     "lineno": 25
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/DoE.ipynb",
     "kind": "function",
     "qualname": "clean_statsmodels_feature_name",
     "lineno": 91
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/DoE.ipynb",
     "kind": "function",
     "qualname": "analyze_factorial_anova",
     "lineno": 97
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/DOE/DoE.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 249
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/.ipynb_checkpoints/Final Sheet-checkpoint.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Making the Sheet Structure/.ipynb_checkpoints/Final Sheet-checkpoint.ipynb",
     "kind": "function",
     "qualname": "update_structured_df",
     "lineno": 40
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet.ipynb",
     "kind": "function",
     "qualname": "update_structured_df",
     "lineno": 40
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet.ipynb",
     "kind": "function",
     "qualname": "update_structured_df",
     "lineno": 44
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet.ipynb",
     "kind": "function",
     "qualname": "fill_faithfulness_scores",
     "lineno": 3
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
     "kind": "function",
     "qualname": "encode_image",
     "lineno": 16
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
     "kind": "function",
     "qualname": "get_response_with_images",
     "lineno": 25
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
     "kind": "function",
     "qualname": "load_example_files",
     "lineno": 62
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
     "kind": "function",
     "qualname": "should_skip_row",
     "lineno": 85
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 118
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
     "kind": "function",
     "qualname": "extract_faithfulness_score",
     "lineno": 227
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
     "kind": "function",
     "qualname": "encode_image",
     "lineno": 17
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
     "kind": "function",
     "qualname": "get_response_with_images",
     "lineno": 26
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
     "kind": "function",
     "qualname": "load_example_files",
     "lineno": 78
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
     "kind": "function",
     "qualname": "should_skip_row",
     "lineno": 101
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 128
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb",
     "kind": "function",
     "qualname": "extract_coverage_score",
     "lineno": 218
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb",
     "kind": "function",
     "qualname": "encode_image",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb",
     "kind": "function",
     "qualname": "get_response_with_images",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb",
     "kind": "function",
     "qualname": "extract_faithfulness_score",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb",
     "kind": "function",
     "qualname": "append_faithfulness_score",
     "lineno": 14
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb",
     "kind": "function",
     "qualname": "extract_coverage_score",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb",
     "kind": "function",
     "qualname": "append_coverage_score",
     "lineno": 14
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/3. Adding 1 point to the answers.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/3. Adding 1 point to the answers.ipynb",
     "kind": "function",
     "qualname": "modify_scores",
     "lineno": 3
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/3. Adding 1 point to the answers.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/3. Adding 1 point to the answers.ipynb",
     "kind": "function",
     "qualname": "modify_scores.increment_score",
     "lineno": 11
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
     "kind": "function",
     "qualname": "extract_text_from_pdf",
     "lineno": 21
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
     "kind": "function",
     "qualname": "create_collage",
     "lineno": 30
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
     "kind": "function",
     "qualname": "prepare_conversation",
     "lineno": 54
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
     "kind": "function",
     "qualname": "generate_response",
     "lineno": 74
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
     "kind": "function",
     "qualname": "get_response_with_images",
     "lineno": 101
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
+    "path": "archive/reference_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb",
     "kind": "function",
     "qualname": "get_response_with_pdf_and_images",
     "lineno": 116
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "extract_parameters",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "update_parameters",
     "lineno": 20
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "format_json_oneline",
     "lineno": 33
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "extract_documentation",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "remove_urls",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "process_documentation",
     "lineno": 10
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "process_documentation.remove_urls_from_data",
     "lineno": 16
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "remove_default_elements",
     "lineno": 16
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "process_documentation",
     "lineno": 41
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "clean_json_content",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "extract_code",
     "lineno": 3
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
     "kind": "function",
     "qualname": "encode_image",
     "lineno": 2
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
     "kind": "function",
     "qualname": "get_llm_response",
     "lineno": 5
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
     "kind": "function",
     "qualname": "get_llm_response2",
     "lineno": 28
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
     "kind": "function",
     "qualname": "append_to_csv",
     "lineno": 2
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
     "kind": "function",
     "qualname": "append_to_csv2",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "clean_context_response",
     "lineno": 3
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "process_csv",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "clean_symbols",
     "lineno": 3
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 8
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "chunk_text",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "summarize_text",
     "lineno": 15
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 25
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "chunk_text",
     "lineno": 6
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "summarize_text",
     "lineno": 17
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 27
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_sentences_with_www",
     "lineno": 14
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_hyphens_after_punctuation",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_unnecessary_punctuation",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_unnecessary_spaces_in_parentheses",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 10
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_space_before_dot",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "capitalize_sentences",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "capitalize_sentences.capitalize",
     "lineno": 6
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 20
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "clean_non_unicode",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "clean_non_unicode.remove_non_unicode",
     "lineno": 5
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/6.Scoring-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/6.Scoring-Copy1.ipynb",
     "kind": "function",
     "qualname": "compute_scores",
     "lineno": 13
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/6.Scoring-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Fauna/6.Scoring-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 37
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
     "kind": "function",
     "qualname": "extract_parameters",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
     "kind": "function",
     "qualname": "update_parameters",
     "lineno": 20
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
     "kind": "function",
     "qualname": "format_json_oneline",
     "lineno": 33
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
     "kind": "function",
     "qualname": "extract_documentation",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_urls",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
     "kind": "function",
     "qualname": "process_documentation",
     "lineno": 10
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
     "kind": "function",
     "qualname": "process_documentation.remove_urls_from_data",
     "lineno": 16
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_default_elements",
     "lineno": 16
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
     "kind": "function",
     "qualname": "process_documentation",
     "lineno": 41
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
     "kind": "function",
     "qualname": "clean_json_content",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
     "kind": "function",
     "qualname": "extract_code",
     "lineno": 3
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/2. Plotting the data.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/2. Plotting the data.ipynb",
     "kind": "function",
     "qualname": "plot_columns",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
     "kind": "function",
     "qualname": "encode_image",
     "lineno": 2
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
     "kind": "function",
     "qualname": "get_llm_response",
     "lineno": 5
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
     "kind": "function",
     "qualname": "get_llm_response2",
     "lineno": 28
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
     "kind": "function",
     "qualname": "append_to_csv",
     "lineno": 2
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
     "kind": "function",
     "qualname": "append_to_csv2",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "clean_context_response",
     "lineno": 3
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "process_csv",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "clean_symbols",
     "lineno": 3
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 8
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "chunk_text",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "summarize_text",
     "lineno": 15
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 25
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "chunk_text",
     "lineno": 6
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "summarize_text",
     "lineno": 17
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 27
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_sentences_with_www",
     "lineno": 14
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_hyphens_after_punctuation",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_unnecessary_punctuation",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_unnecessary_spaces_in_parentheses",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 10
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "remove_space_before_dot",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "capitalize_sentences",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "capitalize_sentences.capitalize",
     "lineno": 6
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 20
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "clean_non_unicode",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "kind": "function",
     "qualname": "clean_non_unicode.remove_non_unicode",
     "lineno": 5
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/6.Scoring-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/6.Scoring-Copy1.ipynb",
     "kind": "function",
     "qualname": "compute_scores",
     "lineno": 13
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/6.Scoring-Copy1.ipynb",
+    "path": "archive/reference_repo/Code/Models/Grazing/6.Scoring-Copy1.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 37
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "extract_parameters",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "update_parameters",
     "lineno": 20
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "format_json_oneline",
     "lineno": 33
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "extract_documentation",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "remove_urls",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "process_documentation",
     "lineno": 10
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "process_documentation.remove_urls_from_data",
     "lineno": 16
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "remove_default_elements",
     "lineno": 16
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "process_documentation",
     "lineno": 41
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "clean_json_content",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
     "kind": "function",
     "qualname": "extract_code",
     "lineno": 3
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/2. Plotting the Data.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/2. Plotting the Data.ipynb",
     "kind": "function",
     "qualname": "plot_columns",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
     "kind": "function",
     "qualname": "encode_image",
     "lineno": 2
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
     "kind": "function",
     "qualname": "get_llm_response",
     "lineno": 5
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
     "kind": "function",
     "qualname": "get_llm_response2",
     "lineno": 28
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
     "kind": "function",
     "qualname": "append_to_csv",
     "lineno": 2
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
     "kind": "function",
     "qualname": "append_to_csv2",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 1
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
     "kind": "function",
     "qualname": "clean_context_response",
     "lineno": 3
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
     "kind": "function",
     "qualname": "process_csv",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
     "kind": "function",
     "qualname": "clean_symbols",
     "lineno": 3
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 8
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
     "kind": "function",
     "qualname": "chunk_text",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
     "kind": "function",
     "qualname": "summarize_text",
     "lineno": 15
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 25
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
     "kind": "function",
     "qualname": "chunk_text",
     "lineno": 6
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
     "kind": "function",
     "qualname": "summarize_text",
     "lineno": 17
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 27
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "remove_sentences_with_www",
     "lineno": 14
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "remove_hyphens_after_punctuation",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "remove_unnecessary_punctuation",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "remove_unnecessary_spaces_in_parentheses",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 10
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "remove_space_before_dot",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 9
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "capitalize_sentences",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "capitalize_sentences.capitalize",
     "lineno": 6
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 20
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "clean_non_unicode",
     "lineno": 4
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
     "kind": "function",
     "qualname": "clean_non_unicode.remove_non_unicode",
     "lineno": 5
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/6.Scoring.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/6.Scoring.ipynb",
     "kind": "function",
     "qualname": "compute_scores",
     "lineno": 13
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/6.Scoring.ipynb",
+    "path": "archive/reference_repo/Code/Models/Milk Consumption/6.Scoring.ipynb",
     "kind": "function",
     "qualname": "main",
     "lineno": 37

@@ -22,7 +22,7 @@ Keep executable parity coverage across ingestion, plotting, scoring, prompt comp
 14. `tests/regression/test_model_assets_migration.py` enforces full file coverage and byte-equivalence for mirrored model assets.
 15. `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/` mirrors reference evaluation artifacts.
 16. `tests/regression/test_evaluation_assets_migration.py` enforces full tracked-file coverage and byte-equivalence for the evaluation mirror.
-17. `tests/fixtures/notebook_parity/archive_assets/legacy_repo/` mirrors remaining archival `Results/` data.
+17. `tests/fixtures/notebook_parity/archive_assets/reference_repo/` mirrors remaining reference `Results/` data.
 
 ## Current parity status
 
@@ -33,15 +33,15 @@ Keep executable parity coverage across ingestion, plotting, scoring, prompt comp
 
 The following reference scripts have been replaced by production implementations and removed from runtime dependency:
 
-- `archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb`
-- `archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb`
-- `archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb`
-- `archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb`
-- `archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb`
-- `archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb`
-- `archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb`
-- `archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb`
-- `archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb`
+- `archive/reference_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb`
+- `archive/reference_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb`
+- `archive/reference_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb`
+- `archive/reference_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb`
+- `archive/reference_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb`
+- `archive/reference_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb`
+- `archive/reference_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb`
+- `archive/reference_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb`
+- `archive/reference_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb`
 
 ## Scope
 

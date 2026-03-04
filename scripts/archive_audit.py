@@ -17,16 +17,16 @@ Classification = Literal[
     "human_ground_truth",
     "experiment_setting",
     "historical_nonruntime",
-    "legacy_visualization",
+    "reference_visualization",
 ]
 Action = Literal["migrate", "retain_record_only"]
 
 ROOT = Path("archive")
-NOTEBOOK_ROOT = Path("archive/legacy_repo/Code")
+NOTEBOOK_ROOT = Path("archive/reference_repo/Code")
 JSON_OUT = Path("docs/archive_full_manifest.json")
 MD_OUT = Path("docs/archive_full_manifest.md")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from distill_abm.legacy.notebook_loader import required_notebook_function_sources  # noqa: E402
+from distill_abm.reference.notebook_loader import required_notebook_function_sources  # noqa: E402
 
 RUNTIME_REQUIRED_NOTEBOOKS = {path.as_posix() for path in required_notebook_function_sources().values()}
 
@@ -55,7 +55,7 @@ def _sha256(path: Path) -> str:
 def _classify(path: Path) -> tuple[Classification, Action, str | None, str]:
     rel = path.as_posix()
     ext = path.suffix.lower()
-    rel_code = rel.split("archive/legacy_repo/Code/", 1)[1] if "archive/legacy_repo/Code/" in rel else rel
+    rel_code = rel.split("archive/reference_repo/Code/", 1)[1] if "archive/reference_repo/Code/" in rel else rel
     if rel in RUNTIME_REQUIRED_NOTEBOOKS:
         return (
             "runtime_required",
@@ -101,7 +101,7 @@ def _classify(path: Path) -> tuple[Classification, Action, str | None, str]:
         )
     if ext in {".png", ".jpg", ".jpeg", ".svg"}:
         return (
-            "legacy_visualization",
+            "reference_visualization",
             "retain_record_only",
             None,
             "Visualization artifact retained for historical comparison and reproducibility.",

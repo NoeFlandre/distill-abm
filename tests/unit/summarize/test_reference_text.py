@@ -6,7 +6,7 @@ from typing import Any, cast
 
 import pandas as pd
 
-from distill_abm.summarize.legacy import (
+from distill_abm.summarize.reference_text import (
     chunk_text,
     clean_context_response,
     clean_dataframe_symbols,

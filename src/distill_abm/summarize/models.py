@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from distill_abm.summarize.legacy import chunk_text
+from distill_abm.summarize.reference_text import chunk_text
 
 
 class TokenizerLike(Protocol):
