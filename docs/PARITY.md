@@ -16,6 +16,7 @@ Provide functional continuity between legacy notebook workflows and production p
 8. `distill_abm.legacy.compat` now consults `notebook_loader.should_dispatch_notebook` before any notebook-first call, so runtime execution does not depend on notebooks when the required set is empty.
 9. Archive CSV artifacts and visualization files (`.png/.jpg/.jpeg/.svg`) are retained for reproducibility; they are not marked as discardable.
 10. `docs/runtime_notebook_dependencies.json` provides the one-to-many mapping of runtime-required notebook files to required compatibility function names (currently empty).
+11. Regression parity tests use deterministic baselines/snapshots and no longer execute notebook files directly.
 
 ## Scope
 
