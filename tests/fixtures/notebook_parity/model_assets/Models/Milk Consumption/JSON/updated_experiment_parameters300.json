@@ -1,0 +1,7 @@
+{
+    "number-of-agents": 1000,
+    "habit-on?": true,
+    "network-type": "\"watts-strogatz\"",
+    "norms": true,
+    "social-conformity": 0.28
+}
