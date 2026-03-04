@@ -49,3 +49,14 @@ def test_archive_manifest_migrate_targets_exclude_junk_temp_files() -> None:
 def test_archive_manifest_excludes_ds_store_noise() -> None:
     rows = json.loads(Path("docs/archive_full_manifest.json").read_text(encoding="utf-8"))
     assert all(Path(row["path"]).name != ".DS_Store" for row in rows)
+
+
+def test_archive_manifest_marks_runtime_required_notebooks_explicitly() -> None:
+    rows = json.loads(Path("docs/archive_full_manifest.json").read_text(encoding="utf-8"))
+    runtime_rows = [row for row in rows if row["classification"] == "runtime_required"]
+    assert runtime_rows
+    for row in runtime_rows:
+        assert row["path"].endswith(".ipynb")
+        assert row["action"] in {"migrate", "retain_record_only"}
+        assert row["action"] != "discard_with_rationale"
+        assert row["target_path"] is not None and str(row["target_path"]).strip()

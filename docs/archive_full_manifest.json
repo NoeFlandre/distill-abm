@@ -15,10 +15,10 @@
     "sha256": "02af6fcf85c3b7c6d8ad9e46df93c7065b867ee892da3dc2a1f3aa4244f1c883",
     "size_bytes": 26645,
     "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
-    "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "classification": "runtime_required",
+    "action": "retain_record_only",
+    "target_path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
+    "rationale": "Notebook file currently required by runtime loader for compatibility dispatch; retained in place.",
     "source_notebook_links": [
       "Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb"
     ]
@@ -50,10 +50,10 @@
     "sha256": "ab1843640705c58785ca634b38b7c4def6e59a043d9e78264cb648cac91234b6",
     "size_bytes": 14111,
     "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
-    "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "classification": "runtime_required",
+    "action": "retain_record_only",
+    "target_path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/C\u00e9dric DoE Analysis averaging the repetitions.ipynb",
+    "rationale": "Notebook file currently required by runtime loader for compatibility dispatch; retained in place.",
     "source_notebook_links": [
       "Evaluation/DOE/Archives/C\u00e9dric DoE Analysis averaging the repetitions.ipynb"
     ]
@@ -696,10 +696,10 @@
     "sha256": "64001a147d1887a35e6feba232b0cd44ddd5a82749daa0877428d0222dcfb998",
     "size_bytes": 121009,
     "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
-    "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "classification": "runtime_required",
+    "action": "retain_record_only",
+    "target_path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet.ipynb",
+    "rationale": "Notebook file currently required by runtime loader for compatibility dispatch; retained in place.",
     "source_notebook_links": [
       "Evaluation/Making the Sheet Structure/Final Sheet.ipynb"
     ]
@@ -935,10 +935,10 @@
     "sha256": "42213f37e75ea60418f1a91267c9932c5381682b8c255b1d2662f422b4ed36a6",
     "size_bytes": 4368,
     "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
-    "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "classification": "runtime_required",
+    "action": "retain_record_only",
+    "target_path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb",
+    "rationale": "Notebook file currently required by runtime loader for compatibility dispatch; retained in place.",
     "source_notebook_links": [
       "Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb"
     ]
@@ -4076,10 +4076,10 @@
     "sha256": "7ce73f035e6715f7f24ba96ab3dd1a491cc268ac2ef60e15bde3080cab5fcf4e",
     "size_bytes": 12833,
     "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
-    "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "classification": "runtime_required",
+    "action": "retain_record_only",
+    "target_path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
+    "rationale": "Notebook file currently required by runtime loader for compatibility dispatch; retained in place.",
     "source_notebook_links": [
       "Models/Milk Consumption/4. Generating the summary.ipynb"
     ]

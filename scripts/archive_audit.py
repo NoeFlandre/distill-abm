@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import sys
 from collections import Counter
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -23,6 +24,10 @@ ROOT = Path("archive")
 NOTEBOOK_ROOT = Path("archive/legacy_repo/Code")
 JSON_OUT = Path("docs/archive_full_manifest.json")
 MD_OUT = Path("docs/archive_full_manifest.md")
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from distill_abm.legacy.notebook_loader import required_notebook_function_sources  # noqa: E402
+
+RUNTIME_REQUIRED_NOTEBOOKS = {path.as_posix() for path in required_notebook_function_sources().values()}
 
 
 @dataclass(frozen=True)
@@ -50,6 +55,13 @@ def _classify(path: Path) -> tuple[Classification, Action, str | None, str]:
     rel = path.as_posix()
     ext = path.suffix.lower()
     rel_code = rel.split("archive/legacy_repo/Code/", 1)[1] if "archive/legacy_repo/Code/" in rel else rel
+    if rel in RUNTIME_REQUIRED_NOTEBOOKS:
+        return (
+            "runtime_required",
+            "retain_record_only",
+            rel,
+            "Notebook file currently required by runtime loader for compatibility dispatch; retained in place.",
+        )
     if path.name == ".DS_Store" or path.name.startswith("~$"):
         return (
             "historical_nonruntime",
