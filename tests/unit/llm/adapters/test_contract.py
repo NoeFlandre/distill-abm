@@ -14,6 +14,7 @@ from distill_abm.llm.adapters.base import (
 from distill_abm.llm.adapters.janus_adapter import JanusAdapter
 from distill_abm.llm.adapters.ollama_adapter import OllamaAdapter
 from distill_abm.llm.adapters.openai_adapter import OpenAIAdapter
+from distill_abm.llm.adapters.openrouter_adapter import OpenRouterAdapter
 from distill_abm.llm.factory import create_adapter
 
 
@@ -55,6 +56,21 @@ def test_factory_creates_known_adapter() -> None:
     assert isinstance(adapter, OllamaAdapter)
 
 
+def test_factory_creates_openrouter_adapter() -> None:
+    client = SimpleNamespace(
+        chat=SimpleNamespace(
+            completions=SimpleNamespace(
+                create=lambda **_: SimpleNamespace(
+                    choices=[SimpleNamespace(message=SimpleNamespace(content="ok"))],
+                    model="qwen/qwen3-vl-235b-a22b-thinking",
+                )
+            )
+        )
+    )
+    adapter = create_adapter("openrouter", model="qwen/qwen3-vl-235b-a22b-thinking", client=client)
+    assert isinstance(adapter, OpenRouterAdapter)
+
+
 def test_openai_adapter_success() -> None:
     completion = SimpleNamespace(
         choices=[SimpleNamespace(message=SimpleNamespace(content="hello"))],
@@ -64,6 +80,17 @@ def test_openai_adapter_success() -> None:
     response = OpenAIAdapter(model="gpt-4o", client=client).complete(make_request())
     assert response.provider == "openai"
     assert response.text == "hello"
+
+
+def test_openrouter_adapter_success() -> None:
+    completion = SimpleNamespace(
+        choices=[SimpleNamespace(message=SimpleNamespace(content="hello from openrouter"))],
+        model="qwen/qwen3-vl-235b-a22b-thinking",
+    )
+    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **_: completion)))
+    response = OpenRouterAdapter(model="qwen/qwen3-vl-235b-a22b-thinking", client=client).complete(make_request())
+    assert response.provider == "openrouter"
+    assert response.text == "hello from openrouter"
 
 
 def test_openai_adapter_includes_image_payload_when_present() -> None:
@@ -265,6 +292,14 @@ def test_janus_adapter_passes_image_and_sampling_fields() -> None:
         (
             OllamaAdapter,
             SimpleNamespace(chat=lambda **_: (_ for _ in ()).throw(RuntimeError("boom"))),
+        ),
+        (
+            OpenRouterAdapter,
+            SimpleNamespace(
+                chat=SimpleNamespace(
+                    completions=SimpleNamespace(create=lambda **_: (_ for _ in ()).throw(RuntimeError("boom")))
+                )
+            ),
         ),
     ],
 )

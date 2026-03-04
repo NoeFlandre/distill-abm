@@ -195,7 +195,7 @@ Primary commands exposed by `distill_abm.cli`:
 - `run` : executes one run from CSV/params/docs
 - `analyze-doe` : generates ANOVA/DoE contributions
 - `evaluate-qualitative` : evaluates coverage or faithfulness (1-5)
-- `smoke-qwen` : runs the full local Qwen smoke matrix (all evidence + text-path combinations, DoE, and sweep)
+- `smoke-qwen` : runs the smoke matrix (provider/model selectable; defaults to local Ollama Qwen)
 
 ### Qualitative output contract
 
@@ -264,13 +264,15 @@ You can trace every production output from:
 
 ## 13) Qwen smoke run (single-command validation)
 
-Use `smoke-qwen` to run the full local Ollama Qwen validation matrix in one command:
+Use `smoke-qwen` to run the validation matrix in one command:
 
 - evidence modes: `plot`, `table-csv`, `plot+table`
 - text-path modes: `full/full`, `summary/summary`, `both/both`
 - prompt sweep: `run_pipeline_sweep`
 - DoE: ANOVA contribution export
 - optional qualitative checks for coverage and faithfulness
+- provider/model are explicit CLI inputs (`--provider`, `--model`)
+- optional case filtering (`--case-id ...`, `--max-cases N`) enables tiny smoke runs for quick debugging
 
 The command writes:
 

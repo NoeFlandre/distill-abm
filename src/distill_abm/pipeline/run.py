@@ -267,6 +267,8 @@ def _build_run_signature(inputs: PipelineInputs, prompts: PromptsConfig, adapter
             "model": inputs.model,
             "temperature": runtime_defaults.llm_request.temperature,
             "max_tokens": runtime_defaults.llm_request.max_tokens,
+            "max_retries": runtime_defaults.llm_request.max_retries,
+            "retry_backoff_seconds": runtime_defaults.llm_request.retry_backoff_seconds,
         },
         "prompts": prompts.model_dump(mode="json"),
     }
@@ -683,6 +685,8 @@ def _write_run_metadata(
     runtime_defaults = get_runtime_defaults()
     default_temperature = runtime_defaults.llm_request.temperature
     default_max_tokens = runtime_defaults.llm_request.max_tokens
+    default_max_retries = runtime_defaults.llm_request.max_retries
+    default_retry_backoff_seconds = runtime_defaults.llm_request.retry_backoff_seconds
     metadata = {
         "run_timestamp_utc": datetime.now(UTC).isoformat(),
         "inputs": {
@@ -721,17 +725,23 @@ def _write_run_metadata(
             "request": {
                 "temperature": default_temperature,
                 "max_tokens": default_max_tokens,
+                "max_retries": default_max_retries,
+                "retry_backoff_seconds": default_retry_backoff_seconds,
             },
             "requests": {
                 "context": {
                     "image_attached": False,
                     "temperature": default_temperature,
                     "max_tokens": default_max_tokens,
+                    "max_retries": default_max_retries,
+                    "retry_backoff_seconds": default_retry_backoff_seconds,
                 },
                 "trend": {
                     "image_attached": trend_image_attached,
                     "temperature": default_temperature,
                     "max_tokens": default_max_tokens,
+                    "max_retries": default_max_retries,
+                    "retry_backoff_seconds": default_retry_backoff_seconds,
                 },
             },
         },

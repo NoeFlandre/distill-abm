@@ -7,6 +7,7 @@ import pandas as pd
 
 from distill_abm.configs.models import PromptsConfig
 from distill_abm.eval.metrics import SummaryScores
+from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError, LLMRequest, LLMResponse
 from distill_abm.pipeline import helpers
 
 
@@ -68,6 +69,60 @@ def test_build_trend_prompt_includes_optional_stats_csv_and_plot_description() -
     assert "\n\nEXAMPLE" in prompt
     assert "INSIGHTS" not in prompt
     assert "time_step,mean,std,min,max,median" in prompt
+
+
+def test_invoke_adapter_retries_transient_provider_errors() -> None:
+    class FlakyAdapter(LLMAdapter):
+        provider = "flaky"
+
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def complete(self, request: LLMRequest) -> LLMResponse:
+            self.calls += 1
+            if self.calls < 3:
+                raise LLMProviderError("temporary timeout")
+            return LLMResponse(provider="flaky", model=request.model, text="final answer", raw={})
+
+    adapter = FlakyAdapter()
+    text = helpers.invoke_adapter(
+        adapter=adapter,
+        model="test-model",
+        prompt="hello",
+        max_retries=2,
+        retry_backoff_seconds=0.0,
+    )
+    assert text == "final answer"
+    assert adapter.calls == 3
+
+
+def test_invoke_adapter_raises_after_retry_budget_exhausted() -> None:
+    class AlwaysFailAdapter(LLMAdapter):
+        provider = "always-fail"
+
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def complete(self, request: LLMRequest) -> LLMResponse:
+            _ = request
+            self.calls += 1
+            raise LLMProviderError("still failing")
+
+    adapter = AlwaysFailAdapter()
+    try:
+        helpers.invoke_adapter(
+            adapter=adapter,
+            model="test-model",
+            prompt="hello",
+            max_retries=1,
+            retry_backoff_seconds=0.0,
+        )
+    except LLMProviderError as exc:
+        message = str(exc)
+    else:  # pragma: no cover
+        raise AssertionError("Expected invoke_adapter to raise after retries are exhausted")
+    assert "after 2 attempt(s)" in message
+    assert adapter.calls == 2
 
 
 def test_build_stats_csv_uses_expected_column_order() -> None:

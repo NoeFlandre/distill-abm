@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import AliasChoices, BaseModel, Field
 
-ProviderName = Literal["openai", "anthropic", "ollama", "janus", "echo"]
+ProviderName = Literal["openai", "openrouter", "anthropic", "ollama", "janus", "echo"]
 
 
 class ModelEntry(BaseModel):
@@ -153,6 +153,8 @@ class RuntimeLLMRequestDefaults(BaseModel):
 
     temperature: float = 0.5
     max_tokens: int = 1000
+    max_retries: int = 2
+    retry_backoff_seconds: float = 2.0
 
 
 class RuntimeRunDefaults(BaseModel):
@@ -178,6 +180,7 @@ class RuntimeQualitativeDefaults(BaseModel):
 class RuntimeSmokeDefaults(BaseModel):
     """Defines CLI defaults for the local Qwen smoke command."""
 
+    provider: ProviderName = "ollama"
     output_dir: str = "results/smoke_qwen"
     model: str = "qwen3.5:0.8b"
     metric_pattern: str = "mean"

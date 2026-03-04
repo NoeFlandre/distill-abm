@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import csv
+import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Literal, Protocol
@@ -11,8 +12,9 @@ from typing import Literal, Protocol
 import pandas as pd
 
 from distill_abm.configs.models import PromptsConfig
+from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.metrics import SummaryScores
-from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMRequest
+from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMProviderError, LLMRequest
 from distill_abm.summarize.models import summarize_with_bart, summarize_with_bert
 from distill_abm.summarize.text import clean_markdown_symbols, strip_think_prefix
 from distill_abm.viz.plots import generate_stats_table
@@ -85,11 +87,36 @@ def build_trend_prompt(
     return "\n\n".join(parts)
 
 
-def invoke_adapter(adapter: LLMAdapter, model: str, prompt: str, image_b64: str | None = None) -> str:
-    """Execute one LLM call and normalize response text."""
+def invoke_adapter(
+    adapter: LLMAdapter,
+    model: str,
+    prompt: str,
+    image_b64: str | None = None,
+    max_retries: int | None = None,
+    retry_backoff_seconds: float | None = None,
+) -> str:
+    """Execute one LLM call with bounded retries and normalize response text."""
     request = LLMRequest(model=model, messages=[LLMMessage(role="user", content=prompt)], image_b64=image_b64)
-    response = adapter.complete(request)
-    return clean_markdown_symbols(strip_think_prefix(response.text))
+    defaults = get_runtime_defaults().llm_request
+    retries = max(defaults.max_retries if max_retries is None else max_retries, 0)
+    backoff = max(defaults.retry_backoff_seconds if retry_backoff_seconds is None else retry_backoff_seconds, 0.0)
+
+    errors: list[str] = []
+    for attempt in range(retries + 1):
+        try:
+            response = adapter.complete(request)
+            return clean_markdown_symbols(strip_think_prefix(response.text))
+        except Exception as exc:
+            wrapped = exc if isinstance(exc, LLMProviderError) else LLMProviderError(str(exc))
+            errors.append(str(wrapped))
+            is_last_attempt = attempt >= retries
+            if is_last_attempt:
+                break
+            if backoff > 0:
+                time.sleep(backoff * (2**attempt))
+    raise LLMProviderError(
+        f"{adapter.provider} request failed after {retries + 1} attempt(s): {errors[-1] if errors else 'unknown'}"
+    )
 
 
 def encode_image(path: Path) -> str:

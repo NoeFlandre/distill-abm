@@ -471,7 +471,9 @@ def _render_markdown_report(result: SmokeSuiteResult) -> str:
     lines.append(
         "- Request defaults: "
         f"`temperature={runtime_defaults.llm_request.temperature}`, "
-        f"`max_tokens={runtime_defaults.llm_request.max_tokens}`"
+        f"`max_tokens={runtime_defaults.llm_request.max_tokens}`, "
+        f"`max_retries={runtime_defaults.llm_request.max_retries}`, "
+        f"`retry_backoff_seconds={runtime_defaults.llm_request.retry_backoff_seconds}`"
     )
     lines.append("")
     lines.append("## Case Matrix")

@@ -685,7 +685,7 @@ def test_cli_smoke_qwen_forwards_inputs_and_reports_paths(tmp_path: Path, monkey
             self.sweep_output_csv: Path | None = output_dir / "sweep.csv"
 
     def fake_run_qwen_smoke_suite(  # type: ignore[no-untyped-def]
-        *, inputs, prompts, adapter, run_qualitative, doe_input_csv, run_sweep, resume_existing
+        *, inputs, prompts, adapter, run_qualitative, doe_input_csv, run_sweep, cases, resume_existing
     ):
         captured["inputs"] = inputs
         captured["prompts"] = prompts
@@ -693,6 +693,7 @@ def test_cli_smoke_qwen_forwards_inputs_and_reports_paths(tmp_path: Path, monkey
         captured["run_qualitative"] = run_qualitative
         captured["doe_input_csv"] = doe_input_csv
         captured["run_sweep"] = run_sweep
+        captured["cases"] = cases
         captured["resume_existing"] = resume_existing
         inputs.output_dir.mkdir(parents=True, exist_ok=True)
         result = _Result(inputs.output_dir)
@@ -717,6 +718,8 @@ def test_cli_smoke_qwen_forwards_inputs_and_reports_paths(tmp_path: Path, monkey
             str(prompts),
             "--output-dir",
             str(tmp_path / "smoke"),
+            "--provider",
+            "echo",
             "--model",
             "qwen3.5:0.8b",
             "--metric-pattern",
@@ -739,6 +742,8 @@ def test_cli_smoke_qwen_forwards_inputs_and_reports_paths(tmp_path: Path, monkey
     assert smoke_inputs.metric_pattern == "mean-incum"
     assert smoke_inputs.metric_description == "weekly milk"
     assert smoke_inputs.plot_description == "plot desc"
+    assert cast(Any, captured["adapter"]).provider == "echo"
+    assert cast(Any, captured["cases"]) is None
     assert captured["run_qualitative"] is False
     assert captured["run_sweep"] is False
     assert captured["resume_existing"] is True
@@ -824,3 +829,78 @@ def test_cli_smoke_qwen_abm_overrides_metric_defaults(tmp_path: Path, monkeypatc
     assert smoke_inputs.metric_description.startswith("species abundance")
     assert smoke_inputs.sweep_plot_descriptions == ["p1", "p2", "p3", "p4", "p5"]
     assert smoke_inputs.scoring_reference_path == Path("fauna_gt.txt")
+
+
+def test_cli_smoke_qwen_supports_case_selection(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    params.write_text("param=1\n", encoding="utf-8")
+    docs = tmp_path / "docs.txt"
+    docs.write_text("doc\n", encoding="utf-8")
+    prompts = tmp_path / "prompts.yaml"
+    prompts.write_text(
+        "\n".join(
+            [
+                'context_prompt: "Context {parameters} {documentation}"',
+                'trend_prompt: "Trend {description}"',
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    captured: dict[str, object] = {}
+
+    class _Result:
+        def __init__(self, output_dir: Path) -> None:
+            self.success = True
+            self.failed_cases: list[str] = []
+            self.report_markdown_path = output_dir / "smoke_report.md"
+            self.report_json_path = output_dir / "smoke_report.json"
+            self.doe_output_csv: Path | None = None
+            self.sweep_output_csv: Path | None = None
+
+    def fake_run_qwen_smoke_suite(*, inputs, cases, **kwargs):  # type: ignore[no-untyped-def]
+        captured["inputs"] = inputs
+        captured["cases"] = cases
+        inputs.output_dir.mkdir(parents=True, exist_ok=True)
+        result = _Result(inputs.output_dir)
+        result.report_markdown_path.write_text("# smoke\n", encoding="utf-8")
+        result.report_json_path.write_text("{}", encoding="utf-8")
+        return result
+
+    monkeypatch.setattr("distill_abm.cli.run_qwen_smoke_suite", fake_run_qwen_smoke_suite)
+    result = runner.invoke(
+        app,
+        [
+            "smoke-qwen",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--output-dir",
+            str(tmp_path / "smoke"),
+            "--provider",
+            "echo",
+            "--model",
+            "echo-model",
+            "--case-id",
+            "plot-full-full",
+            "--case-id",
+            "table-csv-full-full",
+            "--max-cases",
+            "1",
+            "--skip-qualitative",
+            "--skip-sweep",
+        ],
+    )
+
+    assert result.exit_code == 0
+    cases = cast(list[Any], captured["cases"])
+    assert len(cases) == 1
+    assert cases[0].case_id == "plot-full-full"

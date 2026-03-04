@@ -11,6 +11,9 @@ models:
   qwen_ollama:
     provider: ollama
     model: qwen3.5:0.8b
+  qwen_openrouter:
+    provider: openrouter
+    model: qwen/qwen3-vl-235b-a22b-thinking
   janus_pro:
     provider: janus
     model: janus-pro
