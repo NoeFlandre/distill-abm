@@ -3041,6 +3041,19 @@
     "source_notebook_links": []
   },
   {
+    "path": "archive/legacy_repo/Code/Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb",
+    "sha256": "81699ebde0d2181229ab94b1c333d74fe29e58bd9f65296f6b603749dbbc7f1a",
+    "size_bytes": 61196,
+    "extension": ".ipynb",
+    "classification": "historical_nonruntime",
+    "action": "retain_record_only",
+    "target_path": null,
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
+    "source_notebook_links": [
+      "Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb"
+    ]
+  },
+  {
     "path": "archive/legacy_repo/Code/Models/Grazing/2. Plotting the data.ipynb",
     "sha256": "8be45691d6e4b6ed50518f23b040f9a965e4ce2e4b7c972a10e0b3d6f9e0b980",
     "size_bytes": 2620860,
@@ -3658,6 +3671,19 @@
     "target_path": "tests/fixtures/notebook_parity/experiment_settings/Models/Grazing/TXT/narrativeCombined200.txt",
     "rationale": "Model parameter/documentation inputs used in notebook runs.",
     "source_notebook_links": []
+  },
+  {
+    "path": "archive/legacy_repo/Code/Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb",
+    "sha256": "59f995ac8d104e85a219bc5eb5195268c38ac8742119d930ca48995fe8192d53",
+    "size_bytes": 58671,
+    "extension": ".ipynb",
+    "classification": "historical_nonruntime",
+    "action": "retain_record_only",
+    "target_path": null,
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
+    "source_notebook_links": [
+      "Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb"
+    ]
   },
   {
     "path": "archive/legacy_repo/Code/Models/Milk Consumption/2. Plotting the Data.ipynb",
