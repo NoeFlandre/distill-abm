@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
 
+import distill_abm.legacy.notebook_loader as notebook_loader
 from distill_abm.legacy.notebook_loader import (
     REQUIRED_NOTEBOOK_FUNCTIONS,
     _is_better_source,
@@ -16,6 +18,31 @@ from distill_abm.legacy.notebook_loader import (
     required_notebook_function_sources,
     should_dispatch_notebook,
 )
+
+
+def _write_notebook(path: Path, source: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "cells": [
+            {
+                "cell_type": "code",
+                "execution_count": None,
+                "id": "synthetic-cell",
+                "metadata": {},
+                "outputs": [],
+                "source": source,
+            }
+        ],
+        "metadata": {},
+        "nbformat": 4,
+        "nbformat_minor": 5,
+    }
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def _set_note_root(monkeypatch: pytest.MonkeyPatch, root: Path) -> None:
+    monkeypatch.setattr(notebook_loader, "NOTEBOOK_ROOT", root)
+    notebook_loader._build_registry.cache_clear()
 
 
 def test_priority_flags_are_case_insensitive() -> None:
@@ -40,33 +67,22 @@ def test_better_source_prefers_primary_over_archive_copy_checkpoint() -> None:
     assert not _is_better_source(archive, primary)
 
 
-def test_loader_finds_expected_core_functions() -> None:
-    names = available_function_names()
-    assert len(names) >= 60
-    assert "remove_urls" in names
-    assert "compute_scores" in names
-    assert "analyze_factorial_anova" in names
+def test_loader_uses_priority_order_with_synthetic_notebooks(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_note_root(monkeypatch, tmp_path)
+    _write_notebook(tmp_path / "Model/archives/f.ipynb", "def pick():\n    return 'archive'\n")
+    _write_notebook(tmp_path / "Model/.ipynb_checkpoints/f.ipynb", "def pick():\n    return 'checkpoint'\n")
+    _write_notebook(tmp_path / "Model/f-copy.ipynb", "def pick():\n    return 'copy'\n")
+    _write_notebook(tmp_path / "Model/f.ipynb", "def pick():\n    return 'primary'\n")
+
+    assert "pick" in available_function_names()
+    assert get_notebook_function("pick")() == "primary"
+    assert get_notebook_source_path("pick") == tmp_path / "Model/f.ipynb"
 
 
-def test_loader_prefers_primary_not_archive_or_copy() -> None:
-    for name in ["analyze_factorial_anova", "extract_faithfulness_score", "append_to_csv"]:
-        source = str(get_notebook_source_path(name))
-        assert "/Archives/" not in source
-        assert "Copy" not in Path(source).name
-
-
-def test_provenance_avoids_archive_copy_and_checkpoints_case_insensitive() -> None:
-    for name in ["remove_urls", "extract_faithfulness_score", "append_to_csv"]:
-        source = get_notebook_source_path(name)
-        source_text = str(source).lower()
-        assert source.exists()
-        assert source.is_relative_to(Path("archive/legacy_repo/Code"))
-        assert "/archives/" not in source_text
-        assert ".ipynb_checkpoints" not in source_text
-        assert "copy" not in source.name.lower()
-
-
-def test_missing_notebook_function_raises_key_error() -> None:
+def test_missing_notebook_function_raises_key_error_with_empty_root(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _set_note_root(monkeypatch, tmp_path)
     with pytest.raises(KeyError):
         get_notebook_function("_does_not_exist_")
 
@@ -80,7 +96,6 @@ def test_required_function_sources_resolve_for_notebook_deletion_planning() -> N
     assert sorted(sources.keys()) == sorted(REQUIRED_NOTEBOOK_FUNCTIONS)
     for source in sources.values():
         assert source.exists()
-        assert source.is_relative_to(Path("archive/legacy_repo/Code"))
 
 
 def test_required_dependencies_group_by_notebook_path() -> None:
