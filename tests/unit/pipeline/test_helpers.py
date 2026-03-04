@@ -4,6 +4,7 @@ import csv
 from pathlib import Path
 
 from distill_abm.configs.models import PromptsConfig
+from distill_abm.eval.metrics import SummaryScores
 from distill_abm.pipeline import helpers
 
 
@@ -93,3 +94,57 @@ def test_summarize_report_text_prefers_summary_when_enabled_with_mounted_summari
         )
         == "bart:raw\nbert::abc"
     )
+
+
+def test_summarize_report_text_pair_returns_raw_and_summary() -> None:
+    def fake_bart(text: str) -> str:
+        return f"bart:{text}"
+
+    def fake_bert(text: str) -> str:
+        return "bert::abc"
+
+    raw, summary = helpers.summarize_report_text_pair(
+        text="raw",
+        skip_summarization=False,
+        summarize_with_bart_fn=fake_bart,
+        summarize_with_bert_fn=fake_bert,
+    )
+    assert raw == "raw"
+    assert summary == "bart:raw\nbert::abc"
+
+
+def test_write_report_with_both_full_and_summary_scores(tmp_path: Path) -> None:
+    def fake_scores(token_f1: float) -> SummaryScores:
+        return SummaryScores(
+            token_f1=token_f1,
+            precision=0.1,
+            recall=0.2,
+            bleu=0.3,
+            meteor=0.4,
+            rouge1=0.5,
+            rouge2=0.6,
+            rouge_l=0.7,
+            flesch_reading_ease=75.0,
+            reference_length=10,
+            candidate_length=5,
+        )
+
+    report_path = helpers.write_report(
+        output_dir=tmp_path,
+        context="context",
+        trend_full="full trend",
+        trend_summary="summary trend",
+        scores=fake_scores(0.9),
+        full_scores=fake_scores(0.7),
+        summary_scores=fake_scores(0.8),
+        include_extended_columns=True,
+    )
+
+    with report_path.open("r", encoding="utf-8", newline="") as handle:
+        rows = list(csv.reader(handle))
+    assert rows[0][0] == "context_response"
+    assert "trend_full_response" in rows[0]
+    assert "summary_full_response" not in rows[0]
+    assert "full_token_f1" in rows[0]
+    assert "summary_token_f1" in rows[0]
+    assert rows[1][1] == "summary trend"

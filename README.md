@@ -84,7 +84,7 @@ uv run distill-abm run ... --evidence-mode stats-image
 uv run distill-abm run ... --evidence-mode plot+stats
 ```
 
-Run no-summarization baseline:
+Run full-text baseline or summary-based runs:
 
 ```bash
 uv run distill-abm run \
@@ -93,6 +93,17 @@ uv run distill-abm run \
   --documentation-path path/to/docs.txt \
   --evidence-mode plot+stats \
   --skip-summarization
+```
+
+Generate both full-text and summary artifacts and score on both for side-by-side comparison:
+
+```bash
+uv run distill-abm run \
+  --csv-path path/to/reduced.csv \
+  --parameters-path path/to/params.txt \
+  --documentation-path path/to/docs.txt \
+  --summarization-mode both \
+  --score-on both
 ```
 
 Run reference-style combination sweeps in code (`role`, `example`, `insights` matrix):

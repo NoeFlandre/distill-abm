@@ -10,14 +10,16 @@ The system turns NetLogo simulation outputs into text-and-metric summaries using
 2. generate trend artifacts (plots + statistics)
 3. build context and trend prompts
 4. query one or more LLM providers
-5. optionally summarize with BART/BERT
+5. optionally summarize with BART/BERT (or keep full text)
 6. post-process text into final report fields
 7. compute score metrics
 
 The pipeline supports both:
 
 - **reference mode** (`--plot` / `--stats-markdown` / `--stats-image` / `plot+stats`)
-- **no-summarization mode** (`--skip-summarization`)
+- **full-text mode** (`--summarization-mode full` or `--skip-summarization`)
+- **summary mode** (`--summarization-mode summary`)
+- **dual mode** (`--summarization-mode both`, stores both trend text forms)
 
 ## 2) Data Ingestion
 
@@ -108,7 +110,7 @@ Trend prompts include:
 
 ### Default behavior
 
-Unless disabled, pipeline summarization applies two stages:
+By default (`summarization_mode=summary`), pipeline summarization applies:
 
 - BART summarization pass
 - BERT summarization pass on grouped plot analyses
@@ -116,9 +118,21 @@ Unless disabled, pipeline summarization applies two stages:
   - `summarize_with_t5`
   - `summarize_with_longformer_ext`
 
-### No-summarization mode
+You can force full-text usage with `--summarization-mode full` (or legacy `--skip-summarization`) or capture both text versions with `--summarization-mode both`.
 
-With `--skip-summarization`, the trend + context outputs are concatenated directly into the report fields and are not passed through BART/BERT.
+### Dual-path and scoring modes
+
+`run_pipeline` accepts `score_on` to choose scoring source:
+
+- `score_on=full`: score the raw trend text.
+- `score_on=summary`: score summarized trend text.
+- `score_on=both`: compute both and write both sets into `report.csv` as extended columns.
+
+Use `score_on=both` with `summarization-mode both` for a full comparison run where trend response, score columns, and report schema include:
+
+- `trend_full_response`
+- `trend_summary_response`
+- `full_*` and `summary_*` score prefixes in `report.csv`
 
 ### Summary batch behavior
 
