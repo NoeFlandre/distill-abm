@@ -45,6 +45,7 @@ def test_archive_manifest_covers_every_archive_file() -> None:
     rows = json.loads(manifest_path.read_text(encoding="utf-8"))
     archive_files = _tracked_archive_files()
     assert len(rows) == len(archive_files)
+    assert {row["path"] for row in rows} == {path.as_posix() for path in archive_files}
 
 
 def test_archive_manifest_has_no_unresolved_required_mappings() -> None:
