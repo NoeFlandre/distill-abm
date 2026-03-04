@@ -112,6 +112,9 @@ Unless disabled, pipeline summarization applies two stages:
 
 - BART summarization pass
 - BERT summarization pass on grouped plot analyses
+- Additional optional helpers are exposed via `distill_abm.summarize.models`:
+  - `summarize_with_t5`
+  - `summarize_with_longformer_ext`
 
 ### No-summarization mode
 
