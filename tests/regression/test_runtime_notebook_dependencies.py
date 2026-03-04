@@ -19,3 +19,8 @@ def test_runtime_notebook_dependency_report_matches_loader_and_manifest() -> Non
     manifest_rows = json.loads(Path("docs/archive_full_manifest.json").read_text(encoding="utf-8"))
     runtime_paths = sorted(row["path"] for row in manifest_rows if row["classification"] == "runtime_required")
     assert sorted(report_map.keys()) == runtime_paths
+
+
+def test_runtime_notebook_dependency_report_is_empty_at_current_migration_stage() -> None:
+    rows = json.loads(Path("docs/runtime_notebook_dependencies.json").read_text(encoding="utf-8"))
+    assert rows == []

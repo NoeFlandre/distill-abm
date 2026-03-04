@@ -74,3 +74,9 @@ def test_archive_manifest_keeps_csv_and_plot_artifacts() -> None:
 def test_archive_manifest_has_no_discard_actions() -> None:
     rows = json.loads(Path("docs/archive_full_manifest.json").read_text(encoding="utf-8"))
     assert all(row["action"] != "discard_with_rationale" for row in rows)
+
+
+def test_archive_manifest_has_zero_runtime_required_rows_at_current_stage() -> None:
+    rows = json.loads(Path("docs/archive_full_manifest.json").read_text(encoding="utf-8"))
+    runtime_rows = [row for row in rows if row["classification"] == "runtime_required"]
+    assert runtime_rows == []
