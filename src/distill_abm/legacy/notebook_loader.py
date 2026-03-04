@@ -13,6 +13,24 @@ from typing import Any, cast
 import nbformat
 
 NOTEBOOK_ROOT = Path("archive/legacy_repo/Code")
+REQUIRED_NOTEBOOK_FUNCTIONS: tuple[str, ...] = (
+    "analyze_factorial_contributions",
+    "append_coverage_score",
+    "append_faithfulness_score",
+    "calculate_sst",
+    "calculate_sums_and_sst",
+    "clean_context_response",
+    "clean_symbols",
+    "compute_results",
+    "create_factorial_design",
+    "fill_faithfulness_scores",
+    "read_and_parse_csv",
+    "read_csv_to_df",
+    "remove_evaluating_suffix",
+    "return_csv",
+    "return_csv_2",
+    "update_structured_df",
+)
 
 
 @dataclass(frozen=True)
@@ -48,6 +66,12 @@ def _build_registry() -> dict[str, NotebookFunction]:
 def available_function_names() -> list[str]:
     """Returns sorted function names extracted from archived notebooks."""
     return sorted(_build_registry().keys())
+
+
+def missing_required_notebook_functions() -> list[str]:
+    """Returns required notebook function names that are unavailable in the runtime registry."""
+    available = set(available_function_names())
+    return [name for name in REQUIRED_NOTEBOOK_FUNCTIONS if name not in available]
 
 
 def get_notebook_function(name: str) -> Callable[..., Any]:
