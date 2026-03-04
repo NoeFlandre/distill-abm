@@ -139,6 +139,26 @@ def test_ollama_adapter_includes_image_payload_when_present() -> None:
     assert isinstance(messages[0]["images"], list)
 
 
+def test_ollama_adapter_forwards_max_tokens_as_num_predict() -> None:
+    seen: dict[str, object] = {}
+
+    def _chat(**payload):  # type: ignore[no-untyped-def]
+        seen.update(payload)
+        return {"message": {"content": "hi"}, "model": "qwen2.5:latest"}
+
+    request = LLMRequest(
+        model="qwen2.5:latest",
+        messages=[LLMMessage(role="user", content="hello")],
+        max_tokens=321,
+        temperature=0.5,
+    )
+    OllamaAdapter(model="qwen2.5:latest", client=SimpleNamespace(chat=_chat)).complete(request)
+    options = seen["options"]
+    assert isinstance(options, dict)
+    assert options["temperature"] == 0.5
+    assert options["num_predict"] == 321
+
+
 def test_janus_adapter_success() -> None:
     class FakeJanusClient:
         def generate(

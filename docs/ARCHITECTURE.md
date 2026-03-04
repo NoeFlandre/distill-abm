@@ -40,6 +40,9 @@
     - `run_pipeline_sweep` for role/example/insights combinations
     - `write_combinations_csv` for wide per-combination output schema
     - optional split context/trend adapters and resumable wide-CSV updates for Claude/Deepseek parity workflows
+  - smoke orchestration:
+    - `pipeline.smoke.run_qwen_smoke_suite` for all evidence/summarization/scoring mode checks in one run
+    - case-by-case artifact capture (`prompts`, `responses`, `metadata`, qualitative checks, DoE, sweep)
 - `distill_abm.compat`:
   - reference implementation loader with source provenance and priority ordering
   - compatibility wrappers preserving stable function names
@@ -85,9 +88,10 @@ All numeric defaults and runtime hyperparameters are documented in:
 - `uv run distill-abm run ...` executes deterministic CLI workflows with explicit modes and paths.
 - `uv run distill-abm evaluate-qualitative ...` runs qualitative coverage/faithfulness scoring.
 - `uv run distill-abm analyze-doe ...` runs ANOVA/DoE analysis.
+- `uv run distill-abm smoke-qwen ...` runs the full local Qwen smoke matrix with debug artifacts.
 - Each run writes `pipeline_run_metadata.json` and captures:
   - input artifact paths
   - resolved evidence/summarization modes
-  - prompt signatures (`context` and `trend`)
+  - full prompt texts and prompt signatures (`context` and `trend`)
   - model/provider and request hyperparameters
   - trend/tracker score outputs and generated artifact paths

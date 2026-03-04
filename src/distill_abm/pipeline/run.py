@@ -192,6 +192,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         evidence_mode=resolved_evidence_mode,
         requested_evidence_mode=inputs.evidence_mode,
         adapter=adapter,
+        trend_image_attached=image_b64 is not None,
     )
 
     return PipelineResult(
@@ -462,6 +463,7 @@ def _write_run_metadata(
     requested_evidence_mode: EvidenceMode,
     adapter: LLMAdapter,
     selected_scores: SummaryScores,
+    trend_image_attached: bool,
 ) -> Path:
     """Persist deterministic run metadata for reproducibility and auditability."""
     metadata = {
@@ -495,6 +497,22 @@ def _write_run_metadata(
                 "temperature": 0.5,
                 "max_tokens": 1000,
             },
+            "requests": {
+                "context": {
+                    "image_attached": False,
+                    "temperature": 0.5,
+                    "max_tokens": 1000,
+                },
+                "trend": {
+                    "image_attached": trend_image_attached,
+                    "temperature": 0.5,
+                    "max_tokens": 1000,
+                },
+            },
+        },
+        "prompts": {
+            "context_prompt": context_prompt,
+            "trend_prompt": trend_prompt,
         },
         "reproducibility": {
             "include_pattern": include_pattern,
