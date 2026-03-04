@@ -60,6 +60,10 @@ The default request temperature remains `0.5` (`mypy`-validated default in `LLMR
 - `run_pipeline_sweep`: all prompt-feature combinations across multiple plot images.
 - `write_combinations_csv`: notebook-style wide CSV output with per-image trend prompt/response columns.
 - `build_style_feature_combinations`: powerset generation helper used by sweep execution.
+- Deepseek/Claude parity options:
+  - split adapters/models between context and trend phases (`context_adapter`, `trend_adapter`, `context_model`, `trend_model`)
+  - notebook plot-header schema (`csv_column_style="plot"`)
+  - resume/update existing wide CSV (`resume_existing=True`)
 
 These functions provide parity for the retired combination notebooks and keep the notebook artifacts reproducible through audit outputs.
 

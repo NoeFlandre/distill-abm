@@ -30,6 +30,7 @@
   - notebook-style multi-feature sweep API:
     - `run_pipeline_sweep` for role/example/insights combinations
     - `write_combinations_csv` for wide per-combination output schema
+    - optional split context/trend adapters and resumable wide-CSV updates for Claude/Deepseek parity workflows
 - `distill_abm.legacy`:
   - notebook function loader with source provenance and priority ordering
   - compatibility wrappers preserving notebook-era function names

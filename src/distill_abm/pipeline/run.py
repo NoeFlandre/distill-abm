@@ -26,6 +26,7 @@ from distill_abm.viz.plots import (
 )
 
 EvidenceMode = Literal["plot", "stats-markdown", "stats-image", "plot+stats"]
+SweepCsvColumnStyle = Literal["trend", "plot"]
 
 
 class PipelineInputs(BaseModel):
@@ -138,6 +139,12 @@ def run_pipeline_sweep(
     plot_descriptions: list[str],
     style_feature_keys: list[str] | None = None,
     output_csv: Path | None = None,
+    context_adapter: LLMAdapter | None = None,
+    trend_adapter: LLMAdapter | None = None,
+    context_model: str | None = None,
+    trend_model: str | None = None,
+    csv_column_style: SweepCsvColumnStyle = "trend",
+    resume_existing: bool = False,
 ) -> Path:
     """Runs all style-feature prompt combinations and writes notebook-style wide CSV outputs."""
     if not image_paths:
@@ -145,11 +152,15 @@ def run_pipeline_sweep(
     if len(image_paths) != len(plot_descriptions):
         raise ValueError("image_paths and plot_descriptions must have the same length")
 
+    context_client = context_adapter or adapter
+    trend_client = trend_adapter or adapter
+    context_model_name = context_model or inputs.model
+    trend_model_name = trend_model or inputs.model
     combinations_to_run = build_style_feature_combinations(prompts, style_feature_keys)
     rows: list[SweepRunResult] = []
     for description, enabled_features in combinations_to_run:
         context_prompt = _context_prompt(inputs, prompts, enabled_style_features=enabled_features)
-        context_response = _invoke_adapter(adapter, model=inputs.model, prompt=context_prompt)
+        context_response = _invoke_adapter(context_client, model=context_model_name, prompt=context_prompt)
         trend_prompt_base = _build_trend_prompt(
             prompts=prompts,
             metric_description=inputs.metric_description,
@@ -164,8 +175,8 @@ def run_pipeline_sweep(
         for image_path, plot_description in zip(image_paths, plot_descriptions, strict=True):
             trend_prompt = _append_plot_description(trend_prompt_base, plot_description)
             response = _invoke_adapter(
-                adapter,
-                model=inputs.model,
+                trend_client,
+                model=trend_model_name,
                 prompt=trend_prompt,
                 image_b64=_encode_image(image_path),
             )
@@ -182,31 +193,104 @@ def run_pipeline_sweep(
         )
 
     out = output_csv or (inputs.output_dir / "combinations_report.csv")
-    return write_combinations_csv(out, rows)
+    return write_combinations_csv(
+        out,
+        rows,
+        csv_column_style=csv_column_style,
+        resume_existing=resume_existing,
+    )
 
 
-def write_combinations_csv(output_csv: Path, rows: list[SweepRunResult]) -> Path:
+def write_combinations_csv(
+    output_csv: Path,
+    rows: list[SweepRunResult],
+    csv_column_style: SweepCsvColumnStyle = "trend",
+    resume_existing: bool = False,
+) -> Path:
     """Writes notebook-style wide CSV format with one prompt+response column pair per trend image."""
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     max_items = max((len(row.trend_analysis_prompts) for row in rows), default=0)
-    headers = ["Combination Description", "Context Prompt", "Context Response"]
-    for index in range(1, max_items + 1):
-        headers.append(f"Trend Analysis Prompt {index}")
-        headers.append(f"Trend Analysis Response {index}")
+    headers = _sweep_headers(max_items=max_items, csv_column_style=csv_column_style)
+    if resume_existing:
+        return _write_combinations_csv_resume(output_csv=output_csv, rows=rows, headers=headers)
 
     with output_csv.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle)
         writer.writerow(headers)
         for row in rows:
-            record: list[str] = [
-                row.combination_description,
-                row.context_prompt,
-                row.context_response,
-            ]
-            for prompt, response in zip(row.trend_analysis_prompts, row.trend_analysis_responses, strict=True):
-                record.extend([prompt, response])
-            writer.writerow(record)
+            writer.writerow(_row_to_record(row))
     return output_csv
+
+
+def _sweep_headers(max_items: int, csv_column_style: SweepCsvColumnStyle) -> list[str]:
+    headers = ["Combination Description", "Context Prompt", "Context Response"]
+    for index in range(1, max_items + 1):
+        if csv_column_style == "plot":
+            headers.append(f"Plot {index} Prompt")
+            headers.append(f"Plot {index} Analysis")
+        else:
+            headers.append(f"Trend Analysis Prompt {index}")
+            headers.append(f"Trend Analysis Response {index}")
+    return headers
+
+
+def _row_to_record(row: SweepRunResult) -> list[str]:
+    record: list[str] = [
+        row.combination_description,
+        row.context_prompt,
+        row.context_response,
+    ]
+    for prompt, response in zip(row.trend_analysis_prompts, row.trend_analysis_responses, strict=True):
+        record.extend([prompt, response])
+    return record
+
+
+def _write_combinations_csv_resume(output_csv: Path, rows: list[SweepRunResult], headers: list[str]) -> Path:
+    existing = _load_existing_rows_if_compatible(output_csv, headers)
+    for sweep_row in rows:
+        new_record = _row_to_record(sweep_row)
+        merged = existing.get(sweep_row.combination_description, [""] * len(headers))
+        if len(merged) < len(headers):
+            merged = merged + [""] * (len(headers) - len(merged))
+        merged[0] = sweep_row.combination_description
+        if len(new_record) > 1 and not merged[1]:
+            merged[1] = new_record[1]
+        if len(new_record) > 2 and not merged[2]:
+            merged[2] = new_record[2]
+        for index in range(3, len(headers), 2):
+            next_index = index + 1
+            if next_index >= len(headers):
+                break
+            source_prompt = new_record[index] if index < len(new_record) else ""
+            source_response = new_record[next_index] if next_index < len(new_record) else ""
+            if (not merged[index]) and (not merged[next_index]) and (source_prompt or source_response):
+                merged[index] = source_prompt
+                merged[next_index] = source_response
+        existing[sweep_row.combination_description] = merged
+
+    with output_csv.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(headers)
+        for key in existing:
+            writer.writerow(existing[key])
+    return output_csv
+
+
+def _load_existing_rows_if_compatible(output_csv: Path, headers: list[str]) -> dict[str, list[str]]:
+    if not output_csv.exists():
+        return {}
+    with output_csv.open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.reader(handle)
+        file_headers = next(reader, None)
+        if file_headers != headers:
+            return {}
+        records: dict[str, list[str]] = {}
+        for row in reader:
+            if not row:
+                continue
+            key = row[0]
+            records[key] = row
+    return records
 
 
 def build_style_feature_combinations(

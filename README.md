@@ -126,6 +126,12 @@ output_csv = run_pipeline_sweep(
 print(output_csv)
 ```
 
+For Claude and Deepseek legacy-combination parity, `run_pipeline_sweep` also supports:
+
+- `csv_column_style="plot"` to emit notebook headers (`Plot N Prompt`, `Plot N Analysis`)
+- `resume_existing=True` to update/continue an existing combinations CSV
+- separate adapters/models for context and trend phases (`context_adapter` / `trend_adapter`, `context_model` / `trend_model`)
+
 Run qualitative evaluation (Coverage/Faithfulness scored by LLM):
 
 ```bash
@@ -223,6 +229,7 @@ docker run --rm distill-abm
   - `archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb`
   - `archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb`
 - Notebook-discard sequence is now: remove deprecated files, run `python scripts/refresh_parity_artifacts.py`, then run full gates.
+- Deepseek-style dual-model sweep behavior (text context model + multimodal trend model) is supported directly in `run_pipeline_sweep`.
 - `distill_abm.legacy.notebook_loader` builds a callable registry from notebooks and prefers sources in this order:
   - non-`archives` notebooks
   - non-checkpoint notebooks

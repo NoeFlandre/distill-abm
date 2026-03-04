@@ -121,6 +121,24 @@ def test_ollama_adapter_success() -> None:
     assert response.text == "hi"
 
 
+def test_ollama_adapter_includes_image_payload_when_present() -> None:
+    seen: dict[str, object] = {}
+
+    def _chat(**payload):  # type: ignore[no-untyped-def]
+        seen.update(payload)
+        return {"message": {"content": "hi"}, "model": "deepseek-r1"}
+
+    request = LLMRequest(
+        model="deepseek-r1",
+        messages=[LLMMessage(role="user", content="hello")],
+        image_b64="abc",
+    )
+    OllamaAdapter(model="deepseek-r1", client=SimpleNamespace(chat=_chat)).complete(request)
+    messages = seen["messages"]
+    assert isinstance(messages, list)
+    assert isinstance(messages[0]["images"], list)
+
+
 def test_janus_adapter_success() -> None:
     class FakeJanusClient:
         def generate(
@@ -138,6 +156,43 @@ def test_janus_adapter_success() -> None:
     response = JanusAdapter(model="janus-pro", client=FakeJanusClient()).complete(make_request())
     assert response.provider == "janus"
     assert response.text == "vision-output"
+
+
+def test_janus_adapter_passes_image_and_sampling_fields() -> None:
+    class FakeJanusClient:
+        def __init__(self) -> None:
+            self.payload: dict[str, object] = {}
+
+        def generate(
+            self,
+            prompt: str,
+            image_b64: str | None,
+            model: str,
+            max_tokens: int | None,
+            temperature: float | None,
+        ) -> str:
+            self.payload = {
+                "prompt": prompt,
+                "image_b64": image_b64,
+                "model": model,
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+            }
+            return "vision-output"
+
+    client = FakeJanusClient()
+    request = LLMRequest(
+        model="janus-pro",
+        messages=[LLMMessage(role="user", content="hello-image")],
+        image_b64="abc",
+        max_tokens=512,
+        temperature=0.5,
+    )
+    JanusAdapter(model="janus-pro", client=client).complete(request)
+    assert client.payload["prompt"] == "hello-image"
+    assert client.payload["image_b64"] == "abc"
+    assert client.payload["max_tokens"] == 512
+    assert client.payload["temperature"] == 0.5
 
 
 @pytest.mark.parametrize(
