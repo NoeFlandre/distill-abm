@@ -114,6 +114,17 @@ uv run distill-abm run \
   --skip-summarization
 ```
 
+Run summary-only output/scoring (no full-text scoring path selected):
+
+```bash
+uv run distill-abm run \
+  --csv-path path/to/reduced.csv \
+  --parameters-path path/to/params.txt \
+  --documentation-path path/to/docs.txt \
+  --summarization-mode summary \
+  --score-on summary
+```
+
 Generate both full-text and summary artifacts and score on both for side-by-side comparison:
 
 ```bash
