@@ -163,6 +163,14 @@ def test_notebook_parity_for_remove_evaluating_suffix() -> None:
     assert compat.remove_evaluating_suffix(value) == notebook_remove_suffix(value)
 
 
+def test_notebook_parity_for_read_csv_to_df(tmp_path: Path) -> None:
+    csv_path = tmp_path / "simple.csv"
+    frame = pd.DataFrame({"A": [1, 2], "B": ["x", "y"]})
+    frame.to_csv(csv_path, index=False)
+    notebook_read = get_notebook_function("read_csv_to_df")
+    assert compat.read_csv_to_df(csv_path).equals(notebook_read(csv_path))
+
+
 def test_external_wrapper_paths_are_mockable(monkeypatch: pytest.MonkeyPatch) -> None:
     calls: list[tuple[str, str | None]] = []
 
