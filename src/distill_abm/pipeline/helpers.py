@@ -102,15 +102,43 @@ def summarize_report_text(
     summarize_with_bert_fn: Callable[[str], str] = summarize_with_bert,
 ) -> str:
     """Apply dual summarization pass-through unless summarization is disabled."""
-    if skip_summarization:
+    _, summary = summarize_report_text_pair(
+        text=text,
+        skip_summarization=skip_summarization,
+        summarize_with_bart_fn=summarize_with_bart_fn,
+        summarize_with_bert_fn=summarize_with_bert_fn,
+    )
+    if summary is None:
         return text
+    return summary
+
+
+def summarize_report_text_pair(
+    text: str,
+    skip_summarization: bool,
+    summarize_with_bart_fn: Callable[[str], str] = summarize_with_bart,
+    summarize_with_bert_fn: Callable[[str], str] = summarize_with_bert,
+) -> tuple[str, str | None]:
+    """Return raw trend text plus optional summary for dual-path operation."""
+    if skip_summarization:
+        return text, None
     try:
         bart = summarize_with_bart_fn(text).strip()
         bert = summarize_with_bert_fn(text).strip()
     except Exception:
         # Keep direct output as a robust fallback when summarization backends are unavailable.
-        return text
-    return "\n".join(part for part in (bart, bert) if part) or text
+        return text, None
+    summary = "\n".join(part for part in (bart, bert) if part).strip()
+    if not summary:
+        return text, None
+    return text, summary
+
+
+def select_trend_response(trend_full: str, trend_summary: str | None, use_summary: bool) -> str:
+    """Select the report trend response according to a mode."""
+    if use_summary and trend_summary is not None:
+        return trend_summary
+    return trend_full
 
 
 def build_stats_table(frame: pd.DataFrame, include_pattern: str) -> pd.DataFrame:
@@ -142,37 +170,103 @@ def encode_evidence_image(evidence_mode: EvidenceMode, plot_path: Path, stats_im
     return None
 
 
-def write_report(output_dir: Path, context: str, trend: str, scores: SummaryScores) -> Path:
+def write_report(
+    output_dir: Path,
+    context: str,
+    trend_full: str,
+    trend_summary: str | None,
+    scores: SummaryScores,
+    full_scores: SummaryScores | None = None,
+    summary_scores: SummaryScores | None = None,
+    include_extended_columns: bool = False,
+) -> Path:
     """Persist benchmark metrics and trend/context text for one pipeline run."""
     report_path = output_dir / "report.csv"
+    has_dual_path = include_extended_columns
+    trend_response = select_trend_response(
+        trend_full=trend_full,
+        trend_summary=trend_summary,
+        use_summary=summary_scores is not None and trend_summary is not None,
+    )
+    headers = [
+        "context_response",
+        "trend_response",
+        "token_f1",
+        "bleu",
+        "meteor",
+        "rouge1",
+        "rouge2",
+        "rouge_l",
+        "flesch_reading_ease",
+    ]
+    row: list[str | float | int] = [
+        context,
+        trend_response,
+        scores.token_f1,
+        scores.bleu,
+        scores.meteor,
+        scores.rouge1,
+        scores.rouge2,
+        scores.rouge_l,
+        scores.flesch_reading_ease,
+    ]
+
+    if has_dual_path:
+        headers.extend(["trend_full_response", "trend_summary_response"])
+        row.extend([trend_full, trend_summary or ""])
+
+    if full_scores is not None:
+        headers.extend(
+            [
+                "full_token_f1",
+                "full_bleu",
+                "full_meteor",
+                "full_rouge1",
+                "full_rouge2",
+                "full_rouge_l",
+                "full_flesch_reading_ease",
+            ]
+        )
+        row.extend(
+            [
+                full_scores.token_f1,
+                full_scores.bleu,
+                full_scores.meteor,
+                full_scores.rouge1,
+                full_scores.rouge2,
+                full_scores.rouge_l,
+                full_scores.flesch_reading_ease,
+            ]
+        )
+
+    if summary_scores is not None:
+        headers.extend(
+            [
+                "summary_token_f1",
+                "summary_bleu",
+                "summary_meteor",
+                "summary_rouge1",
+                "summary_rouge2",
+                "summary_rouge_l",
+                "summary_flesch_reading_ease",
+            ]
+        )
+        row.extend(
+            [
+                summary_scores.token_f1,
+                summary_scores.bleu,
+                summary_scores.meteor,
+                summary_scores.rouge1,
+                summary_scores.rouge2,
+                summary_scores.rouge_l,
+                summary_scores.flesch_reading_ease,
+            ]
+        )
+
     with report_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle)
-        writer.writerow(
-            [
-                "context_response",
-                "trend_response",
-                "token_f1",
-                "bleu",
-                "meteor",
-                "rouge1",
-                "rouge2",
-                "rouge_l",
-                "flesch_reading_ease",
-            ]
-        )
-        writer.writerow(
-            [
-                context,
-                trend,
-                scores.token_f1,
-                scores.bleu,
-                scores.meteor,
-                scores.rouge1,
-                scores.rouge2,
-                scores.rouge_l,
-                scores.flesch_reading_ease,
-            ]
-        )
+        writer.writerow(headers)
+        writer.writerow(row)
     return report_path
 
 

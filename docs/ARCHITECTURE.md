@@ -26,8 +26,11 @@
   - qualitative score extraction (`extract_coverage_score`, `extract_faithfulness_score`)
   - DoE ANOVA contribution analysis
 - `distill_abm.pipeline`:
-  - end-to-end orchestration from CSV -> plot -> LLM -> (optional BART/BERT summarization) -> scoring
-  - no-summarization baseline mode via CLI `--skip-summarization`
+  - end-to-end orchestration from CSV -> plot -> LLM -> (full text or summarized text) -> scoring
+  - dual text handling via CLI:
+    - `--summarization-mode` (`full`, `summary`, `both`)
+    - `--score-on` (`full`, `summary`, `both`)
+    - legacy `--skip-summarization` maps to `summarization_mode=full`
   - evidence ablation modes via CLI `--evidence-mode`: `plot`, `stats-markdown`, `stats-image`, `plot+stats`
   - reference-style multi-feature sweep API:
     - `run_pipeline_sweep` for role/example/insights combinations

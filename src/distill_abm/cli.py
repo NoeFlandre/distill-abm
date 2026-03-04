@@ -11,7 +11,7 @@ from distill_abm.configs.loader import load_abm_config, load_prompts_config
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
 from distill_abm.llm.factory import create_adapter
-from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, run_pipeline
+from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, ScoreMode, SummarizationMode, run_pipeline
 
 app = typer.Typer(help="Run ABM distillation workflows.")
 
@@ -56,6 +56,17 @@ def run(
         bool,
         typer.Option(help="Skip BART/BERT summarization and keep the full LLM report text."),
     ] = False,
+    summarization_mode: Annotated[
+        SummarizationMode,
+        typer.Option(help="full: keep raw trend text, summary: use summarized trend text, both: store/report both."),
+    ] = "summary",
+    score_on: Annotated[
+        ScoreMode,
+        typer.Option(
+            help="Which text should be used for scoring: full, summary, or both. "
+            "Both adds both score sets to report output."
+        ),
+    ] = "summary",
     abm: Annotated[str | None, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = None,
 ) -> None:
     """Runs one end-to-end pipeline execution from CSV to scored report."""
@@ -79,6 +90,8 @@ def run(
             plot_description=plot_description,
             evidence_mode=evidence_mode,
             skip_summarization=skip_summarization,
+            summarization_mode=summarization_mode,
+            score_on=score_on,
         ),
         prompts=prompts,
         adapter=adapter,

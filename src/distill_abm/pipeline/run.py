@@ -18,6 +18,8 @@ from distill_abm.summarize.models import summarize_with_bart, summarize_with_ber
 from distill_abm.viz.plots import MetricPlotBundle, plot_metric_bundles
 
 EvidenceMode = Literal["plot", "stats-markdown", "stats-image", "plot+stats"]
+SummarizationMode = Literal["full", "summary", "both"]
+ScoreMode = Literal["full", "summary", "both"]
 SweepCsvColumnStyle = Literal["trend", "plot"]
 
 
@@ -33,6 +35,8 @@ class PipelineInputs(BaseModel):
     metric_description: str
     plot_description: str | None = None
     skip_summarization: bool = False
+    summarization_mode: SummarizationMode = "summary"
+    score_on: ScoreMode = "summary"
     evidence_mode: EvidenceMode = "plot"
 
 
@@ -43,6 +47,10 @@ class PipelineResult(BaseModel):
     report_csv: Path
     context_response: str
     trend_response: str
+    trend_full_response: str
+    trend_summary_response: str | None = None
+    full_scores: SummaryScores | None = None
+    summary_scores: SummaryScores | None = None
     stats_markdown: str | None = None
     stats_image_path: Path | None = None
     token_f1: float
@@ -105,24 +113,64 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         stats_image_path=stats_image_path,
     )
     trend_raw = _invoke_adapter(adapter, model=inputs.model, prompt=trend_prompt, image_b64=image_b64)
-    trend = _summarize_report_text(trend_raw, skip_summarization=inputs.skip_summarization)
-    scores = score_summary(reference=context, candidate=trend)
-    report_csv = _write_report(inputs.output_dir, context, trend, scores)
+    summarization_mode = _resolve_summarization_mode(
+        skip_summarization=inputs.skip_summarization,
+        requested_mode=inputs.summarization_mode,
+    )
+    score_on = _resolve_score_mode(
+        requested_score_on=inputs.score_on,
+        summarization_mode=summarization_mode,
+    )
+    trend_full, trend_summary = _summarize_report_text(trend_raw, mode=summarization_mode)
+
+    full_scores = None
+    summary_scores = None
+    if summarization_mode in {"full", "both"} or score_on == "full":
+        full_scores = score_summary(reference=context, candidate=trend_full)
+    if trend_summary is not None and summarization_mode in {"summary", "both"} and score_on in {"summary", "both"}:
+        summary_scores = score_summary(reference=context, candidate=trend_summary)
+
+    if summarization_mode == "both" and score_on == "both":
+        include_extended = True
+    else:
+        include_extended = False
+
+    report_trend, selected_scores = _select_report_outputs(
+        trend_full=trend_full,
+        trend_summary=trend_summary,
+        score_on=score_on,
+        full_scores=full_scores,
+        summary_scores=summary_scores,
+    )
+    report_csv = _write_report(
+        output_dir=inputs.output_dir,
+        context=context,
+        trend_full=trend_full,
+        trend_summary=trend_summary,
+        selected_scores=selected_scores,
+        full_scores=full_scores if include_extended else None,
+        summary_scores=summary_scores if include_extended else None,
+        include_extended_columns=include_extended,
+    )
 
     return PipelineResult(
         plot_path=plot_path,
         report_csv=report_csv,
         context_response=context,
-        trend_response=trend,
+        trend_response=report_trend,
+        trend_full_response=trend_full,
+        trend_summary_response=trend_summary,
+        full_scores=full_scores if include_extended else None,
+        summary_scores=summary_scores if include_extended else None,
         stats_markdown=stats_markdown,
         stats_image_path=stats_image_path,
-        token_f1=scores.token_f1,
-        bleu=scores.bleu,
-        meteor=scores.meteor,
-        rouge1=scores.rouge1,
-        rouge2=scores.rouge2,
-        rouge_l=scores.rouge_l,
-        flesch_reading_ease=scores.flesch_reading_ease,
+        token_f1=selected_scores.token_f1,
+        bleu=selected_scores.bleu,
+        meteor=selected_scores.meteor,
+        rouge1=selected_scores.rouge1,
+        rouge2=selected_scores.rouge2,
+        rouge_l=selected_scores.rouge_l,
+        flesch_reading_ease=selected_scores.flesch_reading_ease,
     )
 
 
@@ -256,16 +304,77 @@ def _encode_image(path: Path) -> str:
     return helpers.encode_image(path)
 
 
-def _write_report(output_dir: Path, context: str, trend: str, scores: SummaryScores) -> Path:
-    return helpers.write_report(output_dir=output_dir, context=context, trend=trend, scores=scores)
-
-
-def _summarize_report_text(text: str, skip_summarization: bool) -> str:
-    return helpers.summarize_report_text(
+def _summarize_report_text(text: str, mode: SummarizationMode) -> tuple[str, str | None]:
+    if mode == "full":
+        return text, None
+    _, summary = helpers.summarize_report_text_pair(
         text=text,
-        skip_summarization=skip_summarization,
+        skip_summarization=False,
         summarize_with_bart_fn=summarize_with_bart,
         summarize_with_bert_fn=summarize_with_bert,
+    )
+    if mode == "summary":
+        return text, summary
+    return text, summary
+
+
+def _resolve_summarization_mode(
+    skip_summarization: bool,
+    requested_mode: SummarizationMode,
+) -> SummarizationMode:
+    if skip_summarization:
+        return "full"
+    return requested_mode
+
+
+def _resolve_score_mode(
+    requested_score_on: ScoreMode,
+    summarization_mode: SummarizationMode,
+) -> ScoreMode:
+    if requested_score_on == "summary" and summarization_mode == "full":
+        return "full"
+    if requested_score_on == "both" and summarization_mode == "full":
+        return "full"
+    if requested_score_on == "both" and summarization_mode != "both":
+        return "summary" if summarization_mode == "summary" else "full"
+    return requested_score_on
+
+
+def _select_report_outputs(
+    trend_full: str,
+    trend_summary: str | None,
+    score_on: ScoreMode,
+    full_scores: SummaryScores | None,
+    summary_scores: SummaryScores | None,
+) -> tuple[str, SummaryScores]:
+    if score_on == "full" or summary_scores is None:
+        if full_scores is None:
+            return trend_full, score_summary(reference=trend_full, candidate=trend_full)
+        return trend_full, full_scores
+    if score_on == "summary":
+        return trend_summary or trend_full, summary_scores
+    return trend_summary or trend_full, summary_scores
+
+
+def _write_report(
+    output_dir: Path,
+    context: str,
+    trend_full: str,
+    trend_summary: str | None,
+    selected_scores: SummaryScores,
+    full_scores: SummaryScores | None = None,
+    summary_scores: SummaryScores | None = None,
+    include_extended_columns: bool = False,
+) -> Path:
+    return helpers.write_report(
+        output_dir=output_dir,
+        context=context,
+        trend_full=trend_full,
+        trend_summary=trend_summary,
+        scores=selected_scores,
+        full_scores=full_scores,
+        summary_scores=summary_scores,
+        include_extended_columns=include_extended_columns,
     )
 
 
