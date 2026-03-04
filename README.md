@@ -159,6 +159,7 @@ docker run --rm distill-abm
 - `docs/runtime_notebook_dependencies.json` maps each runtime-required notebook to the exact required function names currently sourced from it.
 - Legacy CSV outputs and legacy plot/image artifacts are explicitly retained (not discarded) for reproducibility and reference.
 - Notebook prompt sources are preserved in `configs/notebook_prompt_reference.yaml`, with runtime prompts in `configs/prompts.yaml` regression-locked to it.
+- `configs/notebook_experiment_settings.yaml` now also preserves defaults from Fauna's "From NetLogo to CSV" notebook (reporters, run loop settings, and both parameter dictionaries).
 - Regenerate parity/audit artifacts with `python scripts/refresh_parity_artifacts.py`.
 - Notebook-discard sequence: remove `archive/**/*.ipynb`, run `python scripts/refresh_parity_artifacts.py`, then run full gates.
 - `distill_abm.legacy.notebook_loader` builds a callable registry from notebooks and prefers sources in this order:

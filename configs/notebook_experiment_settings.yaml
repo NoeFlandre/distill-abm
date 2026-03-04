@@ -6,5 +6,69 @@ llm_defaults:
 doe_defaults:
   repetitions: 3
   max_interaction_order: 2
+fauna_from_netlogo_to_csv:
+  netlogo_home: /Volumes/NetLogo-6.2.0/NetLogo 6.2.0
+  model_path: NetLogo/model.nlogo
+  output_csv_path: CSV/netlogo_experiment_results.csv
+  reporters:
+    - mean-incum
+    - mean-alt
+    - incum-total-try
+    - alt-total-try
+    - choice-total
+    - mean [incum-quantity] of turtles
+    - mean [alt-quantity] of turtles
+    - mean [habit-factor-incum] of turtles
+    - mean [habit-factor-alt] of turtles
+    - mean [choice-function-deviation] of turtles
+    - mean [value-health-deviation] of turtles
+    - mean [value-env-deviation] of turtles
+  runtime_experiment_parameters:
+    number-of-agents: 1000
+    habit-on?: true
+    network-type: '"watts-strogatz"'
+    norms: true
+    network-parameter: 8
+    memory-lifetime: 5
+    habit-threshold: 2
+    cognitive-dissonance-threshold: 0.15
+    p-interact: 0.3
+    social-blindness: 0.51
+    social-conformity: 0.28
+    social-susceptibility: 0.2
+    alt-health-mean-initial: 1.69
+    alt-env-mean-initial: 1.12
+    incumbent-initial-habit: 10
+    justification: 0.61
+  saved_experiment_parameters:
+    init-foragers: 20
+    processing-cost-females: 3
+    keep-initial-grass-pattern: true
+    maximum-lifespan: 10220
+    food-value-males: 30
+    internal-mortality: 0.025
+    max-ticks: 73000
+    animals-movement-cost: 1
+    external-mortality: 0.0025
+    stop-at-max-herd-size: false
+    init-prey: 250
+    foraging-radius: 6
+    stop-at-max-ticks: true
+    food-value-calf: 3
+    grass-growth: true
+    imortal-foragers: true
+    grass-proportion: 0.33
+    ticks-per-year: 365
+    foragers-movement-cost: 1
+    animals-starvation-threshold: 25
+    animals-gain-from-food: 1.5
+    seasonality: 0.8
+    processing-cost-males: 6
+    age-of-senescence: 7300
+    birth-spacing: 730
+    max-herd-size: 500
+    food-value-females: 27
+    regrowth-time: 3
+    food-storage: true
 qualitative_example_text_dir: configs/notebook_prompt_assets/Evaluation/Qualitative Assessment using LLMs/Examples/Text
 human_reference_dir: tests/fixtures/notebook_parity/human_reference/All Results

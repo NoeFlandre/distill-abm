@@ -8,4 +8,9 @@ def test_load_notebook_experiment_settings_config() -> None:
     assert settings.llm_defaults.temperature == 0.5
     assert settings.llm_defaults.max_tokens == 1000
     assert settings.doe_defaults.repetitions == 3
+    assert settings.fauna_from_netlogo_to_csv.num_runs == 40
+    assert settings.fauna_from_netlogo_to_csv.interval == 50
+    assert len(settings.fauna_from_netlogo_to_csv.reporters) == 12
+    assert settings.fauna_from_netlogo_to_csv.runtime_experiment_parameters["number-of-agents"] == 1000
+    assert settings.fauna_from_netlogo_to_csv.saved_experiment_parameters["init-foragers"] == 20
     assert "notebook_prompt_assets" in settings.qualitative_example_text_dir
