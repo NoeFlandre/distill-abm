@@ -90,10 +90,25 @@ class NotebookDoEDefaults(BaseModel):
     max_interaction_order: int = 2
 
 
+class NotebookFromNetLogoCsvDefaults(BaseModel):
+    """Captures notebook defaults from 'From NetLogo to CSV' preprocessing workflow."""
+
+    netlogo_home: str
+    model_path: str
+    output_csv_path: str
+    reporters: list[str]
+    runtime_experiment_parameters: dict[str, bool | int | float | str]
+    saved_experiment_parameters: dict[str, bool | int | float | str]
+    num_runs: int = 40
+    max_ticks: int = 73000
+    interval: int = 50
+
+
 class NotebookExperimentSettings(BaseModel):
     """Stores canonical notebook experiment references and defaults."""
 
     llm_defaults: NotebookLLMDefaults
     doe_defaults: NotebookDoEDefaults
+    fauna_from_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
     qualitative_example_text_dir: str
     human_reference_dir: str

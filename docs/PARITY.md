@@ -18,6 +18,7 @@ Provide functional continuity between legacy notebook workflows and production p
 10. `docs/runtime_notebook_dependencies.json` provides the one-to-many mapping of runtime-required notebook files to required compatibility function names (currently empty).
 11. Regression parity tests use deterministic baselines/snapshots and no longer execute notebook files directly.
 12. `distill_abm.ingest.netlogo_notebook_workflow` captures the notebook-style NetLogo run loop and file-generation workflow (parameter JSON, updated GUI JSON, narrative TXT, documentation/code outputs).
+13. `configs/notebook_experiment_settings.yaml` preserves Fauna notebook run settings and parameter dictionaries for the "From NetLogo to CSV" workflow.
 
 ## Scope
 
