@@ -1,15 +1,15 @@
 # Archive Full Manifest
 
-- Total files: 463
+- Total files: 460
 - Classification counts:
   - `experiment_setting`: 34
-  - `historical_nonruntime`: 240
+  - `historical_nonruntime`: 237
   - `human_ground_truth`: 32
   - `legacy_visualization`: 151
   - `prompt_reference`: 6
 - Action counts:
   - `migrate`: 72
-  - `retain_record_only`: 391
+  - `retain_record_only`: 388
 - Unresolved mappings: 0
 
 ## Sample Rows

@@ -2378,19 +2378,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
-    "sha256": "30a15708d3efd54fcdb460623bbabe89bd666b8f8b8b3da61a0d9b9677a11e7b",
-    "size_bytes": 14223,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Fauna/4. Generating the summary-Copy1.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
     "sha256": "5e8f85a07113e695d2e02370f3550b0cdf2111dd297a506634fd505d44b4b71e",
     "size_bytes": 11493,
@@ -2989,19 +2976,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
-    "sha256": "12a63e48005a40071e11725e69d19df7fafb5b50946ee17e647574f8da73087f",
-    "size_bytes": 13463,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Grazing/4. Generating the summary-Copy1.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
     "sha256": "770e66e39204ff7ad4ed347b173be94bbc2dc1dcf7bf6629f899f68d83cac013",
     "size_bytes": 11493,
@@ -3554,19 +3528,6 @@
     "target_path": "tests/fixtures/notebook_parity/experiment_settings/Models/Grazing/TXT/narrativeCombined200.txt",
     "rationale": "Model parameter/documentation inputs used in notebook runs.",
     "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
-    "sha256": "7ce73f035e6715f7f24ba96ab3dd1a491cc268ac2ef60e15bde3080cab5fcf4e",
-    "size_bytes": 12833,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Milk Consumption/4. Generating the summary.ipynb"
-    ]
   },
   {
     "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",

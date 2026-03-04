@@ -141,6 +141,13 @@ milk_netlogo_to_csv:
   interval: 1
 qualitative_example_text_dir: /tmp/examples
 human_reference_dir: /tmp/human-reference
+summary_generation:
+  fauna:
+    num_plots: 14
+  grazing:
+    num_plots: 10
+  milk:
+    num_plots: 12
 """,
         encoding="utf-8",
     )
@@ -149,6 +156,7 @@ human_reference_dir: /tmp/human-reference
     assert settings.fauna_from_netlogo_to_csv.netlogo_home == "/tmp/netlogo"
     assert settings.grazint_netlogo_to_csv.output_csv_path == "/tmp/output.csv"
     assert settings.milk_netlogo_to_csv.saved_experiment_parameters["a"] == 1
+    assert settings.summary_generation.fauna.num_plots == 14
 
 
 def test_repository_prompts_follow_notebook_wording() -> None:
