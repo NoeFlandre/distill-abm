@@ -19,6 +19,7 @@ from distill_abm.pipeline.run import (
     SummarizationMode,
     run_pipeline,
 )
+from distill_abm.pipeline.smoke import SmokeSuiteInputs, run_qwen_smoke_suite
 
 app = typer.Typer(help="Run ABM distillation workflows.")
 
@@ -165,6 +166,82 @@ def evaluate_qualitative(
         source_image_path=source_image_path,
     )
     typer.echo(result.model_dump_json())
+
+
+@app.command("smoke-qwen")
+def smoke_qwen(
+    csv_path: Annotated[
+        Path,
+        typer.Option(..., exists=True, file_okay=True, dir_okay=False),
+    ],
+    parameters_path: Annotated[
+        Path,
+        typer.Option(..., exists=True, file_okay=True, dir_okay=False),
+    ],
+    documentation_path: Annotated[
+        Path,
+        typer.Option(..., exists=True, file_okay=True, dir_okay=False),
+    ],
+    doe_input_csv: Annotated[
+        Path,
+        typer.Option(..., exists=True, file_okay=True, dir_okay=False),
+    ],
+    prompts_path: Annotated[
+        Path,
+        typer.Option(exists=True),
+    ] = Path("configs/prompts.yaml"),
+    output_dir: Annotated[Path, typer.Option()] = Path("results/smoke_qwen"),
+    model: Annotated[str, typer.Option()] = "qwen2.5:latest",
+    metric_pattern: Annotated[str, typer.Option()] = "mean",
+    metric_description: Annotated[str, typer.Option()] = "simulation trend",
+    plot_description: Annotated[str | None, typer.Option()] = None,
+    additional_summarizer: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--additional-summarizer",
+            help="Optional extra summary backends in addition to BART/BERT. Repeatable: t5, longformer_ext.",
+        ),
+    ] = None,
+    skip_qualitative: Annotated[
+        bool,
+        typer.Option(help="Skip qualitative coverage/faithfulness checks in the smoke suite."),
+    ] = False,
+    skip_sweep: Annotated[
+        bool,
+        typer.Option(help="Skip prompt-combination sweep execution in the smoke suite."),
+    ] = False,
+) -> None:
+    """Runs full Qwen smoke validation across evidence/text modes plus DoE and sweep artifacts."""
+    prompts = load_prompts_config(prompts_path)
+    adapter = create_adapter(provider="ollama", model=model)
+    result = run_qwen_smoke_suite(
+        inputs=SmokeSuiteInputs(
+            csv_path=csv_path,
+            parameters_path=parameters_path,
+            documentation_path=documentation_path,
+            output_dir=output_dir,
+            model=model,
+            metric_pattern=metric_pattern,
+            metric_description=metric_description,
+            plot_description=plot_description,
+            additional_summarizers=_parse_additional_summarizers(additional_summarizer),
+        ),
+        prompts=prompts,
+        adapter=adapter,
+        run_qualitative=not skip_qualitative,
+        doe_input_csv=doe_input_csv,
+        run_sweep=not skip_sweep,
+    )
+    typer.echo(f"smoke report (markdown): {result.report_markdown_path}")
+    typer.echo(f"smoke report (json): {result.report_json_path}")
+    if result.doe_output_csv is not None:
+        typer.echo(f"doe output: {result.doe_output_csv}")
+    if result.sweep_output_csv is not None:
+        typer.echo(f"sweep output: {result.sweep_output_csv}")
+    if not result.success:
+        failed = ", ".join(result.failed_cases) if result.failed_cases else "doe/sweep"
+        typer.echo(f"smoke suite failed: {failed}")
+        raise typer.Exit(code=1)
 
 
 def main() -> None:

@@ -489,6 +489,10 @@ def test_run_pipeline_writes_reproducibility_metadata(tmp_path: Path, monkeypatc
     assert metadata["llm"]["provider"] == "fake"
     assert metadata["llm"]["request"]["temperature"] == 0.5
     assert metadata["llm"]["request"]["max_tokens"] == 1000
+    assert metadata["llm"]["requests"]["context"]["image_attached"] is False
+    assert metadata["llm"]["requests"]["trend"]["image_attached"] is True
+    assert metadata["prompts"]["context_prompt"].startswith("Context")
+    assert metadata["prompts"]["trend_prompt"].startswith("Trend")
     assert len(metadata["reproducibility"]["context_prompt_signature"]) == 64
     assert len(metadata["reproducibility"]["trend_prompt_signature"]) == 64
     assert metadata["reproducibility"]["delimiter"] == ","

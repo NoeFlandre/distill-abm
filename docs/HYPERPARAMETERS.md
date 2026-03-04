@@ -50,6 +50,18 @@ Defined in `src/distill_abm/cli.py`.
 | `model` | `"echo-model"` |
 | `source_image_path` | `null` |
 
+### `distill-abm smoke-qwen`
+
+| Option | Default |
+| --- | --- |
+| `output_dir` | `results/smoke_qwen` |
+| `model` | `qwen2.5:latest` |
+| `metric_pattern` | `"mean"` |
+| `metric_description` | `"simulation trend"` |
+| `plot_description` | `null` |
+| `run_qualitative` | `true` (`--skip-qualitative` disables) |
+| `run_sweep` | `true` (`--skip-sweep` disables) |
+
 ## 3. Evidence mode values
 
 Canonical values used by runtime:
@@ -110,7 +122,13 @@ Defined in `configs/models.yaml`.
 | `gpt4o` | `openai` | `gpt-4o` |
 | `claude_sonnet` | `anthropic` | `claude-3-sonnet-20240229` |
 | `deepseek_r1` | `ollama` | `deepseek-r1` |
+| `qwen_ollama` | `ollama` | `qwen2.5:latest` |
 | `janus_pro` | `janus` | `janus-pro` |
+
+For Ollama adapter calls:
+
+- `temperature` is passed via `options.temperature`
+- `max_tokens` is passed via `options.num_predict`
 
 ## 7. Experiment settings defaults
 
@@ -208,6 +226,8 @@ Each pipeline run writes `pipeline_run_metadata.json` including:
 
 - requested and resolved runtime modes
 - provider/model and request hyperparameters
+- request-level image attachment flags for context and trend phases
+- full context/trend prompt texts
 - prompt signatures (`sha256`)
 - summarizer enablement and numeric settings
 - score outputs and artifact paths

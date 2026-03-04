@@ -28,10 +28,10 @@ uv run pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85
 
 Latest validated baseline:
 
-- Total tests: `185`
-- Passing tests: `185`
+- Total tests: `190`
+- Passing tests: `190`
 - Coverage threshold: `>=85%`
-- Observed coverage: `85.86%`
+- Observed coverage: `85.68%`
 - Failing gates: `0`
 
 ## 4. Test Taxonomy
@@ -59,6 +59,7 @@ Validate multi-module runtime behavior:
   - scoring modes (`full`, `summary`, `both`)
   - metadata output integrity
   - adapter request behavior (image/text paths)
+  - prompt text capture in metadata (`prompts.context_prompt`, `prompts.trend_prompt`)
 - `tests/integration/test_pipeline_uses_abm_and_full_metrics.py`: ABM config defaults with full metric output.
 
 ### End-to-end tests
@@ -69,6 +70,7 @@ Validate CLI entrypoints and option forwarding:
   - `run`
   - `analyze-doe`
   - `evaluate-qualitative`
+  - `smoke-qwen`
   - mode/option wiring and invalid-option rejection
 
 ### Regression tests
@@ -102,6 +104,9 @@ Protect compatibility/replay guarantees:
   - `t5`
   - `longformer_ext`
   - robust fallback when one backend is unavailable.
+- Ollama request wiring:
+  - `temperature` is mapped to `options.temperature`
+  - `max_tokens` is mapped to `options.num_predict`
 
 ### Scoring behavior
 
@@ -114,6 +119,7 @@ Protect compatibility/replay guarantees:
 - Output files are created in expected paths.
 - `pipeline_run_metadata.json` includes requested/resolved settings and model hyperparameters.
 - CSV report headers match selected mode behavior.
+- Smoke-suite outputs (`smoke_report.md/json`, per-case folders, DoE output, sweep output) are validated.
 
 ## 6. Reproducibility and Audit
 

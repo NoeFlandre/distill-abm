@@ -638,3 +638,93 @@ def test_cli_main_invokes_app(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("distill_abm.cli.app", _DummyApp())
     cli_module.main()
     assert called["value"]
+
+
+def test_cli_smoke_qwen_forwards_inputs_and_reports_paths(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    params.write_text("param=1\n", encoding="utf-8")
+    docs = tmp_path / "docs.txt"
+    docs.write_text("doc\n", encoding="utf-8")
+    prompts = tmp_path / "prompts.yaml"
+    prompts.write_text(
+        "\n".join(
+            [
+                'context_prompt: "Context {parameters} {documentation}"',
+                'trend_prompt: "Trend {description}"',
+                'coverage_eval_prompt: "Coverage score: 4"',
+                'faithfulness_eval_prompt: "Faithfulness score: 4"',
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    doe_csv = tmp_path / "doe.csv"
+    doe_csv.write_text("Model,WithExamples,BLEU\nQwen,Yes,0.4\nQwen,No,0.3\n", encoding="utf-8")
+
+    captured: dict[str, object] = {}
+
+    class _Result:
+        def __init__(self, output_dir: Path) -> None:
+            self.success = True
+            self.failed_cases: list[str] = []
+            self.report_markdown_path = output_dir / "smoke_report.md"
+            self.report_json_path = output_dir / "smoke_report.json"
+            self.doe_output_csv: Path | None = output_dir / "anova.csv"
+            self.sweep_output_csv: Path | None = output_dir / "sweep.csv"
+
+    def fake_run_qwen_smoke_suite(*, inputs, prompts, adapter, run_qualitative, doe_input_csv, run_sweep):  # type: ignore[no-untyped-def]
+        captured["inputs"] = inputs
+        captured["prompts"] = prompts
+        captured["adapter"] = adapter
+        captured["run_qualitative"] = run_qualitative
+        captured["doe_input_csv"] = doe_input_csv
+        captured["run_sweep"] = run_sweep
+        inputs.output_dir.mkdir(parents=True, exist_ok=True)
+        result = _Result(inputs.output_dir)
+        result.report_markdown_path.write_text("# smoke\n", encoding="utf-8")
+        result.report_json_path.write_text("{}", encoding="utf-8")
+        return result
+
+    monkeypatch.setattr("distill_abm.cli.run_qwen_smoke_suite", fake_run_qwen_smoke_suite)
+    result = runner.invoke(
+        app,
+        [
+            "smoke-qwen",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--doe-input-csv",
+            str(doe_csv),
+            "--prompts-path",
+            str(prompts),
+            "--output-dir",
+            str(tmp_path / "smoke"),
+            "--model",
+            "qwen2.5:latest",
+            "--metric-pattern",
+            "mean-incum",
+            "--metric-description",
+            "weekly milk",
+            "--plot-description",
+            "plot desc",
+            "--skip-qualitative",
+            "--skip-sweep",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "smoke report (markdown):" in result.output
+    assert "smoke report (json):" in result.output
+    assert "inputs" in captured
+    smoke_inputs = cast(Any, captured["inputs"])
+    assert smoke_inputs.model == "qwen2.5:latest"
+    assert smoke_inputs.metric_pattern == "mean-incum"
+    assert smoke_inputs.metric_description == "weekly milk"
+    assert smoke_inputs.plot_description == "plot desc"
+    assert captured["run_qualitative"] is False
+    assert captured["run_sweep"] is False

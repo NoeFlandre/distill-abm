@@ -190,6 +190,7 @@ Primary commands exposed by `distill_abm.cli`:
 - `run` : executes one run from CSV/params/docs
 - `analyze-doe` : generates ANOVA/DoE contributions
 - `evaluate-qualitative` : evaluates coverage or faithfulness (1-5)
+- `smoke-qwen` : runs the full local Qwen smoke matrix (all evidence + text-path combinations, DoE, and sweep)
 
 ### Qualitative output contract
 
@@ -224,7 +225,7 @@ The metadata contains:
 
 - absolute and relative input paths used for that run
 - resolved LLM provider/model and request hyperparameters
-- context and trend prompt signatures (SHA-256) plus prompt lengths
+- full context and trend prompts, plus prompt signatures (SHA-256) and lengths
 - evidence/summarization mode settings (`evidence_mode`, `summarization_mode`, `score_on`)
 - selected additional summarizers (`additional_summarizers`) and backend configs
 - score summaries and output artifact locations
@@ -252,3 +253,23 @@ You can trace every production output from:
 7. report writing (`pipeline`)
 8. scoring (`eval`)
 9. parity validation (`docs/` + `tests/`)
+
+## 13) Qwen smoke run (single-command validation)
+
+Use `smoke-qwen` to run the full local Ollama Qwen validation matrix in one command:
+
+- evidence modes: `plot`, `table-csv`, `plot+table`
+- text-path modes: `full/full`, `summary/summary`, `both/both`
+- prompt sweep: `run_pipeline_sweep`
+- DoE: ANOVA contribution export
+- optional qualitative checks for coverage and faithfulness
+
+The command writes:
+
+- `smoke_report.md` and `smoke_report.json` (top-level status and diagnostics)
+- `cases/<case-id>/...` for every matrix case:
+  - prompts, responses, stats table, `report.csv`, `pipeline_run_metadata.json`, and `case_manifest.json`
+- `doe/anova_factorial_contributions.csv`
+- `sweep/combinations_report.csv`
+
+This is the recommended first-line smoke test before sharing or revising outputs.

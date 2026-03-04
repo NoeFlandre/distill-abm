@@ -123,6 +123,32 @@ uv run distill-abm run ... --evidence-mode table-csv
 uv run distill-abm run ... --evidence-mode plot+table
 ```
 
+Run a full local Qwen smoke suite (all evidence/text paths + DoE + prompt sweep + qualitative checks):
+
+```bash
+uv run distill-abm smoke-qwen \
+  --csv-path path/to/reduced.csv \
+  --parameters-path path/to/params.txt \
+  --documentation-path path/to/docs.txt \
+  --doe-input-csv path/to/FinalResultsYesNo.csv \
+  --model qwen2.5:latest \
+  --metric-pattern mean-incum \
+  --metric-description "average weekly whole milk consumption per agent" \
+  --plot-description "weekly whole milk consumption trend"
+```
+
+Smoke outputs are written under `results/smoke_qwen/` by default:
+
+- `smoke_report.md` and `smoke_report.json` with full matrix status and errors
+- `cases/<case-id>/` per-mode artifacts (prompts, responses, `report.csv`, `pipeline_run_metadata.json`, `case_manifest.json`)
+- `doe/anova_factorial_contributions.csv`
+- `sweep/combinations_report.csv`
+
+The smoke matrix runs these combinations with Ollama Qwen:
+
+- evidence mode: `plot`, `table-csv`, `plot+table`
+- summarization/scoring: `full/full`, `summary/summary`, `both/both`
+
 Run full-text baseline or summary-based runs:
 
 ```bash
@@ -297,7 +323,7 @@ Compatibility checks:
 ### Reproducibility manifest
 
 - `pipeline_run_metadata.json` is emitted for each `run` execution.
-- It captures input artifact paths, prompt signatures, provider settings (`temperature`, `max_tokens`), and score outputs.
+- It captures input artifact paths, full prompt texts and signatures, provider settings (`temperature`, `max_tokens`), and score outputs.
 - The metadata file is intended to be versioned together with `report.csv` and generated plot files.
 
 ## License

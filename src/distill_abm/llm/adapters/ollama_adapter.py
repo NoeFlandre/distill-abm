@@ -18,10 +18,13 @@ class OllamaAdapter(LLMAdapter):
         self._client = client
 
     def complete(self, request: LLMRequest) -> LLMResponse:
+        options: dict[str, float | int | None] = {"temperature": request.temperature}
+        if request.max_tokens is not None:
+            options["num_predict"] = request.max_tokens
         payload = {
             "model": self.model or request.model,
             "messages": _build_messages(request),
-            "options": {"temperature": request.temperature},
+            "options": options,
         }
         try:
             result = self._client_for_request().chat(**payload)
