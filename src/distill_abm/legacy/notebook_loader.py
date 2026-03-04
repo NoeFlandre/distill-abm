@@ -74,6 +74,11 @@ def missing_required_notebook_functions() -> list[str]:
     return [name for name in REQUIRED_NOTEBOOK_FUNCTIONS if name not in available]
 
 
+def required_notebook_function_sources() -> dict[str, Path]:
+    """Returns notebook source paths for every required notebook function."""
+    return {name: get_notebook_source_path(name) for name in REQUIRED_NOTEBOOK_FUNCTIONS}
+
+
 def get_notebook_function(name: str) -> Callable[..., Any]:
     """Returns a callable that matches the selected notebook implementation."""
     try:
