@@ -27,4 +27,10 @@ def test_load_notebook_experiment_settings_config() -> None:
     assert settings.summary_generation.fauna.num_plots == 14
     assert settings.summary_generation.grazing.num_plots == 10
     assert settings.summary_generation.milk.num_plots == 12
+    assert settings.scoring.fauna_ground_truth_path.endswith("fauna_scoring_ground_truth.txt")
+    assert settings.scoring.grazing_ground_truth_path.endswith("grazing_scoring_ground_truth.txt")
+    assert settings.scoring.milk_ground_truth_path.endswith("milk_scoring_ground_truth.txt")
+    assert Path(settings.scoring.fauna_ground_truth_path).exists()
+    assert Path(settings.scoring.grazing_ground_truth_path).exists()
+    assert Path(settings.scoring.milk_ground_truth_path).exists()
     assert "notebook_prompt_assets" in settings.qualitative_example_text_dir

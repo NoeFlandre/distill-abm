@@ -148,6 +148,10 @@ summary_generation:
     num_plots: 10
   milk:
     num_plots: 12
+scoring:
+  fauna_ground_truth_path: /tmp/fauna.txt
+  grazing_ground_truth_path: /tmp/grazing.txt
+  milk_ground_truth_path: /tmp/milk.txt
 """,
         encoding="utf-8",
     )
@@ -157,6 +161,7 @@ summary_generation:
     assert settings.grazint_netlogo_to_csv.output_csv_path == "/tmp/output.csv"
     assert settings.milk_netlogo_to_csv.saved_experiment_parameters["a"] == 1
     assert settings.summary_generation.fauna.num_plots == 14
+    assert settings.scoring.milk_ground_truth_path == "/tmp/milk.txt"
 
 
 def test_repository_prompts_follow_notebook_wording() -> None:

@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import csv
 import re
+import tempfile
 from pathlib import Path
+
+import pandas as pd
 
 
 def remove_sentences_with_www(text: str) -> str:
@@ -79,3 +82,47 @@ def postprocess_summary(text: str) -> str:
     cleaned = remove_unnecessary_spaces_in_parentheses(cleaned)
     cleaned = remove_space_before_dot(cleaned)
     return capitalize_sentences(cleaned)
+
+
+def postprocess_csv_batch(
+    input_csv: Path,
+    output_csv: Path,
+    bart_column: str = "Summary (BART) Reduced",
+    bert_column: str = "Summary (BERT) Reduced",
+) -> pd.DataFrame:
+    """Runs notebook-5 staged CSV postprocessing over BART/BERT summary columns."""
+    frame = pd.read_csv(input_csv)
+
+    # Notebook first pass applies www filtering to both summary columns.
+    for column in [bart_column, bert_column]:
+        if column in frame.columns:
+            frame[column] = frame[column].apply(lambda value: remove_sentences_with_www(str(value)))
+
+    # Notebook then applies these passes to BERT only.
+    if bert_column in frame.columns:
+        frame[bert_column] = frame[bert_column].apply(
+            lambda value: remove_hyphens_after_punctuation(value) if pd.notnull(value) else value
+        )
+        frame[bert_column] = frame[bert_column].apply(
+            lambda value: remove_unnecessary_punctuation(value) if pd.notnull(value) else value
+        )
+        frame[bert_column] = frame[bert_column].apply(
+            lambda value: remove_unnecessary_spaces_in_parentheses(value) if pd.notnull(value) else value
+        )
+        frame[bert_column] = frame[bert_column].apply(
+            lambda value: capitalize_sentences(value) if pd.notnull(value) else value
+        )
+
+    # Notebook applies space-before-dot cleanup to BART only.
+    if bart_column in frame.columns:
+        frame[bart_column] = frame[bart_column].apply(
+            lambda value: remove_space_before_dot(value) if pd.notnull(value) else value
+        )
+
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        interim = Path(temp_dir) / "interim.csv"
+        frame.to_csv(interim, index=False)
+        clean_non_unicode(interim, output_csv)
+
+    return pd.read_csv(output_csv)

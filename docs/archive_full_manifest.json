@@ -2378,32 +2378,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/5. Postprocessing-Copy1.ipynb",
-    "sha256": "5e8f85a07113e695d2e02370f3550b0cdf2111dd297a506634fd505d44b4b71e",
-    "size_bytes": 11493,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Fauna/5. Postprocessing-Copy1.ipynb"
-    ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Fauna/6.Scoring-Copy1.ipynb",
-    "sha256": "bd694a5b17a52f85506847971e4482c42a81cf175e528ce5e62c8f32a8643590",
-    "size_bytes": 7900,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Fauna/6.Scoring-Copy1.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Models/Fauna/CSV/Refining/HyphenFixed700.csv",
     "sha256": "f9671f688652927f52a9b0c86567723f68be01e4607e4d261c48523b6425b74a",
     "size_bytes": 502886,
@@ -2976,32 +2950,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/5. Postprocessing-Copy1.ipynb",
-    "sha256": "770e66e39204ff7ad4ed347b173be94bbc2dc1dcf7bf6629f899f68d83cac013",
-    "size_bytes": 11493,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Grazing/5. Postprocessing-Copy1.ipynb"
-    ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Grazing/6.Scoring-Copy1.ipynb",
-    "sha256": "a9096791e90c2c88698cfe3b2a666e636f470fc5fbcc35a37180904fea216788",
-    "size_bytes": 8206,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Grazing/6.Scoring-Copy1.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Models/Grazing/CSV/Refining/HyphenFixed700.csv",
     "sha256": "b3d909725468e8779160fe0d72243e24dea4a79d421b69006b902d8e2b1cb47c",
     "size_bytes": 357093,
@@ -3528,32 +3476,6 @@
     "target_path": "tests/fixtures/notebook_parity/experiment_settings/Models/Grazing/TXT/narrativeCombined200.txt",
     "rationale": "Model parameter/documentation inputs used in notebook runs.",
     "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/5. Postprocessing.ipynb",
-    "sha256": "770e66e39204ff7ad4ed347b173be94bbc2dc1dcf7bf6629f899f68d83cac013",
-    "size_bytes": 11493,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Milk Consumption/5. Postprocessing.ipynb"
-    ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/6.Scoring.ipynb",
-    "sha256": "6352bf205ef87dde01897072a6dd063fbc86ce8a62f928dfc0dadbd91800fbe7",
-    "size_bytes": 9956,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Milk Consumption/6.Scoring.ipynb"
-    ]
   },
   {
     "path": "archive/legacy_repo/Code/Models/Milk Consumption/CSV/Refining/HyphenFixed777.csv",
