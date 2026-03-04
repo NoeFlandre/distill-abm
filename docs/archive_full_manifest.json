@@ -2391,19 +2391,6 @@
     ]
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb",
-    "sha256": "cddf4e6a007955d4b16073c66c24efb29cdcde3d94cd0f1bd30b6320f30d7024",
-    "size_bytes": 496613,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb",
     "sha256": "d8b8183354737741d7f6f83a15244648f8a588a872584a9bd494a497c613652f",
     "size_bytes": 459626,
@@ -3041,19 +3028,6 @@
     ]
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb",
-    "sha256": "9f9b7ae605d3ab464efcc25a19141d8833d9a1c93ba622508e7005284bec273a",
-    "size_bytes": 379374,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Grazing/3. With combinations-Copy1.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb",
     "sha256": "c60a41698a33867b7ddd822420e5a37c753ca36ce279812573fc615c4678f254",
     "size_bytes": 332527,
@@ -3644,19 +3618,6 @@
     "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Milk Consumption/3. (Deepseek) With combinations.ipynb"
-    ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb",
-    "sha256": "ad616509465b10dad20f77c5015d4f0d105a2bac1c8ccedee77745e38c04bd6b",
-    "size_bytes": 378817,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Milk Consumption/3. (GPT) With combinations.ipynb"
     ]
   },
   {
