@@ -43,10 +43,12 @@ The top-level runtime entrypoint is `src/distill_abm/cli.py`. The parity surface
 
 ```bash
 uv sync --extra dev
+uv run pre-commit install
+uv run pre-commit run --all-files
 uv run ruff check .
 uv run black --check .
 uv run mypy src tests
-uv run pytest -q
+uv run pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85
 ```
 
 ## CLI
@@ -209,10 +211,9 @@ docker run --rm distill-abm
 
 - GitHub Actions workflow at `.github/workflows/ci.yml`
 - Runs on push and pull request:
-  - `ruff check .`
-  - `black --check .`
+  - `pre-commit run --all-files`
   - `mypy src tests`
-  - `pytest`
+  - `pytest --cov=distill_abm --cov-report=term-missing --cov-report=xml --cov-fail-under=85`
 
 ## Parity policy
 

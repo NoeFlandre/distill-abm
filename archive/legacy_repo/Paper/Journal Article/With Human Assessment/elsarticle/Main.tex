@@ -1,19 +1,19 @@
-%% 
+%%
 %% Copyright 2007-2024 Elsevier Ltd
-%% 
+%%
 %% This file is part of the 'Elsarticle Bundle'.
 %% ---------------------------------------------
-%% 
+%%
 %% It may be distributed under the conditions of the LaTeX Project Public
 %% License, either version 1.3 of this license or (at your option) any
 %% later version.  The latest version of this license is in
 %%    http://www.latex-project.org/lppl.txt
 %% and version 1.3 or later is part of all distributions of LaTeX
 %% version 1999/12/01 or later.
-%% 
+%%
 %% The list of all files belonging to the 'Elsarticle Bundle' is
 %% given in the file `manifest.txt'.
-%% 
+%%
 %% Template article for Elsevier's document class `elsarticle'
 %% with numbered style bibliographic references
 %% SP 2008/03/01
@@ -103,7 +103,7 @@
             postcode={30100},
             state={Occitanie},
             country={France}}
-            
+
 \affiliation[label2]{organization={Old Dominion University},
             addressline={5115 Hampton Blvd},
             city={Norfolk},
@@ -117,9 +117,9 @@
 
 %% Author affiliation
 %\affiliation{organization={ODU \& Software Engineering, Miami University},%Department and Organization
-            %addressline={501 E High St}, 
+            %addressline={501 E High St},
            % city={Oxford},
-           % postcode={45056}, 
+           % postcode={45056},
            % state={OH},
            % country={USA}}
 
@@ -149,7 +149,7 @@ Explanatory modeling is essential for transforming complex simulation outcomes i
 
 \end{frontmatter}
 
-%% Add \usepackage{lineno} before \begin{document} and uncomment 
+%% Add \usepackage{lineno} before \begin{document} and uncomment
 %% following line to enable line numbers
 %% \linenumbers
 
@@ -163,7 +163,7 @@ Explanatory modeling is essential for transforming complex simulation outcomes i
 
 Explanatory modeling plays a crucial role in interpreting complex simulation outcomes, transforming raw data into understandable narratives that can inform decision-making. This approach is particularly beneficial for policymakers who may not have the technical expertise to interpret raw simulation data directly and therefore might be less able to put the model's insights into practice \cite{Zellner2022}.\\
 
-Agent-based modeling (ABM) simulates interactions of agents to assess their effects on the system as a whole. These models are increasingly used and successful across many domains including ecological and socio-ecological systems \cite{Achter2024} \cite{DeAngelis2019}, sociology \cite{Bianchi2015} or political decision making \cite{Qiu2020}. 
+Agent-based modeling (ABM) simulates interactions of agents to assess their effects on the system as a whole. These models are increasingly used and successful across many domains including ecological and socio-ecological systems \cite{Achter2024} \cite{DeAngelis2019}, sociology \cite{Bianchi2015} or political decision making \cite{Qiu2020}.
 
 
  The challenge lies in conveying the simulation outcomes in a manner that is both comprehensive and accessible. Agent-based models are powerful tools for understanding complex systems, but their results can be challenging to communicate due to the difficulties in analyzing and interpreting the multidimensional output data \cite{Lee2015}. This difficulty is exacerbated when trying to communicate findings \cite{An2020}, particularly to non-experts who need to make informed decisions based on these outcomes.\cite{Papadopoulou2018}\\
@@ -203,7 +203,7 @@ BLEU (Bilingual Evaluation Understudy) measures the precision of n-grams in the 
 Qualitative assessment frequently relies on human evaluators, although there is ongoing research attempting to extend this to Large Language Models (LLMs) \cite{Song2024}. When dealing with a large volume of outcomes, it often necessitates the involvement of multiple individuals. Previous studies have established a structured process to ensure consistency and reliability \cite{Naismith2023} : initially, a first batch of outcomes is collaboratively rated to establish a standard. Subsequently, another batch is independently rated by pairs of raters to measure interrater agreement using Cohen's Kappa. Finally, the remaining results are individually rated, assuming a satisfactory level of interrater agreement has been achieved. A common challenge encountered is the high variability in Cohen's Kappa values, indicating inconsistent agreement among raters. To address this, researchers are increasingly defining detailed rubrics to enhance precision and clarity in ratings. Two predominant approaches are often employed: descriptive rubrics \cite{Moore2023}, which provide detailed criteria for each level of performance, and holistic rubrics \cite{Naismith2023}, which offer a single overall score based on a general impression of performance. These rubrics aim to standardize the evaluation process, reduce variability, and ensure more reliable and consistent assessments across different raters.
 
 
-%% Use \subsubsection, \paragraph, \subparagraph commands to 
+%% Use \subsubsection, \paragraph, \subparagraph commands to
 %% start 3rd, 4th and 5th level sections.
 %% Refer following link for more details.
 %% https://en.wikibooks.org/wiki/LaTeX/Document_Structure#Sectioning_commands
@@ -219,7 +219,7 @@ Qualitative assessment frequently relies on human evaluators, although there is 
 %% Refer following link for more details.
 %% https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
 \begin{figure}[h]%% placement specifier
-%% Use \includegraphics command to insert graphic files. Place graphics files in 
+%% Use \includegraphics command to insert graphic files. Place graphics files in
 %% working directory.
 \includegraphics[scale=0.39]{Picture 2.png} %% Use \caption command for figure caption and label.
 \caption{Our procedure consists in three main parts. Each part is explained in turn, in a dedicated subsection}\label{fig1}
@@ -253,7 +253,7 @@ Qualitative assessment frequently relies on human evaluators, although there is 
 \caption{Python Libraries used including their role in our method}
 \end{table}
 
-Our methods are divided into three main parts (Figure \ref{fig:overview}). First, the Agent-Based Model is specified in NetLogo (subsection \ref{subsec2}). Given a set of parameters, we run several simulations to obtain results from the model. We also extract data from the NetLogo file: we parse the documentation, the Graphical User Interface (GUI), and the comments from the code. Then we generate a report using this information (subsection \ref{subsec3}). GPT-4o and Claude 3.5 Sonnet are used to generate both a context and a trend analysis, then a summarization algorithm reduces the number of paragraphs to the length suitable for a report. We optimize the prompt engineering process using a systematic design of experiments to ensure the generated reports are both accurate and informative. Finally we evaluate the report (subsection \ref{subsec4}) by using a qualitative method, and a quantitative method relying on a ground truth for certain metrics. 
+Our methods are divided into three main parts (Figure \ref{fig:overview}). First, the Agent-Based Model is specified in NetLogo (subsection \ref{subsec2}). Given a set of parameters, we run several simulations to obtain results from the model. We also extract data from the NetLogo file: we parse the documentation, the Graphical User Interface (GUI), and the comments from the code. Then we generate a report using this information (subsection \ref{subsec3}). GPT-4o and Claude 3.5 Sonnet are used to generate both a context and a trend analysis, then a summarization algorithm reduces the number of paragraphs to the length suitable for a report. We optimize the prompt engineering process using a systematic design of experiments to ensure the generated reports are both accurate and informative. Finally we evaluate the report (subsection \ref{subsec4}) by using a qualitative method, and a quantitative method relying on a ground truth for certain metrics.
 
 
 \subsection{Data Extraction}
@@ -264,7 +264,7 @@ Data extraction involved processing NetLogo simulation files. Our research uses 
 
 The dynamic data consisted in parameters we could modify. Thanks to this part of the file, we were able to run the simulations and retrieve the data using pynetlogo (Table \ref{table:libs}). Therefore, we have set the initial parameters, the metrics to follow throughout the experiment, the halting condition and ran the experiment. For example a parameter could be $number\-of\-agents = 1,000$, a metric could be “mean [incum-quantity] of turtles” and a halting condition could be $max\_ticks =73,000$. This would mean that the experiment starts with $1,000$ agents, for a maximum of $73,000$ ticks during which we will measure the mean quantity of whole milk consumed by agents. All the results were then exported into CSV format for further analysis.\\
 
-From the static data, we extracted the documentation, the GUI (the modifiable elements and their range of values) and the comments from the code using regular expressions (Table \ref{table:libs}). While parsing the documentation, we made sure to not include the default content from Netlogo files that were left unfilled and we also made sure to remove urls as it was subject to hallucinations from the LLMs. From the GUI, we have made sure to only pick relevant information (i.e the minimum and maximum value as well as the value set for the experiment). This content was saved into JSON files and plays an essential role in giving context to the simulation for the following explanations. 
+From the static data, we extracted the documentation, the GUI (the modifiable elements and their range of values) and the comments from the code using regular expressions (Table \ref{table:libs}). While parsing the documentation, we made sure to not include the default content from Netlogo files that were left unfilled and we also made sure to remove urls as it was subject to hallucinations from the LLMs. From the GUI, we have made sure to only pick relevant information (i.e the minimum and maximum value as well as the value set for the experiment). This content was saved into JSON files and plays an essential role in giving context to the simulation for the following explanations.
 
 \subsection{Report Generation}
 \label{subsec3}
@@ -281,8 +281,8 @@ The second step was to describe the data from the simulation. To do so, we used 
     \item use of a role (also named a persona) \cite{White2023} \cite{Stahl2024} (example : “You are an expert in Consumer Behavior”)
     \item an example of expected style, as we already showed that examples in prompts can provide better outcomes in several fields, like causal maps \cite{Giabbanelli202444}  (for instance : “ The total number of earthquakes recorded in the region starts at $5,000$ then it declines rapidly over the first $400$ time steps. This initial decline could be attributed to the depletion of immediate stress points within the fault lines, as the most susceptible areas release their pent-up energy early in the simulation. It increases briefly at around $500$ steps, likely due to the aftershocks and secondary stress points being triggered as the system seeks a new equilibrium. The simulation ends with the number of earthquakes near zero, indicating that the majority of the stress has been released and the system has stabilized.
 
-    The total seismic activity follows the same pattern, starting at $10,000$ events and declining steadily. This steady decline reflects a systematic reduction in seismic energy over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance across simulation runs in the first $100$ steps, but deviations become noticeable afterward. This suggests that while the initial reactions to stress are highly predictable, as time progresses, the system's complexity introduces more variability. This variability could be due to differences in secondary stress points and the non-linear nature of seismic energy release over time.“) 
-    \item “insights” \textcolor{red}{that might need a reference}( “When summarizing trends, provide brief insights about their implications for decision makers.”). 
+    The total seismic activity follows the same pattern, starting at $10,000$ events and declining steadily. This steady decline reflects a systematic reduction in seismic energy over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance across simulation runs in the first $100$ steps, but deviations become noticeable afterward. This suggests that while the initial reactions to stress are highly predictable, as time progresses, the system's complexity introduces more variability. This variability could be due to differences in secondary stress points and the non-linear nature of seismic energy release over time.“)
+    \item “insights” \textcolor{red}{that might need a reference}( “When summarizing trends, provide brief insights about their implications for decision makers.”).
 \end{itemize}
 
 
@@ -371,7 +371,7 @@ We evaluated the performance of two leading language models, GPT-4o and Claude 3
 \label{table:llm_comparison}
 \begin{tabular}{|l|c|c|c|c|c|c|}
 \hline
-\textbf{LLM}  & \textbf{BLEU} & \textbf{MET} & \textbf{R-1} & \textbf{R-2} & \textbf{R-L} & \textbf{FRE} \\ 
+\textbf{LLM}  & \textbf{BLEU} & \textbf{MET} & \textbf{R-1} & \textbf{R-2} & \textbf{R-L} & \textbf{FRE} \\
 \hline
 Claude & 0.04259 & 0.23371 & 0.44485 & 0.12047 & 0.18548 & 51.28 \\
 GPT    & 0.04853 & 0.24594 & 0.45972 & 0.12972 & 0.18904 & 46.73 \\
@@ -391,7 +391,7 @@ To further understand the influence of different prompt engineering strategies, 
 \label{table:design_experiment_combined}
 \begin{tabular}{|l|l|l|c|c|c|c|c|c|}
 \hline
-\textbf{Role} & \textbf{Ex} & \textbf{Ins} & \textbf{BLEU} & \textbf{MET} & \textbf{R-1} & \textbf{R-2} & \textbf{R-L} & \textbf{FRE} \\ 
+\textbf{Role} & \textbf{Ex} & \textbf{Ins} & \textbf{BLEU} & \textbf{MET} & \textbf{R-1} & \textbf{R-2} & \textbf{R-L} & \textbf{FRE} \\
 \hline
 No  & No  & No  & 0.04601 & 0.23648 & 0.44899 & 0.12390 & 0.18723 & 49.26 \\
 No  & No  & Yes & 0.04351 & 0.23871 & 0.45070 & 0.12293 & 0.18674 & 46.86 \\
@@ -435,7 +435,7 @@ While the integration of LLMs with simulation outputs shows great promise, there
 
 
 
-%% For citations use: 
+%% For citations use:
 %%       \cite{<label>} ==> [1]
 
 %%
@@ -443,7 +443,7 @@ While the integration of LLMs with simulation outputs shows great promise, there
 %% If you have bib database file and want bibtex to generate the
 %% bibitems, please use
 %%
-%%  \bibliographystyle{elsarticle-num} 
+%%  \bibliographystyle{elsarticle-num}
 %%  \bibliography{<your bibdatabase>}
 
 %% else use the following coding to input the bibitems directly in the
@@ -545,7 +545,7 @@ July 13, 2023.
 
 
 \bibitem{Papadopoulou2018}
-L. Papadopoulou, K. McEntaggart, J. Etienne, 
+L. Papadopoulou, K. McEntaggart, J. Etienne,
 Communicating scientific uncertainty in advice provision to decision-makers: Review of approaches and recommendations for UK Statutory Nature Conservation Bodies,
 JNCC Report No. 617 (2018).
 \href{https://hub.jncc.gov.uk/assets/533a9f57-189b-41b3-872c-424fd8f6ec15}{https://hub.jncc.gov.uk/assets/533a9f57-189b-41b3-872c-424fd8f6ec15}
@@ -591,7 +591,7 @@ Proceedings of the 18th Conference on Natural Language Processing (KONVENS 2022)
 \bibitem{Hendy2023}
 Amr Hendy, Mohamed Abdelrehim, Amr Sharaf, Vikas Raunak, Mohamed Gabr, Hitokazu Matsushita, Young Jin Kim, Mohamed Afify, Hany Hassan Awadalla,
 How Good Are GPT Models at Machine Translation? A Comprehensive Evaluation,
-arXiv preprint arXiv:2302.09210v1 (2023). 
+arXiv preprint arXiv:2302.09210v1 (2023).
 \href{https://doi.org/10.48550/arXiv.2302.09210}{https://doi.org/10.48550/arXiv.2302.09210}
 
 \bibitem{Kho2022}
@@ -615,7 +615,7 @@ Frontiers in Ecology and Evolution, vol. 6, art. 237, 2019.
 
 
 \bibitem{Vatsal2024}
-Shubham Vatsal, Ayush Singh, Shabnam Tafreshi, 
+Shubham Vatsal, Ayush Singh, Shabnam Tafreshi,
 Can GPT Improve the State of Prior Authorization via Guideline Based Automated Question Answering?,
 arXiv preprint arXiv:2402.18419v1 (2024).
 \href{https://doi.org/10.48550/arXiv.2402.18419}{https://doi.org/10.48550/arXiv.2402.18419}
@@ -677,7 +677,7 @@ arXiv preprint arXiv:2203.05227, 2022.
 \bibitem{Moore2023}
 Steven Moore, Huy A. Nguyen, Tianying Chen, and John Stamper,
 Assessing the Quality of Multiple-Choice Questions Using GPT-4 and Rule-Based Methods,
-In: Viberg, O., Jivet, I., Muñoz-Merino, P.J., Perifanou, M., Papathoma, T. (eds) Responsive and Sustainable Educational Futures. EC-TEL 2023. Lecture Notes in Computer Science, vol 14200. Springer, Cham. 
+In: Viberg, O., Jivet, I., Muñoz-Merino, P.J., Perifanou, M., Papathoma, T. (eds) Responsive and Sustainable Educational Futures. EC-TEL 2023. Lecture Notes in Computer Science, vol 14200. Springer, Cham.
 Pages 229-245 (2023), Page 240.
 \href{https://doi.org/10.1007/978-3-031-42682-7_14}{https://doi.org/10.1007/978-3-031-42682-7_14}
 
@@ -796,7 +796,7 @@ Chat with LLMs,
 (2024).
 \href{https://chat.lmsys.org/?leaderboard}{https://chat.lmsys.org/?leaderboard}
 
-\bibitem{duPlooy2023} C. du Plooy and R. Oosthuizen, AI Usefulness in Systems Modelling and Simulation: GPT-4 Application, South African Journal of Industrial Engineering, vol. 34, no. 3, pp. 286-303, Nov. 2023, doi: 10.7166/34-3-2944, \href{http://dx.doi.org//10.7166/34-3-2944}{http://dx.doi.org//10.7166/34-3-2944}. 
+\bibitem{duPlooy2023} C. du Plooy and R. Oosthuizen, AI Usefulness in Systems Modelling and Simulation: GPT-4 Application, South African Journal of Industrial Engineering, vol. 34, no. 3, pp. 286-303, Nov. 2023, doi: 10.7166/34-3-2944, \href{http://dx.doi.org//10.7166/34-3-2944}{http://dx.doi.org//10.7166/34-3-2944}.
 
 
 \bibitem{AbdelSalam2022}

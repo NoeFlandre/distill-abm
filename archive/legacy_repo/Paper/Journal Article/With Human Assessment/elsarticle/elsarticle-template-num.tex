@@ -1,19 +1,19 @@
-%% 
+%%
 %% Copyright 2007-2024 Elsevier Ltd
-%% 
+%%
 %% This file is part of the 'Elsarticle Bundle'.
 %% ---------------------------------------------
-%% 
+%%
 %% It may be distributed under the conditions of the LaTeX Project Public
 %% License, either version 1.3 of this license or (at your option) any
 %% later version.  The latest version of this license is in
 %%    http://www.latex-project.org/lppl.txt
 %% and version 1.3 or later is part of all distributions of LaTeX
 %% version 1999/12/01 or later.
-%% 
+%%
 %% The list of all files belonging to the 'Elsarticle Bundle' is
 %% given in the file `manifest.txt'.
-%% 
+%%
 %% Template article for Elsevier's document class `elsarticle'
 %% with numbered style bibliographic references
 %% SP 2008/03/01
@@ -102,7 +102,7 @@
             postcode={30100},
             state={Occitanie},
             country={France}}
-            
+
 \affiliation[label2]{organization={Old Dominion University},
             addressline={5115 Hampton Blvd},
             city={Norfolk},
@@ -116,9 +116,9 @@
 
 %% Author affiliation
 %\affiliation{organization={ODU \& Software Engineering, Miami University},%Department and Organization
-            %addressline={501 E High St}, 
+            %addressline={501 E High St},
            % city={Oxford},
-           % postcode={45056}, 
+           % postcode={45056},
            % state={OH},
            % country={USA}}
 
@@ -146,7 +146,7 @@ Abstract text.
 \end{keyword}
 \end{frontmatter}
 
-%% Add \usepackage{lineno} before \begin{document} and uncomment 
+%% Add \usepackage{lineno} before \begin{document} and uncomment
 %% following line to enable line numbers
 %% \linenumbers
 
@@ -172,7 +172,7 @@ The remainder of this paper is organized as follows. In Section \ref{sec2}, we p
 \label{sec2}
 
 
-%% Use \subsubsection, \paragraph, \subparagraph commands to 
+%% Use \subsubsection, \paragraph, \subparagraph commands to
 %% start 3rd, 4th and 5th level sections.
 %% Refer following link for more details.
 %% https://en.wikibooks.org/wiki/LaTeX/Document_Structure#Sectioning_commands
@@ -188,7 +188,7 @@ The remainder of this paper is organized as follows. In Section \ref{sec2}, we p
 %% Refer following link for more details.
 %% https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
 \begin{figure}[h]%% placement specifier
-%% Use \includegraphics command to insert graphic files. Place graphics files in 
+%% Use \includegraphics command to insert graphic files. Place graphics files in
 %% working directory.
 \includegraphics[scale=0.85]{Picture 1.png} %% Use \caption command for figure caption and label.
 \caption{Our procedure consists in three main parts. Each part is explained in turn, in a dedicated subsection}\label{fig1}
@@ -219,7 +219,7 @@ The remainder of this paper is organized as follows. In Section \ref{sec2}, we p
 \caption{Python Libraries used including their role in our method}
 \end{table}
 
-Our methods are divided into three main parts (Figure \ref{fig:overview}). First, the Agent-Based Model is specified in NetLogo (subsection \ref{subsec2}). Given a set of parameters, we run several simulations to obtain results from the model. We also extract data from the NetLogo file: we parse the documentation, the Graphical User Interface (GUI), and the comments from the code. Then we generate a report using this information (subsection \ref{subsec3}). GPT-4o and Claude 3.5 Sonnet are used to generate both a context and a trend analysis, then a summarization algorithm reduces the number of paragraphs to the length suitable for a report. We optimize the prompt engineering process using a systematic design of experiments to ensure the generated reports are both accurate and informative. Finally we evaluate the report (subsection \ref{subsec4}) by using a qualitative method, and a quantitative method relying on a ground truth for certain metrics. 
+Our methods are divided into three main parts (Figure \ref{fig:overview}). First, the Agent-Based Model is specified in NetLogo (subsection \ref{subsec2}). Given a set of parameters, we run several simulations to obtain results from the model. We also extract data from the NetLogo file: we parse the documentation, the Graphical User Interface (GUI), and the comments from the code. Then we generate a report using this information (subsection \ref{subsec3}). GPT-4o and Claude 3.5 Sonnet are used to generate both a context and a trend analysis, then a summarization algorithm reduces the number of paragraphs to the length suitable for a report. We optimize the prompt engineering process using a systematic design of experiments to ensure the generated reports are both accurate and informative. Finally we evaluate the report (subsection \ref{subsec4}) by using a qualitative method, and a quantitative method relying on a ground truth for certain metrics.
 
 
 \subsection{Data Extraction}
@@ -230,7 +230,7 @@ Data extraction involved processing NetLogo simulation files. Our research uses 
 
 The dynamic data consisted in parameters we could modify. Thanks to this part of the file, we were able to run the simulations and retrieve the data using pynetlogo (Table \ref{table:libs}). Therefore, we have set the initial parameters, the metrics to follow throughout the experiment, the halting condition and ran the experiment. For example a parameter could be $number\-of\-agents = 1,000$, a metric could be “mean [incum-quantity] of turtles” and a halting condition could be $max\_ticks =73,000$. This would mean that the experiment starts with $1,000$ agents, for a maximum of $73,000$ ticks during which we will measure the mean quantity of whole milk consumed by agents. All the results were then exported into CSV format for further analysis.\\
 
-From the static data, we extracted the documentation, the GUI (the modifiable elements and their range of values) and the comments from the code using regular expressions. While parsing the documentation, we made sure to not include the default content from Netlogo files that were left unfilled and we also made sure to remove urls. From the GUI, we have made sure to only pick relevant information (i.e the minimum and maximum value as well as the value set for the experiment). This content was saved into JSON files and plays an essential role in giving context to the simulation for the following explanations. 
+From the static data, we extracted the documentation, the GUI (the modifiable elements and their range of values) and the comments from the code using regular expressions. While parsing the documentation, we made sure to not include the default content from Netlogo files that were left unfilled and we also made sure to remove urls. From the GUI, we have made sure to only pick relevant information (i.e the minimum and maximum value as well as the value set for the experiment). This content was saved into JSON files and plays an essential role in giving context to the simulation for the following explanations.
 
 \subsection{Report Generation}
 \label{subsec3}
@@ -247,8 +247,8 @@ The second step was to describe the data from the simulation. To do so, we used 
     \item use of a role ( example : “You are an expert in Consumer Behavior”)
     \item an example of expected style ( for instance : “ The total number of earthquakes recorded in the region starts at $5,000$ then it declines rapidly over the first $400$ time steps. This initial decline could be attributed to the depletion of immediate stress points within the fault lines, as the most susceptible areas release their pent-up energy early in the simulation. It increases briefly at around $500$ steps, likely due to the aftershocks and secondary stress points being triggered as the system seeks a new equilibrium. The simulation ends with the number of earthquakes near zero, indicating that the majority of the stress has been released and the system has stabilized.
 
-    The total seismic activity follows the same pattern, starting at $10,000$ events and declining steadily. This steady decline reflects a systematic reduction in seismic energy over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance across simulation runs in the first $100$ steps, but deviations become noticeable afterward. This suggests that while the initial reactions to stress are highly predictable, as time progresses, the system's complexity introduces more variability. This variability could be due to differences in secondary stress points and the non-linear nature of seismic energy release over time.“) 
-    \item “insights” ( “When summarizing trends, provide brief insights about their implications for decision makers.”). 
+    The total seismic activity follows the same pattern, starting at $10,000$ events and declining steadily. This steady decline reflects a systematic reduction in seismic energy over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance across simulation runs in the first $100$ steps, but deviations become noticeable afterward. This suggests that while the initial reactions to stress are highly predictable, as time progresses, the system's complexity introduces more variability. This variability could be due to differences in secondary stress points and the non-linear nature of seismic energy release over time.“)
+    \item “insights” ( “When summarizing trends, provide brief insights about their implications for decision makers.”).
 \end{itemize}
 
 
@@ -357,7 +357,7 @@ The second part of our evaluation is an automated quantitative process, consisti
 
 
 
-%% For citations use: 
+%% For citations use:
 %%       \cite{<label>} ==> [1]
 
 %%
@@ -365,7 +365,7 @@ The second part of our evaluation is an automated quantitative process, consisti
 %% If you have bib database file and want bibtex to generate the
 %% bibitems, please use
 %%
-%%  \bibliographystyle{elsarticle-num} 
+%%  \bibliographystyle{elsarticle-num}
 %%  \bibliography{<your bibdatabase>}
 
 %% else use the following coding to input the bibitems directly in the
@@ -415,7 +415,7 @@ Journal of Cancer Research and Clinical Oncology, vol. 150, pp. 139-152, 2024.
 \href{https://doi.org/10.1007/s00432-024-05673-x}{https://doi.org/10.1007/s00432-024-05673-x}.
 
 \bibitem{Yang2024}
-Joshua C. Yang, Damian Dailisan, Marcin Korecki, Carina I. Hausladen, Dirk Helbing, 
+Joshua C. Yang, Damian Dailisan, Marcin Korecki, Carina I. Hausladen, Dirk Helbing,
 LLM Voting: Human Choices and AI Collective Decision-Making,
 arXiv preprint arXiv:2402.01766v2 (2024).
 \href{https://arxiv.org/abs/2402.01766v2}{https://arxiv.org/abs/2402.01766v2}
@@ -430,7 +430,7 @@ Proceedings of the 18th Conference on Natural Language Processing (KONVENS 2022)
 \bibitem{Hendy2023}
 Amr Hendy, Mohamed Abdelrehim, Amr Sharaf, Vikas Raunak, Mohamed Gabr, Hitokazu Matsushita, Young Jin Kim, Mohamed Afify, Hany Hassan Awadalla,
 How Good Are GPT Models at Machine Translation? A Comprehensive Evaluation,
-arXiv preprint arXiv:2302.09210v1 (2023). 
+arXiv preprint arXiv:2302.09210v1 (2023).
 \href{https://doi.org/10.48550/arXiv.2302.09210}{https://doi.org/10.48550/arXiv.2302.09210}
 
 
@@ -441,7 +441,7 @@ arXiv preprint arXiv:2303.08774v6, 2024.
 \href{https://arxiv.org/abs/2303.08774v6}{https://arxiv.org/abs/2303.08774v6}
 
 \bibitem{Vatsal2024}
-Shubham Vatsal, Ayush Singh, Shabnam Tafreshi, 
+Shubham Vatsal, Ayush Singh, Shabnam Tafreshi,
 Can GPT Improve the State of Prior Authorization via Guideline Based Automated Question Answering?,
 arXiv preprint arXiv:2402.18419v1 (2024).
 \href{https://doi.org/10.48550/arXiv.2402.18419}{https://doi.org/10.48550/arXiv.2402.18419}

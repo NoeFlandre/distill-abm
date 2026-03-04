@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 from collections.abc import Callable
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 import pandas as pd
 
@@ -159,9 +159,9 @@ def _clean_summary_input_frame(frame: pd.DataFrame, context_column: str, plot_co
     return clean_dataframe_symbols(copied, [context_column, *plot_columns])
 
 
-def _clean_context_cell(value: object) -> object:
+def _clean_context_cell(value: Any) -> str | None:
     if pd.isna(value):
-        return value
+        return None
     return clean_context_response(str(value))
 
 

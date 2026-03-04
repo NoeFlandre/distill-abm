@@ -1773,7 +1773,7 @@ TEXTBOX
 45
 130
 86
-Simulation length 
+Simulation length
 13
 0.0
 1
@@ -2293,19 +2293,19 @@ For Experiments ONLY
 
 ## WHAT IS IT?
 
-This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management). 
+This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management).
 
 The original model can be found here:
 https://www.comses.net/codebases/5721/releases/1.0.0/
 
- 
-The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others. 
+
+The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others.
 
 Besides the evaluation of the behavioral types, the model allows to adjust a range of ecological and climatic parameters, such as rainfall average and variability, vegetation growth rates or livestock reproduction rate. The model can be evaluated across a range of social, ecological and economic outcome variables, such as average herd size, pasture biomass condition or surviving number of households.
 
-**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents. 
+**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents.
 
-An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude. 
+An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude.
 
 
 ### A detailed description of the model and its processes can be found in the accompanying ODD+D protocol
@@ -2325,13 +2325,13 @@ The model consists of two main sub-models:  _**Vegetation**_, and _**Household d
 7. Reserve biomass is updated
 8. Households observe and remember reserve biomass
 
-### Model parameters 
+### Model parameters
 
 Extension model parameters: Standard value / range
 
 - extension-model?: true
 - risk-mode?: true
-- number-households: 60   
+- number-households: 60
 - timesteps: 100
 - b: 0 (reproduction not used in extension model)
 - knowledge-radius: 1
@@ -2374,7 +2374,7 @@ Comparing the results of heterogeneous groups of households (*homog-behav-types?
 
 Observe visually the evolution of numbers of agents of each type (corresponding to different colors) in a heterogeneous population (*homog-behav-types?* false) of agents.
 
-## REFERENCES 
+## REFERENCES
 
 ### Original
 

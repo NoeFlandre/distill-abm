@@ -34,19 +34,19 @@ Your goal is to explain an agent-based model. Your explanation must include the 
   - livestock-init. We set it to 90.
   - rain-std. We set it to 100.
 
-The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management). 
+The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management).
 
 The original model can be found here:
 
 
- 
-The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others. 
+
+The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others.
 
 Besides the evaluation of the behavioral types, the model allows to adjust a range of ecological and climatic parameters, such as rainfall average and variability, vegetation growth rates or livestock reproduction rate. The model can be evaluated across a range of social, ecological and economic outcome variables, such as average herd size, pasture biomass condition or surviving number of households.
 
-**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents. 
+**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents.
 
-An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude. 
+An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude.
 
 
 ### A detailed description of the model and its processes can be found in the accompanying ODD+D protocol
@@ -65,7 +65,7 @@ An important modification of the original model is that extension agents are het
 
 - extension-model?: true
 - risk-mode?: true
-- number-households: 60   
+- number-households: 60
 - timesteps: 100
 - b: 0 (reproduction not used in extension model)
 - knowledge-radius: 1
@@ -245,7 +245,7 @@ It is noteworthy that the fluctuations in the count appear to be cyclical, with 
  Plot shows the count of households that have engaged in social learning over time steps in repeated simulations . The dynamics exhibit a sigmoidal or S-shaped curve, starting from a low count near zero at the initial time steps, then increasing rapidly in an accelerating manner .
 
  The plot shows the mean destocked total of households over time steps . This represents the average cumulative number of livestock that have been destocked across all households in the simulation . The rate of increase is relatively slow in the beginning but gradually accelerates as time progresses .
- The plot shows the count of non-learning households over time steps in an agent-based model simulation . The dynamics exhibit a high degree of variability, with the count fluctuating considerably across different time steps . The fluctuations in the count appear to be cyclical, with a recurring pattern of rises and falls .","the context and goals of the model have been provided, along with a description of the model and its processes. 
+ The plot shows the count of non-learning households over time steps in an agent-based model simulation . The dynamics exhibit a high degree of variability, with the count fluctuating considerably across different time steps . The fluctuations in the count appear to be cyclical, with a recurring pattern of rises and falls .","the context and goals of the model have been provided, along with a description of the model and its processes.
 
 the plot represents the mean household initial risk attitude of social learning agents over time steps. at the start ( time step 0 ), there is a wide range of mean risk attitudes across different runs, spanning values from around 0. as the simulation progresses, the risk attitudes tend to converge towards values clustering around 0. it then exhibits a gradual increase, with the rate of increase becoming steeper around the 20th time step. after this peak, the reserve biomass levels off and remains relatively stable until the end of the simulation at the 100th time step. initially, around time step 0, the mean green biomass starts at a value of approximately 45000 units for all simulation runs. as time progresses, the mean green biomass gradually increases in a curvilinear fashion, exhibiting an s - shaped growth pattern.
 
@@ -289,19 +289,19 @@ Your goal is to explain an agent-based model. Your explanation must include the 
   - livestock-init. We set it to 90.
   - rain-std. We set it to 100.
 
-The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management). 
+The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management).
 
 The original model can be found here:
 
 
- 
-The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others. 
+
+The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others.
 
 Besides the evaluation of the behavioral types, the model allows to adjust a range of ecological and climatic parameters, such as rainfall average and variability, vegetation growth rates or livestock reproduction rate. The model can be evaluated across a range of social, ecological and economic outcome variables, such as average herd size, pasture biomass condition or surviving number of households.
 
-**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents. 
+**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents.
 
-An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude. 
+An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude.
 
 
 ### A detailed description of the model and its processes can be found in the accompanying ODD+D protocol
@@ -320,7 +320,7 @@ An important modification of the original model is that extension agents are het
 
 - extension-model?: true
 - risk-mode?: true
-- number-households: 60   
+- number-households: 60
 - timesteps: 100
 - b: 0 (reproduction not used in extension model)
 - knowledge-radius: 1
@@ -367,7 +367,7 @@ This is an extension of the original RAGE (Resilience and Adaptive Grazing manag
 Key Parameters:
 
 - number-households: The initial number of household agents, set to 60 (range 1-100)
-- satisficing-threshold: Not used, set to 0 (range 0-100)  
+- satisficing-threshold: Not used, set to 0 (range 0-100)
 - satisficing-trials: Not used, set to 21 (range 0-100)
 - knowledge-radius: The radius in which agents observe neighbors, set to 1 (range 0-5)
 - resting-threshold: Not used, set to 0.1 (range 0-1)
@@ -376,7 +376,7 @@ Key Parameters:
 - global-rain?: Whether rainfall is global or spatial, set to True
 - start-on-homepatch?: Whether agents start on their home patch, set to True
 - resting?: Whether pasture resting is enforced, set to False
-- homog-behav-types?: Whether agent types are homogeneous, can be True/False  
+- homog-behav-types?: Whether agent types are homogeneous, can be True/False
 - extension-model?: Whether the extension module is used, set to True
 - SL2-strategy-switch?: Whether agents can switch strategies, set to False
 - risk-mode?: Whether agents have heterogeneous risk attitudes, set to True
@@ -384,12 +384,12 @@ Key Parameters:
 - number-SAT/TRAD/MAX: Not used, set to 0
 - number-E-RO/LBD/RO-SL1: Number of each extension agent type, set to 20 each
 - b: Livestock reproduction rate, not used, set to 0
-- number-MAX: Not used, set to 0  
+- number-MAX: Not used, set to 0
 - rain-mean: Mean annual rainfall, set to 200
 - risk-att-init: Initial risk attitude of agents, set to 0.5 (range 0-1)
 - gr1/gr2: Vegetation growth parameters, set to 0.5 and 0.1
 - timesteps: Number of time steps, set to 100
-- w: Intake preference parameter, set to 0.8 
+- w: Intake preference parameter, set to 0.8
 - number-random: Not used, set to 0
 - livestock-init: Initial livestock population, set to 90
 - rain-std: Standard deviation of rainfall, set to 100","You are an expert in grazing systems with a statistic background.
@@ -490,7 +490,7 @@ We have a plot from repeated simulations of an agent based model. Your goal is t
 
 
 
-This plot represents the number of households that have engaged in social learning, indicated by the variable household-SL being true.","The plot displays the count of households that have engaged in social learning over time steps from 0 to 100. Initially, at time step 0, no households have engaged in social learning, as indicated by the count being 0 for all lines. As time progresses, the count of households with social learning increases rapidly for all lines, reaching values between 40 and 54 by around time step 20. 
+This plot represents the number of households that have engaged in social learning, indicated by the variable household-SL being true.","The plot displays the count of households that have engaged in social learning over time steps from 0 to 100. Initially, at time step 0, no households have engaged in social learning, as indicated by the count being 0 for all lines. As time progresses, the count of households with social learning increases rapidly for all lines, reaching values between 40 and 54 by around time step 20.
 
 After this initial steep increase, the rate of growth in the count slows down considerably. Between time steps 20 and 100, the curves exhibit a stair-step pattern, with periods of little to no increase punctuated by occasional small increments in the count. This pattern suggests that the majority of households engaging in social learning do so within the first 20 time steps, with only a few additional households adopting the practice at later stages.
 
@@ -533,7 +533,7 @@ It's important to note that the overall trend exhibits a recurring cyclical patt
  The plot displays the count of households that have engaged in social learning over time steps from 0 to 100 . Initially, at time step 0, no households have engaged with social learning, as indicated by the count being 0 for all lines . By time step 20, the rate of growth in the count slows down considerably . Between time steps 20 and 100, the curves exhibit a stair-step pattern with periods of little to no increase punctuated by occasional small increments .
 
  The plot displays the mean destock total of households over time steps in an agent-based model simulation . As time progresses, it shows that households are destocking livestock at an accelerating rate . The variation among simulation runs, represented by the spread of colored lines, remains relatively narrow throughout the time steps .
- The plot represents the count of non-learning households following the E-RO strategy over time steps . The highest peak occurs around step 10, where the count reaches approximately 36 households . Subsequently, the count experiences a gradual decline until around step 40, where it stabilizes and continues to oscillate .","the original rage model captures feedbacks between pastures, livestock, and household livelihoods in a common property grazing system. 
+ The plot represents the count of non-learning households following the E-RO strategy over time steps . The highest peak occurs around step 10, where the count reaches approximately 36 households . Subsequently, the count experiences a gradual decline until around step 40, where it stabilizes and continues to oscillate .","the original rage model captures feedbacks between pastures, livestock, and household livelihoods in a common property grazing system.
 
 the plot shows the mean household initial risk attitude of social learning agents in an agent - based model over time steps. 14, indicating a slight tendency towards positive initial risk attitudes on average, but with variability across the agents. the data depicts the mean household risk attitude over the course experiencing fluctuations throughout varied in its progression. at the initial timestepoints, the metric shows considerable volatility, with values ranging from around 0. it then undergoes a rapid increase, reaching a peak value of approximately 130, 000 units around the 20th time step. following the peak, the reserve biomass gradually declines, stabilizing around 110, 000 units after the 60th time step. the plot displays the average amount of actual available green biomass across all patches over time, accounting for reductions due to grazing. the specific values and the rate of change vary slightly among the different cases, but they exhibit a similar overall pattern.
 
@@ -575,19 +575,19 @@ Your goal is to explain an agent-based model. Your explanation must include the 
   - livestock-init. We set it to 90.
   - rain-std. We set it to 100.
 
-The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management). 
+The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management).
 
 The original model can be found here:
 
 
- 
-The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others. 
+
+The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others.
 
 Besides the evaluation of the behavioral types, the model allows to adjust a range of ecological and climatic parameters, such as rainfall average and variability, vegetation growth rates or livestock reproduction rate. The model can be evaluated across a range of social, ecological and economic outcome variables, such as average herd size, pasture biomass condition or surviving number of households.
 
-**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents. 
+**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents.
 
-An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude. 
+An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude.
 
 
 ### A detailed description of the model and its processes can be found in the accompanying ODD+D protocol
@@ -606,7 +606,7 @@ An important modification of the original model is that extension agents are het
 
 - extension-model?: true
 - risk-mode?: true
-- number-households: 60   
+- number-households: 60
 - timesteps: 100
 - b: 0 (reproduction not used in extension model)
 - knowledge-radius: 1
@@ -765,7 +765,7 @@ Here is an example of the style of the report: “ The total number of earthquak
 
 The total seismic activity follows the same pattern, starting at 10,000 events and declining steadily. This steady decline reflects a systematic reduction in seismic energy over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance across simulation runs in the first 100 steps, but deviations become noticeable afterward. This suggests that while the initial reactions to stress are highly predictable, as time progresses, the system's complexity introduces more variability. This variability could be due to differences in secondary stress points and the non-linear nature of seismic energy release over time.“
 
-This plot represents the average number of livestock that have been destocked, or removed due to insufficient resources, across all households.","The mean destock of households across simulations begins with a sharp spike, reaching a peak around 6.5 within the first few time steps. This initial surge likely represents an acute shortage of resources that forces households to rapidly reduce their livestock counts to sustainable levels. 
+This plot represents the average number of livestock that have been destocked, or removed due to insufficient resources, across all households.","The mean destock of households across simulations begins with a sharp spike, reaching a peak around 6.5 within the first few time steps. This initial surge likely represents an acute shortage of resources that forces households to rapidly reduce their livestock counts to sustainable levels.
 
 After this dramatic start, the destock rate shows a oscillating pattern with repeated peaks and troughs, gradually decreasing in amplitude over time. The peaks occur approximately every 10-15 time steps, suggesting a cyclical pattern of households rebuilding their herds when conditions allow, only to be forced to destock again as resources become constrained.
 
@@ -880,19 +880,19 @@ Your goal is to explain an agent-based model. Your explanation must include the 
   - livestock-init. We set it to 90.
   - rain-std. We set it to 100.
 
-The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management). 
+The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management).
 
 The original model can be found here:
 
 
- 
-The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others. 
+
+The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others.
 
 Besides the evaluation of the behavioral types, the model allows to adjust a range of ecological and climatic parameters, such as rainfall average and variability, vegetation growth rates or livestock reproduction rate. The model can be evaluated across a range of social, ecological and economic outcome variables, such as average herd size, pasture biomass condition or surviving number of households.
 
-**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents. 
+**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents.
 
-An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude. 
+An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude.
 
 
 ### A detailed description of the model and its processes can be found in the accompanying ODD+D protocol
@@ -911,7 +911,7 @@ An important modification of the original model is that extension agents are het
 
 - extension-model?: true
 - risk-mode?: true
-- number-households: 60   
+- number-households: 60
 - timesteps: 100
 - b: 0 (reproduction not used in extension model)
 - knowledge-radius: 1
@@ -1151,7 +1151,7 @@ For decision-makers, the oscillatory nature of the count of non-learning househo
  The plot displays the count of households that have engaged in social learning over the course of 100 time steps, across multiple simulation runs . The general trend observed is an S-shaped curve, where the number of households with social learning starts off low, then rapidly increases, before plateauing towards the end .
 
  The plot shows the mean destock total of livestock over time steps . The trends exhibit an initially slow increase in destocking, followed by a period of rapid destocking around time steps 20-40 . After this destocking phase, the curves level off and approach an asymptotic value, suggesting that destocking has stabilized .
- The count of non-learning households fluctuates repeatedly throughout the time period . The oscillations occur at varying amplitudes and frequencies, with some instances of sharp peaks and troughs . The fluctuations suggest that the number of households adopting the E-RO strategy varies considerably over time . Understanding the underlying mechanisms driving these fluctuations could provide valuable insights into the factors influencing household behavior .","the context and goals of the model are presented, followed by a description of the key parameters and the values set for each parameter. households observe the state of the pasture and their neighbors to make decisions on how many livestock to place on their pasture every year. 
+ The count of non-learning households fluctuates repeatedly throughout the time period . The oscillations occur at varying amplitudes and frequencies, with some instances of sharp peaks and troughs . The fluctuations suggest that the number of households adopting the E-RO strategy varies considerably over time . Understanding the underlying mechanisms driving these fluctuations could provide valuable insights into the factors influencing household behavior .","the context and goals of the model are presented, followed by a description of the key parameters and the values set for each parameter. households observe the state of the pasture and their neighbors to make decisions on how many livestock to place on their pasture every year.
 
 the data exhibits very little variation over time, with the mean value remaining essentially constant around 0. however, the risk attitudes rapidly converge within the first 20 time steps to a relatively narrow band around 0. after this initial convergence, the risk attitudes exhibit fluctuations within this range for the remainder of the simulation. the increase accelerates until around time step 40, where the curve has an inflection point and the rate of increase starts to decelerate. for decision - makers, this trend indicates that the grazing system may undergo significant changes in biomass availability over time. the biomass then exhibits a rapid sigmoidal growth, with an inflection point around time step 20 - 30 where the growth rate peaks. after this point, the growth rate gradually declines until the biomass values plateau around 60, 000 - 65, 000 units by the end of the simulations.
 
@@ -1195,19 +1195,19 @@ Your goal is to explain an agent-based model. Your explanation must include the 
   - livestock-init. We set it to 90.
   - rain-std. We set it to 100.
 
-The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management). 
+The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management).
 
 The original model can be found here:
 
 
- 
-The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others. 
+
+The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others.
 
 Besides the evaluation of the behavioral types, the model allows to adjust a range of ecological and climatic parameters, such as rainfall average and variability, vegetation growth rates or livestock reproduction rate. The model can be evaluated across a range of social, ecological and economic outcome variables, such as average herd size, pasture biomass condition or surviving number of households.
 
-**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents. 
+**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents.
 
-An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude. 
+An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude.
 
 
 ### A detailed description of the model and its processes can be found in the accompanying ODD+D protocol
@@ -1226,7 +1226,7 @@ An important modification of the original model is that extension agents are het
 
 - extension-model?: true
 - risk-mode?: true
-- number-households: 60   
+- number-households: 60
 - timesteps: 100
 - b: 0 (reproduction not used in extension model)
 - knowledge-radius: 1
@@ -1392,7 +1392,7 @@ Here is an example of the style of the report: “ The total number of earthquak
 
 The total seismic activity follows the same pattern, starting at 10,000 events and declining steadily. This steady decline reflects a systematic reduction in seismic energy over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance across simulation runs in the first 100 steps, but deviations become noticeable afterward. This suggests that while the initial reactions to stress are highly predictable, as time progresses, the system's complexity introduces more variability. This variability could be due to differences in secondary stress points and the non-linear nature of seismic energy release over time.“
 
-This plot represents the average total number of livestock, including both healthy livestock and those that have been destocked, across all households.","The plot displays the mean livestock count, including both healthy animals and those that have been destocked, across all households over the course of 100 time steps. Initially, the mean count starts around 45 animals per household. It rapidly increases over the first few time steps, peaking at approximately 85 animals around step 10. 
+This plot represents the average total number of livestock, including both healthy livestock and those that have been destocked, across all households.","The plot displays the mean livestock count, including both healthy animals and those that have been destocked, across all households over the course of 100 time steps. Initially, the mean count starts around 45 animals per household. It rapidly increases over the first few time steps, peaking at approximately 85 animals around step 10.
 
 This sharp initial rise could indicate a period of herd growth and accumulation of livestock in the early stages of the simulation, potentially due to favorable conditions or management strategies employed by the households.
 
@@ -1511,7 +1511,7 @@ Overall, the plot shows a complex, oscillatory pattern with high variability acr
  The count of households engaging in social learning starts near zero and exhibits a rapid increase within the first 20 time steps . This initial surge likely represents the diffusion of the social learning behavior among a core group of early adopters or households most receptive to the new practice .
 
  The mean cumulative destock total across all households starts near zero and exhibits a sigmoidal growth pattern over the time steps . The initial growth is gradual, with values remaining below 20 until around step 20 . The growth rate then decelerates, with the curve flattening out asymptotically towards an apparent maximum around 170 units by the final step 100 .
- The count of non-learning households starts at around 35 and shows a sharp decline in the first few time steps, reaching a minimum of around 15 households by step 10 . The count fluctuates between 15 and 25 households, exhibiting an oscillatory pattern with no clear overall trend .","households observe the state of their pasture and neighbors to make decisions on how many livestock to place on their pasture each year. three new behavioral types are introduced : e - ro ( baseline behavior ), e - lbd ( learning - by - doing ), and e - ro - sl1 ( social learning ). 
+ The count of non-learning households starts at around 35 and shows a sharp decline in the first few time steps, reaching a minimum of around 15 households by step 10 . The count fluctuates between 15 and 25 households, exhibiting an oscillatory pattern with no clear overall trend .","households observe the state of their pasture and neighbors to make decisions on how many livestock to place on their pasture each year. three new behavioral types are introduced : e - ro ( baseline behavior ), e - lbd ( learning - by - doing ), and e - ro - sl1 ( social learning ).
 
 the mean household initial risk attitude of all social learning agents remains relatively constant throughout the simulation steps. it hovers around a value close to zero, with very slight positive and negative variations across different runs. this sharp drop suggests that households quickly adjust their risk attitudes in response to the simulation's initial conditions. after the initial decline, the risk attitudes stabilize and fluctuate around 0 for the remainder of the simulation. the mean reserve biomass across all patches starts around 90, 000 units and exhibits a rapid increase in the early time steps. this initial growth phase likely represents the natural regeneration of biomass in the absence of significant grazing pressure. the mean green biomass across all patches starts around 45, 000 units at the beginning of the simulation. around time step 80, the oscillations appear to dampen slightly, with the peaks and troughs becoming less pronounced.
 
@@ -1555,19 +1555,19 @@ Your goal is to explain an agent-based model. Your explanation must include the 
   - livestock-init. We set it to 90.
   - rain-std. We set it to 100.
 
-The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management). 
+The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management).
 
 The original model can be found here:
 
 
- 
-The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others. 
+
+The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others.
 
 Besides the evaluation of the behavioral types, the model allows to adjust a range of ecological and climatic parameters, such as rainfall average and variability, vegetation growth rates or livestock reproduction rate. The model can be evaluated across a range of social, ecological and economic outcome variables, such as average herd size, pasture biomass condition or surviving number of households.
 
-**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents. 
+**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents.
 
-An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude. 
+An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude.
 
 
 ### A detailed description of the model and its processes can be found in the accompanying ODD+D protocol
@@ -1586,7 +1586,7 @@ An important modification of the original model is that extension agents are het
 
 - extension-model?: true
 - risk-mode?: true
-- number-households: 60   
+- number-households: 60
 - timesteps: 100
 - b: 0 (reproduction not used in extension model)
 - knowledge-radius: 1
@@ -1628,31 +1628,31 @@ Schulze, J. (2011): _**Risk Measures and Decision Criteria for the Management of
 ","Here is an explanation of the agent-based model with the context, goals and key parameters:
 
 Context and Goals:
-This is an extension of the original RAGE (Resilience and Adaptation in Grazing Ecosystems) model that captures feedbacks between pastures, livestock, and household livelihoods in a common property grazing system. The goal is to add learning capabilities to agents, specifically learning-by-doing and social learning, which are central processes in adaptive co-management. 
+This is an extension of the original RAGE (Resilience and Adaptation in Grazing Ecosystems) model that captures feedbacks between pastures, livestock, and household livelihoods in a common property grazing system. The goal is to add learning capabilities to agents, specifically learning-by-doing and social learning, which are central processes in adaptive co-management.
 
-The original RAGE model implemented three stylized household behavioral types (traditional, maximizer, and satisficer) grounded in social theory and empirical observations. The extension adds three new behavioral types focused on learning: E-RO (baseline), E-LBD (learning-by-doing), and E-RO-SL1 (social learning). 
+The original RAGE model implemented three stylized household behavioral types (traditional, maximizer, and satisficer) grounded in social theory and empirical observations. The extension adds three new behavioral types focused on learning: E-RO (baseline), E-LBD (learning-by-doing), and E-RO-SL1 (social learning).
 
 An important modification is that agents are heterogeneous in how they deal with uncertainty, represented by the r-parameter or household risk attitude. This captures factors like uncertainty in sensing the resource system, noise in received information, or the agent's inherent risk attitude.
 
 Key Parameters:
 
 number-households: from 1.0 to 100.0. We set it to 60.
-satisficing-threshold: from 0.0 to 100.0. We set it to 0. 
+satisficing-threshold: from 0.0 to 100.0. We set it to 0.
 satisficing-trials: from 0.0 to 100.0. We set it to 21.
 knowledge-radius: from 0.0 to 5.0. We set it to 1.
 resting-threshold: from 0.0 to 1.0. We set it to 0.1.
 intrinsic-preference: from 0.0 to 1.0. We set it to 0.
 social-susceptibility: from 0.0 to 1.0. We set it to 0.
-global-rain?: We set it to True.  
+global-rain?: We set it to True.
 start-on-homepatch?: We set it to True.
 resting?: We set it to False.
-homog-behav-types?: We set it to True. 
+homog-behav-types?: We set it to True.
 extension-model?: We set it to True.
 SL2-strategy-switch?: We set it to False.
 risk-mode?: We set it to True.
 behavioral-type: We set it to E-RO.
 number-SAT: We set it to 0.
-number-E-RO: We set it to 20. 
+number-E-RO: We set it to 20.
 number-TRAD: We set it to 0.
 b: We set it to 0.
 number-MAX: We set it to 0.
@@ -1660,7 +1660,7 @@ rain-mean: We set it to 200.
 risk-att-init: We set it to 0.5.
 gr1: We set it to 0.5.
 number-E-LBD: We set it to 20.
-gr2: We set it to 0.1.  
+gr2: We set it to 0.1.
 number-E-RO-SL1: We set it to 20.
 timesteps: We set it to 100.
 w: We set it to 0.8.
@@ -1744,7 +1744,7 @@ We have a plot from repeated simulations of an agent based model. Your goal is t
 
 When summarizing trends, provide brief insights about their implications for decision makers.
 
-This plot represents the average total number of livestock, including both healthy livestock and those that have been destocked, across all households.","The plot displays the average total number of livestock, including both healthy animals and those that have been destocked, across all households over time. 
+This plot represents the average total number of livestock, including both healthy livestock and those that have been destocked, across all households.","The plot displays the average total number of livestock, including both healthy animals and those that have been destocked, across all households over time.
 
 Initially, the metric starts around 47 and rapidly increases to a peak value of approximately 87 by time step 10. This sharp rise suggests a rapid buildup of livestock numbers in the early stages of the simulation.
 
@@ -1851,7 +1851,7 @@ Decision-makers may need to consider the potential impact of varying levels of n
  The plot shows the count of households that have engaged in social learning across multiple simulation runs over time steps . The shape of the curves suggests that social learning spreads through the population in a diffusion-like process . Decision-makers could use this information to anticipate the potential spread of social learning in similar systems .
 
  The plot depicts the mean destocking total of households over time steps, which appears to follow a sigmoidal curve . The trend suggests that households initially maintain their livestock holdings, but beyond a certain threshold, destocking becomes more prevalent . This trend could inform policies and interventions aimed at supporting livestock holders during the initial phases when destocking is limited .
- Figure shows the count of non-learning households, which follow the E-RO strategy, over time steps in a model simulation . The count oscillates, exhibiting periodic increases and decreases, ranging between approximately 15 and 30 households for the remainder of the simulation period .","this captures factors like uncertainty in sensing the resource system, noise in received information, or the agent's inherent risk attitude. 
+ Figure shows the count of non-learning households, which follow the E-RO strategy, over time steps in a model simulation . The count oscillates, exhibiting periodic increases and decreases, ranging between approximately 15 and 30 households for the remainder of the simulation period .","this captures factors like uncertainty in sensing the resource system, noise in received information, or the agent's inherent risk attitude.
 
 the plot depicts the mean household initial risk attitude of social learning agents across simulation steps. the metric remains relatively stable and consistent throughout the simulation, hovering around zero for all time steps. this high initial risk attitude suggests households are more inclined towards risk - taking behavior at the start of the simulations. around step 10, there is a sharp decline in the risk attitude for most runs, with values dropping to around 0. in the early time steps, up to around step 20, the mean reserve biomass remains relatively low, indicating a slow growth phase. the subsequent rapid growth phase could indicate a window of opportunity for increased grazing or harvesting activities. the plot displays the mean green biomass over time steps from repeated simulations of an agent - based model. after reaching the peak, the mean green biomass values gradually decline and stabilize around 60, 000 units towards the end of the simulation period.
 
@@ -1893,19 +1893,19 @@ Your goal is to explain an agent-based model. Your explanation must include the 
   - livestock-init. We set it to 90.
   - rain-std. We set it to 100.
 
-The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management). 
+The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management).
 
 The original model can be found here:
 
 
- 
-The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others. 
+
+The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others.
 
 Besides the evaluation of the behavioral types, the model allows to adjust a range of ecological and climatic parameters, such as rainfall average and variability, vegetation growth rates or livestock reproduction rate. The model can be evaluated across a range of social, ecological and economic outcome variables, such as average herd size, pasture biomass condition or surviving number of households.
 
-**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents. 
+**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents.
 
-An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude. 
+An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude.
 
 
 ### A detailed description of the model and its processes can be found in the accompanying ODD+D protocol
@@ -1924,7 +1924,7 @@ An important modification of the original model is that extension agents are het
 
 - extension-model?: true
 - risk-mode?: true
-- number-households: 60   
+- number-households: 60
 - timesteps: 100
 - b: 0 (reproduction not used in extension model)
 - knowledge-radius: 1
@@ -2018,7 +2018,7 @@ When summarizing trends, provide brief insights about their implications for dec
 
 This plot represents the average initial risk attitude of all social learning agents, used to store and report their initial disposition to deviate from the recommended number of livestock.","The plot displays the mean household initial risk attitude across multiple simulation runs. The values are concentrated in a narrow range between approximately 0.05 and -0.05, with the majority of data points clustered around 0.
 
-This indicates that, averaged across households, the initial risk attitudes were relatively neutral, with only a slight deviation from the recommended number of livestock. The lack of significant variation suggests a consensus among agents to maintain a moderate level of herd size initially. 
+This indicates that, averaged across households, the initial risk attitudes were relatively neutral, with only a slight deviation from the recommended number of livestock. The lack of significant variation suggests a consensus among agents to maintain a moderate level of herd size initially.
 
 Notably, there is no discernible trend over time, implying that the initial risk attitudes do exist have a fixed value that is set at the start of each simulation run.
 
@@ -2168,7 +2168,7 @@ The total seismic activity follows the same pattern, starting at 10,000 events a
 
 When summarizing trends, provide brief insights about their implications for decision makers.
 
-This plot represents the average cumulative number of livestock that have been destocked across all households.","The mean destocked livestock total across households starts near zero and exhibits a rapid increase in the initial time steps. Around step 20, the increase begins to level off, transitioning into a more gradual upward trend that continues until the end of the simulation at step 100. 
+This plot represents the average cumulative number of livestock that have been destocked across all households.","The mean destocked livestock total across households starts near zero and exhibits a rapid increase in the initial time steps. Around step 20, the increase begins to level off, transitioning into a more gradual upward trend that continues until the end of the simulation at step 100.
 
 This trajectory suggests that households are destocking livestock at an accelerating rate in the early stages, likely due to immediate pressures or shocks that necessitate the liquidation of assets. As time progresses, the destocking rate decelerates but remains positive, implying an ongoing need to divest livestock assets, albeit at a more moderate pace.
 
@@ -2207,7 +2207,7 @@ For decision-makers, the observed variability and persistence of non-learning ho
  The count of households engaged in social learning starts near zero and exhibits a rapid increase in the early time steps . This steep initial rise suggests that social learning spreads quickly through the population, likely facilitated by strong social connections and the appeal of adopting new behaviors . After this initial surge, the rate of adoption slows down considerably .
 
  The mean destocked livestock total across households starts near zero and exhibits a rapid increase in the initial time steps . Around step 20, the increase begins to level off, transitioning into a more gradual upward trend that continues until the end of the simulation at step 100 . This trajectory suggests that households are destocking livestock at an accelerating rate in the early stages .
- The count of non-learning households displays a high degree of variability across simulation runs . The initial values range from around 35 down to 20, indicating a diverse starting point in the proportion of households following the E-RO strategy . Despite the variability, some general trends can be observed, there appears to be an overall declining tendency .","true - behavioral - type : e - ro - number - sat : 0 - number - e - ro : 20 - number - trad : 0 - b : 0. 
+ The count of non-learning households displays a high degree of variability across simulation runs . The initial values range from around 35 down to 20, indicating a diverse starting point in the proportion of households following the E-RO strategy . Despite the variability, some general trends can be observed, there appears to be an overall declining tendency .","true - behavioral - type : e - ro - number - sat : 0 - number - e - ro : 20 - number - trad : 0 - b : 0.
 
 the lack of significant variation suggests a consensus among agents to maintain a moderate level of herd size initially. it suggests that households, collectively approached things with a relatively balanced perspective on deviating from recommendations at first. after this initial convergence period, the risk attitudes exhibit a cyclical pattern, oscillating between approximately 0. the mean reserve biomass across all patches starts around 90, 000 and exhibits a rapid increase over the first 20 time steps. throughout the simulation, there is a noticeable spread in the individual trajectories, indicating variability across different model runs. the mean green biomass across all patches starts around 45, 000 units at the beginning of the simulation. this downward trend could indicate an increasing grazing pressure on the available vegetation, leading to a depletion of the green biomass over time.
 
@@ -2251,19 +2251,19 @@ Your goal is to explain an agent-based model. Your explanation must include the 
   - livestock-init. We set it to 90.
   - rain-std. We set it to 100.
 
-The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management). 
+The context and goals of the model are as follows. This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management).
 
 The original model can be found here:
 
 
- 
-The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others. 
+
+The RAGE model is a *multi-agent simulation model* that captures *feedbacks between pastures, livestock and household livelihood in a common property grazing system*. It implements three stylized *household behavioral types* (traditional *TRAD*, maximizer *MAX* and satisficer *SAT*) which are grounded in social theory and reflect empirical observations. These types can be compared regarding their long-term social-ecological consequences. The types differ in their preferences for livestock, how they value social norms concerning pasture resting and how they are influenced by the behavior of others.
 
 Besides the evaluation of the behavioral types, the model allows to adjust a range of ecological and climatic parameters, such as rainfall average and variability, vegetation growth rates or livestock reproduction rate. The model can be evaluated across a range of social, ecological and economic outcome variables, such as average herd size, pasture biomass condition or surviving number of households.
 
-**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents. 
+**The extension module** is applied to smallholder farmers' decision-making - here, a pasture (patch) is the private property of the household (agent) placed on it and there is no movement of the households. Households observe the state of the pasture and their neighrbours to make decisions on how many livestock to place on their pasture every year. Three new behavioural types are created (which cannot be combined with the original ones): E-RO (baseline behaviour), E-LBD (learning-by-doing) and E-RO-SL1 (social learning). Similarly to the original model, these three types can be compared regarding long-term social-ecological performance. In addition, a global strategy switching option (corresponding to double-loop learning) allows users to study how behavioural strategies diffuse in a heterogeneous population of learning and non-learning agents.
 
-An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude. 
+An important modification of the original model is that extension agents are heterogeneous in how they deal with uncertainty. This is represented by an agent property, called the r-parameter (household-risk-att in the code). The r-parameter is catch-all for various factors that form an agent's disposition to act in a certain way, such as: uncertainty in the sensing (partial observability of the resource system), noise in the information received, or an inherent characteristic of the agent, for instance, their risk attitude.
 
 
 ### A detailed description of the model and its processes can be found in the accompanying ODD+D protocol
@@ -2282,7 +2282,7 @@ An important modification of the original model is that extension agents are het
 
 - extension-model?: true
 - risk-mode?: true
-- number-households: 60   
+- number-households: 60
 - timesteps: 100
 - b: 0 (reproduction not used in extension model)
 - knowledge-radius: 1
@@ -2324,7 +2324,7 @@ Schulze, J. (2011): _**Risk Measures and Decision Criteria for the Management of
 ","Here is an explanation of the agent-based model, including the context, goals, and key parameters with their ranges and set values:
 
 Context and Goals:
-This is an extension of the original RAGE (Resilience and Adaptation in Arid and Semi-Arid Grazing Systems) model, which captures feedbacks between pastures, livestock, and household livelihoods in a common property grazing system. The original model implemented three stylized household behavioral types: traditional (TRAD), maximizer (MAX), and satisficer (SAT). 
+This is an extension of the original RAGE (Resilience and Adaptation in Arid and Semi-Arid Grazing Systems) model, which captures feedbacks between pastures, livestock, and household livelihoods in a common property grazing system. The original model implemented three stylized household behavioral types: traditional (TRAD), maximizer (MAX), and satisficer (SAT).
 
 The extension module applies to smallholder farmers' decision-making, where each pasture is the private property of the household placed on it. Households observe the state of their pasture and neighbors to make yearly decisions on livestock stocking rates. Three new behavioral types are introduced: E-RO (baseline), E-LBD (learning-by-doing), and E-RO-SL1 (social learning). These types can be compared for long-term social-ecological performance.
 
@@ -2334,7 +2334,7 @@ Key Parameters:
 2. satisficing-threshold: Range 0.0 to 100.0. Set to 0.
 3. satisficing-trials: Range 0.0 to 100.0. Set to 21.
 4. knowledge-radius: Range 0.0 to 5.0. Set to 1.
-5. resting-threshold: Range 0.0 to 1.0. Set to 0.1. 
+5. resting-threshold: Range 0.0 to 1.0. Set to 0.1.
 6. intrinsic-preference: Range 0.0 to 1.0. Set to 0.
 7. social-susceptibility: Range 0.0 to 1.0. Set to 0.
 8. global-rain?: Set to True.
@@ -2478,7 +2478,7 @@ The total seismic activity follows the same pattern, starting at 10,000 events a
 
 When summarizing trends, provide brief insights about their implications for decision makers.
 
-This plot represents the average number of livestock that have been destocked, or removed due to insufficient resources, across all households.","The mean destock of households starts at around 6.5 livestock units and rapidly declines within the first 5 time steps. This initial sharp drop likely represents a scenario where households are faced with immediate resource scarcity, forcing them to reduce their herd sizes significantly to match the available resources. 
+This plot represents the average number of livestock that have been destocked, or removed due to insufficient resources, across all households.","The mean destock of households starts at around 6.5 livestock units and rapidly declines within the first 5 time steps. This initial sharp drop likely represents a scenario where households are faced with immediate resource scarcity, forcing them to reduce their herd sizes significantly to match the available resources.
 
 After this initial adjustment period, the destock levels fluctuate between 1 and 3 livestock units, exhibiting a cyclical pattern with peaks occurring approximately every 10-15 time steps. These fluctuations could be attributed to the dynamic nature of resource availability, where households periodically need to destock to cope with temporary resource shortages, followed by periods of herd rebuilding when resources become more abundant.
 
@@ -2498,7 +2498,7 @@ The total seismic activity follows the same pattern, starting at 10,000 events a
 
 When summarizing trends, provide brief insights about their implications for decision makers.
 
-This plot represents the inequality in the distribution of healthy livestock across all households.","The Gini coefficient, a measure of inequality, starts near zero for the distribution of healthy livestock across households. This indicates an initially equal distribution of livestock assets at the beginning of the simulation. 
+This plot represents the inequality in the distribution of healthy livestock across all households.","The Gini coefficient, a measure of inequality, starts near zero for the distribution of healthy livestock across households. This indicates an initially equal distribution of livestock assets at the beginning of the simulation.
 
 Over time, the Gini coefficient increases rapidly, reflecting a growing inequality in the distribution of healthy animals among the households. By around step 40, the Gini coefficient has reached values above 0.6, indicating a high level of inequality where a relatively small number of households possess the majority of the healthy livestock.
 
@@ -2581,7 +2581,7 @@ For decision-makers, the oscillatory nature of non-learning households highlight
  The count of households with social learning starts around 18 at the beginning of the simulation . It exhibits a rapid increase, with the majority of households adopting social learning within the first 20 time steps . After around time step 40, the adoption of social learning plateaus . This suggests that a saturation point has been reached, where the remaining households are unlikely to adopt social learning .
 
  The mean destocking total across all households starts near zero and exhibits an S-shaped growth curve over the simulated time steps . The spread of the individual simulation runs, represented by the colored lines, remains narrow during the initial stages but widens significantly after step 40 . The increasing variability across simulation runs highlights the importance of considering household-level heterogeneity when developing policies or interventions related to livestock management .
- The count of non-learning households exhibits a highly oscillatory pattern throughout the simulation period . It's important to note that the oscillations exhibit a consistent range and frequency throughout the . system maintains a relatively stable equilibrium in terms of the proportion of non .learning households . The oscillations suggest that a subset of households persistently adheres to traditional grazing practices .","the original model implemented three stylized household behavioral types : traditional ( trad ), maximizer ( max ), and satisficer ( sat ). the extension module applies to smallholder farmers'decision - making, where each pasture is the private property of the household placed on it. 
+ The count of non-learning households exhibits a highly oscillatory pattern throughout the simulation period . It's important to note that the oscillations exhibit a consistent range and frequency throughout the . system maintains a relatively stable equilibrium in terms of the proportion of non .learning households . The oscillations suggest that a subset of households persistently adheres to traditional grazing practices .","the original model implemented three stylized household behavioral types : traditional ( trad ), maximizer ( max ), and satisficer ( sat ). the extension module applies to smallholder farmers'decision - making, where each pasture is the private property of the household placed on it.
 
 the mean household initial risk attitude exhibits a relatively stable value close to zero across all time steps. there are slight fluctuations around zero, with the metric occasionally taking on small positive or negative values, but the deviations are minimal. this risk - seeking tendency could be attributed to optimism and lack of experience in managing grazing systems at the start of the simulation. after this initial surge, the reserve biomass settles into a more gradual upward trend, continuing to increase but at a slower rate. overall, the trends suggest a grazing system that initially has abundant resources, allowing for rapid biomass accumulation. the mean green biomass across all patches starts around 45, 000 units at the beginning of the simulation. from time step 40 onwards, the biomass levels off and exhibits a relatively stable pattern, oscillating between 49, 000 and 51, 000 units.
 

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-from typing import cast
 
 import pandas as pd
 
@@ -26,8 +25,8 @@ def identify_factors_and_metrics(df: pd.DataFrame) -> tuple[list[str], list[str]
 
 
 def _candidate_factor_columns(df: pd.DataFrame, max_unique: int) -> list[str]:
-    potential = cast(list[str], df.select_dtypes(include=["object", "category"]).columns.tolist())
-    numeric_columns = cast(list[str], df.select_dtypes(include=["number"]).columns.tolist())
+    potential = [str(column) for column in df.select_dtypes(include=["object", "category"]).columns.tolist()]
+    numeric_columns = [str(column) for column in df.select_dtypes(include=["number"]).columns.tolist()]
     for column in numeric_columns:
         unique_values = set(df[column].dropna().unique())
         is_binary = unique_values.issubset({0, 1}) or unique_values.issubset({-1, 1})
