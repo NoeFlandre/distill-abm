@@ -19,8 +19,8 @@ from distill_abm.summarize.models import summarize_with_bart, summarize_with_ber
 from distill_abm.summarize.text import clean_markdown_symbols, strip_think_prefix
 from distill_abm.viz.plots import generate_stats_table
 
-EvidenceMode = Literal["plot", "table-csv", "plot+table", "stats-markdown", "stats-image", "plot+stats"]
-ResolvedEvidenceMode = Literal["plot", "table-csv", "plot+table"]
+EvidenceMode = Literal["plot", "table", "plot+table"]
+ResolvedEvidenceMode = Literal["plot", "table", "plot+table"]
 
 
 class SweepRow(Protocol):
@@ -56,7 +56,7 @@ def build_trend_prompt(
     stats_table_csv: str,
     enabled: set[str] | None = None,
 ) -> str:
-    """Compose trend prompt with optional role/example/insight features and stats overlay."""
+    """Compose trend prompt with optional role/example/insight features and table evidence overlay."""
     parts: list[str] = []
     active = enabled or set()
     include_all = enabled is None
@@ -81,7 +81,7 @@ def build_trend_prompt(
             parts.append(stripped_plot)
 
     resolved_mode = resolve_evidence_mode(evidence_mode)
-    if resolved_mode in {"table-csv", "plot+table"}:
+    if resolved_mode in {"table", "plot+table"}:
         parts.append(f"Stats table (CSV):\n{stats_table_csv}")
 
     return "\n\n".join(parts)
@@ -191,7 +191,7 @@ def build_stats_csv(stats_table: pd.DataFrame) -> str:
 def write_stats_image_if_needed(
     stats_table: pd.DataFrame, output_dir: Path, include_pattern: str, evidence_mode: EvidenceMode
 ) -> Path | None:
-    """Stats-table images are disabled for reviewer table-only ablations."""
+    """Stats-table images are intentionally disabled for reproducible text-table ablations."""
     _ = (stats_table, output_dir, include_pattern, evidence_mode)
     return None
 
@@ -206,17 +206,9 @@ def encode_evidence_image(evidence_mode: EvidenceMode, plot_path: Path, stats_im
 
 
 def resolve_evidence_mode(evidence_mode: EvidenceMode) -> ResolvedEvidenceMode:
-    """Map compatibility aliases to canonical reviewer-facing ablation modes."""
-    if evidence_mode == "plot":
-        return "plot"
-    if evidence_mode == "table-csv":
-        return "table-csv"
-    if evidence_mode == "plot+table":
-        return "plot+table"
-    if evidence_mode in {"stats-markdown", "stats-image"}:
-        return "table-csv"
-    if evidence_mode == "plot+stats":
-        return "plot+table"
+    """Validate reviewer-facing evidence ablation modes."""
+    if evidence_mode in {"plot", "table", "plot+table"}:
+        return evidence_mode
     raise ValueError(f"unsupported evidence mode: {evidence_mode}")
 
 

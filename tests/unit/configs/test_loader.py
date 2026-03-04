@@ -7,9 +7,9 @@ from distill_abm.configs.loader import (
     ConfigError,
     load_abm_config,
     load_evaluation_config,
+    load_experiment_settings,
     load_logging_config,
     load_models_config,
-    load_notebook_experiment_settings,
     load_prompts_config,
     load_runtime_defaults_config,
 )
@@ -18,16 +18,16 @@ from distill_abm.configs.loader import (
 def test_load_models_config(tmp_path: Path) -> None:
     content = """
 models:
-  openai:
-    provider: openai
-    model: gpt-4o
+  kimi:
+    provider: openrouter
+    model: moonshotai/kimi-k2.5
 """
     path = tmp_path / "models.yaml"
     path.write_text(content, encoding="utf-8")
 
     config = load_models_config(path)
-    assert config.models["openai"].provider == "openai"
-    assert config.models["openai"].model == "gpt-4o"
+    assert config.models["kimi"].provider == "openrouter"
+    assert config.models["kimi"].model == "moonshotai/kimi-k2.5"
 
 
 def test_load_prompts_config(tmp_path: Path) -> None:
@@ -82,6 +82,7 @@ def test_non_mapping_yaml_raises_config_error(tmp_path: Path) -> None:
         load_evaluation_config,
         load_logging_config,
         load_runtime_defaults_config,
+        load_experiment_settings,
     ],
 )
 def test_missing_config_file_raises(tmp_path: Path, loader: Callable[[Path], object]) -> None:
@@ -93,11 +94,11 @@ def test_missing_config_file_raises(tmp_path: Path, loader: Callable[[Path], obj
 @pytest.mark.parametrize(
     "loader, body",
     [
-        (load_models_config, "models:\n  openai: 1"),
+        (load_models_config, "models:\n  kimi: 1"),
         (load_prompts_config, "context_prompt: ['bad']"),
         (load_abm_config, "name: 1"),
         (load_evaluation_config, "use_reference_metrics: not-bool"),
-        (load_notebook_experiment_settings, "llm_defaults: not-a-dict"),
+        (load_experiment_settings, "ground_truth: not-a-dict"),
         (load_runtime_defaults_config, "llm_request: 7"),
     ],
 )
@@ -112,87 +113,32 @@ def test_invalid_config_payload_raises(
         loader(path)
 
 
-def test_load_notebook_experiment_settings_round_trip(tmp_path: Path) -> None:
+def test_load_experiment_settings_round_trip(tmp_path: Path) -> None:
     path = tmp_path / "experiment_settings.yaml"
     path.write_text(
         """
-llm_defaults:
-  openai_model: gpt-4o
-  anthropic_model: claude-3-5-sonnet-20241022
-  max_tokens: 1000
-  temperature: 0.5
-doe_defaults:
-  repetitions: 3
-  max_interaction_order: 2
-fauna_from_netlogo_to_csv:
-  netlogo_home: /tmp/netlogo
-  model_path: /tmp/model.nlogo
-  output_csv_path: /tmp/output.csv
-  reporters:
-    - m1
-  runtime_experiment_parameters: {"a": 1}
-  saved_experiment_parameters: {"a": 1}
-  num_runs: 1
-  max_ticks: 1
-  interval: 1
-grazint_netlogo_to_csv:
-  netlogo_home: /tmp/netlogo
-  model_path: /tmp/model.nlogo
-  output_csv_path: /tmp/output.csv
-  reporters:
-    - m1
-  runtime_experiment_parameters: {"a": 1}
-  saved_experiment_parameters: {"a": 1}
-  num_runs: 1
-  max_ticks: 1
-  interval: 1
-milk_netlogo_to_csv:
-  netlogo_home: /tmp/netlogo
-  model_path: /tmp/model.nlogo
-  output_csv_path: /tmp/output.csv
-  reporters:
-    - m1
-  runtime_experiment_parameters: {"a": 1}
-  saved_experiment_parameters: {"a": 1}
-  num_runs: 1
-  max_ticks: 1
-  interval: 1
+ground_truth:
+  fauna: /tmp/fauna.txt
+  grazing: /tmp/grazing.txt
+  milk_consumption: /tmp/milk.txt
 qualitative_example_text_dir: /tmp/examples
 human_reference_dir: /tmp/human-reference
-summary_generation:
-  fauna:
-    num_plots: 14
-  grazing:
-    num_plots: 10
-  milk:
-    num_plots: 12
-scoring:
-  fauna_ground_truth_path: /tmp/fauna.txt
-  grazing_ground_truth_path: /tmp/grazing.txt
-  milk_ground_truth_path: /tmp/milk.txt
 """,
         encoding="utf-8",
     )
 
-    settings = load_notebook_experiment_settings(path)
-    assert settings.fauna_from_netlogo_to_csv.netlogo_home == "/tmp/netlogo"
-    assert settings.grazint_netlogo_to_csv.output_csv_path == "/tmp/output.csv"
-    assert settings.milk_netlogo_to_csv.saved_experiment_parameters["a"] == 1
-    assert settings.summary_generation.fauna.num_plots == 14
-    assert settings.scoring.milk_ground_truth_path == "/tmp/milk.txt"
+    settings = load_experiment_settings(path)
+    assert settings.ground_truth.fauna == "/tmp/fauna.txt"
+    assert settings.ground_truth.grazing == "/tmp/grazing.txt"
+    assert settings.ground_truth.milk_consumption == "/tmp/milk.txt"
+    assert settings.qualitative_example_text_dir == "/tmp/examples"
+    assert settings.human_reference_dir == "/tmp/human-reference"
 
 
-def test_repository_prompts_follow_notebook_wording() -> None:
+def test_repository_prompts_include_style_factors() -> None:
     config = load_prompts_config(Path("configs/prompts.yaml"))
     assert "Do not write any summary or conclusion." in config.context_prompt
     assert "Do not refer to the plot or any visual in your description." in config.trend_prompt
-    assert "rate a report based on its coverage with respect to an input context and input plots" in (
-        config.coverage_eval_prompt
-    )
-    assert "rate a report based on its faithfulness with respect to an input context and input plots" in (
-        config.faithfulness_eval_prompt
-    )
-    assert "Image used for the example" in config.coverage_eval_prompt
-    assert "Image used for the example" in config.faithfulness_eval_prompt
-    assert "The main car brand used by agents is Toyota." in config.coverage_eval_prompt
-    assert "The main car brand used by agents is Toyota." in config.faithfulness_eval_prompt
+    assert "rate a report based on its coverage" in config.coverage_eval_prompt
+    assert "rate a report based on its faithfulness" in config.faithfulness_eval_prompt
+    assert set(("role", "example", "insights")) <= set(config.style_features)

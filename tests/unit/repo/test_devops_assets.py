@@ -34,6 +34,6 @@ def test_ci_workflow_runs_quality_gates() -> None:
     assert workflow.exists()
     content = workflow.read_text(encoding="utf-8")
     assert "ruff check ." in content
-    assert "black --check ." in content
     assert "mypy src tests" in content
     assert "pytest" in content
+    assert "uv build" in content

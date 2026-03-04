@@ -7,7 +7,7 @@ import pandas as pd
 from distill_abm.summarize.reference_text import summarize_csv_batch
 
 
-def test_summarize_csv_batch_applies_notebook_lengths_and_formats(tmp_path: Path) -> None:
+def test_summarize_csv_batch_applies_expected_lengths_and_formats(tmp_path: Path) -> None:
     input_csv = tmp_path / "responses.csv"
     output_csv = tmp_path / "summaries.csv"
     pd.DataFrame(

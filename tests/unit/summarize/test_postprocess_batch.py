@@ -7,7 +7,7 @@ import pandas as pd
 from distill_abm.summarize.postprocess import postprocess_csv_batch
 
 
-def test_postprocess_csv_batch_matches_notebook_stage_order(tmp_path: Path) -> None:
+def test_postprocess_csv_batch_matches_stage_order(tmp_path: Path) -> None:
     input_csv = tmp_path / "in.csv"
     output_csv = tmp_path / "out.csv"
     pd.DataFrame(

@@ -7,7 +7,7 @@ import pandas as pd
 from distill_abm.eval.reference_scores import ReferenceScores, score_summaries_csv_batch
 
 
-def test_score_summaries_csv_batch_writes_notebook_metric_columns(tmp_path: Path) -> None:
+def test_score_summaries_csv_batch_writes_metric_columns(tmp_path: Path) -> None:
     input_csv = tmp_path / "in.csv"
     output_csv = tmp_path / "out.csv"
     pd.DataFrame(

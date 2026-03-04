@@ -1,25 +1,25 @@
-"""Typer CLI entrypoint for distill-abm production workflows."""
+"""Typer CLI entrypoint for distill-abm paper-aligned workflows."""
 
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
 from typing import Annotated, Literal, cast
 
 import typer
 
-from distill_abm.configs.loader import load_abm_config, load_notebook_experiment_settings, load_prompts_config
+from distill_abm.configs.loader import (
+    load_abm_config,
+    load_experiment_settings,
+    load_models_config,
+    load_prompts_config,
+)
+from distill_abm.configs.models import ModelEntry, SummarizerId
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
 from distill_abm.llm.factory import create_adapter
-from distill_abm.pipeline.run import (
-    AdditionalSummarizer,
-    EvidenceMode,
-    PipelineInputs,
-    ScoreMode,
-    SummarizationMode,
-    run_pipeline,
-)
+from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
     SmokeCase,
     SmokeSuiteInputs,
@@ -31,8 +31,15 @@ from distill_abm.pipeline.smoke import (
 app = typer.Typer(help="Run ABM distillation workflows.")
 RUNTIME_DEFAULTS = get_runtime_defaults()
 DEFAULT_EVIDENCE_MODE: EvidenceMode = RUNTIME_DEFAULTS.run.evidence_mode
-DEFAULT_SUMMARIZATION_MODE: SummarizationMode = RUNTIME_DEFAULTS.run.summarization_mode
-DEFAULT_SCORE_MODE: ScoreMode = RUNTIME_DEFAULTS.run.score_on
+DEFAULT_TEXT_SOURCE_MODE: TextSourceMode = RUNTIME_DEFAULTS.run.text_source_mode
+DEFAULT_SUMMARIZERS: tuple[SummarizerId, ...] = RUNTIME_DEFAULTS.run.summarizers
+
+BENCHMARK_MODELS: set[tuple[str, str]] = {
+    ("openrouter", "moonshotai/kimi-k2.5"),
+    ("openrouter", "google/gemini-3.1-pro-preview"),
+    ("ollama", "qwen3.5:0.8b"),
+}
+DEBUG_MODEL: tuple[str, str] = ("openrouter", "qwen/qwen3-vl-235b-a22b-thinking")
 
 
 @app.callback()
@@ -58,9 +65,21 @@ def run(
         Path,
         typer.Option(exists=True),
     ] = Path("configs/prompts.yaml"),
+    models_path: Annotated[
+        Path,
+        typer.Option(exists=True, help="Model registry YAML path."),
+    ] = Path("configs/models.yaml"),
     output_dir: Annotated[Path, typer.Option()] = Path(RUNTIME_DEFAULTS.run.output_dir),
     provider: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.run.provider,
     model: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.run.model,
+    model_id: Annotated[
+        str | None,
+        typer.Option(help="Optional model alias from configs/models.yaml (recommended)."),
+    ] = None,
+    allow_debug_model: Annotated[
+        bool,
+        typer.Option(help="Allow debug model in this run (disabled by default for benchmark integrity)."),
+    ] = False,
     metric_pattern: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.run.metric_pattern,
     metric_description: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.run.metric_description,
     plot_description: Annotated[
@@ -69,36 +88,27 @@ def run(
     ] = None,
     evidence_mode: Annotated[
         EvidenceMode,
-        typer.Option(
-            help="Evidence ablation mode: plot (vision only), table-csv (text table only), or plot+table (both)."
-        ),
+        typer.Option(help="Evidence ablation mode: plot, table, or plot+table."),
     ] = DEFAULT_EVIDENCE_MODE,
-    skip_summarization: Annotated[
-        bool,
-        typer.Option(help="Skip BART/BERT summarization and keep the full LLM report text."),
-    ] = False,
-    summarization_mode: Annotated[
-        SummarizationMode,
-        typer.Option(help="full: keep raw trend text, summary: use summarized trend text, both: store/report both."),
-    ] = DEFAULT_SUMMARIZATION_MODE,
-    additional_summarizer: Annotated[
+    text_source_mode: Annotated[
+        TextSourceMode,
+        typer.Option(help="Text source mode: summary_only or full_text_only."),
+    ] = DEFAULT_TEXT_SOURCE_MODE,
+    summarizer: Annotated[
         list[str] | None,
         typer.Option(
-            "--additional-summarizer",
-            help="Optional extra summary backends in addition to BART/BERT. Repeatable: t5, longformer_ext.",
+            "--summarizer",
+            help="Summary backend roster. Repeatable: bart, bert, t5, longformer_ext.",
         ),
     ] = None,
-    score_on: Annotated[
-        ScoreMode,
-        typer.Option(
-            help="Which text should be used for scoring: full, summary, or both. "
-            "Both adds both score sets to report output."
-        ),
-    ] = DEFAULT_SCORE_MODE,
     abm: Annotated[str | None, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = None,
 ) -> None:
-    """Runs one end-to-end pipeline execution from CSV to scored report."""
+    """Run one end-to-end pipeline execution from CSV to scored report."""
     prompts = load_prompts_config(prompts_path)
+    if model_id is not None:
+        provider, model = _resolve_model_from_registry(models_path=models_path, model_id=model_id)
+    _validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
+
     scoring_reference_path: Path | None = None
     if abm:
         abm_config = load_abm_config(Path("configs/abms") / f"{abm}.yaml")
@@ -107,6 +117,7 @@ def run(
         if plot_description is None and abm_config.plot_descriptions:
             plot_description = abm_config.plot_descriptions[0]
         scoring_reference_path = _resolve_scoring_reference_path(abm)
+
     adapter = create_adapter(provider=provider, model=model)
     result = run_pipeline(
         inputs=PipelineInputs(
@@ -119,10 +130,8 @@ def run(
             metric_description=metric_description,
             plot_description=plot_description,
             evidence_mode=evidence_mode,
-            skip_summarization=skip_summarization,
-            summarization_mode=summarization_mode,
-            additional_summarizers=_parse_additional_summarizers(additional_summarizer),
-            score_on=score_on,
+            text_source_mode=text_source_mode,
+            summarizers=_parse_summarizers(summarizer, fallback=DEFAULT_SUMMARIZERS),
             scoring_reference_path=scoring_reference_path,
         ),
         prompts=prompts,
@@ -138,7 +147,7 @@ def analyze_doe(
     output_csv: Annotated[Path, typer.Option()] = Path(RUNTIME_DEFAULTS.doe.output_csv),
     max_interaction_order: Annotated[int, typer.Option()] = RUNTIME_DEFAULTS.doe.max_interaction_order,
 ) -> None:
-    """Runs full factorial ANOVA contribution analysis."""
+    """Run full factorial ANOVA contribution analysis."""
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     result = analyze_factorial_anova(input_csv, output_csv, max_interaction_order=max_interaction_order)
     if result is None:
@@ -166,8 +175,13 @@ def evaluate_qualitative(
     ] = Path("configs/prompts.yaml"),
     provider: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.qualitative.provider,
     model: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.qualitative.model,
+    allow_debug_model: Annotated[
+        bool,
+        typer.Option(help="Allow debug model in qualitative scoring command."),
+    ] = True,
 ) -> None:
-    """Evaluates coverage or faithfulness with an LLM and returns JSON output."""
+    """Evaluate coverage or faithfulness with an LLM and return JSON output."""
+    _validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
     prompts = load_prompts_config(prompts_path)
     adapter = create_adapter(provider=provider, model=model)
     result = evaluate_qualitative_score(
@@ -207,15 +221,21 @@ def smoke_qwen(
     output_dir: Annotated[Path, typer.Option()] = Path(RUNTIME_DEFAULTS.smoke.output_dir),
     provider: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.provider,
     model: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.model,
+    allow_debug_model: Annotated[
+        bool,
+        typer.Option(help="Allow debug model in smoke runs."),
+    ] = True,
     metric_pattern: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.metric_pattern,
     metric_description: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.metric_description,
     plot_description: Annotated[str | None, typer.Option()] = None,
+    evidence_mode: Annotated[EvidenceMode, typer.Option()] = RUNTIME_DEFAULTS.smoke.evidence_mode,
+    text_source_mode: Annotated[TextSourceMode, typer.Option()] = RUNTIME_DEFAULTS.smoke.text_source_mode,
     abm: Annotated[str | None, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = None,
-    additional_summarizer: Annotated[
+    summarizer: Annotated[
         list[str] | None,
         typer.Option(
-            "--additional-summarizer",
-            help="Optional extra summary backends in addition to BART/BERT. Repeatable: t5, longformer_ext.",
+            "--summarizer",
+            help="Summary backend roster. Repeatable: bart, bert, t5, longformer_ext.",
         ),
     ] = None,
     skip_qualitative: Annotated[
@@ -246,7 +266,9 @@ def smoke_qwen(
         typer.Option("--resume/--no-resume", help="Reuse existing smoke artifacts and skip already completed work."),
     ] = True,
 ) -> None:
-    """Runs full Qwen smoke validation across evidence/text modes plus DoE and sweep artifacts."""
+    """Run full debug smoke validation across evidence/text modes plus DoE and sweep artifacts."""
+    _validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
+
     prompts = load_prompts_config(prompts_path)
     sweep_plot_descriptions: list[str] | None = None
     scoring_reference_path: Path | None = None
@@ -271,7 +293,9 @@ def smoke_qwen(
             metric_description=metric_description,
             plot_description=plot_description,
             sweep_plot_descriptions=sweep_plot_descriptions,
-            additional_summarizers=_parse_additional_summarizers(additional_summarizer),
+            summarizers=_parse_summarizers(summarizer, fallback=RUNTIME_DEFAULTS.smoke.summarizers),
+            text_source_mode=text_source_mode,
+            evidence_mode=evidence_mode,
             scoring_reference_path=scoring_reference_path,
         ),
         prompts=prompts,
@@ -295,33 +319,81 @@ def smoke_qwen(
 
 
 def main() -> None:
-    """Preserves setuptools/uv script compatibility with explicit callable."""
+    """Entrypoint callable used by setuptools/uv script wiring."""
     app()
 
 
-def _parse_additional_summarizers(values: list[str] | None) -> tuple[AdditionalSummarizer, ...]:
-    allowed = {"t5", "longformer_ext"}
-    normalized = tuple(dict.fromkeys(values or []))
+def _parse_summarizers(values: list[str] | None, fallback: tuple[SummarizerId, ...]) -> tuple[SummarizerId, ...]:
+    allowed = {"bart", "bert", "t5", "longformer_ext"}
+    normalized = tuple(dict.fromkeys(values or list(fallback)))
     invalid = [value for value in normalized if value not in allowed]
     if invalid:
         raise typer.BadParameter(
-            f"unsupported additional summarizer(s): {', '.join(invalid)}. Allowed: t5, longformer_ext."
+            "unsupported summarizer(s): "
+            f"{', '.join(invalid)}. Allowed: bart, bert, t5, longformer_ext."
         )
-    return cast(tuple[AdditionalSummarizer, ...], normalized)
+    return cast(tuple[SummarizerId, ...], normalized)
+
+
+def _resolve_model_from_registry(models_path: Path, model_id: str) -> tuple[str, str]:
+    config = load_models_config(models_path)
+    try:
+        entry: ModelEntry = config.models[model_id]
+    except KeyError as exc:
+        available = ", ".join(sorted(config.models))
+        raise typer.BadParameter(f"unknown model_id '{model_id}'. Available: {available}") from exc
+    return entry.provider, entry.model
 
 
 def _resolve_scoring_reference_path(abm: str) -> Path:
-    settings = load_notebook_experiment_settings(Path("configs/notebook_experiment_settings.yaml"))
+    settings = load_experiment_settings(Path("configs/experiment_settings.yaml"))
     mapping = {
-        "fauna": settings.scoring.fauna_ground_truth_path,
-        "grazing": settings.scoring.grazing_ground_truth_path,
-        "milk_consumption": settings.scoring.milk_ground_truth_path,
+        "fauna": settings.ground_truth.fauna,
+        "grazing": settings.ground_truth.grazing,
+        "milk_consumption": settings.ground_truth.milk_consumption,
     }
     if abm not in mapping:
         raise typer.BadParameter(
             f"unsupported ABM for scoring reference: {abm}. Allowed: fauna, grazing, milk_consumption."
         )
     return Path(mapping[abm])
+
+
+def _assert_ollama_model_available(model: str) -> None:
+    try:
+        completed = subprocess.run(
+            ["ollama", "list"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except Exception as exc:  # pragma: no cover - environment dependent
+        raise typer.BadParameter(f"failed to run 'ollama list' to verify local model '{model}': {exc}") from exc
+
+    lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+    if not any(line.split()[0] == model for line in lines[1:] if line.split()):
+        raise typer.BadParameter(
+            f"required local model '{model}' not found in 'ollama list'. Pull it before benchmark runs."
+        )
+
+
+def _validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:
+    key = (provider.strip().lower(), model.strip())
+    if key == DEBUG_MODEL:
+        if not allow_debug_model:
+            raise typer.BadParameter(
+                "debug model is blocked for benchmark runs. Use --allow-debug-model to run debug workflows."
+            )
+        return
+
+    if key not in BENCHMARK_MODELS:
+        allowed = ", ".join(f"{p}:{m}" for p, m in sorted(BENCHMARK_MODELS))
+        raise typer.BadParameter(
+            f"unsupported benchmark model '{provider}:{model}'. Allowed benchmark models: {allowed}."
+        )
+
+    if key == ("ollama", "qwen3.5:0.8b"):
+        _assert_ollama_model_available(model)
 
 
 def _select_smoke_cases(

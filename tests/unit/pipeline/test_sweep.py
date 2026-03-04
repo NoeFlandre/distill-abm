@@ -79,7 +79,6 @@ def test_run_pipeline_sweep_runs_context_and_one_call_per_image_per_combination(
             model="fake-model",
             metric_pattern="mean-incum",
             metric_description="weekly milk",
-            skip_summarization=True,
         ),
         prompts=PromptsConfig(
             context_prompt="Context {parameters} {documentation}",
@@ -101,7 +100,7 @@ def test_run_pipeline_sweep_runs_context_and_one_call_per_image_per_combination(
     assert adapter.requests[2].image_b64 is not None
 
 
-def test_write_combinations_csv_uses_notebook_wide_schema(tmp_path: Path) -> None:
+def test_write_combinations_csv_uses_wide_schema(tmp_path: Path) -> None:
     path = tmp_path / "llm_responses.csv"
     write_combinations_csv(
         path,
@@ -152,7 +151,6 @@ def test_run_pipeline_sweep_supports_separate_context_and_trend_adapters(tmp_pat
             model="unused-default-model",
             metric_pattern="mean-incum",
             metric_description="weekly milk",
-            skip_summarization=True,
         ),
         prompts=PromptsConfig(
             context_prompt="Context {parameters} {documentation}",

@@ -11,7 +11,7 @@ from typing import Literal
 import pandas as pd
 from pydantic import BaseModel, Field
 
-from distill_abm.configs.models import PromptsConfig
+from distill_abm.configs.models import PromptsConfig, SummarizerId
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.metrics import SummaryScores, score_summary
 from distill_abm.ingest.csv_ingest import load_simulation_csv
@@ -25,12 +25,10 @@ from distill_abm.summarize.models import (
 )
 from distill_abm.viz.plots import MetricPlotBundle, plot_metric_bundles
 
-EvidenceMode = Literal["plot", "table-csv", "plot+table", "stats-markdown", "stats-image", "plot+stats"]
-ResolvedEvidenceMode = Literal["plot", "table-csv", "plot+table"]
-SummarizationMode = Literal["full", "summary", "both"]
-ScoreMode = Literal["full", "summary", "both"]
+EvidenceMode = Literal["plot", "table", "plot+table"]
+ResolvedEvidenceMode = Literal["plot", "table", "plot+table"]
+TextSourceMode = Literal["summary_only", "full_text_only"]
 SweepCsvColumnStyle = Literal["trend", "plot"]
-AdditionalSummarizer = Literal["t5", "longformer_ext"]
 
 
 class PipelineInputs(BaseModel):
@@ -44,11 +42,9 @@ class PipelineInputs(BaseModel):
     metric_pattern: str
     metric_description: str
     plot_description: str | None = None
-    skip_summarization: bool = False
-    summarization_mode: SummarizationMode = "both"
-    score_on: ScoreMode = "both"
-    evidence_mode: EvidenceMode = "plot"
-    additional_summarizers: tuple[AdditionalSummarizer, ...] = ()
+    text_source_mode: TextSourceMode = "summary_only"
+    evidence_mode: EvidenceMode = "plot+table"
+    summarizers: tuple[SummarizerId, ...] = ("bart", "bert", "t5", "longformer_ext")
     enabled_style_features: tuple[str, ...] | None = None
     scoring_reference_path: Path | None = None
     resume_existing: bool = False
@@ -78,7 +74,7 @@ class PipelineResult(BaseModel):
 
 
 class SweepRunResult(BaseModel):
-    """Represents one notebook-style combination run across multiple trend prompts."""
+    """Represents one style-factor combination run across multiple trend prompts."""
 
     combination_description: str
     context_prompt: str
@@ -88,7 +84,7 @@ class SweepRunResult(BaseModel):
 
 
 def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAdapter) -> PipelineResult:
-    """Executes the notebook-equivalent workflow through pure Python components."""
+    """Execute one end-to-end paper-aligned workflow through pure Python components."""
     inputs.output_dir.mkdir(parents=True, exist_ok=True)
     run_signature = _build_run_signature(inputs=inputs, prompts=prompts, adapter=adapter)
     if inputs.resume_existing:
@@ -138,53 +134,33 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         stats_image_path=stats_image_path,
     )
     trend_raw = _invoke_adapter(adapter, model=inputs.model, prompt=trend_prompt, image_b64=image_b64)
-    summarization_mode = _resolve_summarization_mode(
-        skip_summarization=inputs.skip_summarization,
-        requested_mode=inputs.summarization_mode,
-    )
     scoring_reference_text, scoring_reference_source, scoring_reference_path = _resolve_scoring_reference(
         inputs=inputs,
         context=context,
     )
-    score_on = _resolve_score_mode(
-        requested_score_on=inputs.score_on,
-        summarization_mode=summarization_mode,
-    )
-
-    # Compute full and/or summary trend variants first, then apply scoring policy.
     trend_full, trend_summary = _summarize_report_text(
-        trend_raw,
-        mode=summarization_mode,
-        additional_summarizers=inputs.additional_summarizers,
+        text=trend_raw,
+        text_source_mode=inputs.text_source_mode,
+        summarizers=inputs.summarizers,
+    )
+    selected_text_source: TextSourceMode = "summary_only" if trend_summary is not None else "full_text_only"
+    report_trend = trend_summary if trend_summary is not None else trend_full
+
+    selected_scores = score_summary(reference=scoring_reference_text, candidate=report_trend)
+    full_scores = score_summary(reference=scoring_reference_text, candidate=trend_full)
+    summary_scores = (
+        score_summary(reference=scoring_reference_text, candidate=trend_summary) if trend_summary is not None else None
     )
 
-    full_scores = None
-    summary_scores = None
-    if summarization_mode in {"full", "both"} or score_on == "full":
-        full_scores = score_summary(reference=scoring_reference_text, candidate=trend_full)
-    if trend_summary is not None and summarization_mode in {"summary", "both"} and score_on in {"summary", "both"}:
-        summary_scores = score_summary(reference=scoring_reference_text, candidate=trend_summary)
-
-    if summarization_mode == "both" and score_on == "both":
-        include_extended = True
-    else:
-        include_extended = False
-
-    report_trend, selected_scores = _select_report_outputs(
-        trend_full=trend_full,
-        trend_summary=trend_summary,
-        score_on=score_on,
-        full_scores=full_scores,
-        summary_scores=summary_scores,
-    )
+    include_extended = trend_summary is not None
     report_csv = _write_report(
         output_dir=inputs.output_dir,
         context=context,
         trend_full=trend_full,
         trend_summary=trend_summary,
         selected_scores=selected_scores,
-        full_scores=full_scores if include_extended else None,
-        summary_scores=summary_scores if include_extended else None,
+        full_scores=full_scores,
+        summary_scores=summary_scores,
         include_extended_columns=include_extended,
     )
 
@@ -201,8 +177,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         context_response=context,
         trend_full=trend_full,
         trend_summary=trend_summary,
-        summarization_mode=summarization_mode,
-        score_on=score_on,
+        selected_text_source=selected_text_source,
         full_scores=full_scores,
         summary_scores=summary_scores,
         selected_scores=selected_scores,
@@ -225,8 +200,8 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         trend_response=report_trend,
         trend_full_response=trend_full,
         trend_summary_response=trend_summary,
-        full_scores=full_scores if include_extended else None,
-        summary_scores=summary_scores if include_extended else None,
+        full_scores=full_scores,
+        summary_scores=summary_scores,
         stats_table_csv=stats_table_csv,
         stats_image_path=stats_image_path,
         token_f1=selected_scores.token_f1,
@@ -250,11 +225,9 @@ def _build_run_signature(inputs: PipelineInputs, prompts: PromptsConfig, adapter
             "metric_pattern": inputs.metric_pattern,
             "metric_description": inputs.metric_description,
             "plot_description": inputs.plot_description,
-            "skip_summarization": inputs.skip_summarization,
-            "summarization_mode": inputs.summarization_mode,
-            "score_on": inputs.score_on,
+            "text_source_mode": inputs.text_source_mode,
             "evidence_mode": inputs.evidence_mode,
-            "additional_summarizers": list(inputs.additional_summarizers),
+            "summarizers": list(inputs.summarizers),
             "enabled_style_features": list(inputs.enabled_style_features) if inputs.enabled_style_features else None,
             "scoring_reference_path": (
                 str(inputs.scoring_reference_path.resolve()) if inputs.scoring_reference_path is not None else None
@@ -400,7 +373,7 @@ def run_pipeline_sweep(
     csv_column_style: SweepCsvColumnStyle = "trend",
     resume_existing: bool = False,
 ) -> Path:
-    """Runs all style-feature prompt combinations and writes notebook-style wide CSV outputs."""
+    """Runs all style-feature prompt combinations and writes wide CSV outputs."""
     if not image_paths:
         raise ValueError("image_paths cannot be empty")
     if len(image_paths) != len(plot_descriptions):
@@ -475,7 +448,7 @@ def write_combinations_csv(
     csv_column_style: SweepCsvColumnStyle = "trend",
     resume_existing: bool = False,
 ) -> Path:
-    """Writes notebook-style wide CSV format with one prompt+response pair per trend image."""
+    """Write wide CSV output with one prompt+response pair per trend image."""
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     max_items = max((len(row.trend_analysis_prompts) for row in rows), default=0)
     headers = _sweep_headers(max_items=max_items, csv_column_style=csv_column_style)
@@ -553,7 +526,7 @@ def build_style_feature_combinations(
     prompts: PromptsConfig,
     style_feature_keys: list[str] | None = None,
 ) -> list[tuple[str, set[str]]]:
-    """Builds notebook-style all-combination feature sets (role/example/insights by default)."""
+    """Build all-combination feature sets (role/example/insights by default)."""
     requested = style_feature_keys or ["role", "example", "insights"]
     available = [key for key in requested if prompts.style_features.get(key, "").strip()]
     combinations_to_run: list[tuple[str, set[str]]] = [("None", set())]
@@ -592,76 +565,30 @@ def _encode_image(path: Path) -> str:
 
 def _summarize_report_text(
     text: str,
-    mode: SummarizationMode,
-    additional_summarizers: tuple[AdditionalSummarizer, ...] = (),
+    text_source_mode: TextSourceMode,
+    summarizers: tuple[SummarizerId, ...],
 ) -> tuple[str, str | None]:
-    """Resolve and generate trend text variants based on the selected summarization mode."""
-    if mode == "full":
+    """Resolve and generate trend text variants based on selected text-source mode."""
+    if text_source_mode == "full_text_only":
         return text, None
-    extra = _resolve_additional_summarizer_runners(additional_summarizers)
-    _, summary = helpers.summarize_report_text_pair(
-        text=text,
-        skip_summarization=False,
-        summarize_with_bart_fn=summarize_with_bart,
-        summarize_with_bert_fn=summarize_with_bert,
-        additional_summarizers=extra,
-    )
-    if mode == "summary":
-        return text, summary
-    return text, summary
-
-
-def _resolve_additional_summarizer_runners(
-    additional_summarizers: tuple[AdditionalSummarizer, ...],
-) -> list[tuple[str, Callable[[str], str]]]:
-    runners: list[tuple[str, Callable[[str], str]]] = []
-    for name in additional_summarizers:
-        if name == "t5":
-            runners.append(("t5", summarize_with_t5))
-        elif name == "longformer_ext":
-            runners.append(("longformer_ext", summarize_with_longformer_ext))
-    return runners
-
-
-def _resolve_summarization_mode(
-    skip_summarization: bool,
-    requested_mode: SummarizationMode,
-) -> SummarizationMode:
-    """Skip summarization requests force full-text trend mode."""
-    if skip_summarization:
-        return "full"
-    return requested_mode
-
-
-def _resolve_score_mode(
-    requested_score_on: ScoreMode,
-    summarization_mode: SummarizationMode,
-) -> ScoreMode:
-    """Resolve score mode to a valid combination given unavailable summary path."""
-    if requested_score_on == "summary" and summarization_mode == "full":
-        return "full"
-    if requested_score_on == "both" and summarization_mode == "full":
-        return "full"
-    if requested_score_on == "both" and summarization_mode != "both":
-        return "summary" if summarization_mode == "summary" else "full"
-    return requested_score_on
-
-
-def _select_report_outputs(
-    trend_full: str,
-    trend_summary: str | None,
-    score_on: ScoreMode,
-    full_scores: SummaryScores | None,
-    summary_scores: SummaryScores | None,
-) -> tuple[str, SummaryScores]:
-    """Select the trend text and score tuple that the report writer should persist."""
-    if score_on == "full" or summary_scores is None:
-        if full_scores is None:
-            return trend_full, score_summary(reference=trend_full, candidate=trend_full)
-        return trend_full, full_scores
-    if score_on == "summary":
-        return trend_summary or trend_full, summary_scores
-    return trend_summary or trend_full, summary_scores
+    runners: dict[SummarizerId, Callable[[str], str]] = {
+        "bart": summarize_with_bart,
+        "bert": summarize_with_bert,
+        "t5": summarize_with_t5,
+        "longformer_ext": summarize_with_longformer_ext,
+    }
+    summary_parts: list[str] = []
+    ordered = summarizers or ("bart", "bert", "t5", "longformer_ext")
+    for summarizer_id in ordered:
+        runner = runners[summarizer_id]
+        try:
+            value = runner(text).strip()
+        except Exception:
+            continue
+        if value:
+            summary_parts.append(value)
+    summary = "\n".join(summary_parts).strip()
+    return text, summary or None
 
 
 def _write_report(
@@ -698,8 +625,7 @@ def _write_run_metadata(
     context_response: str,
     trend_full: str,
     trend_summary: str | None,
-    summarization_mode: SummarizationMode,
-    score_on: ScoreMode,
+    selected_text_source: TextSourceMode,
     full_scores: SummaryScores | None,
     summary_scores: SummaryScores | None,
     include_extended: bool,
@@ -731,12 +657,9 @@ def _write_run_metadata(
             "plot_description": inputs.plot_description,
             "evidence_mode": evidence_mode,
             "evidence_mode_requested": requested_evidence_mode,
-            "summarization_mode": summarization_mode,
-            "score_on": score_on,
-            "skip_summarization": inputs.skip_summarization,
-            "summarization_mode_requested": inputs.summarization_mode,
-            "score_on_requested": inputs.score_on,
-            "additional_summarizers": list(inputs.additional_summarizers),
+            "text_source_mode": inputs.text_source_mode,
+            "selected_text_source": selected_text_source,
+            "summarizers": list(inputs.summarizers),
             "enabled_style_features": list(inputs.enabled_style_features) if inputs.enabled_style_features else None,
             "output_dir": str(inputs.output_dir),
             "scoring_reference_path": str(scoring_reference_path) if scoring_reference_path is not None else None,
@@ -821,14 +744,14 @@ def _write_run_metadata(
                 "max_input_length": 1024,
                 "min_summary_length": 40,
                 "max_summary_length": 120,
-                "enabled": "t5" in inputs.additional_summarizers,
+                "enabled": "t5" in inputs.summarizers,
             },
-            "longformer_like": {
+            "longformer_ext": {
                 "model": "allenai/led-base-16384",
                 "max_input_length": 2048,
                 "min_summary_length": 64,
                 "max_summary_length": 180,
-                "enabled": "longformer_ext" in inputs.additional_summarizers,
+                "enabled": "longformer_ext" in inputs.summarizers,
             },
         },
         "scores": {

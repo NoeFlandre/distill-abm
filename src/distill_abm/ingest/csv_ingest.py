@@ -1,4 +1,4 @@
-"""CSV ingestion utilities extracted from notebook preprocessing steps."""
+"""CSV ingestion utilities for ABM simulation outputs."""
 
 from __future__ import annotations
 
