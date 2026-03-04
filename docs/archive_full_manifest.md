@@ -3,15 +3,16 @@
 - Total files: 570
 - Classification counts:
   - `experiment_setting`: 38
-  - `historical_nonruntime`: 310
+  - `historical_nonruntime`: 305
   - `human_ground_truth`: 32
   - `legacy_visualization`: 184
   - `prompt_reference`: 6
+  - `runtime_required`: 5
 - Action counts:
   - `archive_separately`: 184
-  - `discard_with_rationale`: 39
+  - `discard_with_rationale`: 34
   - `migrate`: 76
-  - `retain_record_only`: 271
+  - `retain_record_only`: 276
 - Unresolved mappings: 0
 
 ## Sample Rows
@@ -19,10 +20,10 @@
 | path | classification | action | target_path |
 | --- | --- | --- | --- |
 | `archive/legacy_repo/Code/Evaluation/DOE/Archives/1 and -1 Sorted.csv` | `historical_nonruntime` | `retain_record_only` | `-` |
-| `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric Version/DoEFeatureImportance.ipynb` | `historical_nonruntime` | `discard_with_rationale` | `-` |
+| `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric Version/DoEFeatureImportance.ipynb` | `runtime_required` | `retain_record_only` | `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric Version/DoEFeatureImportance.ipynb` |
 | `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric Version/FinalResultsYesNo.csv` | `experiment_setting` | `migrate` | `tests/fixtures/notebook_parity/experiment_settings/Evaluation/DOE/Archives/Cédric Version/FinalResultsYesNo.csv` |
 | `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric Version/factorial_contributions.csv` | `historical_nonruntime` | `retain_record_only` | `-` |
-| `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric DoE Analysis averaging the repetitions.ipynb` | `historical_nonruntime` | `discard_with_rationale` | `-` |
+| `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric DoE Analysis averaging the repetitions.ipynb` | `runtime_required` | `retain_record_only` | `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric DoE Analysis averaging the repetitions.ipynb` |
 | `archive/legacy_repo/Code/Evaluation/DOE/Archives/test2.csv` | `historical_nonruntime` | `retain_record_only` | `-` |
 | `archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb` | `historical_nonruntime` | `discard_with_rationale` | `-` |
 | `archive/legacy_repo/Code/Evaluation/DOE/FinalResultsYesNo.csv` | `experiment_setting` | `migrate` | `tests/fixtures/notebook_parity/experiment_settings/Evaluation/DOE/FinalResultsYesNo.csv` |
