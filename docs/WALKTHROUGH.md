@@ -39,9 +39,9 @@ For a standard ABM run, provide:
 - `parameters_path`: default or chosen experiment values
 - `documentation_path`: model documentation narrative
 
-### Reference ingestion flow
+### Ingestion workflow details
 
-The module `distill_abm.ingest.netlogo_notebook_workflow` re-implements the reference workflow logic:
+The module `distill_abm.ingest.netlogo_notebook_workflow` implements the deterministic ingestion workflow:
 
 - parses ABM metadata from CSV headers and configured reporters
 - builds a consistent ordering of simulation files and metric columns
@@ -57,8 +57,7 @@ The module `distill_abm.ingest.netlogo_notebook_workflow` re-implements the refe
 For each metric, `run_pipeline` creates:
 
 - a PNG line chart in `output_dir` (default `results/pipeline`)
-- an optional stats table (mean/std/min/max/median per time step)
-- an optional stats table image (for multimodal evidence)
+- an optional stats table (mean/std/min/max/median per time step) serialized as CSV text when requested
 
 ### Plot output controls
 
@@ -118,6 +117,8 @@ By default (`summarization_mode=both`, `score_on=both`), pipeline summarization 
   - `--additional-summarizer longformer_ext`
 - Additional backends are additive to the default BART+BERT stack and are merged into the summary output in deterministic order.
 
+Exact numeric values for all summarizers are listed in `docs/HYPERPARAMETERS.md`.
+
 You can force full-text usage with `--summarization-mode full` (equivalent to `--skip-summarization`) or capture both text versions with `--summarization-mode both`.
 
 For strict summary-only runs, use:
@@ -173,7 +174,7 @@ Scoring modules are in `distill_abm.eval`:
 
 ## 9) Prompt sweeps
 
-`run_pipeline_sweep` is the explicit parity API for combination runs:
+`run_pipeline_sweep` is the dedicated API for combination runs:
 
 - builds all combinations through `build_style_feature_combinations`
 - writes wide sweep output with `write_combinations_csv`
@@ -204,9 +205,10 @@ Configuration files:
 
 - `configs/prompts.yaml` : editable prompt templates and style features
 - `configs/models.yaml` : provider aliases and model defaults
-- `configs/notebook_prompt_reference.yaml` : source templates for reference parity
-- `configs/notebook_experiment_settings.yaml` : captured reporter/run settings per ABM
+- `configs/notebook_prompt_reference.yaml` : frozen reference templates (filename retained for compatibility)
+- `configs/notebook_experiment_settings.yaml` : frozen ABM experiment settings (filename retained for compatibility)
 - `configs/abms/*.yaml` : model-specific defaults used by `--abm`
+- `docs/HYPERPARAMETERS.md` : complete numeric values for runtime defaults and model parameters
 
 Compatibility behavior:
 
