@@ -53,7 +53,10 @@ target-version = ["py311"]
 [tool.ruff]
 line-length = 120
 target-version = "py311"
-extend-exclude = ["archive"]
+extend-exclude = [
+    "archive",
+    "tests/fixtures/notebook_parity",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "RUF"]

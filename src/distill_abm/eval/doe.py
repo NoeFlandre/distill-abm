@@ -1,4 +1,4 @@
-"""Design-of-experiments helpers from ANOVA notebook workflows."""
+"""Design-of-experiments helpers for ANOVA-compatible workflows."""
 
 from __future__ import annotations
 

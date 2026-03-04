@@ -1,4 +1,4 @@
-"""Full factorial ANOVA analysis migrated from DoE notebook workflow."""
+"""Full factorial ANOVA analysis for factor contribution inspection."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ def analyze_factorial_anova(
     output_csv: Path,
     max_interaction_order: int = 2,
 ) -> pd.DataFrame | None:
-    """Builds ANOVA contribution table equivalent to notebook DoE analysis."""
+    """Build ANOVA contribution table for factor and interaction effects."""
     frame = _read_input(csv_path)
     if frame is None:
         return None

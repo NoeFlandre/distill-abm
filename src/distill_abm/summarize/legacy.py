@@ -1,4 +1,4 @@
-"""Legacy summary helpers retained for notebook-equivalent behavior."""
+"""Summary helpers preserved for compatibility behavior."""
 
 from __future__ import annotations
 
@@ -84,7 +84,7 @@ def summarize_text(
     max_summary_length: int = 100,
     max_input_length: int = 1024,
 ) -> str:
-    """Runs chunked summarization exactly as done in BART notebook cells."""
+    """Run chunked summarization with the configured summarizer."""
     chunks = chunk_text(text, summarizer.tokenizer, max_input_length)
     summaries: list[str] = []
     for chunk in chunks:
@@ -99,7 +99,7 @@ def summarize_text(
 
 
 def clean_dataframe_symbols(frame: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
-    """Applies notebook markdown cleanup to selected dataframe columns."""
+    """Apply symbol cleanup to selected dataframe columns."""
     copied = frame.copy()
     for column in columns:
         if column in copied.columns:
@@ -117,7 +117,7 @@ def summarize_csv_batch(
     bart_summarize_fn: Callable[[str, int, int], str] | None = None,
     bert_summarize_fn: Callable[[str], str] | None = None,
 ) -> pd.DataFrame:
-    """Runs notebook-4 summary generation workflow over an LLM-response CSV."""
+    """Generate summary columns for LLM-response tables."""
     frame = pd.read_csv(input_csv)
     frame = _clean_summary_input_frame(frame, context_column=context_column, plot_columns=plot_columns)
 

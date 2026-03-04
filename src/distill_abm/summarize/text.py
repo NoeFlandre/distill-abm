@@ -1,4 +1,4 @@
-"""Text cleanup helpers extracted from notebook post-processing cells."""
+"""Text cleanup utilities used before and after summarization."""
 
 from __future__ import annotations
 

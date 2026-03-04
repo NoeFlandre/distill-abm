@@ -13,7 +13,7 @@ from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qual
 from distill_abm.llm.factory import create_adapter
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, run_pipeline
 
-app = typer.Typer(help="Run ABM distillation workflows without notebooks.")
+app = typer.Typer(help="Run ABM distillation workflows.")
 
 
 @app.callback()
@@ -46,7 +46,7 @@ def run(
     metric_description: Annotated[str, typer.Option()] = "simulation trend",
     plot_description: Annotated[
         str | None,
-        typer.Option(help="Optional notebook-style description of the plotted metric."),
+        typer.Option(help="Optional evidence description for the plotted metric."),
     ] = None,
     evidence_mode: Annotated[
         EvidenceMode,

@@ -3,12 +3,22 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar, cast
 
 import yaml
 from pydantic import ValidationError
 
 from distill_abm.configs.models import (
+    ABMConfig,
+    EvaluationConfig,
+    LoggingConfig,
+    ModelsConfig,
+    NotebookExperimentSettings,
+    PromptsConfig,
+)
+
+ModelType = TypeVar(
+    "ModelType",
     ABMConfig,
     EvaluationConfig,
     LoggingConfig,
@@ -29,46 +39,41 @@ def _read_yaml(path: Path) -> dict[str, Any]:
         raise ConfigError(f"failed to read config at {path}: {exc}") from exc
     if not isinstance(content, dict):
         raise ConfigError(f"config at {path} must be a mapping")
-    return content
+    return cast(dict[str, Any], content)
+
+
+def _load_yaml_model(path: Path, model_class: type[ModelType]) -> ModelType:
+    try:
+        return model_class.model_validate(_read_yaml(path))
+    except ValidationError as exc:
+        raise ConfigError(f"invalid config at {path}: {exc}") from exc
 
 
 def load_models_config(path: Path) -> ModelsConfig:
-    try:
-        return ModelsConfig.model_validate(_read_yaml(path))
-    except ValidationError as exc:
-        raise ConfigError(f"invalid models config at {path}: {exc}") from exc
+    """Load and validate the provider model mapping."""
+    return _load_yaml_model(path, ModelsConfig)
 
 
 def load_prompts_config(path: Path) -> PromptsConfig:
-    try:
-        return PromptsConfig.model_validate(_read_yaml(path))
-    except ValidationError as exc:
-        raise ConfigError(f"invalid prompts config at {path}: {exc}") from exc
+    """Load and validate prompt templates."""
+    return _load_yaml_model(path, PromptsConfig)
 
 
 def load_abm_config(path: Path) -> ABMConfig:
-    try:
-        return ABMConfig.model_validate(_read_yaml(path))
-    except ValidationError as exc:
-        raise ConfigError(f"invalid ABM config at {path}: {exc}") from exc
+    """Load and validate ABM defaults."""
+    return _load_yaml_model(path, ABMConfig)
 
 
 def load_evaluation_config(path: Path) -> EvaluationConfig:
-    try:
-        return EvaluationConfig.model_validate(_read_yaml(path))
-    except ValidationError as exc:
-        raise ConfigError(f"invalid evaluation config at {path}: {exc}") from exc
+    """Load and validate evaluation settings."""
+    return _load_yaml_model(path, EvaluationConfig)
 
 
 def load_logging_config(path: Path) -> LoggingConfig:
-    try:
-        return LoggingConfig.model_validate(_read_yaml(path))
-    except ValidationError as exc:
-        raise ConfigError(f"invalid logging config at {path}: {exc}") from exc
+    """Load and validate logging behavior."""
+    return _load_yaml_model(path, LoggingConfig)
 
 
 def load_notebook_experiment_settings(path: Path) -> NotebookExperimentSettings:
-    try:
-        return NotebookExperimentSettings.model_validate(_read_yaml(path))
-    except ValidationError as exc:
-        raise ConfigError(f"invalid notebook experiment settings config at {path}: {exc}") from exc
+    """Load and validate notebook experiment settings."""
+    return _load_yaml_model(path, NotebookExperimentSettings)

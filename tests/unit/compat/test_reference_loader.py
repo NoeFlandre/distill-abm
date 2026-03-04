@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-import distill_abm.legacy.notebook_loader as notebook_loader
-from distill_abm.legacy.notebook_loader import (
+import distill_abm.compat.reference_loader as notebook_loader
+from distill_abm.compat.reference_loader import (
     REQUIRED_NOTEBOOK_FUNCTIONS,
     _is_better_source,
     _path_priority,

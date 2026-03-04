@@ -1,4 +1,4 @@
-"""Artifact-focused helpers for NetLogo notebook-equivalent preprocessing workflows."""
+"""Artifact-focused helpers for NetLogo reference preprocessing workflows."""
 
 from __future__ import annotations
 
@@ -25,13 +25,13 @@ def save_experiment_parameters(
     experiment_parameters: Mapping[str, ParameterScalar],
     output_json_path: Path,
 ) -> None:
-    """Writes notebook-style experiment parameter JSON."""
+    """Write experiment parameter JSON."""
     output_json_path.parent.mkdir(parents=True, exist_ok=True)
     output_json_path.write_text(json.dumps(experiment_parameters, indent=4), encoding="utf-8")
 
 
 def extract_gui_parameters_to_json(model_path: Path, output_json_path: Path) -> dict[str, list[dict[str, Any]]]:
-    """Extracts GUI parameters from NetLogo code and writes JSON output."""
+    """Extract GUI parameters from NetLogo code and write JSON output."""
     parameters = extract_parameters(extract_code(model_path))
     output_json_path.parent.mkdir(parents=True, exist_ok=True)
     output_json_path.write_text(json.dumps(parameters, indent=4), encoding="utf-8")
@@ -45,7 +45,7 @@ def update_gui_with_experiment_parameters(
     updated_gui_parameters_path: Path,
     updated_experiment_parameters_path: Path,
 ) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
-    """Applies experiment values to GUI controls and writes both notebook outputs."""
+    """Apply experiment values to GUI controls and write companion artifacts."""
     gui_parameters = json.loads(gui_parameters_path.read_text(encoding="utf-8"))
     experiment_parameters = json.loads(experiment_parameters_path.read_text(encoding="utf-8"))
     for section in ["sliders", "switches", "monitors", "buttons"]:
@@ -64,7 +64,7 @@ def build_parameter_narrative(
     experiment_parameters_path: Path,
     output_text_path: Path,
 ) -> str:
-    """Builds the notebook narrative text from updated GUI and experiment parameters."""
+    """Build simulation-setup narrative from updated GUI and experiment parameters."""
     data_gui = json.loads(gui_parameters_path.read_text(encoding="utf-8"))
     data_experiment = json.loads(experiment_parameters_path.read_text(encoding="utf-8"))
     narrative: list[str] = []
@@ -94,7 +94,7 @@ def build_parameter_narrative(
 
 
 def extract_documentation_to_json(model_path: Path, output_json_path: Path) -> str:
-    """Extracts NetLogo documentation and writes notebook-style JSON output."""
+    """Extract NetLogo documentation and write JSON output."""
     documentation = extract_documentation(model_path)
     output_json_path.parent.mkdir(parents=True, exist_ok=True)
     output_json_path.write_text(json.dumps({"documentation": documentation}, indent=4), encoding="utf-8")
@@ -102,7 +102,7 @@ def extract_documentation_to_json(model_path: Path, output_json_path: Path) -> s
 
 
 def extract_code_to_text(model_path: Path, output_text_path: Path) -> str:
-    """Extracts NetLogo code section and writes notebook-style TXT output."""
+    """Extract NetLogo code section and write TXT output."""
     code_section = extract_code(model_path)
     output_text_path.parent.mkdir(parents=True, exist_ok=True)
     output_text_path.write_text(code_section, encoding="utf-8")
@@ -110,7 +110,7 @@ def extract_code_to_text(model_path: Path, output_text_path: Path) -> str:
 
 
 def clean_documentation_artifacts(documentation_json: Path, final_text_path: Path) -> None:
-    """Runs documentation cleanup pipeline used by notebook-equivalent workflow."""
+    """Run documentation cleanup pipeline used by reference workflow."""
     clean_json_content(documentation_json, final_text_path)
 
 

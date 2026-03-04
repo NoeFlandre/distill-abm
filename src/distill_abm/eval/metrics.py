@@ -10,7 +10,7 @@ from distill_abm.eval.legacy_scores import compute_scores
 
 
 class SummaryScores(BaseModel):
-    """Captures both lexical overlap and notebook legacy evaluation metrics."""
+    """Captures lexical overlap plus compatibility scoring metrics."""
 
     token_f1: float
     precision: float
@@ -26,7 +26,7 @@ class SummaryScores(BaseModel):
 
 
 def score_summary(reference: str, candidate: str) -> SummaryScores:
-    """Computes notebook-compatible lexical metrics plus stable token overlap."""
+    """Computes stable token overlap plus configured lexical metrics."""
     ref_tokens = reference.lower().split()
     cand_tokens = candidate.lower().split()
     overlap = _overlap_count(ref_tokens, cand_tokens)

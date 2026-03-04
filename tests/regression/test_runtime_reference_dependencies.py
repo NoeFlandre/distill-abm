@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from distill_abm.legacy.notebook_loader import required_notebook_dependencies_by_path
+from distill_abm.compat.reference_loader import required_notebook_dependencies_by_path
 
 
 def test_runtime_notebook_dependency_report_matches_loader_and_manifest() -> None:

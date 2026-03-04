@@ -1,11 +1,11 @@
-"""Text cleaning utilities kept for notebook parity."""
+"""Text cleaning utilities kept for compatibility parity."""
 
 from __future__ import annotations
 
 import re
 from typing import cast
 
-from distill_abm.legacy.compat_callables import _call_notebook_first
+from distill_abm.compat.compat_callables import _call_notebook_first
 from distill_abm.summarize.legacy import clean_context_response as _clean_context_response_refactored
 from distill_abm.summarize.legacy import clean_symbols as _clean_symbols_refactored
 

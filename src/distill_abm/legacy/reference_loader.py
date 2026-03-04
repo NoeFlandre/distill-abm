@@ -1,3 +1,3 @@
-"""Backward-compatible loader shim for existing imports."""
+"""Backward-compatible compatibility shim."""
 
 from distill_abm.compat.reference_loader import *  # noqa: F403

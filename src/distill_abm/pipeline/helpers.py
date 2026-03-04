@@ -34,7 +34,7 @@ def build_context_prompt(
     prompts: PromptsConfig,
     enabled: set[str] | None,
 ) -> str:
-    """Compose context prompt with notebook-style optional role preamble."""
+    """Compose context prompt with optional role preamble."""
     parameters = inputs_csv_path.read_text(encoding="utf-8")
     documentation = inputs_doc_path.read_text(encoding="utf-8")
     base = prompts.context_prompt.format(parameters=parameters, documentation=documentation)
@@ -53,7 +53,7 @@ def build_trend_prompt(
     stats_markdown: str,
     enabled: set[str] | None = None,
 ) -> str:
-    """Compose trend prompt with optional notebook style features and stats overlay."""
+    """Compose trend prompt with optional role/example/insight features and stats overlay."""
     parts: list[str] = []
     active = enabled or set()
     include_all = enabled is None
@@ -114,7 +114,7 @@ def summarize_report_text(
 
 
 def build_stats_table(frame: pd.DataFrame, include_pattern: str) -> pd.DataFrame:
-    """Build notebook-style statistics table for one metric pattern."""
+    """Build statistics table for one metric pattern."""
     return generate_stats_table(frame, include_pattern=include_pattern)
 
 

@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-import distill_abm.legacy.compat as compat
+import distill_abm.compat as compat
 from distill_abm.eval.doe import clean_name, clean_statsmodels_feature_name, identify_factors_and_metrics
 from distill_abm.eval.qualitative import extract_coverage_score, extract_faithfulness_score, should_skip_row
 from distill_abm.ingest.netlogo import remove_default_elements, remove_urls

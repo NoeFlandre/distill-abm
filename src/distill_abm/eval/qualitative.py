@@ -1,4 +1,4 @@
-"""Qualitative score extraction helpers from GPT/Claude rating notebooks."""
+"""Qualitative score extraction helpers for LLM-rated evaluation responses."""
 
 from __future__ import annotations
 

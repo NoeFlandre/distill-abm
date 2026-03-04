@@ -1,4 +1,4 @@
-"""Small, reusable building blocks for notebook-equivalent NetLogo execution."""
+"""Small, reusable building blocks for reference NetLogo execution."""
 
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ def run_single_repetition(
     interval: int,
     experiment_parameters: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
-    """Run a single notebook-style simulation repetition and return a frame."""
+    """Run a single simulation repetition and return a dataframe."""
     if experiment_parameters:
         for param, value in experiment_parameters.items():
             netlogo.command(f"set {param} {coerce_parameter_value_for_netlogo(value)}")

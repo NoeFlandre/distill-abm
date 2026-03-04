@@ -1,16 +1,17 @@
 # distill-abm
 
-Production Python package for ABM-to-LLM distillation, extracted from legacy notebooks with regression-backed parity.
+Production Python package for ABM-to-LLM distillation with reference-parity validation.
 
 ## Repository layout
 
-- `src/distill_abm/` - main production codebase
-- `tests/` - unit, integration, e2e, and notebook-regression tests
-- `configs/` - YAML configs for models, prompts, ABMs, evaluation, logging
-- `configs/notebook_prompt_reference.yaml` - canonical notebook prompt/reference capture with provenance
-- `configs/notebook_experiment_settings.yaml` - preserved notebook experiment defaults (LLM + DoE)
-- `archive/legacy_repo/` - full legacy repository snapshot (notebooks + assets)
-- `docs/` - architecture and parity documentation
+- `src/distill_abm/` - production code
+- `tests/` - unit, integration, CLI, and parity tests
+- `configs/` - runtime defaults for prompts, ABMs, evaluation, and logging
+- `configs/notebook_prompt_reference.yaml` - reference templates extracted from scripts
+- `configs/notebook_experiment_settings.yaml` - captured experiment defaults for ingestion and summarization
+- `archive/legacy_repo/` - preserved reference implementation snapshot (scripts + artifacts)
+- `tests/fixtures/notebook_parity/` - canonical mirrored fixtures used for migration coverage
+- `docs/` - architecture, parity, and audit evidence
 
 ## Codebase organization
 
@@ -20,24 +21,27 @@ distill-abm/
 │   ├── models.yaml
 │   ├── prompts.yaml
 │   ├── evaluation.yaml
+│   ├── logging.yaml
 │   ├── notebook_prompt_reference.yaml
 │   ├── notebook_experiment_settings.yaml
 │   └── notebook_prompt_assets/
 ├── src/distill_abm/
-│   ├── configs/           # typed config loaders and models
-│   ├── eval/              # scoring and statistical workflows
-│   ├── ingest/            # NetLogo and CSV preprocessing
-│   ├── legacy/            # loader, compatibility, migration safety
-│   ├── llm/               # provider adapters and model selection
-│   ├── pipeline/          # end-to-end CLI orchestration
-│   ├── summarize/         # text cleanup and summarization options
-│   └── viz/               # plot and stats-table generation
-├── docs/                  # parity, coverage, and manifest evidence
-├── archive/legacy_repo/   # retained legacy notebooks and raw inputs
-└── tests/                 # unit, integration, regression, e2e
+│   ├── compat/             # compatibility surface for historical interfaces
+│   ├── configs/            # typed config loading and models
+│   ├── eval/               # metric scoring and qualitative parsing
+│   ├── ingest/             # NetLogo and CSV ingestion
+│   ├── llm/                # provider adapters and request factory
+│   ├── pipeline/           # end-to-end orchestration
+│   ├── summarize/          # text cleanup and summarization
+│   └── viz/                # plot and stats-table rendering
+├── docs/                  # architecture + parity evidence
+├── tests/
+└── archive/legacy_repo/   # retained reference scripts
 ```
 
-The top-level runtime entrypoint is `src/distill_abm/cli.py`. The parity surface is in `src/distill_abm/legacy/compat.py`, with dispatch governed by `src/distill_abm/legacy/notebook_loader.py`.
+Compatibility imports are preserved as `distill_abm.compat` shims for backward compatibility.
+
+The top-level runtime entrypoint is `src/distill_abm/cli.py`. The canonical compatibility surface is `src/distill_abm/compat`, with fallback dispatch implemented by `src/distill_abm/compat/compat_callables.py` and reference loader `src/distill_abm/compat/reference_loader.py`.
 
 ## Quickstart
 
@@ -53,7 +57,7 @@ uv run pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85
 
 ## CLI
 
-Run distillation pipeline:
+Run the core pipeline:
 
 ```bash
 uv run distill-abm run \
@@ -65,50 +69,43 @@ uv run distill-abm run \
   --model gpt-4o
 ```
 
-Notebook-style plot description can be explicitly overridden:
+Override trend description text:
 
 ```bash
-uv run distill-abm run ... --plot-description "The attachment is the plot representing ..."
+uv run distill-abm run ... --plot-description "The attachment shows the livestock count over time."
 ```
 
-Run evidence ablations for reviewer comparisons:
+Run evidence ablations:
 
 ```bash
-# plot-only (image)
 uv run distill-abm run ... --evidence-mode plot
-
-# stats-only (markdown table in prompt)
 uv run distill-abm run ... --evidence-mode stats-markdown
-
-# stats-only (table image for multimodal input)
 uv run distill-abm run ... --evidence-mode stats-image
-
-# plot + stats (plot image + markdown stats table in prompt)
-uv run distill-abm run ... --evidence-mode "plot+stats"
+uv run distill-abm run ... --evidence-mode plot+stats
 ```
 
-Run no-summarization baseline (skip BART/BERT summarization and keep direct LLM report text):
+Run no-summarization baseline:
 
 ```bash
 uv run distill-abm run \
   --csv-path path/to/reduced.csv \
   --parameters-path path/to/params.txt \
   --documentation-path path/to/docs.txt \
-  --evidence-mode "plot+stats" \
+  --evidence-mode plot+stats \
   --skip-summarization
 ```
 
-Run notebook-style combination sweeps from code (role/example/insights variants across multiple images):
+Run reference-style combination sweeps in code (`role`, `example`, `insights` matrix):
 
 ```python
 from pathlib import Path
 
-from distill_abm.pipeline.run import PipelineInputs, run_pipeline_sweep
 from distill_abm.configs.loader import load_prompts_config
 from distill_abm.llm.factory import create_adapter
+from distill_abm.pipeline.run import PipelineInputs, run_pipeline_sweep
 
 prompts = load_prompts_config(Path("configs/prompts.yaml"))
-adapter = create_adapter("openai", model="gpt-4o")
+adapter = create_adapter(provider="openai", model="gpt-4o")
 
 output_csv = run_pipeline_sweep(
     inputs=PipelineInputs(
@@ -116,83 +113,56 @@ output_csv = run_pipeline_sweep(
         parameters_path=Path("params.txt"),
         documentation_path=Path("documentation.txt"),
         output_dir=Path("results/sweep"),
-        model="gpt-4o",
         metric_pattern="mean-incum",
         metric_description="weekly milk trend",
+        model="gpt-4o",
     ),
     prompts=prompts,
     adapter=adapter,
     image_paths=[Path("results/plots/p1.png"), Path("results/plots/p2.png")],
     plot_descriptions=["Plot 1 description", "Plot 2 description"],
 )
+
 print(output_csv)
 ```
 
-For Claude and Deepseek legacy-combination parity, `run_pipeline_sweep` also supports:
+For multi-provider workflows:
 
-- `csv_column_style="plot"` to emit notebook headers (`Plot N Prompt`, `Plot N Analysis`)
-- `resume_existing=True` to update/continue an existing combinations CSV
-- separate adapters/models for context and trend phases (`context_adapter` / `trend_adapter`, `context_model` / `trend_model`)
+- `context_adapter` / `trend_adapter`
+- `context_model` / `trend_model`
+- `csv_column_style="plot"` for wide output matching historic schemas
+- `resume_existing=True` to continue an existing combinations CSV
 
-Run qualitative evaluation (Coverage/Faithfulness scored by LLM):
+## Qualitative evaluation
 
 ```bash
-# coverage from summary + source text
 uv run distill-abm evaluate-qualitative \
   --summary-text "Generated ABM summary..." \
-  --source-text "ABM context and evidence..." \
+  --source-text "ABM source context..." \
   --metric coverage \
   --provider openai \
   --model gpt-4o
 
-# faithfulness with optional source image for multimodal models
 uv run distill-abm evaluate-qualitative \
   --summary-text "Generated ABM summary..." \
-  --source-text "ABM context and evidence..." \
+  --source-text "ABM source context..." \
   --metric faithfulness \
   --source-image-path results/pipeline/mean-incum.png \
   --provider openai \
   --model gpt-4o
 ```
 
-Expected output JSON:
+Expected output schema:
 
 ```json
 {
   "score": 4,
-  "reasoning": "Coverage score: 4. Most key dynamics and turning points are captured.",
+  "reasoning": "Coverage is strong. Core dynamics and regime changes are represented.",
   "model": "gpt-4o"
 }
 ```
 
-### Evidence Artifacts and Examples
-
-- Runtime artifacts:
-  - Plot artifact (`plot` mode): `results/pipeline/mean-incum.png`
-  - Stats image artifact (`stats-image` mode): `results/pipeline/mean-incum_stats.png`
-  - Report artifact: `results/pipeline/report.csv`
-
-Embedded examples:
-
-Plot example (`plot` mode):
-
-![Plot example](docs/assets/plot_example.png)
-
-Stats table image example (`stats-image` mode):
-
-![Stats table image example](docs/assets/stats_table_example.png)
-
-Stats markdown table example (used in `stats-markdown` and `plot+stats` modes):
-
-| time_step | mean | std | min | max | median |
-| --- | --- | --- | --- | --- | --- |
-| 0 | 1.5000 | 0.5000 | 1.0000 | 2.0000 | 1.5000 |
-| 1 | 2.5000 | 0.5000 | 2.0000 | 3.0000 | 2.5000 |
-| 2 | 3.5000 | 0.5000 | 3.0000 | 4.0000 | 3.5000 |
-
-The stats table always includes, per time step: `mean`, `std`, `min`, `max`, and `median`.
-
-Run DoE ANOVA analysis:
+## DoE analysis
 
 ```bash
 uv run distill-abm analyze-doe \
@@ -209,50 +179,41 @@ docker run --rm distill-abm
 
 ## CI
 
-- GitHub Actions workflow at `.github/workflows/ci.yml`
-- Runs on push and pull request:
-  - `pre-commit run --all-files`
-  - `mypy src tests`
-  - `pytest --cov=distill_abm --cov-report=term-missing --cov-report=xml --cov-fail-under=85`
+GitHub Actions configuration is at `.github/workflows/ci.yml` and runs:
 
-## Parity policy
+- `pre-commit run --all-files`
+- `ruff check .`
+- `black --check .`
+- `mypy src tests`
+- `pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85`
 
-- Legacy notebooks are preserved under `archive/legacy_repo/`.
-- `docs/archive_full_manifest.json` provides a file-by-file migration classification and action trail for all archive assets.
-- `docs/archive_full_manifest.json` marks loader-dependent notebooks as `runtime_required`; current status is `0` runtime-required notebooks/functions, with notebook-backed behavior covered by fallback/parity tests.
-- `docs/runtime_notebook_dependencies.json` maps each runtime-required notebook to the exact required function names currently sourced from it.
-- Legacy CSV outputs and legacy plot/image artifacts are explicitly retained (not discarded) for reproducibility and reference.
-- Notebook prompt sources are preserved in `configs/notebook_prompt_reference.yaml`, with runtime prompts in `configs/prompts.yaml` regression-locked to it.
-- `configs/notebook_experiment_settings.yaml` now also preserves defaults from Fauna, Grazing, and Milk Consumption "From NetLogo to CSV" workflows (reporters, run loop settings, and parameter dictionaries).
-- Regenerate parity/audit artifacts with `python scripts/refresh_parity_artifacts.py`.
-- Notebooks removed from runtime usage now include:
-  - `archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb`
-  - `archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb`
-  - `archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb`
-  - `archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb`
-  - `archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb`
-  - `archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb`
-  - `archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb`
-  - `archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb`
-  - `archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb`
-- Notebook-discard sequence is now: remove deprecated files, run `python scripts/refresh_parity_artifacts.py`, then run full gates.
-- Deepseek-style dual-model sweep behavior (text context model + multimodal trend model) is supported directly in `run_pipeline_sweep`.
-- `distill_abm.legacy.notebook_loader` builds a callable registry from notebooks and prefers sources in this order:
-  - non-`archives` notebooks
-  - non-checkpoint notebooks
-  - non-`copy` notebook filenames
-- Pipeline prompt assembly mirrors notebook structure:
-  - context prompt: optional `style_features.role` + context template
-  - trend prompt: optional `style_features.role`, trend template, optional `style_features.example`, optional `style_features.insights`, then plot description
-- `run_pipeline` uses the pipeline default plot prompt unless `--plot-description` is explicitly provided.
-- `distill_abm.legacy.compat` dispatches notebook-first for selected deterministic helpers and falls back to refactored package implementations when notebook loading/calls fail.
-- `tests/regression/test_notebook_equivalence.py` validates behavior parity for migrated core utilities.
-- `tests/regression/test_notebook_function_coverage.py` ensures every notebook function name is accounted for in the new codebase (`distill_abm.legacy.compat`) or explicitly exempted.
+## Evidence and parity
+
+- `docs/WALKTHROUGH.md`: reviewer-oriented end-to-end behavior.
+- `docs/ARCHITECTURE.md`: module boundaries and data flow.
+- `docs/PARITY.md`: parity policy and proof by test.
+- `docs/archive_full_manifest.json`: migration and retention policy for every archived file.
+- `docs/runtime_notebook_dependencies.json`: reference dispatch dependencies for audit.
+- `configs/notebook_prompt_reference.yaml`: reference prompt texts for behavior lock.
+
+### Reference artifacts
+
+- `archive/legacy_repo/` retains source reference scripts and artifacts.
+- `tests/fixtures/notebook_parity/` stores byte-equivalent mirrors used by migration audits.
+- `archive/` is retained for auditability and does not drive runtime execution.
+
+Compatibility details used by parity:
+
+- `tests/regression/test_reference_equivalence.py` covers core runtime parity.
+- `tests/regression/test_reference_function_coverage.py` validates function accounting.
+- `tests/regression/test_runtime_reference_dependencies.py` validates dispatch source map integrity.
 
 ## Known limits
 
-- Notebook execution is intentionally restricted to safe AST node types in the loader; some notebook side-effects are not replayed.
-- Fallback behavior for complex legacy DoE CSV writers (`return_csv`, `return_csv_2`) aims for robustness but may differ in formatting if notebook execution is unavailable.
-- Default LLM request temperature is set to `0.5` for notebook-aligned generation behavior.
+- Reference loader execution is AST-restricted and intentionally does not execute full side-effectful reference cells.
+- `return_csv` and `return_csv_2` are protected by fallback behavior if reference execution is unavailable.
+- Default request temperature is `0.5`.
 
-See `docs/PARITY.md` for details.
+## License
+
+See repository license file.
