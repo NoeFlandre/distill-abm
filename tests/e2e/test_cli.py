@@ -184,6 +184,14 @@ def test_cli_run_with_abm_passes_first_plot_description(tmp_path: Path, monkeypa
             plot_descriptions=["first plot description", "second"],
         )
 
+    class _Scoring:
+        fauna_ground_truth_path = "fauna.txt"
+        grazing_ground_truth_path = "grazing.txt"
+        milk_ground_truth_path = "milk.txt"
+
+    class _Settings:
+        scoring = _Scoring()
+
     class _Result:
         def __init__(self, output_dir: Path) -> None:
             self.plot_path = output_dir / "plot.png"
@@ -202,6 +210,7 @@ def test_cli_run_with_abm_passes_first_plot_description(tmp_path: Path, monkeypa
         return _Result(output_dir)
 
     monkeypatch.setattr("distill_abm.cli.load_abm_config", fake_load_abm_config)
+    monkeypatch.setattr("distill_abm.cli.load_notebook_experiment_settings", lambda _path: _Settings())
     monkeypatch.setattr("distill_abm.cli.run_pipeline", fake_run_pipeline)
 
     result = runner.invoke(
@@ -231,6 +240,7 @@ def test_cli_run_with_abm_passes_first_plot_description(tmp_path: Path, monkeypa
     assert "inputs" in captured
     inputs = captured["inputs"]
     assert cast(Any, inputs).plot_description == "first plot description"
+    assert cast(Any, inputs).scoring_reference_path == Path("milk.txt")
 
 
 def test_cli_run_direct_call_with_abm_defaults_plot_description(
@@ -674,13 +684,16 @@ def test_cli_smoke_qwen_forwards_inputs_and_reports_paths(tmp_path: Path, monkey
             self.doe_output_csv: Path | None = output_dir / "anova.csv"
             self.sweep_output_csv: Path | None = output_dir / "sweep.csv"
 
-    def fake_run_qwen_smoke_suite(*, inputs, prompts, adapter, run_qualitative, doe_input_csv, run_sweep):  # type: ignore[no-untyped-def]
+    def fake_run_qwen_smoke_suite(  # type: ignore[no-untyped-def]
+        *, inputs, prompts, adapter, run_qualitative, doe_input_csv, run_sweep, resume_existing
+    ):
         captured["inputs"] = inputs
         captured["prompts"] = prompts
         captured["adapter"] = adapter
         captured["run_qualitative"] = run_qualitative
         captured["doe_input_csv"] = doe_input_csv
         captured["run_sweep"] = run_sweep
+        captured["resume_existing"] = resume_existing
         inputs.output_dir.mkdir(parents=True, exist_ok=True)
         result = _Result(inputs.output_dir)
         result.report_markdown_path.write_text("# smoke\n", encoding="utf-8")
@@ -728,6 +741,7 @@ def test_cli_smoke_qwen_forwards_inputs_and_reports_paths(tmp_path: Path, monkey
     assert smoke_inputs.plot_description == "plot desc"
     assert captured["run_qualitative"] is False
     assert captured["run_sweep"] is False
+    assert captured["resume_existing"] is True
 
 
 def test_cli_smoke_qwen_abm_overrides_metric_defaults(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -772,8 +786,17 @@ def test_cli_smoke_qwen_abm_overrides_metric_defaults(tmp_path: Path, monkeypatc
             plot_descriptions=["p1", "p2", "p3", "p4", "p5"],
         )
 
+    class _Scoring:
+        fauna_ground_truth_path = "fauna_gt.txt"
+        grazing_ground_truth_path = "grazing_gt.txt"
+        milk_ground_truth_path = "milk_gt.txt"
+
+    class _Settings:
+        scoring = _Scoring()
+
     monkeypatch.setattr("distill_abm.cli.run_qwen_smoke_suite", fake_run_qwen_smoke_suite)
     monkeypatch.setattr("distill_abm.cli.load_abm_config", fake_load_abm_config)
+    monkeypatch.setattr("distill_abm.cli.load_notebook_experiment_settings", lambda _path: _Settings())
     result = runner.invoke(
         app,
         [
@@ -800,3 +823,4 @@ def test_cli_smoke_qwen_abm_overrides_metric_defaults(tmp_path: Path, monkeypatc
     assert smoke_inputs.metric_pattern == "count-species"
     assert smoke_inputs.metric_description.startswith("species abundance")
     assert smoke_inputs.sweep_plot_descriptions == ["p1", "p2", "p3", "p4", "p5"]
+    assert smoke_inputs.scoring_reference_path == Path("fauna_gt.txt")

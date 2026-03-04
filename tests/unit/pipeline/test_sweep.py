@@ -222,3 +222,55 @@ def test_write_combinations_csv_plot_headers_and_resume_mode(tmp_path: Path) -> 
     # Existing row remains unchanged in filled prompt/analysis slots when resuming.
     assert rows[1] == ["None", "cp1", "cr1", "p1", "r1", "p2", "r2"]
     assert rows[2] == ["role", "cp2", "cr2", "rp1", "rr1", "rp2", "rr2"]
+
+
+def test_run_pipeline_sweep_resume_skips_existing_combinations_without_llm_calls(tmp_path: Path) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("d=1", encoding="utf-8")
+    image = tmp_path / "1.png"
+    image.write_bytes(b"one")
+    output_csv = tmp_path / "out" / "combinations_report.csv"
+    prompts = PromptsConfig(
+        context_prompt="Context {parameters} {documentation}",
+        trend_prompt="Trend {description} {context}",
+        style_features={"role": "ROLE", "example": "EXAMPLE", "insights": "INSIGHTS"},
+    )
+
+    all_rows: list[SweepRunResult] = []
+    for description, _ in build_style_feature_combinations(prompts):
+        all_rows.append(
+            SweepRunResult(
+                combination_description=description,
+                context_prompt=f"context {description}",
+                context_response=f"context response {description}",
+                trend_analysis_prompts=["p1"],
+                trend_analysis_responses=["r1"],
+            )
+        )
+    write_combinations_csv(output_csv, all_rows, resume_existing=False)
+
+    adapter = CapturingAdapter()
+    out = run_pipeline_sweep(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+        ),
+        prompts=prompts,
+        adapter=adapter,
+        image_paths=[image],
+        plot_descriptions=["PLOT-1"],
+        output_csv=output_csv,
+        resume_existing=True,
+    )
+
+    assert out == output_csv
+    assert len(adapter.requests) == 0

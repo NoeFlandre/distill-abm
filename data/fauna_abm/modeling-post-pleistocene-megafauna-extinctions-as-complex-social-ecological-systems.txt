@@ -1,0 +1,1710 @@
+Quaternary Research (2024), 121, 1–14
+doi:10.1017/qua.2024.6
+
+Research Article
+
+Modeling post-Pleistocene megafauna extinctions as complex
+social-ecological systems
+Miriam C. Kopelsa,b and Isaac I. Ullaha
+a
+
+Department of Anthropology, San Diego State University, 5500 Campanile Drive, San Diego, CA 92182-6040, USA and bNow at Department of Anthropology,
+University of Nevada, Las Vegas, 4505 S. Maryland Pkwy., Las Vegas, NV 89154, USA
+
+Abstract
+The role of human hunting behavior versus climate change in the mass extinction of megafauna during the Late Quaternary is much
+debated. To move beyond monocausal arguments, we treat human–megafauna–environment relationships as social–ecological systems
+from a complex adaptive systems perspective, to create an agent-based model that tests how human hunting may interact with environmental stress and animal life history to affect the probability of extinction. Using the extinction of Syncerus antiquus in South Africa at 12–10 ka
+as a loose inspirational case study, we parameterized a set of experiments to identify cross-feedbacks among environmental dynamics, prey life
+history, and human hunting pressure that affect extinction probability in a non-linear way. An important anthropogenic boundary condition
+emerges when hunting strategies interrupt prey animal breeding cycles. This effect is amplified in patchy, highly seasonal environments to
+increase the chances of extinction. This modeling approach to human behavior and biodiversity loss helps us understand how these types
+of cross-feedback effects and boundary conditions emerge as system components interact and change. We argue that this approach can
+help translate archaeological data and insight about past extinction for use in understanding and combating the current mass extinction crisis.
+Keywords: Megafauna extinction, anthropogenic impacts, social-ecological systems, complex adaptive systems, agent-based modeling,
+South Africa
+
+Introduction
+We are currently amid a highly accelerated anthropogenic extinction event conservatively estimated to be one hundred times
+higher than expected background rates (Ceballos et al., 2015). It
+is estimated that 48% of animal species are currently in decline
+(Finn et al., 2023) and that 50% of the plant and animal species
+on Earth may be lost by 2100 (Braje and Erlandson, 2013,
+p. 21). Biologists have identified four recent periods of significant
+acceleration in the extinction rate of land animals (63.8–32.2 ka,
+16–9.5 ka, 2300–600 yr, and 180–120 yr) (Andermann et al.,
+2020). There is a general temporal correlation between the dispersal
+of anatomically modern humans and the demise of faunal species
+around the world (Braje and Erlandson, 2013; Boivin et al., 2016),
+but the role of human-driven effects versus climate-driven effects in
+these extinctions continues to be debated (Barnosky et al., 2004;
+Koch and Barnosky, 2006; Braje and Erlandson, 2013).
+In our opinion, archaeological data about past extinction is not
+being utilized to its fullest potential in combating the current
+mass extinction. Analyses of specific extinction events are typically reductive and attempt to identify and test the validity of specific and often monocausal explanations for specific past cases of
+population decline, extirpation, or extinction (Supplemental Text,
+Corresponding author: Isaac I. Ullah; Email address: iullah@sdsu.edu
+Cite this article: Kopels MC, Ullah II (2024). Modeling post-Pleistocene megafauna
+extinctions as complex social-ecological systems. Quaternary Research 121, 1–14.
+https://doi.org/10.1017/qua.2024.6
+
+Section 1). The coarse-grained and incomplete nature of archaeological, paleoenvironmental, and paleoclimatological data often
+combines with the highly variegated nature of extinction events
+across time and space to provide fodder for endless debate
+about causal mechanisms for extinctions in various parts of the
+world (Lyons et al., 2004; Turney et al., 2008; van der Kaars
+et al., 2017; Saltré et al., 2019). If we want these findings to be relevant to current-day issues (i.e., “action archaeology” sensu
+Sabloff, 2016), it is growing clearer that multifactor explanations
+are needed. Additionally, the combination and relative influence
+of the potential factors driving extinction need to be contextualized at a higher level than individual cases of past extinction
+events. But reductionist inductive approaches can at best only
+show correlations in the proxy record of the past, which are sometimes weak, sometimes spurious, and often inconclusive (Faith
+et al., 2020). The dynamics of how extinction events played out
+over time are completely missing from even the best-preserved
+proxy records, and even the most detailed analyses of fossil data
+sets are flawed by the sampling biases introduced by time,
+taphonomy, and by how we find, retrieve, and analyze material
+remains of the past.
+We intend to show that a more fruitful way for archaeologists
+to create actionable knowledge relevant to addressing contemporary issues is by using paleontological and archaeological evidence
+to parameterize experiments within formal, generative, deductive
+models derived from theories of human and animal behavior as
+well as theories of climate and environmental change. To do so,
+
+© The Author(s), 2024. Published by Cambridge University Press on behalf of Quaternary Research Center. This is an Open Access article, distributed under the terms of the Creative
+Commons Attribution-NonCommercial-ShareAlike licence (http://creativecommons.org/licenses/by-nc-sa/4.0), which permits non-commercial re-use, distribution, and reproduction in
+any medium, provided the same Creative Commons licence is used to distribute the re-used or adapted article and the original article is properly cited. The written permission of
+Cambridge University Press must be obtained prior to any commercial use.
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+2
+
+we employed the agent-based modeling (ABM) formalism
+(Epstein, 1999; Bankes, 2002) informed by a complex adaptive
+systems (CAS) perspective about social–ecological systems (SES)
+(Preiser et al., 2018) to create a deductive model of interactions
+among human hunting preferences, environmental change, and
+animal demography that is used to investigate extinction dynamics in large-bodied, k-selected, mammals (i.e., megafauna >45 kg).
+ABM is a computer simulation formalism (Supplemental Text,
+Section 1) centered around multiple interacting software agents
+that can sense stimuli in their environment and respond according to behavioral rules (Epstein, 1999; Bankes, 2002;
+Romanowska, 2015; Wilensky and Rand, 2015). The CAS framework identifies aggregates of interrelated variables that form systems, such as the individual cells of the nervous system, or the
+individuals and institutions of an economic system (Daems,
+2021). The components of these systems change and reorganize
+themselves to adapt to their surroundings (Holland, 1992).
+There is no central all-controlling mechanism that guides the system’s behavior (Mitchell, 2009). Rather, complex, self-organizing
+behavior emerges out of simple operational rules and complex
+feedback interactions (Kohler, 2012). SES are a special type of
+CAS where human social system components connect to and
+interact with ecosystem components (Walker et al., 2006; Glaser
+et al., 2012; Preiser et al., 2018).
+In our model, we consider humans, prey species, and the environment to be key components of an interconnected, adaptive
+SES, in which feedback occurs between and among individuals
+and communities as the system changes over time. We demonstrate the usefulness of this approach by presenting a loose case
+study inspired by megafauna extinction dynamics that may have
+played out in the greater South African Cape Floristic Region
+across the Pleistocene–Holocene transition. All models are
+abstractions of the real world and are by definition limited in
+scope, realism, and detail (Box and Draper, 1987), but deductive
+models are flexible and are preferred for the initial exploration of
+the capacity for emergence within a general problem domain
+(Robinson et al., 2007; Rounsevell et al., 2012; Railsback and
+Grimm, 2019). Specificity and complexity are added to the
+model as required by our understanding of the behavior, or as
+the model problem domain evolves, which is the approach that
+we have taken here (Railsback and Grimm, 2019; Romanowska
+et al., 2021). We think that these methods may allow us to take
+lessons from past extinction dynamics and apply them to present
+SES by identifying extinction thresholds and the ways in which
+such systems move towards or away from them.
+
+Methods
+The megafauna hunting pressure model
+We created our ABM simulation model, which we call the
+“Megafauna Hunting Pressure Model” (MHPM), using the
+NetLogo modeling platform (Version 6.3.0; Wilensky, 1999).
+The MHPM is described in detail using the Overview, Design
+Concepts, and Details (ODD) protocol (Grimm et al., 2006,
+2010, 2020) in the Supplementary Text, and summarized here following the Summary ODD format outlined by Grimm et al.
+(2020).
+The MHPM is a model of large-bodied ungulate population
+dynamics with human predation in a simplified, but dynamic
+grassland environment. The overall purpose of the model is to
+understand how environmental dynamics and human predation
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+M.C. Kopels and I.I. Ullah
+
+preferences interact with ungulate life history characteristics to
+affect ungulate population dynamics over time. The model considers patterns in environmental change, human hunting behavior, prey profitability, herd demography, herd movement, and
+animal life history as relevant to this main purpose. The most
+important design concept of the model is the way that we have
+composed and connected the following functional areas in regard
+to prey animal extinction dynamics: (1) human and prey animal
+energetics and foraging, (2) herd animal demography and life history, (3) human and prey mobility and movement, and (4) environmental dynamics. The MHPM contains individual prey animals,
+forager bands, and landscape patches as entities. Each entity type
+has several state variables and attributes, and the model has temporal processes that involve each type of entity. Table 1 lists all of the
+model’s input state variables and maps them to the model entities
+and to the basic functional areas of the model.
+Prey animals can be male or female, and prey animal sex is
+related to payoff and costs to human foragers who may prey
+on them. Prey animal population change is a key process in
+the model. Animals can mate and produce offspring, and female
+prey animals carry offspring through a gestational and weaning
+period, after which offspring become independent animal entities. The foraging payoff of in utero or unweaned offspring is
+added to that of their mothers during this period. Prey animals
+must graze on vegetated landscape patches to maintain energy
+levels. Energy is expended when moving, and animals will
+move toward nearby vegetated patches first, in the same direction as most nearby animals second, or in a random direction
+third. Animals die from old age, starvation (low energy levels),
+intrinsic causes of death (illness, accident, animal predation),
+or by human predation.
+Forager entities are considered to be forager bands (coresidential groups of related human hunter–gatherers) that collectively
+have an energy level that is expended when moving and replenished by hunting prey animals. Energy level affects forager hunting strategy and, optionally, low energy can lead to forager
+starvation and death. Foragers will move toward nearby prey animals first, or in a random direction if no animals are nearby.
+Foragers must hunt to obtain food energy from prey animals,
+but they also expend energy to pursue and process prey.
+Hunting prey animals is one of the most important key processes
+in the model. After a successful hunt, foragers may pause movement until all excess food energy is consumed, or they can leave
+the excess behind and continue to forage. Forager entities employ
+a foraging decision engine to choose whether to, and which animal to hunt. This decision logic is inspired by, but does not
+exactly replicate, classical optimal foraging theory (OFT) forging
+models. OFT has long been employed in archaeology as a baseline
+for understanding how human foraging behavior would play out
+under controlled circumstances with perfect knowledge of conditions and complete rationality (Gremillion, 2002; Codding and
+Bird, 2015). These restrictions have been fodder for many critiques (e.g., Keene, 1983), but we use the ABM formalism to mitigate the strict assumptions of classical OFT by embedding
+optimality decision logic in a changing, dynamic environment
+where foragers have limited knowledge about current conditions.
+Landscape patch entities exist in an abstract square 211 × 211
+gridded landscape universe (44,521 patches) that wraps at the
+edges (like a game of Pac-Man). Patches can be vegetated or
+unvegetated, and vegetation can be removed from vegetated patches
+by the grazing action of animal entities. Vegetation regrowth is
+another key process of the model. Vegetation can regrow on grazed
+
+Modeling post‐Pleistocene megafauna extinctions
+
+3
+
+Table 1. List of MHPM model variables with mappings to variable type, model entity, and general functional area(s) within the model
+Model variable
+
+Type
+
+Entity
+
+Functional area(s)
+
+ticks-per-year
+
+integer
+
+general
+
+temporal
+
+max-ticks
+
+integer
+
+general
+
+temporal
+
+stop-at-max-ticks
+
+Boolean
+
+general
+
+temporal
+
+Output-csv-file
+
+string
+
+general
+
+output
+
+grass-proportion
+
+decimal
+
+landscape patches
+
+spatial, environmental
+
+seasonality
+
+decimal
+
+landscape patches
+
+temporal, environmental
+
+regrowth-time
+
+integer
+
+landscape patches
+
+temporal, environmental
+
+grass-growth
+
+Boolean
+
+landscape patches
+
+temporal, environmental
+
+keep-initial-grass-pattern
+
+Boolean
+
+landscape patches
+
+spatial, environmental
+
+init-foragers
+
+integer
+
+foragers
+
+demographic
+
+foragers-movement-cost
+
+decimal
+
+foragers
+
+temporal, energetics
+
+foraging-radius
+
+integer
+
+foragers
+
+spatial, energetics
+
+food-storage
+
+Boolean
+
+foragers
+
+energetics
+
+immortal-foragers
+
+Boolean
+
+foragers
+
+demographic
+
+init-prey
+
+integer
+
+prey animals
+
+demographic
+
+maximum-lifespan
+
+integer
+
+prey animals
+
+temporal, demographic
+
+age-of-senescence
+
+integer
+
+prey animals
+
+temporal, demographic
+
+internal-mortality
+
+decimal
+
+prey animals
+
+demographic
+
+external-mortality
+
+decimal
+
+prey animals
+
+demographic
+
+max-herd-size
+
+Boolean
+
+prey animals
+
+demographic
+
+stop-at-max-herd-size
+
+Boolean
+
+prey animals
+
+temporal, demographic
+
+animals-movement-cost
+
+decimal
+
+prey animals
+
+temporal, energetics
+
+animals-gain-from-food
+
+decimal
+
+prey animals
+
+energetics
+
+animals-starvation-threshold
+
+integer
+
+prey animals
+
+energetics, demographic
+
+birth-spacing
+
+integer
+
+prey animals
+
+temporal, demographic
+
+food-value-males
+
+integer
+
+prey animals
+
+energetics
+
+processing-cost-males
+
+integer
+
+prey animals
+
+energetics
+
+food-value-females
+
+integer
+
+prey animals
+
+energetics
+
+processing-cost-females
+
+integer
+
+prey animals
+
+energetics
+
+food-value-calf
+
+integer
+
+prey animals
+
+energetics
+
+patches after a specified number of time steps. Optionally, regrowth
+can be constrained to only a portion of the year using a seasonality
+variable. The proportion and spatial patterning of vegetated to nonvegetated patches can be altered, and initially non-vegetated patches
+can be set as persistent non-vegetated areas.
+The temporal and spatial scales of the model are not hardcoded and are determined in relation to the way that parameters
+are set in relation to input data about prey animal life histories,
+environmental variability and dynamics, and human foraging
+strategies. Time units used in NetLogo are “ticks,” and it is
+most useful to scale these to a finite proportion of an annual
+cycle of vegetation growth. Although the landscape patches
+employed in the model are unitless, because animals move from
+one patch to an adjacent patch, it is most useful to consider
+their scale based on approximations of daily distance traveled
+by the particular prey species being modeled.
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+Simulating extinction dynamics with the MHPM
+Background: the extirpation of Syncerus antiquus in the Cape
+Floristic Region of South Africa
+We conducted a set of general modeling experiments with the
+MHPM loosely inspired by the case of the extinction of
+Syncerus antiquus in the Greater Cape Floristic Region in South
+Africa during the Late Quaternary. This case is a useful starting
+place for employing our modeling approach, because it provides
+an opportunity to simulate the confluence of interesting human
+and environmental factors related to megafauna extinction
+dynamics. Syncerus antiquus remains have been found in southern, eastern, and northern Africa, dating as far back as 1 Ma
+(Rossouw, 2001). The population of S. antiquus in South Africa
+became extirpated from the Cape Floristic Region by 12–10 ka
+(Faith, 2014) along with a handful of other large, grazing
+
+4
+
+ungulates, including the Cape zebra (Equus capensis), a giant wildebeest (Megalotragus priscus), and a springbok (Antidorcas australis) (Klein, 1980; Rossouw, 2001; Faith, 2011a; Steele and Klein,
+2013). Within the Cape Floristic Region, S. antiquus was present
+for ca. 1 Ma prior to its extirpation at the end of the Pleistocene
+(Faith, 2013; Steele and Klein, 2013). Although there is no definitive consensus on the drivers of S. antiquus extinction, hypotheses about this extinction have revolved around human
+exploitation of the species as a prey animal, or significant climatic
+and environmental shifts that occurred around the same time as
+the species was extirpated (Klein, 1980; Faith, 2014).
+Anthropogenic explanations of this extinction event began
+with Klein’s (1975, 1976) analysis of S. antiquus remains at the
+Klasies River Mouth site, which revealed a pattern of newborn
+(or late gestational) individuals of S. antiquus alongside mature
+adults. This stands in contrast to other large bovids at the site,
+whose fossil records show a more evenly distributed survivorship
+curve (Klein, 1975, p. 266). Klein hypothesized that this represented an intentional hunting pattern that targeted vulnerable
+individuals to buffer costs associated with hunting larger, dangerous males (Klein, 1975, 1976, 1978), and suggested that, “such a
+pattern could have endangered the survival of the species”
+(Klein, 1975, p. 267). The slower life histories of megafauna in
+general contribute to the plausibility of this hypothesis (e.g.,
+Brook and Johnson, 2006).
+Evidence of hafted microliths and spears appear early in the
+archaeological record of the region (Lombard, 2005; Wurz and
+Lombard, 2007; Wilkins et al., 2012; Schoville et al., 2016), and
+large bovids are frequently present in faunal assemblages at
+archaeological sites across time (Faith, 2011a; Reynard and
+Henshilwood, 2017), including direct evidence of human predation of mature S. antiquus from the Middle Stone Age layers at
+the Klasies River Mouth site (Milo, 1998). Therefore, hunters living during the Pleistocene–Holocene transition at the South
+African Cape were likely capable of taking large game such as
+S. antiquus (Reynard and Wurz, 2020). Additionally, human population density likely grew over the Pleistocene–Holocene transition (Clark and Kandel, 2013; Hallinan and Parkington, 2017),
+which would have amplified any negative effects of human predation on the S. antiquus population.
+Other analyses, however, place greater weight on the significant climatic shifts that occurred across the Pleistocene–
+Holocene transition as part of a process extending back 1 Ma
+(Faith, 2011a, 2014). Widespread evidence suggests there was a
+decline of grassy forage in the region at the end of the
+Pleistocene that likely coincided with increased aridity and a
+decline in the productivity of the remaining grasslands (Klein,
+1978; Schweitzer and Wilson, 1982; Cowling et al., 1999;
+Parkington et al., 2000; Faith, 2013; Klein and Cruz-Uribe,
+2016; Chase et al., 2017, 2019; Faith et al., 2019). These climatic
+events likely had significant effects on the size and density of
+S. antiquus herds, and regression analysis of ungulate abundance
+data from late-middle Pleistocene through the Early Holocene in
+the Cape Floristic Region confirm this (Faith, 2011b). There was
+an overall reduction in biorichness due to changes in primary
+production, which may have combined with rising sea levels
+and localized declining precipitation to greatly diminish the
+paleo-Agulhas plain ecosystem. During the MSA, this expansive
+grassland ecosystem likely supported large numbers of grazing
+ungulates traveling north–south in response to seasonal rainfall
+patterns (Copeland et al., 2016). The loss of this plain was likely
+detrimental to ungulate biorichness in the Cape Floristic Region
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+M.C. Kopels and I.I. Ullah
+
+(Faith, 2011a; Reynard and Wurz, 2020). In other parts of the
+Cape, there was a significant reduction in seasonality at this
+time, characterized by a shift to year-round rainfall regimes
+(Sealy et al., 2016, 2020; Chase et al., 2017; Faith et al., 2019).
+Comparisons to their still-extant close relative, the Cape buffalo (Syncerus caffer), and analysis of co-occurring species in faunal assemblages suggest that S. antiquus was a social grazer that
+sought grassy fodder in expansive, open environments (Reynard
+and Wurz, 2020). Reynard and Wurz (2020) suggested that the
+significant differences in ungulate diversity and richness among
+browsers, mixed-feeders, and grazers (like S. antiquus) observed
+in the archaeological record across time indicate ecological shifts
+among grassy, bushy, and mosaic environments. This suggests
+that S. antiquus may have been vulnerable to ecological changes
+that constrained the availability of open grasslands, causing
+them to either die out or migrate. Syncerus caffer prefers patches
+with higher green-leaf content, which meets their protein (nitrogen) needs (7–8% of diet) (Hildebrandt, 2014). This is particularly
+common when lower-quality food is available (Winnie et al.,
+2008). However, as large ruminants, S. caffer often engage in
+bulk grazing—and appear less picky—when foraging on higher
+quality patches that are “good enough,” suggesting their diets
+are more constrained by the protein content of their fodder
+(Prins, 1989; Ryan, 2006; Winnie et al., 2008). Additionally, it is
+important to note that S. caffer mortality tends to be influenced
+more by resource limitation than predation (Sinclair et al.,
+2003). Multiple lines of paleodietary evidence indicate that
+S. antiquus was a grazer with a similar diet to S. caffer (Faith,
+2014). More details regarding estimations of the life history of
+S. antiquus are available in the Supplemental Text, Section 3,
+but this reconstruction combined with the potential types of
+environmental changes outlined above suggests that the extirpation of S. antiquus from this region could also plausibly have
+been associated with longer (but less productive) growing seasons
+and reduced availability of grassy fodder that decreased its grazing
+niche. Environmental and human hunting hypotheses are not
+necessarily at odds with one another, however, which presents
+an opportunity to employ a simulation approach to clarify how
+human hunting preferences and climate-driven environmental
+dynamics in this ancient SES could have worked, either in tandem
+or individually, to push or pull the South African population of
+S. antiquus towards an extinction threshold.
+Formulating experiments in the MHPM
+We parameterized a set of 24 modeling experiments (Table 3)
+inspired by the types of potential extinction dynamics that may
+have occurred in the greater Cape Floristic Region during the
+Late Quaternary using different combinations of values for environmental patchiness, growing season length, male prey handling
+cost, and forager population size. Three forager population configurations include scenarios with no hunters (init-foragers = 0),
+scenarios with a moderate hunter population (init-foragers =
+10), and scenarios with a larger population of hunters (initforagers = 20). Four different environmental configurations are
+parameterized by two possibilities for the intrinsic patchiness of
+the environment (grass-proportion = 0.33, grass-proportion = 0.66)
+and two possibilities for the length of the growing season (seasonality = 0.4 yr, seasonality = 0.8 yr). Two possibilities for male prey
+handling costs include aggressive males with higher handling
+costs than females (processing-cost-males = 6) or less-aggressive
+males with handling costs equal to those of females (processingcost-males = 3). We set the other parameters of the model
+
+Modeling post‐Pleistocene megafauna extinctions
+
+5
+
+Table 2. Values of all variables used in the experiments presented here.
+Baseline variable values were not changed, but experimental variables were
+allowed to change through the sets of values listed here for a total of 20
+functionally distinct experiments
+Model Variable
+
+Value(s)
+
+ticks-per-year
+
+365
+
+max-ticks
+
+73000
+
+stop-at-max-ticks
+
+True
+
+Output-csv-file
+
+n/a
+
+grass-proportion
+
+0.33, 0.66
+
+seasonality
+
+0.4, 0.8
+
+regrowth-time
+
+3
+
+grass-growth
+
+True
+
+keep-initial-grass-pattern
+
+True
+
+init-foragers
+
+0, 10, 20
+
+foragers-movement-cost
+
+1
+
+foraging-radius
+
+6
+
+food-storage
+
+True
+
+immortal-foragers
+
+True
+
+init-prey
+
+250
+
+maximum-lifespan
+
+10220
+
+age-of-senescence
+
+7300
+
+internal-mortality
+
+0.025
+
+external-mortality
+
+0.0025
+
+max-herd-size
+
+n/a
+
+stop-at-max-herd-size
+
+False
+
+animals-movement-cost
+
+1
+
+animals-gain-from-food
+
+1.5
+
+animals-starvation-threshold
+
+25
+
+birth-spacing
+
+730
+
+food-value-males
+
+30
+
+processing-cost-males
+
+3, 6
+
+food-value-females
+
+27
+
+processing-cost-females
+
+3
+
+food-value-calf
+
+3
+
+(Table 2) in relation to an approximate reconstruction of S. antiquus life history as well as archaeological and paleoecological data
+from the Late Quaternary of the region to help situate these hypothetical experimental scenarios in a reasonably realistic setting. We
+explain these parameterizations in the remainder of this section.
+The MHPM can be computationally expensive, so we needed
+to balance the spatio-temporal complexity of the model runs
+to achieve an acceptable level of detail in a reasonable amount
+of runtime. We set the temporal scale of our experiments to a
+daily granularity (ticks-per-year = 365 ticks). The spatial scale of
+the model is relative. If S. antiquus displayed average walking
+speeds and daily distance movements like those reported for
+S. caffer (∼3.4 km/day, Supplemental Text, Section 3) (Ryan and
+Jordaan, 2005), then the spatial scale of a single patch in our
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+model would be roughly equivalent to ∼911 km2, and the entire
+world would be ∼500,000 km2. These values are relative and
+speculative, however, because the actual daily movement speed
+of S. antiquus is not known. This size of the model world,
+however, provides ample space for large herds to develop and
+self-organize within distinct seasonal home ranges. We set the
+forager search radius to twelve patches, which, using the relative
+values from above, would translate to a “real world” value of
+not more than 40 km. It is important to reiterate that the “search
+radius” of the MHPM is not the same as the “foraging radius” of
+the central place foraging model (e.g., Kelly, 1995), but instead
+delineates the local environment for which a forager agent
+would have some general current knowledge about animal densities while making foraging decisions.
+Syncerus antiquus was larger than S. caffer, with estimates of
+adult weight varying by methodological approach, including
+1300–1800 kg (Klein, 1976), ∼1,000 kg (Smith et al., 2003), or
+∼850 kg (Bibi and Kiessling, 2015). Syncerus antiquus was likely
+a highly sexually dimorphic species with males standing ∼2 m
+tall with broad horns spanning 3 m or more in width (Klein,
+1976). Recalling that food value and handling costs are highly
+generalized in the MHPM, we tuned these parameters to reflect
+differences in food value and processing costs inherent to a sexually dimorphic species (like S. antiquus) and held male prey handling values as an independent variable related to their potential
+for aggressiveness. Recalling that energy units are arbitrary in the
+MHPM (see the ODD protocol in the Supplemental Material for
+detailed equations and descriptions of variables and units) and
+that the maximum forager-energy-value is 100, in these experiments we considered that a large-bodied prey animal would provide substantial payoff. Thus, male prey contribute an intrinsic
+food value of 30 with a processing cost of either 3 or 6, for a
+total payoff of either 27 or 24 energy units. Harvested female
+prey contribute an intrinsic food value of 27 with a fixed processing cost of 3, for a total payoff of 24 energy units. Pregnant or
+recently postpartum female prey provide an additional food
+value of 3 when harvested, which means that females with calves
+will have a combined payoff of 27 energy units, which is equal to
+or greater than the payoff for males, depending on male processing costs. This means that the initial intrinsic prey rankings, as
+well as the outcome of the instantaneous prey choice decision
+model, will differ across experiments. Recalling that forager agents
+are (1) conceptually bands rather than individuals, (2) we intentionally kept the forager agents simple, (3) other food items are
+ignored in the model, and (4) forager energy value is measured
+on an abstract scale of 0–100, a single successful hunt provides
+about a quarter of the maximum forager energy value. The forager
+movement cost is 1, which means that forager bands need to harvest at least one animal per month in order to maintain peak
+energy values. Forager agents will remain stationary after a successful hunt until the entire food value is consumed. These
+parameterizations are comparable to data on big game hunting
+styles and frequencies of successful kills among contemporary
+African hunter–gatherers (Hawkes et al., 1991).
+Prey life history variables were scaled to the temporal granularity of 365 ticks per year and parameterized to be roughly equivalent to the reconstruction of S. antiquus life history through
+comparison to S. caffer and information about other extinct
+large bovines (Supplemental Text, Section 3). We set the prey
+age of senescence to 7300 ticks (20 years) and the prey maximum
+lifespan to 10,220 ticks (28 years) (∼30% longer than values
+reported for S. caffer, Supplemental Text, Section 3). We set the
+
+6
+
+M.C. Kopels and I.I. Ullah
+
+Table 3. Matrix of the 16 experiment scenarios implemented in this research. Each scenario is labeled by a unique numerical code that combines the slider values
+for the four foraging scenarios and the four types of environmental conditions, as denoted by the row and column descriptors
+Environmental Conditions
+Less Patchy
+
+Foraging
+Scenario
+
+Large Forager
+Population
+
+Small Forager
+Population
+
+No Foragers
+
+More Patchy
+
+Long Wet
+Season
+
+Short Wet
+Season
+
+Long Wet
+Season
+
+Short Wet
+Season
+
+Low Male Handling
+Costs
+
+20-3, 0.66–0.8
+
+20-3, 0.66–0.4
+
+20-3, 0.33–0.8
+
+20-3, 0.33–0.4
+
+High Male Handing
+Costs
+
+20-6, 0.66–0.8
+
+20-6, 0.66–0.4
+
+20-6, 0.33–0.8
+
+20-6, 0.33–0.4
+
+Low Male Handling
+Costs
+
+10-3, 0.66–0.8
+
+10-3, 0.66–0.4
+
+10-3, 0.33–0.8
+
+10-3, 0.33–0.4
+
+High Male Handing
+Costs
+
+10-6, 0.66–0.8
+
+10-6, 0.66–0.4
+
+10-6, 0.33–0.8
+
+10-6, 0.33–0.4
+
+Low Male Handling
+Costs
+
+0-3, 0.66–0.8
+
+10-3, 0.66–0.4
+
+10-3, 0.33–0.8
+
+10-3, 0.33–0.4
+
+High Male Handing
+Costs
+
+0-6, 0.66–0.8
+
+10-6, 0.66–0.4
+
+10-6, 0.33–0.8
+
+10-6, 0.33–0.4
+
+prey birth spacing interval to 730 ticks (two years), which approximates a seasonal reproductive schedule where females will, on
+average, produce a new calf every two to three years (∼30% longer
+than the average birth spacing interval for S. caffer, Supplemental
+Text, Section 3; Supplemental Table 1, Supplemental Fig. 2). We
+set the initial population of prey as 400 individuals split evenly
+between males and females, providing approximately 125 ha per
+individual (Supplemental Text, Section 3). We set an external
+mortality rate of 0.0025 (∼1 death per 400 animals), and an internal mortality of 0.025 (∼1 death per 40 animals). The maximum
+animal energy is 100 in the MHPM. We set the animal starvation
+threshold to 25 energy units, the animal movement energy cost to
+1, and the energy gain for a grazed patch of grass to 1.5 energy
+units. This means that a prey agent with a full energy value of
+100 could become resource stressed after 75 days of continuous
+movement without grazing returns but could regain full energy
+in about half a year of continuous grazing returns. Altogether,
+these dietary and life history parameters interact to produce reasonable population dynamics, including senescence curves and
+population growth rates. We set the length of each experiment
+to 73,000 ticks, allowing for population dynamics to play out
+over 200 years, which is ∼10 sequential lifetimes of prey.
+We conducted 40 repeated runs of each scenario (see Table 3)
+to characterize the inter-run variability of each scenario
+(Romanowska, 2015). This resulted in a total of 960 model
+runs. We used the BehaviorSpace tool in NetLogo to set up and
+execute these experiments on a high-performance computer
+with 88 independent compute nodes and 270 gigabytes of
+RAM. Temporal dynamics in male, female, and postpartumfemale populations were saved to delimited text files for each
+run, and we used the Pandas and Seaborn data organization, analysis, and visualization packages in Python to parse, analyze, and
+plot results across all repetitions for each experiment.
+Results
+We measured the probability that each experimental scenario
+could lead to localized extinction, which we defined as a prey
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+animal population of 0 at any point before the full 73,000 ticks.
+Sensitivity analysis, reported in Supplemental Text Section 4, indicates that in the absence of human predation, prey populations are
+stable unless the environment is extremely patchy (grassproportion < 0.2, Supplemental Figs. 3–5). Demographic instability in these conditions is exacerbated by a shortened growing season, particularly when the growing season is less than half a year
+(seasonality < 0.5, Supplemental Figs. 3–5). Adding human foraging pressure to the simulation changes these dynamics. Figure 1
+shows the percentage of repetitions in each model scenario that
+ended in an extinction event, Figure 2 plots the timing of those
+events, and Table 4 summarizes these results. Across environmental scenarios, the main determinant of the timing of extinction
+events is male prey processing costs. When males are low cost
+(foraging scenarios 10-3 and 20-3, Figs. 1a–d and 2a–d), prey
+populations endure for significantly longer times regardless of
+forager population size. With small forager populations and low
+male handling costs (foraging scenario 10-3, Figs. 1a–d and
+2a–d), no extinctions occurred in the less-patchy grassland
+environment scenarios (environmental scenarios 0.66-0.4 and
+0.66-0.8, Figs. 1c, d and 2c, d), and few extinctions occurred in
+the patchy grassland environment scenario when the growing season was long (environmental scenario 0.33-0.8, Figs. 1b and 2b).
+When male prey handling costs are high (foraging scenarios 10-6
+and 20-6, Figs. 1a–d and 2a–d), extinction always occurs quickly,
+regardless of environmental conditions. These poor environmental conditions, exemplified by high patchiness coupled with a
+short growing season (environmental scenario 0.33-0.4, Figs. 1a
+and 2a), elicited the greatest number of extinction events, which
+also occurred earlier in the simulation timeline than other scenarios. No extinctions occurred in the scenarios with no hunters
+(foraging scenarios 0-3 and 0-6, Fig. 1a–d and 2a–d).
+We tracked demographic variability in the prey populations
+within each scenario by recording the proportion of males to
+females at each tick (Fig. 3). This illustrates how male processing
+costs are the primary factor driving differences in hunting strategies. When males have low processing costs (foraging scenarios
+10-3 and 20-3, Fig. 3b, c, upper row of subplots) hunters prefer
+
+Modeling post‐Pleistocene megafauna extinctions
+
+7
+
+Figure 1. Percentage of scenario repetitions ending in an extinction event for the different foraging scenarios tested in this paper. Subplots in the top row represent
+scenarios with sparse patchy grasslands; subplots in the bottom row represent scenarios with fuller, more continuous grasslands. Subplots in the left column
+represent scenarios with a short growing season; subplots in the right column represent scenarios with a long growing season. Foraging scenarios appear
+along the x-axes and are coded as a combination of forager population size (number to left of dash) and male buffalo processing cost (number to right of
+dash; see Table 3 for full experiment codes).
+
+males but exploit all three prey “types” (males, females, and
+postpartum females, Supplemental Figure 6), resulting in a
+female-skewed sex ratio (Fig. 3b, c), these scenarios only lead to
+extinction under poor environmental conditions (Figs. 1a–d and
+2a–d, Table 4) because female-skewed herds still maintain high
+reproductive capacity. This pattern is reminiscent of a traditional
+“overkill” scenario, where the overall quantity of animals killed is
+the main anthropogenic driver of extinction. When males have
+high processing costs (foraging scenarios 10-6 and 20-6, Fig. 3b,
+c, lower row of subplots), hunters will always prefer postpartum
+females because the payoff is the highest. This results in a
+male-skewed sex ratio (Fig. 3b, c, lower row of subplots), which,
+in our model, always leads to extinction because of the concomitant reduction in reproductive capacity of the prey population
+that diminishes the ability of the herd to replace individuals lost
+to human predation. This differs from a purely “overkill” scenario
+because extinction is driven by feedback between prey demography and hunting strategies that culminate in rapid extinction
+when one sex is preferred over the other. Scenarios with no hunting (Fig. 3a) resulted in evenly balanced sex ratios across all environmental scenarios.
+We estimate the environmental effect of prey animal herds
+with an “overgrazing coefficient,” which is the ratio of the number
+of grazed patches to the total possible number of grass-covered
+patches for each scenario (Fig. 4). Human hunting keeps prey
+populations below the emergent carrying capacity of the
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+equivalent environmental conditions when there is no human
+predation (Supplemental Fig. 4). This results in lower overgrazing
+coefficients for all scenarios with any amount of human hunting
+pressure. Scenarios with small forager populations and low-cost
+males (foraging scenario 10-3) resulted in average overgrazing
+coefficients like those of the control runs, especially in the highly
+seasonal but well-vegetated environmental scenario (environmental scenario 0.66-0.4). In general, the highly seasonal environments (environmental scenarios 0.33-0.4 and 0.66-0.4) resulted
+in more highly overgrazed landscapes compared to the lessseasonal ones (environmental scenarios 0.33-0.8 and 0.66-0.8),
+indicating that seasonality reduces an important environmental
+buffer that limits the resilience of herds recovering from human
+predation.
+Additional results are available in Supplemental Text, Section
+5, where we report the number and sex of animals foraged per
+tick (including a separate tally of foraged postpartum female animals, Supplemental Fig. 5), the total number of prey animal births
+and deaths that occurred in each tick of each run (Supplemental
+Fig. 6), the total number of males, females, and postpartum
+females at each time-step of each run (Supplemental Figs. 7, 8),
+and the average animal energy levels at each time-step
+(Supplemental Fig. 8). The patterns in these additional results
+align with those reported above. When male processing cost is
+high, postpartum females become the preferred prey
+(Supplemental Fig. 6). Scenarios that include human hunting
+
+8
+
+M.C. Kopels and I.I. Ullah
+
+Figure 2. Timing of extinction events in each modeled scenario of human predation of prey across all repetitions of each simulation scenario. Subplots in the top
+row represent scenarios with sparse patchy grasslands; subplots in the bottom row represent scenarios with fuller, more continuous grasslands. Subplots in the left
+column represent scenarios with a short growing season; subplots in the right column represent scenarios with a long growing season. Foraging scenarios appear
+along the x-axes and are coded as a combination of forager population size (number to left of dash) and male prey processing cost (number to right of dash; see
+Table 3 for full experiment codes). Each dot represents the time (in number of ticks) where prey populations dropped to zero in a simulation run. The median value
+and 99% confidence interval (determined by bootstrap) of time to extinction in each scenario is overlain in black.
+
+have an overall lower prey animal birth-to-death ratio when compared to scenarios without humans (Supplemental Fig. 6). In these
+situations, prey populations are also smaller (Supplemental Figs. 8,
+9), and seasonal energy dynamics in the overall size of prey populations are dampened (Supplemental Fig. 8).
+
+Discussion
+Feedback and boundary conditions
+The results of our modeling experiments show that when modeled as a complex set of feedbacks, extinction is not necessarily
+a forgone conclusion of any specific human behaviors or of any
+specific sets of environmental conditions. Rather, we can characterize combinations of socio-environmental conditions where the
+probability of extinction is more and less likely. Extinction itself
+occurs when feedback processes self-amplify within the system
+to set prey animal populations on precipitous pathways of decline
+without the possibility of recovery. In other words, under many
+system configurations, extinction can happen, but does not always
+happen. But extinction is much more likely to occur under some
+system configurations than others. In CAS theory, the size and
+configuration of areas of uncertain outcome are related to the
+adaptive capacity of the SES (Preiser et al., 2018). This adaptive
+region is often circumscribed by permeable, dynamically derived,
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+boundary conditions, across which the probability of different system trajectories (e.g., extinction) are more and less definite, but
+which are not necessarily determinable a priori because they
+tend to be emergent properties of the system (Preiser et al.,
+2018). Here, we explore the sets of environmental, anthropogenic,
+and cross-level feedbacks that may control extinction dynamics
+and the emergence of boundary conditions under the set of
+social-environmental conditions that we modeled.
+Environmental patchiness and seasonality interact to influence
+prey animal dispersal and probability of starvation. These dynamics affect the overall likelihood of finding mates and successfully
+reproducing across the different scenarios, thereby influencing
+the resilience of the population of prey animals to additional
+deaths from human hunting. When the environment is patchy
+and highly seasonal (scenario 0.33-0.4), it becomes harder to
+find mates because the dwindling population is spread thinner
+across the landscape. We consider this to be strong negative feedback that increases extinction risk over time, especially if deaths
+due to starvation begin to outweigh births. Comparing the results
+of the sensitivity analysis (Supplemental Fig. 3) with the experiment results (Figs. 1, 2), we see that this value (scenario
+0.33-0.4) is lower without human predations (grass-proportion =
+0.2 when seasonality < 0.6 yr). This is an emergent boundary
+condition that increases the probability of extinction due to
+environmental risk within only a few years.
+
+Modeling post‐Pleistocene megafauna extinctions
+
+9
+
+Table 4. Number and timing of extinction events occurring in each model
+scenario. See Table 3 for explanation of the Experiment ID codes
+Number of repetitions
+ending in extinction
+
+Average number of
+years to extinction
+
+0, 0.33–0.4
+
+0 (0%)
+
+—
+
+0, 0.33–0.8
+
+0 (0%)
+
+—
+
+Experiment ID
+
+0, 0.66–0.4
+
+0 (0%)
+
+—
+
+0, 0.66–0.8
+
+0 (0%)
+
+—
+
+10-3, 0.33–0.4
+
+38 (95%)
+
+116.48 ± 37.41
+
+10-3, 0.33–0.8
+
+3 (7.5%)
+
+185.09 ± 23.15
+
+10-3, 0.66–0.4
+
+0 (0%)
+
+—
+
+10-3, 0.66–0.8
+
+0 (0%)
+
+—
+
+10-6, 0.33–0.4
+
+40 (100%)
+
+5.77 ± 1.38
+
+10-6, 0.33–0.8
+
+40 (100%)
+
+7.14 ± 1.34
+
+10-6, 0.66–0.4
+
+40 (100%)
+
+6.82 ± 1.63
+
+10-6, 0.66–0.8
+
+40 (100%)
+
+8.06 ± 1.62
+
+20-3, 0.33–0.4
+
+40 (100%)
+
+39.32 ± 9.00
+
+20-3, 0.33–0.8
+
+40 (100%)
+
+46.37 ± 8.00
+
+20-3, 0.66–0.4
+
+40 (100%)
+
+52.04 ± 10.36
+
+20-3, 0.66–0.8
+
+40 (100%)
+
+58.13 ± 11.01
+
+20-6, 0.33–0.4
+
+40 (100%)
+
+3.17 ± 0.88
+
+20-6, 0.33–0.8
+
+40 (100%)
+
+3.94 ± 0.92
+
+20-6, 0.66–0.4
+
+40 (100%)
+
+3.63 ± 0.85
+
+20-6, 0.66–0.8
+
+40 (100%)
+
+3.78 ± 0.81
+
+On the other hand, when vegetation is patchy, but the growing
+season is longer (environmental scenario 0.33-0.8), the prey population is scattered and it is easier for individual animals to find
+grazable patches over most of the year. In this environmental scenario, fewer animals die of starvation, and they can still find mates
+with enough frequency to maintain a stable, if not maximally
+large population. We consider this to be “neutral” environmental
+feedback that neither increases nor decreases extinction risk over
+time.
+In a less-patchy environment with a short growing season
+(environmental scenario 0.66-0.4), prey populations tend to coalesce into emergent herds that follow the seasonal regrowth of
+grasses across the landscape. Although grazable grass can become
+seasonally scarce in this scenario, it occurs in contiguous patches
+and most animals can consume enough fodder to prevent excessive deaths due to starvation. The density of animals in the emergent “herds” means that they are also able to easily locate
+potential mates and reproduce. This maintains a large, stable,
+but not maximal population. We consider this environmental scenario to have a slightly positive feedback effect.
+Finally, when grasslands are extensive and the growing season
+is long (environmental scenario 0.66-0.8), fodder is always easy to
+find, and animals rarely enter into starvation conditions. Mates
+are easy to find because the overall population remains high,
+even if not always spatially clumped. Here, maximum population
+sizes are achieved, and we consider this to be a positive feedback
+effect. Again, comparing the experiment results (Figures 1, 2) to
+the sensitivity analysis results (Supplemental Fig. 3), we see that
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+in the absence of human predation, prey populations stabilize
+when grass-proportion > 0.2 and seasonality ≠ 0, which we consider to be another environmental boundary condition, across
+which the risk of extinction from environmental pressure is
+minimal.
+Foraging scenarios that led to preferential hunting patterns targeting postpartum females (foraging scenarios 10-6 and 20-6)
+enhance the chance and speed of extinction events across multiple
+replications, indicating a strong negative feedback process (Figs.
+1a–d, 2a–d). This is an anthropogenic boundary condition of
+the SES that emerges quickly and leads to extinction under all
+but the most favorable environmental conditions. In large
+k-selected species such as S. antiquus and other megafauna, interruptions to breeding can have drastic short- and long-term effects.
+Their slow life histories (particularly their low fecundity and slow
+maturation) make them particularly vulnerable to human predation (Johnson, 2002; Brook and Johnson, 2006). When the time
+between subsequent births is long, the loss of even a single breeding female reduces the overall reproductive rate significantly, especially when the population is small. This becomes a strong
+negative feedback effect when breeding females are targeted systematically as part of a human adaptive strategy. Scenarios with
+large forager populations (foraging scenarios 20-3 and 20-6)
+also enhanced the probability of extinction, but did so because
+of over-harvesting, rather than (or in addition to) disrupting the
+breeding cycle (Figs. 1a–d, 2a–d). This is another anthropogenic
+boundary condition, which aligns closely to the classic “overkill”
+hypotheses of human-caused extinction (e.g., Martin, 1990). On
+the other hand, when a small forager population size combined
+with hunting strategies where males and females were equally targeted (foraging scenario 10-3), human hunting had a minimal
+effect on population dynamics unless the environment was both
+highly seasonal and patchy (Figs. 1a, 2a). This indicates a neutral
+to weak negative feedback loop and suggests the presence of
+another boundary condition across which human predation of
+large prey could be considered sustainable.
+In a SES, socio-environmental feedback can alter the boundary
+conditions in ways that cannot be predicted if the social and natural components are only considered independently. When we
+examine how feedbacks from human hunting pressures combine
+with those from environmental variation across the modeled scenarios, we see distinct patterns in extinction rates. This suggests
+that a new set of cross-feedbacks emerged from these socionatural interactions that are more than simply the sum of the
+individual environmental and anthropogenic effects. For example,
+our experiments show how the addition of human hunting in
+general may reduce the range of sustainable environmental configurations for prey herds (compare Figs. 1 and 2 with
+Supplemental Fig. 3). This potentially introduces new boundary
+conditions, or extends or foreshortens those that already exist.
+In other words, cross-system feedback produces non-linear combination effects that amplify or dampen existing extinction risks.
+Alongside other research (e.g., Braun et al., 2021), these results
+contribute to our understanding of deep-time socio-natural
+dynamics that were keystone to human evolution.
+Insights into the dynamics of Late Quaternary megafauna
+extinctions
+Our model can contribute to broader understandings of Late
+Quaternary megafauna extinction by providing a view of how
+extinction dynamics potentially play out in changing conditions.
+
+10
+
+M.C. Kopels and I.I. Ullah
+
+Figure 3. Scatterplots showing variability in the ratio of male prey to female prey in each simulated foraging scenario. Each dot represents a specific time-step (tick)
+in one of the repetitions of each scenario. The black diagonal dashed line represents parity between the number of males and females. Points falling above this line
+indicate time-steps with an excess of females; points falling below this line indicate time-steps with an excess of males. The left two columns represent scenarios
+with sparse patchy grasslands; the right two columns represent scenarios with fuller, more continuous grasslands. The first and third columns represent scenarios
+with a short growing season; the second and fourth columns represent scenarios with a long growing season. Each row represents a different simulated foraging
+scenario, categorized as a combination of forager population size (number to left of dash) and male prey processing cost (number to right of dash; see Table 3 full
+experiment codes). A 1% sample of all data points is displayed so that the smaller nuances of the data patterns are less obscured by plot marker overlap.
+
+As we discussed in the introduction to this paper, the inductive
+models that archaeologists generally build often struggle to adequately fill in these dynamics, which are never directly preserved
+in the archaeological record. Formal modeling approaches, such
+as the ABM approach we have employed here, offer a robust alternative that stands to help move long-standing debates forward.
+For example, our experiments show that overkill hypotheses,
+which place blame squarely on human hunters, are possible, but
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+are only likely to be correct when a specific set of boundary conditions are surpassed. Recent empirical research corroborates this
+insight, but also begs the need for additional formal modeling
+studies. For example, Bradshaw et al. (2021) and Stewart et al.
+(2021) both failed to confirm simple correlations among human
+population growth, hunting susceptibility, and extinction. Louys
+et al.’s (2021) examination of early insular megafauna extinction
+events conceded that humans could have played a role in island
+
+Modeling post‐Pleistocene megafauna extinctions
+
+11
+
+Figure 4. The “grazing coefficient” (ratio of grazed patches to total initial grass patches) for each model scenario and control model. Red solid line is the mean
+value for all ticks of all repetitions. The dotted lines represent an error envelope at the 1σ level. The dashed line represents the maximum overgrazing coefficient
+recorded for each scenario. The x-axis is labeled by experiment codes, which are explained in Table 3.
+
+extinctions, but their deep-time analysis painted a more complex
+picture of human–animal interactions. Similar work by Boivin
+et al. (2016) and Jukar et al. (2021) showed that large animals
+may potentially coevolve with humans in areas with prolonged
+human–megafauna interactions, such as Africa and India, where
+longer time periods of interaction correlate with a greater number
+of surviving species of megafauna. In another region with a very
+long history of human occupation, Hocknull et al. (2020) suggested that the extinction of northeastern Australian megafauna
+40 ka ago resulted from complex interactions of environmental
+variables (hydroclimate deterioration combined with prolonged
+environmental change). And yet, Brook and Johnson’s (2006)
+examination of megafauna decline in Australia suggested that
+the slow life history of the largest known marsupial, Diprotodon
+optatum, meant that even a slow rate of exploitation of juveniles
+(0.2 kills/yr per capita) would be sufficient to catalyze extinction
+within a few centuries. Similarly, in southeastern Australia, Saltré
+et al. (2019) found that hunting pressure from small human
+groups in search of drinkable water may have interacted with
+environmental pressure accelerating localized extinctions of
+megafauna. Again, these inductive approaches provide tantalizing
+glimpses into past worlds, but do little to help us understand how,
+why, when, and how likely it is that extinctions will occur in different SES across time and space.
+Our modeling results also inform the relative effects of climatic
+and environmental fluctuations in megafauna extinction dynamics. In the case study of S. antiquus, the correlation of extinction
+of species with the decline of grasslands in the greater Cape
+Floristic Region has led many researchers to assume that environmental change was a major causal factor (Klein, 1980; Faith,
+2014). During the Pleistocene–Holocene transition in the Cape
+Floristic Region, it does appear that grasslands contracted while
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+closed habitats expanded (Klein, 1974; Faith, 2011b). At the
+same time, however, the ratio of C4 to C3 grasses was increasing,
+and isotopic analysis of S. antiquus teeth recovered from Nelsons
+Bay shows that they were increasingly focusing on C4 plants
+across this transition (Sealy et al., 2020). Sealy et al. (2020) suggested the shift from C3- to C4-dominant grasslands in the area
+was due to a change from year-round rainfall at the last glacial
+maximum to more seasonal (likely summer) rainfall in the
+Early Holocene.
+These different possible environmental conditions are captured in the four environmental scenarios used in our experiments, which show that it is possible that contracting habitat
+alone may lead to prey animal extinction. But, again, this is not
+a foregone conclusion. Instead, when deleterious anthropogenic
+and environmental conditions amplify due to cross-feedback,
+the probability of crossing an extinction boundary condition
+increases rapidly. In a complimentary example, Seersholm et al.
+(2020) found that DNA dating to the Younger Dryas period in
+Hall’s Cave, Texas demonstrated that although the contracting
+grasslands correlated with decreased biodiversity, taxa that faced
+direct human predation did not survive the Pleistocene–
+Holocene transition (including several species of megafauna).
+The same is not true of taxa that were sheltered from human predation (such as rodents and many plants). These empirical results
+largely align with the behavior of our model.
+Conclusion
+Extinctions are multifaceted, complex events that are highly influenced by risk factors and feedback processes that emerge as a consequence of system dynamics over time. Any successful
+explanation for a particular extinction event must be able to
+
+12
+
+satisfactorily answer three basic questions: (1) Why did this animal go extinct, and not others? (2) Why did extinction occur at
+this time, and not at other times? (3) Why did extinction happen
+in this location, and not others? The proxy nature of the archaeological and paleoecological records makes conclusive answers to
+these questions difficult to find. But, even if they could be
+answered conclusively, the answers may not be particularly useful
+if we want to translate archaeological knowledge and data about
+past extinctions towards understanding (and perhaps even preventing) current and future anthropogenic extinctions. Formal
+deductive models, such as the MHPM, can, however, elucidate
+the boundary conditions of systems and illuminate the feedback
+pathways that make extinction more or less likely occur in past
+SESs. When carefully designed and parameterized in reasonable
+and meaningful ways, modeling can help us learn about the inevitability (or not) of extinction in different scenarios, which is
+knowledge that could be directly put to use in current conservation situations (Johnson et al., 2005; Hjelle et al., 2012; Dearing
+et al., 2014; Barton et al., 2016).
+But much like the earlier calls for interdisciplinary efforts to
+engage archaeologists and conservationists around the concept
+of historical ecology (Balée, 2006; Szabó, 2010; Hjelle et al.,
+2012), modelers and empiricists must work together to make
+this happen. We have shown how models and modeling experiments can be inspired by real archaeological cases. To complete
+the loop, hypotheses about potential past boundary conditions
+that emerge from modeling experiments should inspire new
+archaeological questions and research. In our case study of the
+early Holocene extinction of S. antiquus, four important boundary conditions in the greater Cape Floristic Region during the
+Pleistocene–Holocene transition warrant renewed investigation
+by field scientists: (1) the extent of grassland fragmentation, (2)
+the extremity of the changes in rainfall seasonality, (3) the sex
+ratios of species found in faunal assemblages, and (4) the density
+of human foragers in the region. By combining new empirical data
+with the insights from our modeling experiments, we may be able to
+characterize these boundary conditions with observed data so that,
+following the work of Nielsen et al. (2021), they can become actionable knowledge that can be used to combat the current widespread
+loss of biodiversity. In this way, we can move beyond the practice of
+telling archaeological “just so” stories about the past, and towards a
+future of archaeology as part of a multidisciplinary approach to
+solving contemporary and future problems.
+Supplementary material. The supplementary material for this article can
+be found at https://doi.org/10.1017/qua.2024.6
+Acknowledgments. We would like to thank C.M. Barton for making his
+Diet Breadth NetLogo model freely available for reuse and modification.
+M.C.K. and I.U. conceived and designed the research; I.U. coded the model
+and conducted the experiments; I.U. conducted the statistical analysis of
+model output; M.C.K. and I.U. interpreted the results; and M.C.K. and I.U.
+authored the paper. This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors.
+Computational resources in the Computational Archaeology Laboratory at
+San Diego State University were used to develop the MHPM and to run
+and analyze the simulations.
+Software and Data Availability. The Megafauna Hunting Pressure Model
+was created in NetLogo 6.3.0 (Wilensky, 1999) and is made freely available
+under the GNU GPL version 3. The code for this project is hosted at
+https://github.com/isaacullah/MegafaunaHuntingPressure. The static release
+of version 1.1 of the model was used for the experiments presented here
+and can be referenced with the following: https://doi.org/10.5281/zenodo.
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+M.C. Kopels and I.I. Ullah
+7686273. The simulation output data and the Python scripts used for statistical
+analysis for the experiments presented in this paper can be accessed at the following permalink, https://osf.io/sbau2/, and referenced with https://doi.org/10.
+17605/osf.io/sbau2.
+
+References
+Andermann, T., Faurby, S., Turvey, S.T., Antonelli, A., Silvestro, D., 2020.
+The past and future human impact on mammalian diversity. Science
+Advances 6, eabb2313. https://doi.org/10.1126/sciadv.abb2313.
+Balée, W., 2006. The research program of historical ecology. Annual Reviews of
+Anthropology 35, 75–98.
+Bankes, S.C., 2002. Agent-based modeling: a revolution? Proceedings of the
+National Academy of Sciences 99, 7199–71200.
+Barnosky, A.D., Koch, P.L., Feranec, R.S., Wing, S.L., Shabel, A.B., 2004.
+Assessing the causes of late Pleistocene extinctions on the continents.
+Science 306, 70–75.
+Barton, C.M., Ullah, I.I.T., Bergin, S.M., Sarjoughian, H.S., Mayer, G.R.,
+Bernabeu-Auban, J.E., Heimsath, A.M., Acevedo, M.F., Riel-Salvatore,
+J.G., Arrowsmith, J.R., 2016. Experimental socioecology: integrative science for Anthropocene landscape dynamics. Anthropocene 13, 34–45.
+Bibi, F., Kiessling, W., 2015. Continuous evolutionary change in
+Plio-Pleistocene mammals of eastern Africa. Proceedings of the National
+Academy of Sciences 112, 10623–10628.
+Boivin, N.L., Zeder, M.A., Fuller, D.Q., Crowther, A., Larson, G.,
+Erlandson, J.M., Denham, T., Petraglia, M.D., 2016. Ecological consequences of human niche construction: examining long-term anthropogenic
+shaping of global species distributions. Proceedings of the National Academy
+of Sciences 113, 6388–6396.
+Box, G.E., Draper, N.R., 1987. Empirical Model-Building and Response
+Surfaces. John Wiley & Sons, New York.
+Bradshaw, C.J.A., Johnson, C.N., Llewelyn, J., Weisbecker, V., Strona, G.,
+Saltré, F., 2021. Relative demographic susceptibility does not explain the
+extinction chronology of Sahul’s megafauna. eLife 10, e63870. https://doi.
+org/10.7554/eLife.63870
+Braje, T.J., Erlandson, J.M., 2013. Human acceleration of animal and plant
+extinctions: a late Pleistocene, Holocene, and Anthropocene continuum.
+In: Erlandson, J.M., Braje, T.J. (Eds.), Anthropocene, When Humans
+Dominated the Earth: Archeological Perspectives on the Anthropocene.
+Anthropocene 4, 14–23.
+Braun, D.R., Faith, J.T., Douglass, M.J., Davies, B., Power, M.J., Aldeias, V.,
+Conard, N.J., et al., 2021. Ecosystem engineering in the Quaternary of the
+West Coast of South Africa. Evolutionary Anthropology: Issues, News, and
+Reviews 30, 50–62.
+Brook, B.W., Johnson, C.N., 2006. Selective hunting of juveniles as a cause of
+the imperceptible overkill of the Australian Pleistocene megafauna.
+Alcheringa 30, 39–48.
+Ceballos, G., Ehrlich, P.R., Barnosky, A.D., García, A., Pringle, R.M.,
+Palmer, T.M., 2015. Accelerated modern human-induced species losses:
+entering the sixth mass extinction. Science Advances 1, e1400253. https://
+doi.org/10.1126/sciadv.1400253.
+Chase, B.M., Chevalier, M., Boom, A., Carr, A.S., 2017. The dynamic relationship between temperate and tropical circulation systems across South
+Africa since the last glacial maximum. Quaternary Science Reviews 174,
+54–62.
+Chase, B.M., Boom, A., Carr, A.S., Chevalier, M., Quick, L.J., Verboom,
+G.A., Reimer, P.J., 2019. Extreme hydroclimate response gradients within
+the Western Cape floristic region of South Africa since the last glacial
+maximum. Quaternary Science Reviews 219, 297–307.
+Clark, J.L., Kandel, A.W., 2013. The evolutionary implications of variation in
+human hunting strategies and diet breadth during the Middle Stone Age of
+southern Africa. Current Anthropology 54, S269–S287.
+Codding, B.F., Bird, D.W., 2015. Behavioral ecology and the future of archaeological science. In: Torrence, R., Rehren, T., Martinón-Torres, M. (Eds.),
+Scoping the Future of Archaeological Science: Papers in Honour of
+Richard Klein. Journal of Archaeological Science 56, 9–20.
+Copeland, S.R., Cawthra, H.C., Fisher, E.C., Lee-Thorp, J.A., Cowling,
+R.M., le Roux, P.J., Hodgkins, J., Marean, C.W., 2016. Strontium isotope
+
+Modeling post‐Pleistocene megafauna extinctions
+investigation of ungulate movement patterns on the Pleistocene
+Paleo-Agulhas Plain of the Greater Cape Floristic Region, South Africa.
+Quaternary Science Reviews 141, 65–84.
+Cowling, R.M., Cartwright, C.R., Parkington, J.E., Allsopp, J.C., 1999. Fossil
+wood charcoal assemblages from Elands Bay Cave, South Africa: implications for Late Quaternary vegetation and climates in the winter-rainfall
+Fynbos biome. Journal of Biogeography 26, 367–378.
+Daems, D., 2021. Social Complexity and Complex Systems in Archaeology.
+Routledge, London.
+Dearing, J.A., Wang, R., Zhang, K., Dyke, J.G., Haberl, H., Hossain, Md.S.,
+Langdon, P.G., et al., 2014. Safe and just operating spaces for regional
+social-ecological systems. Global Environmental Change 28, 227–238.
+Epstein, J.M., 1999. Agent-based computational models and generative social
+science. Complexity 4, 4–46.
+Faith, J.T., 2011a. Ungulate community richness, grazer extinctions, and
+human subsistence behavior in southern Africa’s Cape Floral Region.
+Palaeogeography, Palaeoclimatology, Palaeoecology 306, 219–227.
+Faith, J.T., 2011b. Ungulate biogeography, statistical methods, and the proficiency of Middle Stone Age hunters. Journal of Human Evolution 60,
+315–317.
+Faith, J.T., 2013. Taphonomic and paleoecological change in the large mammal sequence from Boomplaas Cave, western Cape, South Africa. Journal of
+Human Evolution 65, 715–730.
+Faith, J.T., 2014. Late Pleistocene and Holocene mammal extinctions on continental Africa. Earth-Science Reviews 128, 105–121.
+Faith, J.T., Chase, B.M., Avery, D.M., 2019. Late Quaternary micromammals
+and the precipitation history of the southern Cape, South Africa.
+Quaternary Research 91, 848–860. https://doi.org/10.1017/qua.2018.105
+Faith, J.T., Rowan, J., Du, A., Barr, W.A., 2020. The uncertain case for
+human-driven extinctions prior to Homo sapiens. Quaternary Research
+96, 88–104.
+Finn, C., Grattarola, F., Pincheira-Donoso, D., 2023. More losers than winners: investigating Anthropocene defaunation through the diversity of population trends. Biological Reviews 98, 1732–1748.
+Glaser, M., Ratter, B.M.W., Krause, G., Welp, M., 2012. New approaches to
+the analysis of human–nature relations. In: Glaser, M., Ratter, B.M.W.,
+Krause, G., Welp, M. (Eds.), Human–Nature Interactions in the
+Anthropocene: Potentials of Social-Ecological Systems Analysis. Routledge,
+New York, pp. 1–12.
+Gremillion, K.J., 2002. Foraging theory and hypothesis testing in archaeology:
+an exploration of methodological problems and solutions. Journal of
+Anthropological Archaeology 21, 142–164.
+Grimm, V., Berger, U., Bastiansen, F., Eliassen, S., Ginot, V., Giske, J., GossCustard, J., et al., 2006. A standard protocol for describing individual-based
+and agent-based models. Ecological Modelling 198, 115–126.
+Grimm, V., Berger, U., DeAngelis, D.L., Polhill, J.G., Giske, J., Railsback,
+S.F., 2010. The ODD protocol: a review and first update. Ecological
+Modelling 221, 2760–2768.
+Grimm, V., Railsback, S.F., Vincenot, C.E., Berger, U., Gallagher, C.,
+DeAngelis, D.L., Edmonds, B., et al., 2020. The ODD protocol for describing agent-based and other simulation models: a second update to improve
+clarity, replication, and structural realism. Journal of Artificial Societies and
+Social Simulation 23, 7. https://doi.org/10.18564/jasss.4259.
+Hallinan, E., Parkington, J., 2017. Stone Age landscape use in the Olifants
+River Valley, Clanwilliam, western Cape, South Africa. Azania: Archaeological
+Research in Africa 52, 324–372.
+Hawkes, K., O’Connell, J.F., Blurton Jones, N.G., 1991. Hunting income patterns among the Hadza: big game, common goods, foraging goals and the
+evolution of the human diet. Philosophical Transactions of the Royal Society
+London B. Biological Sciences 334, 243–251.
+Hildebrandt, W.R., 2014. Management and reproduction of the African
+savanna buffalo (Syncerus caffer caffer). Master’s thesis, Stellenbosch
+University, Stellenbosch, South Africa.
+Hjelle, K.L., Kaland, S., Kvamme, M., Lødøen, T.K., Natlandsmyr, B., 2012.
+Ecology and long-term land-use, palaeoecology and archaeology—the usefulness of interdisciplinary studies for knowledge-based conservation and
+management of cultural landscapes. International Journal of Biodiversity
+Science, Ecosystem Services & Management 8, 321–337.
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+13
+Hocknull, S.A., Lewis, R., Arnold, L.J., Pietsch, T., Joannes-Boyau, R., Price,
+G.J., Moss, P., et al., 2020. Extinction of eastern Sahul megafauna coincides
+with sustained environmental deterioration. Nature Communications 11,
+2250. https://doi.org/10.1038/s41467-020-15785-w.
+Holland, J.H., 1992. Complex adaptive systems. Daedalus 121, 17–30.
+Johnson, C.N., 2002. Determinants of loss of mammal species during the Late
+Quaternary ‘megafauna’ extinctions: life history and ecology, but not body
+size. Proceedings of the Royal Society B Biological Sciences 269, 2221–2227.
+Johnson, D.C., Kohler, T., Cowan, J., 2005. Modeling historical ecology, thinking about contemporary systems. American Anthropologist 107, 96–107.
+Jukar, A.M., Lyons, S.K., Wagner, P.J., Uhen, M.D., 2021. Late Quaternary
+extinctions in the Indian Subcontinent. Palaeogeography, Palaeoclimatology,
+Palaeoecology 562, 110137. https://doi.org/10.1016/j.palaeo.2020.110137.
+Keene, A.S., 1983. Biology, behavior, and borrowing: a critical examination of
+optimal foraging theory in archaeology. In: Moore, J.A., Keene, A.S. (Eds.),
+Archaeological Hammers and Theories. Academic Press, New York,
+London, pp. 137–155.
+Kelly, R.L., 1995. The Foraging Spectrum: Diversity in Hunter-Gatherer
+Lifeways. Smithsonian Institution Press, Washington, D.C.
+Klein, R., 1974. Environment and subsistence of prehistoric man in the southern Cape Province, South Africa. World Archaeology 5, 249–284.
+Klein, R., 1975. Middle Stone Age man–animal relationships in southern
+Africa: evidence from Die Kelders and Klasies River mouth. Science 190,
+265–267.
+Klein, R., 1976. The mammalian fauna of the Klasies River Mouth Sites,
+Southern Cape Province, South Africa. The South African Archaeological
+Bulletin 31, 75–98.
+Klein, R., 1978. Stone age predation on large African bovids. Journal of
+Archaeological Science 5, 195–217.
+Klein, R., 1980. Environmental and ecological implications of large mammals
+from upper Pleistocene and Holocene sites in southern Africa. Annals of the
+South African Museum 81, 223–283.
+Klein, R., Cruz-Uribe, K., 2016. Large mammal and tortoise bones from
+Elands Bay Cave (South Africa): implications for Later Stone Age environment and ecology. Southern African Humanities 29, 259–282.
+Koch, P., Barnosky, A., 2006. Late Quaternary extinctions: state of the debate.
+Annual Review of Ecology, Evolution, and Systematics 37, 215–250.
+Kohler, T.A., 2012. Complex systems and archaeology. Archaeological Theory
+Today 2012, 93–123.
+Lombard, M., 2005. Evidence of hunting and hafting during the Middle Stone
+Age at Sibidu Cave, KwaZulu-Natal, South Africa: a multianalytical
+approach. Journal of Human Evolution 48, 279–300.
+Louys, J., Braje, T.J., Chang, C.-H., Cosgrove, R., Fitzpatrick, S.M., Fujita,
+M., Hawkins, S., et al., 2021. No evidence for widespread island extinctions
+after Pleistocene hominin arrival. Proceedings of the National Academy of
+Sciences 118, e2023005118. https://doi.org/10.1073/pnas.2023005118.
+Lyons, S.K., Smith, F.A., Wagner, P.J., White, E.P., Brown, J.H., 2004. Was a
+‘hyperdisease’ responsible for the late Pleistocene megafaunal extinction?
+Ecological Letters 7, 859–868.
+Martin, P.S., 1990. 40,000 years of extinctions on the “planet of doom.” Global
+and Planetary Change 2, 187–201.
+Milo, R.G., 1998. Evidence for hominid predation at Klasies River mouth,
+South Africa, and its implications for the behaviour of early modern
+humans. Journal of Archaeological Science 25, 99–133.
+Mitchell, M., 2009. Complexity: A Guided Tour. Oxford University Press.
+Oxford, UK, New York.
+Nielsen, K.S., Marteau, T.M., Bauer, J.M., Bradbury, R.B., Broad, S.,
+Burgess, G., Burgman, M., et al., 2021. Biodiversity conservation as a
+promising frontier for behavioural science. Nature Human Behaviour 5,
+550–556.
+Parkington, J., Cartwright, C., Cowling, R.M., Baxter, A., Meadows, M.,
+2000. Palaeovegetation at the last glacial maximum in the western Cape,
+South Africa: wood charcoal and pollen evidence from Elands Bay Cave.
+South African Journal of Science 96, 543–546.
+Preiser, R., Biggs, R., De Vos, A., Folke, C., 2018. Social-ecological systems as
+complex adaptive systems: organizing principles for advancing research
+methods and approaches. Ecology and Society 23, 46. https://doi.org/10.
+5751/ES-10558-230446.
+
+14
+Prins, H.H.T., 1989. Condition changes and choice of social environment in
+African buffalo bulls. Behaviour 108, 297–323.
+Railsback, S., Grimm, V., 2019. Agent-Based and Individual-Based Modeling.
+A Practical Introduction, 2nd ed. Princeton University Press, Princeton, NJ.
+Reynard, J.P., Henshilwood, C.S., 2017. Subsistence strategies during the late
+Pleistocene in the southern Cape of South Africa: comparing the Still Bay of
+Blombos Cave with the Howiesons Poort of Klipdrift Shelter. Journal of
+Human Evolution 108, 110–130.
+Reynard, J.P., Wurz, S., 2020. The palaeoecology of Klasies River, South
+Africa: an analysis of the large mammal remains from the 1984–1995 excavations of Cave 1 and 1A. Quaternary Science Reviews 237, 106301. https://
+doi.org/10.1016/j.quascirev.2020.106301.
+Robinson, D.T., Brown, D.G., Parker, D.C., Schreinemachers, P., Janssen,
+M.A., Huigen, M., Wittmer, H., Gotts, N., Promburom, P., Irwin, E.,
+2007. Comparison of empirical methods for building agent-based models
+in land use science. Journal of Land Use Science 2, 31–55.
+Romanowska, I., 2015. So you think you can model? A guide to building and
+evaluating archaeological simulation models of dispersals. Human Biology
+87, 169–192.
+Romanowska, I., Wren, C.D., Crabtree, S.A., 2021. Agent-Based Modeling for
+Archaeology: Simulating the Complexity of Societies. SFI Press, Santa Fe
+Institute, Santa Fe, NM.
+Rossouw, L., 2001. The extinct giant long-horned buffalo of Africa (Pelorovis
+antiquus). Culna 56, 14–15.
+Rounsevell, M.D.A., Robinson, D.T., Murray-Rust, D., 2012. From actors to
+agents in socio-ecological systems models. Philosophical Transactions of the
+Royal Society B Biological Sciences 367, 259–269.
+Ryan, S.J., 2006. Spatial Ecology of African Buffalo and their Resources in a
+Savanna Ecosystem. Ph.D. dissertation, University of California, Berkeley,
+Berkeley, California.
+Ryan, S.J., Jordaan, W., 2005. Activity patterns of African buffalo Syncerus
+caffer in the Lower Sabie Region, Kruger National Park, South Africa.
+Koedoe 48, 117–124.
+Sabloff, J.A., 2016. Archaeology Matters: Action Archaeology in the Modern
+World. Routledge, London, New York. [first published in 2008]
+Saltré, F., Chadoeuf, J., Peters, K.J., McDowell, M.C., Friedrich, T.,
+Timmermann, A., Ulm, S., Bradshaw, C.J.A., 2019. Climate–human interaction associated with southeast Australian megafauna extinction patterns.
+Nature Communications 10, 5311. https://doi.org/10.1038/s41467-019-13277-0.
+Schoville, B.J., Brown, K.S., Harris, J.A., Wilkins, J., 2016. New experiments
+and a model-driven approach for interpreting Middle Stone Age lithic point
+function using the edge damage distribution method. PLoS ONE 11,
+e0164088. https://doi.org/10.1371/journal.pone.0164088.
+Schweitzer, F.R., Wilson, M.L., 1982. A Late Quaternary living site in the southern
+Cape Province, South Africa. Annals of the South African Museum 88, 1–203.
+Sealy, J., Lee-Thorp, J., Loftus, E., Faith, J.T., Marean, C.W., 2016. Late
+Quaternary environmental change in the Southern Cape, South Africa,
+from stable carbon and oxygen isotopes in faunal tooth enamel from
+Boomplaas Cave. Journal of Quaternary Science 31, 919–927.
+Sealy, J., Naidoo, N., Hare, V.J., Brunton, S., Faith, J.T., 2020. Climate and
+ecology of the palaeo-Agulhas Plain from stable carbon and oxygen isotopes
+
+https://doi.org/10.1017/qua.2024.6 Published online by Cambridge University Press
+
+M.C. Kopels and I.I. Ullah
+in bovid tooth enamel from Nelson Bay Cave, South Africa. In: Cleghorn,
+N., Potts, A., Cawthra, H. (Eds.), The Palaeo-Agulhas Plain: A Lost
+World and Extinct Ecosystem. Quaternary Science Reviews 235, 105974.
+https://doi.org/10.1016/j.quascirev.2019.105974.
+Seersholm, F.V., Werndly, D.J., Grealy, A., Johnson, T., Keenan Early, E.M.,
+Lundelius, E.L., Winsborough, B., et al., 2020. Rapid range shifts and
+megafaunal extinctions associated with late Pleistocene climate change.
+Nature Communications 11, 2770. https://doi.org/10.1038/s41467-02016502-3.
+Sinclair, A.R.E., Mduma, S., Brashares, J.S., 2003. Patterns of predation in a
+diverse predator–prey system. Nature 425, 288–290.
+Smith, F.A., Lyons, S.K., Ernest, S.K.M., Jones, K.E., Kaufman, D.M.,
+Dayan, T., Marquet, P.A., Brown, J.H., Haskell, J.P., 2003. Body mass
+of Late Quaternary mammals. Ecology 84, 3402. https://doi.org/10.1890/
+02-9003
+Steele, T.E., Klein, R., 2013. The Middle and Later Stone Age faunal remains
+from Diepkloof Rock Shelter, Western Cape, South Africa. Journal of
+Archaeological Science 40, 3453–3462.
+Stewart, M., Carleton, W.C., Groucutt, H.S., 2021. Climate change, not
+human population growth, correlates with Late Quaternary megafauna
+declines in North America. Nature Communications 12, 965. https://doi.
+org/10.1038/s41467-021-21201-8.
+Szabó, P., 2010. Why history matters in ecology: an interdisciplinary perspective. Environmental Conservation 37, 380–387.
+Turney, C.S.M., Flannery, T.F., Roberts, R.G., Reid, C., Fifield, L.K.,
+Higham, T.F.G., Jacobs, Z., et al., 2008. Late-surviving megafauna in
+Tasmania, Australia, implicate human involvement in their extinction.
+Proceedings of the National Academy of Sciences 105, 12150–12153.
+van der Kaars, S., Miller, G.H., Turney, C.S.M., Cook, E.J., Nürnberg, D.,
+Schönfeld, J., Kershaw, A.P., Lehman, S.J., 2017. Humans rather than
+climate the primary cause of Pleistocene megafaunal extinction in
+Australia. Nature Communications 8, 14142. https://doi.org/10.1038/
+ncomms14142.
+Walker, B., Gunderson, L., Kinzig, A., Folke, C., Carpenter, S., Schultz, L.,
+2006. A handful of heuristics and some propositions for understanding
+resilience in social-ecological systems. Ecology & Society 11, 13. https://
+doi.org/10/gc95xz.
+Wilensky, U., 1999. NetLogo. Center for Connected Learning and
+Computer-Based Modeling. Northwestern University, Evanston, Illinois.
+http://ccl.northwestern.edu/netlogo/.
+Wilensky, U., Rand, W., 2015. An Introduction to Agent-Based Modeling:
+Modeling Natural, Social, and Engineered Complex Systems with NetLogo.
+The MIT Press, Cambridge, MA.
+Wilkins, J., Schoville, B.J., Brown, K.S., Chazan, M., 2012. Evidence for early
+hafted hunting technology. Science 338, 942–946.
+Winnie, J.A., Jr., Cross, P., Getz, W., 2008. Habitat quality and heterogeneity
+influence distribution and behavior in African buffalo (Syncerus caffer).
+Ecology 89, 1457–1468.
+Wurz, S., Lombard, M., 2007. 70,000-year-old geometric backed tools from
+the Howiesons Poort at Klasies River, South Africa: were they used for
+hunting? Southern African Humanities 19, 1–16.
+
+

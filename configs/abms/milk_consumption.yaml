@@ -2,16 +2,16 @@ name: milk_consumption
 metric_pattern: mean-incum
 metric_description: average weekly whole milk consumption per agent
 plot_descriptions:
-  - average weekly whole milk consumption per agent
-  - average weekly skimmed and semi-skimmed milk consumption per agent
-  - total number of whole milk choices
-  - total number of skimmed or semi-skimmed choices
-  - total milk choices made by all agents
-  - mean whole milk quantity consumed
-  - mean skimmed/semi-skimmed quantity consumed
-  - mean whole-milk habit factor
-  - mean skimmed/semi-skimmed habit factor
-  - mean choice function deviation
-  - mean health value deviation
-  - mean environmental value deviation
+  - "The attachment is the plot representing the average weekly consumption of whole milk per agent."
+  - "The attachment is the plot representing the average weekly consumption of skimmed and semi-skimmed milk per agent."
+  - "The attachment is the plot representing the total number of times agents have chosen whole milk."
+  - "The attachment is the plot representing the total number of times agents have chosen skimmed or semi-skimmed milk."
+  - "The attachment is the plot representing the total number of milk choices made by all agents combined."
+  - "The attachment is the plot representing the mean quantity of whole milk consumed by agents."
+  - "The attachment is the plot representing the mean quantity of skimmed and semi-skimmed milk consumed by agents."
+  - "The attachment is the plot representing the mean factor applied to the whole milk choice function due to habit."
+  - "The attachment is the plot representing the mean factor applied to the skimmed and semi-skimmed milk choice function due to habit."
+  - "The attachment is the plot representing the mean percentage difference between the maximum and minimum choice function scores among agents."
+  - "The attachment is the plot representing the mean deviation between the agents' held health values and the implied values by their milk choices."
+  - "The attachment is the plot representing the mean deviation between the agents' held environmental values and the implied values by their milk choices."
 default_input_csv: Code/Models/Milk Consumption/CSV/reducedmilk.csv

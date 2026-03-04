@@ -178,8 +178,8 @@ Defined in `configs/abms/*.yaml`.
 
 | ABM | `metric_pattern` | `metric_description` | `plot_descriptions` count |
 | --- | --- | --- | ---: |
-| Fauna | `count-species` | `species abundance dynamics across repeated fauna simulations` | 5 |
-| Grazing | `grass-density` | `grazing pressure and vegetation regeneration dynamics` | 5 |
+| Fauna | `count-species` | `species abundance dynamics across repeated fauna simulations` | 14 |
+| Grazing | `household-risk-att-init` | `grazing pressure and vegetation regeneration dynamics` | 10 |
 | Milk consumption | `mean-incum` | `average weekly whole milk consumption per agent` | 12 |
 
 ## 9. Visualization defaults
@@ -235,3 +235,10 @@ Each pipeline run writes `pipeline_run_metadata.json` including:
 - prompt signatures (`sha256`)
 - summarizer enablement and numeric settings
 - score outputs and artifact paths
+- scoring reference details (`scores.reference.source/path/signature/length`)
+
+When running with `--abm`, the scoring reference file is selected from `configs/notebook_experiment_settings.yaml`:
+
+- `fauna` -> `scoring.fauna_ground_truth_path`
+- `grazing` -> `scoring.grazing_ground_truth_path`
+- `milk_consumption` -> `scoring.milk_ground_truth_path`

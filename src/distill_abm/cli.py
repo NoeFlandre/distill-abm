@@ -7,7 +7,7 @@ from typing import Annotated, cast
 
 import typer
 
-from distill_abm.configs.loader import load_abm_config, load_prompts_config
+from distill_abm.configs.loader import load_abm_config, load_notebook_experiment_settings, load_prompts_config
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
@@ -93,12 +93,14 @@ def run(
 ) -> None:
     """Runs one end-to-end pipeline execution from CSV to scored report."""
     prompts = load_prompts_config(prompts_path)
+    scoring_reference_path: Path | None = None
     if abm:
         abm_config = load_abm_config(Path("configs/abms") / f"{abm}.yaml")
         metric_pattern = abm_config.metric_pattern
         metric_description = abm_config.metric_description
         if plot_description is None and abm_config.plot_descriptions:
             plot_description = abm_config.plot_descriptions[0]
+        scoring_reference_path = _resolve_scoring_reference_path(abm)
     adapter = create_adapter(provider=provider, model=model)
     result = run_pipeline(
         inputs=PipelineInputs(
@@ -115,6 +117,7 @@ def run(
             summarization_mode=summarization_mode,
             additional_summarizers=_parse_additional_summarizers(additional_summarizer),
             score_on=score_on,
+            scoring_reference_path=scoring_reference_path,
         ),
         prompts=prompts,
         adapter=adapter,
@@ -216,10 +219,15 @@ def smoke_qwen(
         bool,
         typer.Option(help="Skip prompt-combination sweep execution in the smoke suite."),
     ] = not RUNTIME_DEFAULTS.smoke.run_sweep,
+    resume: Annotated[
+        bool,
+        typer.Option("--resume/--no-resume", help="Reuse existing smoke artifacts and skip already completed work."),
+    ] = True,
 ) -> None:
     """Runs full Qwen smoke validation across evidence/text modes plus DoE and sweep artifacts."""
     prompts = load_prompts_config(prompts_path)
     sweep_plot_descriptions: list[str] | None = None
+    scoring_reference_path: Path | None = None
     if abm:
         abm_config = load_abm_config(Path("configs/abms") / f"{abm}.yaml")
         metric_pattern = abm_config.metric_pattern
@@ -227,6 +235,7 @@ def smoke_qwen(
         if plot_description is None and abm_config.plot_descriptions:
             plot_description = abm_config.plot_descriptions[0]
         sweep_plot_descriptions = list(abm_config.plot_descriptions)
+        scoring_reference_path = _resolve_scoring_reference_path(abm)
     adapter = create_adapter(provider="ollama", model=model)
     result = run_qwen_smoke_suite(
         inputs=SmokeSuiteInputs(
@@ -240,12 +249,14 @@ def smoke_qwen(
             plot_description=plot_description,
             sweep_plot_descriptions=sweep_plot_descriptions,
             additional_summarizers=_parse_additional_summarizers(additional_summarizer),
+            scoring_reference_path=scoring_reference_path,
         ),
         prompts=prompts,
         adapter=adapter,
         run_qualitative=not skip_qualitative,
         doe_input_csv=doe_input_csv,
         run_sweep=not skip_sweep,
+        resume_existing=resume,
     )
     typer.echo(f"smoke report (markdown): {result.report_markdown_path}")
     typer.echo(f"smoke report (json): {result.report_json_path}")
@@ -273,6 +284,20 @@ def _parse_additional_summarizers(values: list[str] | None) -> tuple[AdditionalS
             f"unsupported additional summarizer(s): {', '.join(invalid)}. Allowed: t5, longformer_ext."
         )
     return cast(tuple[AdditionalSummarizer, ...], normalized)
+
+
+def _resolve_scoring_reference_path(abm: str) -> Path:
+    settings = load_notebook_experiment_settings(Path("configs/notebook_experiment_settings.yaml"))
+    mapping = {
+        "fauna": settings.scoring.fauna_ground_truth_path,
+        "grazing": settings.scoring.grazing_ground_truth_path,
+        "milk_consumption": settings.scoring.milk_ground_truth_path,
+    }
+    if abm not in mapping:
+        raise typer.BadParameter(
+            f"unsupported ABM for scoring reference: {abm}. Allowed: fauna, grazing, milk_consumption."
+        )
+    return Path(mapping[abm])
 
 
 if __name__ == "__main__":
