@@ -1,17 +1,17 @@
 # distill-abm
 
-Production Python package for ABM-to-LLM distillation with reference-parity validation.
+Production Python package for ABM-to-LLM distillation, report generation, and evaluation.
 
 ## Repository layout
 
 - `src/distill_abm/` - production code
-- `tests/` - unit, integration, CLI, and parity tests
+- `tests/` - unit, integration, and end-to-end tests
 - `configs/` - runtime defaults for prompts, ABMs, evaluation, and logging
-- `configs/notebook_prompt_reference.yaml` - reference templates extracted from scripts
-- `configs/notebook_experiment_settings.yaml` - captured experiment defaults for ingestion and summarization
+- `configs/notebook_prompt_reference.yaml` - frozen reference prompt templates (filename retained for compatibility)
+- `configs/notebook_experiment_settings.yaml` - frozen reference experiment settings (filename retained for compatibility)
 - `archive/reference_repo/` - preserved reference implementation snapshot (scripts + artifacts)
-- `tests/fixtures/notebook_parity/` - canonical mirrored fixtures used for migration coverage
-- `docs/` - architecture, parity, and audit evidence
+- `tests/fixtures/notebook_parity/` - mirrored reference fixtures used for reproducibility checks
+- `docs/` - architecture, walkthrough, hyperparameters, and testing evidence
 
 ## Codebase organization
 
@@ -39,9 +39,16 @@ distill-abm/
 └── archive/reference_repo/   # retained reference scripts
 ```
 
-Compatibility imports are preserved as `distill_abm.compat` shims for backward compatibility.
+Compatibility imports are preserved as `distill_abm.compat` shims for stable interfaces.
 
-The top-level runtime entrypoint is `src/distill_abm/cli.py`. The canonical compatibility surface is `src/distill_abm/compat`, with fallback dispatch implemented by `src/distill_abm/compat/compat_callables.py` and reference loader `src/distill_abm/compat/reference_loader.py`.
+The top-level runtime entrypoint is `src/distill_abm/cli.py`. The compatibility surface is `src/distill_abm/compat`, with fallback dispatch implemented by `src/distill_abm/compat/compat_callables.py` and source loader `src/distill_abm/compat/reference_loader.py`.
+
+## Documentation map
+
+- `docs/WALKTHROUGH.md` - end-to-end flow, step by step
+- `docs/ARCHITECTURE.md` - module-by-module organization and runtime data flow
+- `docs/HYPERPARAMETERS.md` - complete list of runtime hyperparameter values
+- `docs/TESTING_REPORT.md` - complete testing methodology and gate criteria
 
 ## Quickstart
 
@@ -73,6 +80,20 @@ docker run --rm -v \"$(pwd):/app\" distill-abm distill-abm run ...
 ```
 
 4. Keep each output directory plus `pipeline_run_metadata.json` in immutable storage for full replay.
+
+## Hyperparameters
+
+All hyperparameter values used by the runtime are documented in:
+
+- `docs/HYPERPARAMETERS.md`
+
+This includes:
+
+- LLM request defaults (`temperature`, `max_tokens`)
+- summarizer backend parameters (BART, BERT, T5, Longformer-like)
+- evidence/summarization/scoring mode defaults
+- DoE and ingestion defaults
+- quality gate thresholds
 
 ## CLI
 
@@ -244,25 +265,26 @@ GitHub Actions configuration is at `.github/workflows/ci.yml` and runs:
 - `mypy src tests`
 - `pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85`
 
-## Evidence and parity
+## Documentation and audit artifacts
 
 - `docs/WALKTHROUGH.md`: reviewer-oriented end-to-end behavior.
 - `docs/ARCHITECTURE.md`: module boundaries and data flow.
-- `docs/PARITY.md`: parity policy and proof by test.
+- `docs/PARITY.md`: compatibility and reproducibility policy.
+- `docs/HYPERPARAMETERS.md`: complete hyperparameter values and defaults.
 - `docs/TESTING_REPORT.md`: single authoritative testing reference (scope, methods, gates, and outcomes).
-- `docs/archive_full_manifest.json`: migration and retention policy for every archived file.
-- `docs/runtime_notebook_dependencies.json`: reference dispatch dependencies for audit.
-- `configs/notebook_prompt_reference.yaml`: reference prompt texts for behavior lock.
+- `docs/archive_full_manifest.json`: retention policy for every archived file.
+- `docs/runtime_notebook_dependencies.json`: reference dispatch dependency map for audit.
+- `configs/notebook_prompt_reference.yaml`: frozen reference prompt texts used for behavior lock.
 
-### Reference artifacts
+### Archived artifacts (non-runtime)
 
 - `archive/reference_repo/` retains source reference scripts and artifacts.
-- `tests/fixtures/notebook_parity/` stores byte-equivalent mirrors used by migration audits.
+- `tests/fixtures/notebook_parity/` stores byte-equivalent mirrors used by replay audits.
 - `archive/` is retained for auditability and does not drive runtime execution.
 
-Compatibility details used by parity:
+Compatibility checks:
 
-- `tests/regression/test_reference_equivalence.py` covers core runtime parity.
+- `tests/regression/test_reference_equivalence.py` covers core runtime equivalence.
 - `tests/regression/test_reference_function_coverage.py` validates function accounting.
 - `tests/regression/test_runtime_reference_dependencies.py` validates dispatch source map integrity.
 
@@ -270,7 +292,7 @@ Compatibility details used by parity:
 
 - Reference loader execution is AST-restricted and intentionally does not execute full side-effectful reference cells.
 - `return_csv` and `return_csv_2` are protected by fallback behavior if reference execution is unavailable.
-- Default request temperature is `0.5`.
+- Default request temperature is `0.5` (see `docs/HYPERPARAMETERS.md`).
 
 ### Reproducibility manifest
 

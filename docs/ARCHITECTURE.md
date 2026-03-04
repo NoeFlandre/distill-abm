@@ -5,14 +5,14 @@
 - `distill_abm.ingest`:
   - CSV ingestion and NetLogo preprocessing orchestration
   - `netlogo.py`: extraction helpers (`extract_code`, `extract_parameters`, `extract_documentation`)
-  - `netlogo_notebook_workflow.py`: compatibility-equivalent run loop and artifact generation
+  - `netlogo_notebook_workflow.py`: deterministic NetLogo run loop and artifact generation
   - `netlogo_notebook_artifacts.py`: reusable artifact builders (parameters, docs, code, narratives)
   - `netlogo_notebook_steps.py`: reusable NetLogo execution primitives (parameter coercion, single-run capture)
 - `distill_abm.viz`:
   - metric plotting for repeated simulations
   - stats table computation (`generate_stats_table`)
   - optional mean overlay rendering
-  - stats table rendering into Markdown and image
+  - stats table serialization for text evidence (`table-csv`)
 - `distill_abm.llm`:
   - adapter interface + OpenAI, Anthropic, Ollama, Janus implementations
   - unified request schema (`LLMRequest`) and provider factory
@@ -42,10 +42,16 @@
     - optional split context/trend adapters and resumable wide-CSV updates for Claude/Deepseek parity workflows
 - `distill_abm.compat`:
   - reference implementation loader with source provenance and priority ordering
-  - compatibility wrappers preserving historical function names
+  - compatibility wrappers preserving stable function names
   - reference-first dispatch for selected deterministic helpers with fallback to refactored code paths
 - `distill_abm.configs`:
   - validated, typed models for prompts, ABMs, experiment settings, and CLI defaults
+
+## Hyperparameter reference
+
+All numeric defaults and runtime hyperparameters are documented in:
+
+- `docs/HYPERPARAMETERS.md`
 
 ## Configs
 
@@ -77,6 +83,8 @@
 - `uv sync --extra dev` installs the project and development tooling.
 - `docker build -t distill-abm .` creates a reproducible runtime image.
 - `uv run distill-abm run ...` executes deterministic CLI workflows with explicit modes and paths.
+- `uv run distill-abm evaluate-qualitative ...` runs qualitative coverage/faithfulness scoring.
+- `uv run distill-abm analyze-doe ...` runs ANOVA/DoE analysis.
 - Each run writes `pipeline_run_metadata.json` and captures:
   - input artifact paths
   - resolved evidence/summarization modes
