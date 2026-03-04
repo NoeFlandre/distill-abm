@@ -70,3 +70,8 @@ def test_archive_manifest_keeps_csv_and_plot_artifacts() -> None:
             continue
         assert row["action"] in {"retain_record_only", "migrate"}
         assert row["action"] != "discard_with_rationale"
+
+
+def test_archive_manifest_has_no_discard_actions() -> None:
+    rows = json.loads(Path("docs/archive_full_manifest.json").read_text(encoding="utf-8"))
+    assert all(row["action"] != "discard_with_rationale" for row in rows)
