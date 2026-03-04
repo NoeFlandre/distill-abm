@@ -64,6 +64,14 @@ def test_invalid_yaml_raises_config_error(tmp_path: Path) -> None:
         load_models_config(path)
 
 
+def test_non_mapping_yaml_raises_config_error(tmp_path: Path) -> None:
+    path = tmp_path / "scalar.yaml"
+    path.write_text("7", encoding="utf-8")
+
+    with pytest.raises(ConfigError):
+        load_models_config(path)
+
+
 @pytest.mark.parametrize(
     "loader", [load_models_config, load_prompts_config, load_abm_config, load_evaluation_config, load_logging_config]
 )

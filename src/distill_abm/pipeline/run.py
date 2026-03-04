@@ -216,17 +216,9 @@ def _sweep_headers(max_items: int, csv_column_style: SweepCsvColumnStyle) -> lis
     return helpers.sweep_headers(max_items=max_items, csv_column_style=csv_column_style)
 
 
-def _row_to_record(row: SweepRunResult) -> list[str]:
-    return helpers.row_to_record(row)
-
-
 def _write_combinations_csv_resume(output_csv: Path, rows: list[SweepRunResult], headers: list[str]) -> Path:
     helpers.write_sweep_rows_resume(output_csv=output_csv, rows=rows, headers=headers)
     return output_csv
-
-
-def _load_existing_rows_if_compatible(output_csv: Path, headers: list[str]) -> dict[str, list[str]]:
-    return helpers.load_existing_rows_if_compatible(output_csv=output_csv, headers=headers)
 
 
 def build_style_feature_combinations(

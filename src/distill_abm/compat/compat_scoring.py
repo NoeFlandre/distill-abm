@@ -1,4 +1,4 @@
-"""Compatibility scoring and LLM CSV post-processing helpers."""
+"""Compatibility scoring and CSV post-processing helpers."""
 
 from __future__ import annotations
 
@@ -183,6 +183,6 @@ def summarize_text_with_models(text: str) -> dict[str, str]:
 
 
 def _call_notebook_first(name: str, fallback: Callable[..., T], *args: Any, **kwargs: Any) -> T:
-    from distill_abm.legacy.compat_callables import _call_notebook_first as _dispatch
+    from distill_abm.compat.compat_callables import _call_notebook_first as _dispatch
 
     return cast(T, _dispatch(name, fallback, *args, **kwargs))

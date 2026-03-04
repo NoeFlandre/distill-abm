@@ -5,7 +5,7 @@
 - `distill_abm.ingest`:
   - CSV ingestion and NetLogo preprocessing orchestration
   - `netlogo.py`: extraction helpers (`extract_code`, `extract_parameters`, `extract_documentation`)
-  - `netlogo_notebook_workflow.py`: notebook-compatible run loop and artifact generation
+  - `netlogo_notebook_workflow.py`: compatibility-equivalent run loop and artifact generation
   - `netlogo_notebook_artifacts.py`: reusable artifact builders (parameters, docs, code, narratives)
   - `netlogo_notebook_steps.py`: reusable NetLogo execution primitives (parameter coercion, single-run capture)
 - `distill_abm.viz`:
@@ -17,26 +17,26 @@
   - adapter interface + OpenAI, Anthropic, Ollama, Janus implementations
   - unified request schema (`LLMRequest`) and provider factory
 - `distill_abm.summarize`:
-  - notebook-compatible text cleanup
+  - prompt-safe text cleanup
   - BART/BERT summarization runners
   - report post-processing utilities (`clean_markdown_symbols`, etc.)
 - `distill_abm.eval`:
   - token overlap metrics
-  - BLEU/METEOR/ROUGE/Flesch legacy scoring
+  - BLEU/METEOR/ROUGE/Flesch scoring
   - qualitative score extraction (`extract_coverage_score`, `extract_faithfulness_score`)
   - DoE ANOVA contribution analysis
 - `distill_abm.pipeline`:
   - end-to-end orchestration from CSV -> plot -> LLM -> (optional BART/BERT summarization) -> scoring
   - no-summarization baseline mode via CLI `--skip-summarization`
   - evidence ablation modes via CLI `--evidence-mode`: `plot`, `stats-markdown`, `stats-image`, `plot+stats`
-  - notebook-style multi-feature sweep API:
+  - reference-style multi-feature sweep API:
     - `run_pipeline_sweep` for role/example/insights combinations
     - `write_combinations_csv` for wide per-combination output schema
     - optional split context/trend adapters and resumable wide-CSV updates for Claude/Deepseek parity workflows
-- `distill_abm.legacy`:
-  - notebook function loader with source provenance and priority ordering
-  - compatibility wrappers preserving notebook-era function names
-  - notebook-first dispatch for selected deterministic helpers with fallback to refactored code paths
+- `distill_abm.compat`:
+  - reference implementation loader with source provenance and priority ordering
+  - compatibility wrappers preserving historical function names
+  - reference-first dispatch for selected deterministic helpers with fallback to refactored code paths
 - `distill_abm.configs`:
   - validated, typed models for prompts, ABMs, experiment settings, and CLI defaults
 
@@ -53,8 +53,8 @@
 - Unit tests for deterministic utilities and contracts
 - Integration tests for pipeline flows
 - E2E tests for CLI behavior
-- Regression tests for notebook parity and function-coverage accounting
-- Legacy loader/dispatch tests to verify source priority, provenance, notebook-first behavior, and fallback robustness
+- Regression tests for reference parity and function-coverage accounting
+- Compatibility loader/dispatch tests to verify source priority, provenance, and fallback robustness
 
 ## Runtime Data Flow
 
@@ -63,4 +63,4 @@
 3. Prompt text is assembled from `PromptsConfig` plus optional style features.
 4. `llm` adapters submit image/context requests.
 5. Qualitative and lexical scorers evaluate outputs.
-6. `legacy.compat` and `legacy.notebook_loader` provide safe fallbacks for parity-critical helpers.
+6. `distill_abm.compat` and `distill_abm.compat.reference_loader` provide safe fallbacks for parity-critical helpers.

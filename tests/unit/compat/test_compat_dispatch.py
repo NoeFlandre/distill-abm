@@ -5,8 +5,8 @@ from typing import Any
 
 import pytest
 
-import distill_abm.legacy.compat as compat
-import distill_abm.legacy.notebook_loader as notebook_loader
+import distill_abm.compat as compat
+import distill_abm.compat.reference_loader as notebook_loader
 
 
 def test_compat_prefers_notebook_callable_when_available(monkeypatch: pytest.MonkeyPatch) -> None:

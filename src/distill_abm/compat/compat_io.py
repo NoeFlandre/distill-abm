@@ -1,4 +1,4 @@
-"""Compatibility helpers for legacy I/O and small file utilities."""
+"""Compatibility helpers for compatibility I/O and small file utilities."""
 
 from __future__ import annotations
 

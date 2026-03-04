@@ -1,4 +1,4 @@
-"""Notebook-equivalent NetLogo ingestion workflow helpers."""
+"""Reference-compatible NetLogo ingestion workflow helpers."""
 
 from __future__ import annotations
 
@@ -66,7 +66,7 @@ def run_netlogo_experiment(
     output_csv_path: Path,
     netlogo_link_factory: Callable[..., NetLogoLinkProtocol] | None = None,
 ) -> pd.DataFrame:
-    """Runs notebook-style NetLogo repetition loops and writes a combined CSV."""
+    """Run NetLogo repetition loops and write a combined CSV artifact."""
     factory = netlogo_link_factory or _default_link_factory
     netlogo = factory(netlogo_home=netlogo_home)
     netlogo.load_model(str(model_path))
@@ -98,7 +98,7 @@ def run_single_repetition(
     interval: int,
     experiment_parameters: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
-    """Wrapper retained for compatibility with existing unit and caller imports."""
+    """Retain compatibility with existing caller imports."""
     return _run_single_repetition(
         netlogo=netlogo,
         reporters=reporters,
@@ -109,7 +109,7 @@ def run_single_repetition(
 
 
 def _coerce_parameter_value_for_netlogo(value: ParameterScalar) -> ParameterScalar:
-    """Compatibility shim for current and legacy callers expecting local helper."""
+    """Compatibility shim for callers expecting direct helper access."""
     return coerce_parameter_value_for_netlogo(value)
 
 
@@ -117,12 +117,12 @@ def save_experiment_parameters(
     experiment_parameters: Mapping[str, ParameterScalar],
     output_json_path: Path,
 ) -> None:
-    """Wrapper retained for notebook-compatible import paths."""
+    """Retain compatibility import path."""
     _save_experiment_parameters(experiment_parameters, output_json_path)
 
 
 def extract_gui_parameters_to_json(model_path: Path, output_json_path: Path) -> dict[str, list[dict[str, Any]]]:
-    """Wrapper retained for notebook-compatible import paths."""
+    """Retain compatibility import path."""
     return _extract_gui_parameters_to_json(model_path, output_json_path)
 
 
@@ -133,7 +133,7 @@ def update_gui_with_experiment_parameters(
     updated_gui_parameters_path: Path,
     updated_experiment_parameters_path: Path,
 ) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
-    """Wrapper retained for notebook-compatible import paths."""
+    """Retain compatibility import path."""
     return _update_gui_with_experiment_parameters(
         gui_parameters_path=gui_parameters_path,
         experiment_parameters_path=experiment_parameters_path,
@@ -148,7 +148,7 @@ def build_parameter_narrative(
     experiment_parameters_path: Path,
     output_text_path: Path,
 ) -> str:
-    """Wrapper retained for notebook-compatible import paths."""
+    """Retain compatibility import path."""
     return _build_parameter_narrative(
         gui_parameters_path=gui_parameters_path,
         experiment_parameters_path=experiment_parameters_path,
@@ -157,12 +157,12 @@ def build_parameter_narrative(
 
 
 def extract_documentation_to_json(model_path: Path, output_json_path: Path) -> str:
-    """Wrapper retained for notebook-compatible import paths."""
+    """Retain compatibility import path."""
     return _extract_documentation_to_json(model_path, output_json_path)
 
 
 def extract_code_to_text(model_path: Path, output_text_path: Path) -> str:
-    """Wrapper retained for notebook-compatible import paths."""
+    """Retain compatibility import path."""
     return _extract_code_to_text(model_path, output_text_path)
 
 
@@ -173,7 +173,7 @@ def run_notebook_ingest_workflow(
     output_dir: Path,
     suffix: str = "100",
 ) -> dict[str, Path]:
-    """Runs notebook-equivalent preprocessing workflow and returns artifact paths."""
+    """Run reference preprocessing workflow and return artifact paths."""
     json_dir = output_dir / "JSON"
     txt_dir = output_dir / "TXT"
     experiment_parameters_json = json_dir / f"experiment_parameters{suffix}.json"

@@ -18,7 +18,7 @@ class PlotError(RuntimeError):
 
 @dataclass(frozen=True)
 class MetricPlotBundle:
-    """Describes one notebook-style metric plot request."""
+    """Captures one metric bundle plot request."""
 
     include_pattern: str
     title: str
@@ -36,7 +36,7 @@ def plot_metric_bundle(
     exclude_pattern: str | None = None,
     show_mean_line: bool = True,
 ) -> Path:
-    """Creates one metric plot so LLM prompts can consume image evidence."""
+    """Create one metric plot for downstream evidence generation."""
     columns = matching_columns(list(frame.columns), include_pattern, exclude_pattern)
     if not columns:
         raise PlotError(f"no columns found for pattern '{include_pattern}'")
@@ -52,7 +52,7 @@ def plot_metric_bundles(
     bundles: list[MetricPlotBundle],
     output_dir: Path,
 ) -> list[Path]:
-    """Creates many notebook-style metric plots from one CSV frame in a single call."""
+    """Create many metric plots from one CSV frame in a single call."""
     if not bundles:
         raise PlotError("no metric bundles provided")
     output_paths: list[Path] = []

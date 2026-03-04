@@ -1,4 +1,4 @@
-"""Regex cleanup pipeline equivalent to notebook postprocessing steps."""
+"""Regex cleanup pipeline for compatibility output normalization."""
 
 from __future__ import annotations
 
@@ -57,7 +57,7 @@ def _capitalize_match(match: re.Match[str]) -> str:
 
 
 def clean_non_unicode(input_file: Path, output_file: Path) -> None:
-    """Normalizes Unicode to ASCII exactly like notebook unidecode cleanup."""
+    """Normalize Unicode to ASCII."""
     with input_file.open(mode="r", encoding="utf-8") as infile:
         reader = csv.reader(infile)
         rows = [row for row in reader]
@@ -72,7 +72,7 @@ def _remove_non_unicode(text: str) -> str:
 
 
 def postprocess_summary(text: str) -> str:
-    """Applies notebook cleanup stages in the same order used in practice."""
+    """Apply cleanup stages in deterministic order."""
     cleaned = remove_sentences_with_www(text)
     cleaned = remove_hyphens_after_punctuation(cleaned)
     cleaned = remove_unnecessary_punctuation(cleaned)
@@ -87,7 +87,7 @@ def postprocess_csv_batch(
     bart_column: str = "Summary (BART) Reduced",
     bert_column: str = "Summary (BERT) Reduced",
 ) -> pd.DataFrame:
-    """Runs notebook-5 staged CSV postprocessing over BART/BERT summary columns."""
+    """Run staged CSV postprocessing over BART/BERT summary columns."""
     frame = pd.read_csv(input_csv)
 
     # Notebook first pass applies www filtering to both summary columns.

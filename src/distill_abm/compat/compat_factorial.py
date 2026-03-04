@@ -308,6 +308,6 @@ def add_interactions(frame: pd.DataFrame, columns: list[str], max_order: int = 2
 
 
 def _call_notebook_first(name: str, fallback: Callable[..., T], *args: Any, **kwargs: Any) -> T:
-    from distill_abm.legacy.compat_callables import _call_notebook_first as _dispatch
+    from distill_abm.compat.compat_callables import _call_notebook_first as _dispatch
 
     return cast(T, _dispatch(name, fallback, *args, **kwargs))

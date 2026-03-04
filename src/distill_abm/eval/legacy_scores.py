@@ -1,4 +1,4 @@
-"""Notebook-compatible lexical metrics with graceful dependency fallbacks."""
+"""Lexical metric helpers with graceful dependency fallbacks."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import pandas as pd
 
 @dataclass(frozen=True)
 class LegacyScores:
-    """Holds notebook-style metric outputs in a typed structure."""
+    """Typed container for lexical metric outputs."""
 
     bleu: float
     meteor: float
@@ -22,7 +22,7 @@ class LegacyScores:
 
 
 def compute_scores(ground_truth: str, summary: str) -> LegacyScores:
-    """Computes BLEU/METEOR/ROUGE/Flesch scores used in scoring notebooks."""
+    """Compute BLEU/METEOR/ROUGE/Flesch scores."""
     try:
         return _compute_with_external_metrics(ground_truth, summary)
     except Exception:
@@ -85,7 +85,7 @@ def score_summaries_csv_batch(
     bert_column: str = "Summary (BERT) Reduced",
     score_fn: Callable[[str, str], LegacyScores] | None = None,
 ) -> pd.DataFrame:
-    """Runs notebook-6 lexical scoring for BART and BERT summary columns."""
+    """Run lexical scoring for BART and BERT summary columns."""
     frame = pd.read_csv(input_csv)
     missing = [column for column in [bart_column, bert_column] if column not in frame.columns]
     if missing:

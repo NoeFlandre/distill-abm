@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import distill_abm.legacy.compat as compat
+import distill_abm.compat as compat
 
 
 def test_snapshot_notebook_functions_are_accounted_for() -> None:

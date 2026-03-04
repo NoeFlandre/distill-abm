@@ -1,4 +1,4 @@
-"""BART and BERT summarization runners extracted from notebook workflows."""
+"""BART and BERT summarization runners."""
 
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ class SummarizationError(RuntimeError):
 
 
 class BartSummarizerRunner:
-    """Runs notebook-equivalent BART chunked abstractive summarization."""
+    """Run chunked BART summarization."""
 
     def __init__(
         self, summarizer: BartPipelineLike | None = None, model_name: str = "sshleifer/distilbart-cnn-12-6"
@@ -85,7 +85,7 @@ class BartSummarizerRunner:
 
 
 class BertSummarizerRunner:
-    """Runs notebook-equivalent BERT chunked extractive summarization."""
+    """Run chunked BERT summarization."""
 
     def __init__(
         self,
@@ -133,7 +133,7 @@ class BertSummarizerRunner:
 
 
 def summarize_with_bart(text: str, summarizer: BartPipelineLike | None = None) -> str:
-    """Convenience wrapper for notebook-compatible BART summaries."""
+    """Convenience wrapper for BART summaries."""
     return BartSummarizerRunner(summarizer=summarizer).summarize(text)
 
 
@@ -142,5 +142,5 @@ def summarize_with_bert(
     model: BertModelLike | None = None,
     tokenizer: TokenizerLike | None = None,
 ) -> str:
-    """Convenience wrapper for notebook-compatible BERT summaries."""
+    """Convenience wrapper for BERT summaries."""
     return BertSummarizerRunner(model=model, tokenizer=tokenizer).summarize(text)

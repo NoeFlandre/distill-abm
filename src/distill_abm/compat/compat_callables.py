@@ -1,4 +1,4 @@
-"""Compatibility helpers for notebook-dispatch and LLM call plumbing."""
+"""Compatibility helpers for reference-dispatch and LLM call plumbing."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any, cast
 
-import distill_abm.legacy.notebook_loader as notebook_loader
+import distill_abm.compat.reference_loader as notebook_loader
 from distill_abm.llm.adapters.base import LLMMessage, LLMRequest
 from distill_abm.llm.adapters.echo_adapter import EchoAdapter
 
@@ -51,7 +51,7 @@ def analyze_image_with_janus(prompt: str, base64_image: str) -> str:
 
 
 def setup_janus_model() -> str:
-    """Compatibility stub for notebook Janus model initialization."""
+    """Compatibility stub for Janus model initialization."""
     return "janus-model-initialized"
 
 
