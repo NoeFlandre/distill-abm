@@ -70,27 +70,21 @@ def _classify(path: Path) -> tuple[Classification, Action, str | None, str]:
             None,
             "Temporary/editor artifact retained only for historical traceability.",
         )
-    if "/Evaluation/Human Assessment/" in rel:
-        target = "tests/fixtures/notebook_parity/human_reference/" + rel.split("/Evaluation/Human Assessment/", 1)[1]
-        return ("human_ground_truth", "migrate", target, "Human-scored references used for evaluation parity.")
-    if "/Evaluation/Qualitative Assessment using LLMs/Examples/Text/" in rel:
-        target = "configs/notebook_prompt_assets/" + rel.split("archive/legacy_repo/Code/", 1)[1]
+    if "/Evaluation/" in rel:
+        eval_rel = rel.split("/Evaluation/", 1)[1]
+        target = "tests/fixtures/notebook_parity/evaluation_assets/Evaluation/" + eval_rel
+        classification: Classification = "historical_nonruntime"
+        if "/Evaluation/Human Assessment/" in rel:
+            classification = "human_ground_truth"
+        elif "/Evaluation/Qualitative Assessment using LLMs/Examples/" in rel:
+            classification = "prompt_reference"
+        elif path.name in {"reducedmilk.csv", "reduced3.csv", "FinalResultsYesNo.csv", "Yes-No Format.csv"}:
+            classification = "experiment_setting"
         return (
-            "prompt_reference",
+            classification,
             "migrate",
             target,
-            "Notebook qualitative prompt exemplars and input reference text.",
-        )
-    if "/Evaluation/Qualitative Assessment using LLMs/Examples/Images/" in rel:
-        target = (
-            "tests/fixtures/notebook_parity/qual_examples/"
-            + rel.split("/Evaluation/Qualitative Assessment using LLMs/Examples/", 1)[1]
-        )
-        return (
-            "prompt_reference",
-            "migrate",
-            target,
-            "Example image assets referenced by qualitative notebook prompts.",
+            "Canonical mirrored evaluation artifact for notebook-parity provenance and safe archive cleanup.",
         )
     if path.name in {"reducedmilk.csv", "reduced3.csv", "FinalResultsYesNo.csv", "Yes-No Format.csv"}:
         target = "tests/fixtures/notebook_parity/experiment_settings/" + rel_code

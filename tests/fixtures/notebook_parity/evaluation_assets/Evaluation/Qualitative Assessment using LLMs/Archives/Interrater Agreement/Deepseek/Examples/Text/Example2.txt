@@ -1,0 +1,5 @@
+The primary aim of the agent-based model is to replicate urban mobility patterns and the utilization of various transportation modes by the inhabitants of a medium-sized city. The model's specific objective is to investigate how transportation preferences, the availability of public and private transport options, and urban infrastructure affect the daily movements and interactions of city residents. It seeks to simulate the evolution of transportation behaviors and the usage patterns of different mobility options over time.
+This model was requested by the city of Paris in a way to reduce the number of cars.
+
+
+The mean distance traveled by private car by the agents starts at around 2700 units, rapidly decreases to about 1200 units over the first 5 time steps, and then continues to decline more slowly. The main car brand used by agents is Toyota.

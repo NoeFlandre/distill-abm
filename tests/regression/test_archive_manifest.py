@@ -122,8 +122,12 @@ def test_archive_manifest_has_zero_runtime_required_rows_at_current_stage() -> N
     assert runtime_rows == []
 
 
-def test_archive_manifest_keeps_all_notebooks() -> None:
+def test_archive_manifest_notebook_rows_have_explicit_policy() -> None:
     rows = json.loads(Path("docs/archive_full_manifest.json").read_text(encoding="utf-8"))
     notebook_rows = [row for row in rows if row["extension"] == ".ipynb"]
     for row in notebook_rows:
-        assert row["action"] == "retain_record_only"
+        assert row["action"] in {"retain_record_only", "migrate"}
+        if row["action"] == "migrate":
+            target_path = row["target_path"]
+            assert target_path is not None and str(target_path).strip()
+            assert _path_exists_with_unicode_normalization(str(target_path))
