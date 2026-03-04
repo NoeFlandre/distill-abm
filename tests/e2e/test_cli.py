@@ -904,3 +904,77 @@ def test_cli_smoke_qwen_supports_case_selection(tmp_path: Path, monkeypatch: pyt
     cases = cast(list[Any], captured["cases"])
     assert len(cases) == 1
     assert cases[0].case_id == "plot-full-full"
+
+
+def test_cli_smoke_qwen_supports_three_branch_profile(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    params.write_text("param=1\n", encoding="utf-8")
+    docs = tmp_path / "docs.txt"
+    docs.write_text("doc\n", encoding="utf-8")
+    prompts = tmp_path / "prompts.yaml"
+    prompts.write_text(
+        "\n".join(
+            [
+                'context_prompt: "Context {parameters} {documentation}"',
+                'trend_prompt: "Trend {description}"',
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    captured: dict[str, object] = {}
+
+    class _Result:
+        def __init__(self, output_dir: Path) -> None:
+            self.success = True
+            self.failed_cases: list[str] = []
+            self.report_markdown_path = output_dir / "smoke_report.md"
+            self.report_json_path = output_dir / "smoke_report.json"
+            self.doe_output_csv: Path | None = None
+            self.sweep_output_csv: Path | None = None
+
+    def fake_run_qwen_smoke_suite(*, inputs, cases, **kwargs):  # type: ignore[no-untyped-def]
+        captured["cases"] = cases
+        inputs.output_dir.mkdir(parents=True, exist_ok=True)
+        result = _Result(inputs.output_dir)
+        result.report_markdown_path.write_text("# smoke\n", encoding="utf-8")
+        result.report_json_path.write_text("{}", encoding="utf-8")
+        return result
+
+    monkeypatch.setattr("distill_abm.cli.run_qwen_smoke_suite", fake_run_qwen_smoke_suite)
+    result = runner.invoke(
+        app,
+        [
+            "smoke-qwen",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--output-dir",
+            str(tmp_path / "smoke"),
+            "--provider",
+            "echo",
+            "--model",
+            "echo-model",
+            "--profile",
+            "three-branches",
+            "--skip-qualitative",
+            "--skip-sweep",
+        ],
+    )
+
+    assert result.exit_code == 0
+    cases = cast(list[Any], captured["cases"])
+    assert len(cases) == 3
+    assert {case.case_id for case in cases} == {
+        "branch-role-full",
+        "branch-insights-summary-t5",
+        "branch-role-insights-summary-longformer",
+    }

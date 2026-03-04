@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import csv
 import json
+import shutil
 import traceback
 from datetime import UTC, datetime
 from itertools import cycle
@@ -26,6 +28,72 @@ from distill_abm.pipeline.run import (
 )
 
 SmokeStatus = Literal["ok", "failed", "skipped"]
+SmokeResponseKind = Literal["context", "trend"]
+
+RESPONSE_BUNDLE_COLUMNS: tuple[str, ...] = (
+    "run_output_dir",
+    "case_id",
+    "response_kind",
+    "case_status",
+    "resumed_from_existing",
+    "provider",
+    "model",
+    "temperature",
+    "max_tokens",
+    "max_retries",
+    "retry_backoff_seconds",
+    "evidence_mode",
+    "summarization_mode",
+    "score_on",
+    "enabled_style_features",
+    "additional_summarizers",
+    "input_csv_path",
+    "parameters_path",
+    "documentation_path",
+    "scoring_reference_path",
+    "scoring_reference_source",
+    "scoring_reference_text",
+    "prompt_path",
+    "prompt_text",
+    "prompt_signature",
+    "prompt_length",
+    "response_path",
+    "response_text",
+    "response_length",
+    "evidence_image_path",
+    "plot_path",
+    "stats_table_csv_path",
+    "report_csv_path",
+    "metadata_path",
+    "case_manifest_path",
+    "selected_token_f1",
+    "selected_bleu",
+    "selected_meteor",
+    "selected_rouge1",
+    "selected_rouge2",
+    "selected_rouge_l",
+    "selected_flesch_reading_ease",
+    "full_token_f1",
+    "full_bleu",
+    "full_meteor",
+    "full_rouge1",
+    "full_rouge2",
+    "full_rouge_l",
+    "full_flesch_reading_ease",
+    "summary_token_f1",
+    "summary_bleu",
+    "summary_meteor",
+    "summary_rouge1",
+    "summary_rouge2",
+    "summary_rouge_l",
+    "summary_flesch_reading_ease",
+    "error",
+    "inputs_json",
+    "llm_json",
+    "scores_json",
+    "reproducibility_json",
+    "summarizers_json",
+)
 
 
 class SmokeCase(BaseModel):
@@ -35,6 +103,8 @@ class SmokeCase(BaseModel):
     evidence_mode: EvidenceMode
     summarization_mode: SummarizationMode
     score_on: ScoreMode
+    enabled_style_features: tuple[str, ...] | None = None
+    additional_summarizers: tuple[Literal["t5", "longformer_ext"], ...] | None = None
 
 
 class QualitativeOutcome(BaseModel):
@@ -65,6 +135,7 @@ class SmokeCaseResult(BaseModel):
     context_response_path: Path | None = None
     trend_full_response_path: Path | None = None
     trend_summary_response_path: Path | None = None
+    case_rows_csv_path: Path | None = None
     case_manifest_path: Path | None = None
     resumed_from_existing: bool = False
     qualitative: list[QualitativeOutcome] = Field(default_factory=list)
@@ -105,6 +176,8 @@ class SmokeSuiteResult(BaseModel):
     sweep_status: SmokeStatus = "skipped"
     sweep_output_csv: Path | None = None
     sweep_error: str | None = None
+    run_master_csv_path: Path | None = None
+    global_master_csv_path: Path | None = None
     report_markdown_path: Path
     report_json_path: Path
 
@@ -130,6 +203,36 @@ def default_smoke_cases() -> list[SmokeCase]:
                 )
             )
     return cases
+
+
+def default_branch_smoke_cases() -> list[SmokeCase]:
+    """Return a compact three-branch smoke profile for debugging prompt/summarizer variants."""
+    return [
+        SmokeCase(
+            case_id="branch-role-full",
+            evidence_mode="plot",
+            summarization_mode="full",
+            score_on="full",
+            enabled_style_features=("role",),
+            additional_summarizers=(),
+        ),
+        SmokeCase(
+            case_id="branch-insights-summary-t5",
+            evidence_mode="table-csv",
+            summarization_mode="summary",
+            score_on="summary",
+            enabled_style_features=("insights",),
+            additional_summarizers=("t5",),
+        ),
+        SmokeCase(
+            case_id="branch-role-insights-summary-longformer",
+            evidence_mode="plot+table",
+            summarization_mode="summary",
+            score_on="summary",
+            enabled_style_features=("role", "insights"),
+            additional_summarizers=("longformer_ext",),
+        ),
+    ]
 
 
 def run_qwen_smoke_suite(
@@ -159,6 +262,12 @@ def run_qwen_smoke_suite(
                 resume_existing=resume_existing,
             )
         )
+
+    for case_result in case_results:
+        _ensure_case_response_bundles(case_result=case_result, inputs=inputs)
+
+    run_master_csv = _write_run_master_csv(output_root=inputs.output_dir, case_results=case_results)
+    global_master_csv = _write_global_master_csv(run_master_csv=run_master_csv)
 
     failed_cases = [result.case.case_id for result in case_results if result.status == "failed"]
     doe_status, doe_output_csv, doe_error = _run_doe_if_requested(
@@ -196,6 +305,8 @@ def run_qwen_smoke_suite(
         sweep_status=sweep_status,
         sweep_output_csv=sweep_output_csv,
         sweep_error=sweep_error,
+        run_master_csv_path=run_master_csv,
+        global_master_csv_path=global_master_csv,
         report_markdown_path=report_markdown_path,
         report_json_path=report_json_path,
     )
@@ -234,7 +345,8 @@ def _run_smoke_case(
                 evidence_mode=case.evidence_mode,
                 summarization_mode=case.summarization_mode,
                 score_on=case.score_on,
-                additional_summarizers=inputs.additional_summarizers,
+                additional_summarizers=case.additional_summarizers or inputs.additional_summarizers,
+                enabled_style_features=case.enabled_style_features,
                 scoring_reference_path=inputs.scoring_reference_path,
             ),
             prompts=prompts,
@@ -446,6 +558,314 @@ def _run_sweep_if_requested(
     return "ok", sweep_output, None
 
 
+def _ensure_case_response_bundles(case_result: SmokeCaseResult, inputs: SmokeSuiteInputs) -> None:
+    case_dir = case_result.output_dir
+    inputs_dir = case_dir / "inputs"
+    prompts_dir = case_dir / "prompts"
+    evidence_dir = case_dir / "evidence"
+    outputs_dir = case_dir / "outputs"
+    responses_root = case_dir / "responses"
+    for path in (inputs_dir, prompts_dir, evidence_dir, outputs_dir, responses_root):
+        path.mkdir(parents=True, exist_ok=True)
+
+    _copy_if_exists(inputs.csv_path, inputs_dir / "simulation.csv")
+    _copy_if_exists(inputs.parameters_path, inputs_dir / "parameters.txt")
+    _copy_if_exists(inputs.documentation_path, inputs_dir / "documentation.txt")
+    if inputs.scoring_reference_path is not None:
+        _copy_if_exists(inputs.scoring_reference_path, inputs_dir / "ground_truth.txt")
+
+    _copy_if_exists(case_result.context_prompt_path, prompts_dir / "context_prompt.txt")
+    _copy_if_exists(case_result.trend_prompt_path, prompts_dir / "trend_prompt.txt")
+    _copy_if_exists(case_result.plot_path, evidence_dir / "plot.png")
+    _copy_if_exists(case_result.stats_table_csv_path, evidence_dir / "stats_table.csv")
+    _copy_if_exists(case_result.report_csv, outputs_dir / "report.csv")
+    _copy_if_exists(case_result.metadata_path, outputs_dir / "pipeline_run_metadata.json")
+    _copy_if_exists(case_result.case_manifest_path, outputs_dir / "case_manifest.json")
+
+    rows = _build_case_response_rows(case_result=case_result, smoke_inputs=inputs)
+    if not rows:
+        return
+    for row in rows:
+        response_kind = str(row["response_kind"])
+        response_dir = responses_root / response_kind
+        response_dir.mkdir(parents=True, exist_ok=True)
+        response_path = Path(str(row["response_path"])) if row["response_path"] else None
+        if response_path is not None and response_path.exists():
+            _copy_if_exists(response_path, response_dir / "response.txt")
+        _write_csv_rows(response_dir / "response_bundle.csv", [row], RESPONSE_BUNDLE_COLUMNS)
+    case_rows_csv = case_dir / "case_responses.csv"
+    _write_csv_rows(case_rows_csv, rows, RESPONSE_BUNDLE_COLUMNS)
+    case_result.case_rows_csv_path = case_rows_csv
+
+
+def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeSuiteInputs) -> list[dict[str, str]]:
+    metadata_payload: dict[str, object] | None = None
+    if case_result.metadata_path is not None and case_result.metadata_path.exists():
+        try:
+            metadata_payload = json.loads(case_result.metadata_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            metadata_payload = None
+
+    if metadata_payload is None:
+        return [_build_fallback_error_row(case_result=case_result, smoke_inputs=smoke_inputs)]
+
+    inputs_block = _dict(metadata_payload.get("inputs"))
+    llm_block = _dict(metadata_payload.get("llm"))
+    request_block = _dict(llm_block.get("request"))
+    prompts_block = _dict(metadata_payload.get("prompts"))
+    responses_block = _dict(metadata_payload.get("responses"))
+    artifacts_block = _dict(metadata_payload.get("artifacts"))
+    scores_block = _dict(metadata_payload.get("scores"))
+    reference_block = _dict(scores_block.get("reference"))
+    reproducibility_block = _dict(metadata_payload.get("reproducibility"))
+    summarizers_block = _dict(metadata_payload.get("summarizers"))
+
+    selected_scores = _dict(scores_block.get("selected_scores"))
+    full_scores = _dict(scores_block.get("full_scores"))
+    summary_scores = _dict(scores_block.get("summary_scores"))
+
+    base = {
+        "run_output_dir": str(smoke_inputs.output_dir),
+        "case_id": case_result.case.case_id,
+        "case_status": case_result.status,
+        "resumed_from_existing": str(case_result.resumed_from_existing),
+        "provider": str(llm_block.get("provider", "")),
+        "model": str(llm_block.get("model", "")),
+        "temperature": _stringify(request_block.get("temperature")),
+        "max_tokens": _stringify(request_block.get("max_tokens")),
+        "max_retries": _stringify(request_block.get("max_retries")),
+        "retry_backoff_seconds": _stringify(request_block.get("retry_backoff_seconds")),
+        "evidence_mode": str(inputs_block.get("evidence_mode", case_result.case.evidence_mode)),
+        "summarization_mode": str(inputs_block.get("summarization_mode", case_result.case.summarization_mode)),
+        "score_on": str(inputs_block.get("score_on", case_result.case.score_on)),
+        "enabled_style_features": _stringify(inputs_block.get("enabled_style_features")),
+        "additional_summarizers": _stringify(inputs_block.get("additional_summarizers")),
+        "input_csv_path": str(inputs_block.get("csv_path", smoke_inputs.csv_path)),
+        "parameters_path": str(inputs_block.get("parameters_path", smoke_inputs.parameters_path)),
+        "documentation_path": str(inputs_block.get("documentation_path", smoke_inputs.documentation_path)),
+        "scoring_reference_path": _stringify(reference_block.get("path")),
+        "scoring_reference_source": _stringify(reference_block.get("source")),
+        "scoring_reference_text": _stringify(reference_block.get("text")),
+        "evidence_image_path": _stringify(artifacts_block.get("trend_evidence_image_path")),
+        "plot_path": _stringify(artifacts_block.get("plot_path")),
+        "stats_table_csv_path": _stringify(artifacts_block.get("stats_table_csv_path")),
+        "report_csv_path": _stringify(artifacts_block.get("report_csv")),
+        "metadata_path": str(case_result.metadata_path) if case_result.metadata_path else "",
+        "case_manifest_path": str(case_result.case_manifest_path) if case_result.case_manifest_path else "",
+        "selected_token_f1": _stringify(selected_scores.get("token_f1")),
+        "selected_bleu": _stringify(selected_scores.get("bleu")),
+        "selected_meteor": _stringify(selected_scores.get("meteor")),
+        "selected_rouge1": _stringify(selected_scores.get("rouge1")),
+        "selected_rouge2": _stringify(selected_scores.get("rouge2")),
+        "selected_rouge_l": _stringify(selected_scores.get("rouge_l")),
+        "selected_flesch_reading_ease": _stringify(selected_scores.get("flesch_reading_ease")),
+        "full_token_f1": _stringify(full_scores.get("token_f1")),
+        "full_bleu": _stringify(full_scores.get("bleu")),
+        "full_meteor": _stringify(full_scores.get("meteor")),
+        "full_rouge1": _stringify(full_scores.get("rouge1")),
+        "full_rouge2": _stringify(full_scores.get("rouge2")),
+        "full_rouge_l": _stringify(full_scores.get("rouge_l")),
+        "full_flesch_reading_ease": _stringify(full_scores.get("flesch_reading_ease")),
+        "summary_token_f1": _stringify(summary_scores.get("token_f1")),
+        "summary_bleu": _stringify(summary_scores.get("bleu")),
+        "summary_meteor": _stringify(summary_scores.get("meteor")),
+        "summary_rouge1": _stringify(summary_scores.get("rouge1")),
+        "summary_rouge2": _stringify(summary_scores.get("rouge2")),
+        "summary_rouge_l": _stringify(summary_scores.get("rouge_l")),
+        "summary_flesch_reading_ease": _stringify(summary_scores.get("flesch_reading_ease")),
+        "error": _stringify(case_result.error),
+        "inputs_json": json.dumps(inputs_block, sort_keys=True),
+        "llm_json": json.dumps(llm_block, sort_keys=True),
+        "scores_json": json.dumps(scores_block, sort_keys=True),
+        "reproducibility_json": json.dumps(reproducibility_block, sort_keys=True),
+        "summarizers_json": json.dumps(summarizers_block, sort_keys=True),
+    }
+
+    context_prompt = _stringify(prompts_block.get("context_prompt"))
+    trend_prompt = _stringify(prompts_block.get("trend_prompt"))
+    context_response = _stringify(responses_block.get("context_response"))
+    trend_response = _stringify(responses_block.get("trend_full_response"))
+
+    context_row = {
+        **base,
+        "response_kind": "context",
+        "prompt_path": str(case_result.context_prompt_path) if case_result.context_prompt_path else "",
+        "prompt_text": context_prompt,
+        "prompt_signature": _stringify(reproducibility_block.get("context_prompt_signature")),
+        "prompt_length": _stringify(reproducibility_block.get("context_prompt_length")),
+        "response_path": str(case_result.context_response_path) if case_result.context_response_path else "",
+        "response_text": context_response,
+        "response_length": str(len(context_response)),
+    }
+    trend_row = {
+        **base,
+        "response_kind": "trend",
+        "prompt_path": str(case_result.trend_prompt_path) if case_result.trend_prompt_path else "",
+        "prompt_text": trend_prompt,
+        "prompt_signature": _stringify(reproducibility_block.get("trend_prompt_signature")),
+        "prompt_length": _stringify(reproducibility_block.get("trend_prompt_length")),
+        "response_path": str(case_result.trend_full_response_path) if case_result.trend_full_response_path else "",
+        "response_text": trend_response,
+        "response_length": str(len(trend_response)),
+    }
+    return [context_row, trend_row]
+
+
+def _build_fallback_error_row(case_result: SmokeCaseResult, smoke_inputs: SmokeSuiteInputs) -> dict[str, str]:
+    return {
+        "run_output_dir": str(smoke_inputs.output_dir),
+        "case_id": case_result.case.case_id,
+        "response_kind": "context",
+        "case_status": case_result.status,
+        "resumed_from_existing": str(case_result.resumed_from_existing),
+        "provider": "",
+        "model": smoke_inputs.model,
+        "temperature": "",
+        "max_tokens": "",
+        "max_retries": "",
+        "retry_backoff_seconds": "",
+        "evidence_mode": case_result.case.evidence_mode,
+        "summarization_mode": case_result.case.summarization_mode,
+        "score_on": case_result.case.score_on,
+        "enabled_style_features": _stringify(case_result.case.enabled_style_features),
+        "additional_summarizers": _stringify(
+            case_result.case.additional_summarizers or smoke_inputs.additional_summarizers
+        ),
+        "input_csv_path": str(smoke_inputs.csv_path),
+        "parameters_path": str(smoke_inputs.parameters_path),
+        "documentation_path": str(smoke_inputs.documentation_path),
+        "scoring_reference_path": str(smoke_inputs.scoring_reference_path or ""),
+        "scoring_reference_source": "",
+        "scoring_reference_text": "",
+        "prompt_path": "",
+        "prompt_text": "",
+        "prompt_signature": "",
+        "prompt_length": "",
+        "response_path": "",
+        "response_text": "",
+        "response_length": "",
+        "evidence_image_path": "",
+        "plot_path": str(case_result.plot_path or ""),
+        "stats_table_csv_path": str(case_result.stats_table_csv_path or ""),
+        "report_csv_path": str(case_result.report_csv or ""),
+        "metadata_path": str(case_result.metadata_path or ""),
+        "case_manifest_path": str(case_result.case_manifest_path or ""),
+        "selected_token_f1": "",
+        "selected_bleu": "",
+        "selected_meteor": "",
+        "selected_rouge1": "",
+        "selected_rouge2": "",
+        "selected_rouge_l": "",
+        "selected_flesch_reading_ease": "",
+        "full_token_f1": "",
+        "full_bleu": "",
+        "full_meteor": "",
+        "full_rouge1": "",
+        "full_rouge2": "",
+        "full_rouge_l": "",
+        "full_flesch_reading_ease": "",
+        "summary_token_f1": "",
+        "summary_bleu": "",
+        "summary_meteor": "",
+        "summary_rouge1": "",
+        "summary_rouge2": "",
+        "summary_rouge_l": "",
+        "summary_flesch_reading_ease": "",
+        "error": _stringify(case_result.error),
+        "inputs_json": "",
+        "llm_json": "",
+        "scores_json": "",
+        "reproducibility_json": "",
+        "summarizers_json": "",
+    }
+
+
+def _write_run_master_csv(output_root: Path, case_results: list[SmokeCaseResult]) -> Path:
+    rows: list[dict[str, str]] = []
+    for case_result in case_results:
+        case_rows_path = case_result.case_rows_csv_path or (case_result.output_dir / "case_responses.csv")
+        if not case_rows_path.exists():
+            continue
+        rows.extend(_read_csv_rows(case_rows_path))
+    run_master_csv = output_root / "master_responses.csv"
+    _write_csv_rows(run_master_csv, _dedupe_rows(rows), RESPONSE_BUNDLE_COLUMNS)
+    return run_master_csv
+
+
+def _write_global_master_csv(run_master_csv: Path) -> Path:
+    cwd = Path.cwd().resolve()
+    try:
+        relative = run_master_csv.resolve().relative_to(cwd)
+    except ValueError:
+        return run_master_csv
+    if not relative.parts or relative.parts[0].lower() != "results":
+        return run_master_csv
+
+    global_master = Path("results") / "master_responses.csv"
+    global_master.parent.mkdir(parents=True, exist_ok=True)
+    existing = _read_csv_rows(global_master) if global_master.exists() else []
+    incoming = _read_csv_rows(run_master_csv)
+    merged = _dedupe_rows([*existing, *incoming])
+    _write_csv_rows(global_master, merged, RESPONSE_BUNDLE_COLUMNS)
+    return global_master
+
+
+def _read_csv_rows(path: Path) -> list[dict[str, str]]:
+    if not path.exists():
+        return []
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        return [dict(row) for row in reader]
+
+
+def _write_csv_rows(path: Path, rows: list[dict[str, str]], columns: tuple[str, ...]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(columns))
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({column: row.get(column, "") for column in columns})
+
+
+def _dedupe_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    seen: set[tuple[str, str, str, str, str]] = set()
+    deduped: list[dict[str, str]] = []
+    for row in rows:
+        key = (
+            row.get("run_output_dir", ""),
+            row.get("case_id", ""),
+            row.get("response_kind", ""),
+            row.get("prompt_signature", ""),
+            row.get("response_path", ""),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(row)
+    return deduped
+
+
+def _copy_if_exists(source: Path | None, destination: Path) -> None:
+    if source is None or not source.exists():
+        return
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, destination)
+
+
+def _dict(value: object) -> dict[str, object]:
+    if isinstance(value, dict):
+        return value
+    return {}
+
+
+def _stringify(value: object) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, (str, int, float, bool)):
+        return str(value)
+    return json.dumps(value, sort_keys=True)
+
+
 def _render_markdown_report(result: SmokeSuiteResult) -> str:
     runtime_defaults = get_runtime_defaults()
     lines: list[str] = []
@@ -479,13 +899,15 @@ def _render_markdown_report(result: SmokeSuiteResult) -> str:
     lines.append("## Case Matrix")
     lines.append("")
     lines.append(
-        "| Case | Evidence | Summarization | Score On | Status | Resumed | Report CSV | Plot | Metadata | Manifest |"
+        "| Case | Evidence | Summarization | Score On | Style Features | Summarizers | "
+        "Status | Resumed | Report CSV | Plot | Metadata | Manifest |"
     )
-    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for case in result.cases:
         lines.append(
             f"| `{case.case.case_id}` | `{case.case.evidence_mode}` | `{case.case.summarization_mode}` | "
-            f"`{case.case.score_on}` | `{case.status}` | `{case.resumed_from_existing}` | `{case.report_csv}` | "
+            f"`{case.case.score_on}` | `{case.case.enabled_style_features}` | `{case.case.additional_summarizers}` | "
+            f"`{case.status}` | `{case.resumed_from_existing}` | `{case.report_csv}` | "
             f"`{case.plot_path}` | `{case.metadata_path}` | `{case.case_manifest_path}` |"
         )
 
@@ -532,6 +954,8 @@ def _render_markdown_report(result: SmokeSuiteResult) -> str:
         "- Use `pipeline_run_metadata.json` in each case folder for full prompts, signatures, "
         "hyperparameters, and scores."
     )
+    lines.append(f"- Run master CSV: `{result.run_master_csv_path}`")
+    lines.append(f"- Global master CSV: `{result.global_master_csv_path}`")
     lines.append("")
     return "\n".join(lines)
 

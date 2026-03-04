@@ -120,7 +120,7 @@ def fill_faithfulness_scores(
     frame: pd.DataFrame | None = None,
     source_column: str = "Faithfulness (GPT)",
     structured_data_path: str | Path = "Final Sheet/updated_structured_data.csv",
-    yes_no_path: str | Path = "Results/Yes-No Format.csv",
+    yes_no_path: str | Path = "results/Yes-No Format.csv",
     output_path: str | Path = "Final Sheet/updated_structured_data_filled.csv",
 ) -> pd.DataFrame:
     if frame is not None:

@@ -49,6 +49,7 @@ class PipelineInputs(BaseModel):
     score_on: ScoreMode = "both"
     evidence_mode: EvidenceMode = "plot"
     additional_summarizers: tuple[AdditionalSummarizer, ...] = ()
+    enabled_style_features: tuple[str, ...] | None = None
     scoring_reference_path: Path | None = None
     resume_existing: bool = False
 
@@ -119,7 +120,8 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         include_pattern=inputs.metric_pattern,
         evidence_mode=resolved_evidence_mode,
     )
-    context_prompt = _context_prompt(inputs, prompts)
+    enabled_style_features = _enabled_style_features(inputs.enabled_style_features)
+    context_prompt = _context_prompt(inputs, prompts, enabled_style_features=enabled_style_features)
     context = _invoke_adapter(adapter, model=inputs.model, prompt=context_prompt)
     trend_prompt = _build_trend_prompt(
         prompts=prompts,
@@ -128,6 +130,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         plot_description=inputs.plot_description,
         evidence_mode=resolved_evidence_mode,
         stats_table_csv=stats_table_csv,
+        enabled_style_features=enabled_style_features,
     )
     image_b64 = _encode_image_for_evidence(
         evidence_mode=resolved_evidence_mode,
@@ -252,6 +255,7 @@ def _build_run_signature(inputs: PipelineInputs, prompts: PromptsConfig, adapter
             "score_on": inputs.score_on,
             "evidence_mode": inputs.evidence_mode,
             "additional_summarizers": list(inputs.additional_summarizers),
+            "enabled_style_features": list(inputs.enabled_style_features) if inputs.enabled_style_features else None,
             "scoring_reference_path": (
                 str(inputs.scoring_reference_path.resolve()) if inputs.scoring_reference_path is not None else None
             ),
@@ -553,6 +557,12 @@ def _invoke_adapter(adapter: LLMAdapter, model: str, prompt: str, image_b64: str
     return helpers.invoke_adapter(adapter=adapter, model=model, prompt=prompt, image_b64=image_b64)
 
 
+def _enabled_style_features(values: tuple[str, ...] | None) -> set[str] | None:
+    if values is None:
+        return None
+    return {value.strip() for value in values if value.strip()}
+
+
 def _encode_image(path: Path) -> str:
     return helpers.encode_image(path)
 
@@ -704,6 +714,7 @@ def _write_run_metadata(
             "summarization_mode_requested": inputs.summarization_mode,
             "score_on_requested": inputs.score_on,
             "additional_summarizers": list(inputs.additional_summarizers),
+            "enabled_style_features": list(inputs.enabled_style_features) if inputs.enabled_style_features else None,
             "output_dir": str(inputs.output_dir),
             "scoring_reference_path": str(scoring_reference_path) if scoring_reference_path is not None else None,
             "resume_existing": inputs.resume_existing,
