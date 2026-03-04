@@ -110,7 +110,7 @@ Trend prompts include:
 
 ### Default behavior
 
-By default (`summarization_mode=summary`), pipeline summarization applies:
+By default (`summarization_mode=both`, `score_on=both`), pipeline summarization and scoring computes both paths:
 
 - BART summarization pass
 - BERT summarization pass on grouped plot analyses

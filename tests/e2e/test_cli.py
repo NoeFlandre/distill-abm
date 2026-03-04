@@ -368,6 +368,70 @@ def test_cli_run_pipeline_forwards_summarization_modes(tmp_path: Path, monkeypat
     assert captured_inputs.skip_summarization is False
 
 
+def test_cli_run_pipeline_defaults_summarization_and_score_modes_to_both(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    prompts = tmp_path / "prompts.yaml"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("d=1", encoding="utf-8")
+    prompts.write_text(
+        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
+        encoding="utf-8",
+    )
+
+    captured: dict[str, object] = {}
+
+    class _Result:
+        def __init__(self, output_dir: Path) -> None:
+            self.plot_path = output_dir / "plot.png"
+            self.report_csv = output_dir / "report.csv"
+
+    def fake_run_pipeline(*, inputs, prompts, adapter):  # type: ignore[no-untyped-def]
+        captured["inputs"] = inputs
+        captured["prompts"] = prompts
+        captured["adapter"] = adapter
+        output_dir = inputs.output_dir
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_dir.joinpath("plot.png").write_text("plot", encoding="utf-8")
+        output_dir.joinpath("report.csv").write_text("report", encoding="utf-8")
+        return _Result(output_dir)
+
+    monkeypatch.setattr("distill_abm.cli.run_pipeline", fake_run_pipeline)
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--output-dir",
+            str(tmp_path / "out"),
+            "--provider",
+            "echo",
+            "--model",
+            "echo-model",
+            "--metric-pattern",
+            "mean-incum",
+            "--metric-description",
+            "weekly milk",
+        ],
+    )
+
+    assert result.exit_code == 0
+    captured_inputs = cast(Any, captured["inputs"])
+    assert captured_inputs.summarization_mode == "both"
+    assert captured_inputs.score_on == "both"
+
+
 def test_cli_analyze_doe_exit_without_result(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     input_csv = tmp_path / "input.csv"
     input_csv.write_text("a,b,c\n1,2,3\n", encoding="utf-8")
