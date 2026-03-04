@@ -1,13 +1,12 @@
 # Archive Full Manifest
 
-- Total files: 214
+- Total files: 205
 - Classification counts:
-  - `experiment_setting`: 2
-  - `historical_nonruntime`: 174
+  - `historical_nonruntime`: 167
   - `human_ground_truth`: 32
   - `prompt_reference`: 6
 - Action counts:
-  - `migrate`: 213
+  - `migrate`: 204
   - `retain_record_only`: 1
 - Unresolved mappings: 0
 
@@ -15,15 +14,6 @@
 
 | path | classification | action | target_path |
 | --- | --- | --- | --- |
-| `archive/legacy_repo/Code/Evaluation/DOE/Archives/1 and -1 Sorted.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/DOE/Archives/1 and -1 Sorted.csv` |
-| `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric DoE Analysis averaging the repetitions.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/DOE/Archives/Cédric DoE Analysis averaging the repetitions.ipynb` |
-| `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric Version/DoEFeatureImportance.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/DOE/Archives/Cédric Version/DoEFeatureImportance.ipynb` |
-| `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric Version/FinalResultsYesNo.csv` | `experiment_setting` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/DOE/Archives/Cédric Version/FinalResultsYesNo.csv` |
-| `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric Version/factorial_contributions.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/DOE/Archives/Cédric Version/factorial_contributions.csv` |
-| `archive/legacy_repo/Code/Evaluation/DOE/Archives/test2.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/DOE/Archives/test2.csv` |
-| `archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/DOE/DoE.ipynb` |
-| `archive/legacy_repo/Code/Evaluation/DOE/FinalResultsYesNo.csv` | `experiment_setting` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/DOE/FinalResultsYesNo.csv` |
-| `archive/legacy_repo/Code/Evaluation/DOE/anova_factorial_contributions.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/DOE/anova_factorial_contributions.csv` |
 | `archive/legacy_repo/Code/Evaluation/Human Assessment/ Training/PresentationRaters.pptx` | `human_ground_truth` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Human Assessment/ Training/PresentationRaters.pptx` |
 | `archive/legacy_repo/Code/Evaluation/Human Assessment/ Training/PresentationRaters2.pptx` | `human_ground_truth` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Human Assessment/ Training/PresentationRaters2.pptx` |
 | `archive/legacy_repo/Code/Evaluation/Human Assessment/ Training/UnrelatedCase.xlsx` | `human_ground_truth` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Human Assessment/ Training/UnrelatedCase.xlsx` |
@@ -65,3 +55,12 @@
 | `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet/updated_structured_data.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Final Sheet/updated_structured_data.csv` |
 | `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet/updated_structured_data_filled.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Final Sheet/updated_structured_data_filled.csv` |
 | `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Final Sheet.ipynb` |
+| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Structure/structured_data.csv` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Making the Sheet Structure/Structure/structured_data.csv` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/3. Adding 1 point to the answers.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/3. Adding 1 point to the answers.ipynb` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/4. Modifying the final results to compute the DoE matrix.ipynb` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/4. Modifying the final results to compute the DoE matrix.ipynb` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Examples/Images/Picture Example.png` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Examples/Images/Picture Example.png` |
+| `archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Examples/Text/Example1.txt` | `historical_nonruntime` | `migrate` | `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/Qualitative Assessment using LLMs/Archives/Examples/Text/Example1.txt` |
