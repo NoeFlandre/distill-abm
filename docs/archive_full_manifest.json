@@ -935,10 +935,10 @@
     "sha256": "42213f37e75ea60418f1a91267c9932c5381682b8c255b1d2662f422b4ed36a6",
     "size_bytes": 4368,
     "extension": ".ipynb",
-    "classification": "runtime_required",
+    "classification": "historical_nonruntime",
     "action": "retain_record_only",
-    "target_path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb",
-    "rationale": "Notebook file currently required by runtime loader for compatibility dispatch; retained in place.",
+    "target_path": null,
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb"
     ]
