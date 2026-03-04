@@ -7,15 +7,18 @@ from pathlib import Path
 
 
 def _tracked_archive_files() -> list[Path]:
-    result = subprocess.run(
-        ["git", "ls-files", "-z", "--", "archive"],
-        check=True,
-        capture_output=True,
-        text=False,
-    )
-    raw_items = [item for item in result.stdout.split(b"\x00") if item]
-    files = [Path(item.decode("utf-8", errors="surrogateescape")) for item in raw_items]
-    return sorted(path for path in files if path.is_file() and path.name != ".DS_Store")
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "-z", "--", "archive"],
+            check=True,
+            capture_output=True,
+            text=False,
+        )
+        raw_items = [item for item in result.stdout.split(b"\x00") if item]
+        files = [Path(item.decode("utf-8", errors="surrogateescape")) for item in raw_items]
+        return sorted(path for path in files if path.is_file() and path.name != ".DS_Store")
+    except Exception:
+        return sorted(path for path in Path("archive").rglob("*") if path.is_file() and path.name != ".DS_Store")
 
 
 def _path_exists_with_unicode_normalization(path_str: str) -> bool:
