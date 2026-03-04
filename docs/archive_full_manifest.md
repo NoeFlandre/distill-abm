@@ -9,10 +9,9 @@
   - `prompt_reference`: 6
   - `runtime_required`: 5
 - Action counts:
-  - `archive_separately`: 184
   - `discard_with_rationale`: 34
   - `migrate`: 76
-  - `retain_record_only`: 276
+  - `retain_record_only`: 460
 - Unresolved mappings: 0
 
 ## Sample Rows

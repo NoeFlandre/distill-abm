@@ -156,6 +156,7 @@ docker run --rm distill-abm
 - Legacy notebooks are preserved under `archive/legacy_repo/`.
 - `docs/archive_full_manifest.json` provides a file-by-file migration classification and action trail for all archive assets.
 - `docs/archive_full_manifest.json` marks currently loader-dependent notebooks as `runtime_required`; these are intentionally retained in place until their callable equivalents are migrated out of notebooks.
+- Legacy CSV outputs and legacy plot/image artifacts are explicitly retained (not discarded) for reproducibility and reference.
 - Notebook prompt sources are preserved in `configs/notebook_prompt_reference.yaml`, with runtime prompts in `configs/prompts.yaml` regression-locked to it.
 - `distill_abm.legacy.notebook_loader` builds a callable registry from notebooks and prefers sources in this order:
   - non-`archives` notebooks

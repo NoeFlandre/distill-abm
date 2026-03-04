@@ -975,9 +975,9 @@
     "size_bytes": 88775,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1164,9 +1164,9 @@
     "size_bytes": 88775,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1263,9 +1263,9 @@
     "size_bytes": 25900,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1274,9 +1274,9 @@
     "size_bytes": 181285,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1285,9 +1285,9 @@
     "size_bytes": 185207,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1296,9 +1296,9 @@
     "size_bytes": 179339,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1307,9 +1307,9 @@
     "size_bytes": 177534,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1318,9 +1318,9 @@
     "size_bytes": 91568,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1329,9 +1329,9 @@
     "size_bytes": 96734,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1340,9 +1340,9 @@
     "size_bytes": 170281,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1351,9 +1351,9 @@
     "size_bytes": 164213,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1362,9 +1362,9 @@
     "size_bytes": 163423,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1373,9 +1373,9 @@
     "size_bytes": 25823,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1384,9 +1384,9 @@
     "size_bytes": 179105,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1395,9 +1395,9 @@
     "size_bytes": 178316,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1406,9 +1406,9 @@
     "size_bytes": 168921,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1417,9 +1417,9 @@
     "size_bytes": 51710,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1428,9 +1428,9 @@
     "size_bytes": 156660,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1439,9 +1439,9 @@
     "size_bytes": 186235,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1450,9 +1450,9 @@
     "size_bytes": 152450,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1461,9 +1461,9 @@
     "size_bytes": 152743,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1472,9 +1472,9 @@
     "size_bytes": 89361,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1483,9 +1483,9 @@
     "size_bytes": 132947,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1494,9 +1494,9 @@
     "size_bytes": 170764,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1505,9 +1505,9 @@
     "size_bytes": 93776,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1516,9 +1516,9 @@
     "size_bytes": 131860,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1527,9 +1527,9 @@
     "size_bytes": 108441,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1538,9 +1538,9 @@
     "size_bytes": 67592,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1549,9 +1549,9 @@
     "size_bytes": 119874,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1560,9 +1560,9 @@
     "size_bytes": 58161,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1571,9 +1571,9 @@
     "size_bytes": 126119,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1582,9 +1582,9 @@
     "size_bytes": 173933,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1593,9 +1593,9 @@
     "size_bytes": 104499,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1604,9 +1604,9 @@
     "size_bytes": 44317,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1615,9 +1615,9 @@
     "size_bytes": 108451,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1626,9 +1626,9 @@
     "size_bytes": 126588,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1637,9 +1637,9 @@
     "size_bytes": 190481,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1648,9 +1648,9 @@
     "size_bytes": 109671,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1736,9 +1736,9 @@
     "size_bytes": 25900,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1747,9 +1747,9 @@
     "size_bytes": 181285,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1758,9 +1758,9 @@
     "size_bytes": 185207,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1769,9 +1769,9 @@
     "size_bytes": 179339,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1780,9 +1780,9 @@
     "size_bytes": 177534,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1791,9 +1791,9 @@
     "size_bytes": 91568,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1802,9 +1802,9 @@
     "size_bytes": 96734,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1813,9 +1813,9 @@
     "size_bytes": 170281,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1824,9 +1824,9 @@
     "size_bytes": 164213,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1835,9 +1835,9 @@
     "size_bytes": 163423,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1846,9 +1846,9 @@
     "size_bytes": 25823,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1857,9 +1857,9 @@
     "size_bytes": 179105,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1868,9 +1868,9 @@
     "size_bytes": 178316,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1879,9 +1879,9 @@
     "size_bytes": 168921,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1890,9 +1890,9 @@
     "size_bytes": 51710,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1901,9 +1901,9 @@
     "size_bytes": 156660,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1912,9 +1912,9 @@
     "size_bytes": 186235,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1923,9 +1923,9 @@
     "size_bytes": 152450,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1934,9 +1934,9 @@
     "size_bytes": 152743,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1945,9 +1945,9 @@
     "size_bytes": 89361,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1956,9 +1956,9 @@
     "size_bytes": 132947,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1967,9 +1967,9 @@
     "size_bytes": 170764,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1978,9 +1978,9 @@
     "size_bytes": 93776,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -1989,9 +1989,9 @@
     "size_bytes": 131860,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2000,9 +2000,9 @@
     "size_bytes": 108441,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2011,9 +2011,9 @@
     "size_bytes": 67592,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2022,9 +2022,9 @@
     "size_bytes": 119874,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2033,9 +2033,9 @@
     "size_bytes": 58161,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2044,9 +2044,9 @@
     "size_bytes": 126119,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2055,9 +2055,9 @@
     "size_bytes": 173933,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2066,9 +2066,9 @@
     "size_bytes": 104499,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2077,9 +2077,9 @@
     "size_bytes": 44317,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2088,9 +2088,9 @@
     "size_bytes": 108451,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2099,9 +2099,9 @@
     "size_bytes": 126588,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2110,9 +2110,9 @@
     "size_bytes": 190481,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2121,9 +2121,9 @@
     "size_bytes": 109671,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2308,9 +2308,9 @@
     "size_bytes": 25900,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2319,9 +2319,9 @@
     "size_bytes": 181285,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2330,9 +2330,9 @@
     "size_bytes": 185207,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2341,9 +2341,9 @@
     "size_bytes": 179339,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2352,9 +2352,9 @@
     "size_bytes": 177534,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2363,9 +2363,9 @@
     "size_bytes": 91568,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2374,9 +2374,9 @@
     "size_bytes": 96734,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2385,9 +2385,9 @@
     "size_bytes": 170281,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2396,9 +2396,9 @@
     "size_bytes": 164213,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2407,9 +2407,9 @@
     "size_bytes": 163423,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2418,9 +2418,9 @@
     "size_bytes": 25823,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2429,9 +2429,9 @@
     "size_bytes": 179105,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2440,9 +2440,9 @@
     "size_bytes": 178316,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2451,9 +2451,9 @@
     "size_bytes": 168921,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2462,9 +2462,9 @@
     "size_bytes": 51710,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2473,9 +2473,9 @@
     "size_bytes": 156660,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2484,9 +2484,9 @@
     "size_bytes": 186235,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2495,9 +2495,9 @@
     "size_bytes": 152450,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2506,9 +2506,9 @@
     "size_bytes": 152743,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2517,9 +2517,9 @@
     "size_bytes": 89361,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2528,9 +2528,9 @@
     "size_bytes": 132947,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2539,9 +2539,9 @@
     "size_bytes": 170764,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2550,9 +2550,9 @@
     "size_bytes": 93776,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2561,9 +2561,9 @@
     "size_bytes": 131860,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2572,9 +2572,9 @@
     "size_bytes": 108441,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2583,9 +2583,9 @@
     "size_bytes": 67592,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2594,9 +2594,9 @@
     "size_bytes": 119874,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2605,9 +2605,9 @@
     "size_bytes": 58161,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2616,9 +2616,9 @@
     "size_bytes": 126119,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2627,9 +2627,9 @@
     "size_bytes": 173933,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2638,9 +2638,9 @@
     "size_bytes": 104499,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2649,9 +2649,9 @@
     "size_bytes": 44317,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2660,9 +2660,9 @@
     "size_bytes": 108451,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2671,9 +2671,9 @@
     "size_bytes": 126588,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2682,9 +2682,9 @@
     "size_bytes": 190481,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -2693,9 +2693,9 @@
     "size_bytes": 109671,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3105,9 +3105,9 @@
     "size_bytes": 25900,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3116,9 +3116,9 @@
     "size_bytes": 181285,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3127,9 +3127,9 @@
     "size_bytes": 185207,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3138,9 +3138,9 @@
     "size_bytes": 179339,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3149,9 +3149,9 @@
     "size_bytes": 177534,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3160,9 +3160,9 @@
     "size_bytes": 91568,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3171,9 +3171,9 @@
     "size_bytes": 96734,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3182,9 +3182,9 @@
     "size_bytes": 170281,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3193,9 +3193,9 @@
     "size_bytes": 164213,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3204,9 +3204,9 @@
     "size_bytes": 163423,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3215,9 +3215,9 @@
     "size_bytes": 25823,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3226,9 +3226,9 @@
     "size_bytes": 179105,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3237,9 +3237,9 @@
     "size_bytes": 178316,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3248,9 +3248,9 @@
     "size_bytes": 168921,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3781,9 +3781,9 @@
     "size_bytes": 27284,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3792,9 +3792,9 @@
     "size_bytes": 224866,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3803,9 +3803,9 @@
     "size_bytes": 283370,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3814,9 +3814,9 @@
     "size_bytes": 242457,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3825,9 +3825,9 @@
     "size_bytes": 327427,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3836,9 +3836,9 @@
     "size_bytes": 127799,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3847,9 +3847,9 @@
     "size_bytes": 208584,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3858,9 +3858,9 @@
     "size_bytes": 281676,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3869,9 +3869,9 @@
     "size_bytes": 131077,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -3880,9 +3880,9 @@
     "size_bytes": 181652,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4446,9 +4446,9 @@
     "size_bytes": 108441,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4457,9 +4457,9 @@
     "size_bytes": 67592,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4468,9 +4468,9 @@
     "size_bytes": 119874,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4479,9 +4479,9 @@
     "size_bytes": 58161,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4490,9 +4490,9 @@
     "size_bytes": 126119,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4501,9 +4501,9 @@
     "size_bytes": 173933,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4512,9 +4512,9 @@
     "size_bytes": 104499,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4523,9 +4523,9 @@
     "size_bytes": 44317,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4534,9 +4534,9 @@
     "size_bytes": 108451,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4545,9 +4545,9 @@
     "size_bytes": 126588,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4556,9 +4556,9 @@
     "size_bytes": 190481,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4567,9 +4567,9 @@
     "size_bytes": 109671,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4578,9 +4578,9 @@
     "size_bytes": 1496326,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -4820,9 +4820,9 @@
     "size_bytes": 251399,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5062,9 +5062,9 @@
     "size_bytes": 327035,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5260,9 +5260,9 @@
     "size_bytes": 152068,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5271,9 +5271,9 @@
     "size_bytes": 253755,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5821,9 +5821,9 @@
     "size_bytes": 15262,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5832,9 +5832,9 @@
     "size_bytes": 14652,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5843,9 +5843,9 @@
     "size_bytes": 15262,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5854,9 +5854,9 @@
     "size_bytes": 14082,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5865,9 +5865,9 @@
     "size_bytes": 18925,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5876,9 +5876,9 @@
     "size_bytes": 18399,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5887,9 +5887,9 @@
     "size_bytes": 19221,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5898,9 +5898,9 @@
     "size_bytes": 17992,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5909,9 +5909,9 @@
     "size_bytes": 18557,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5920,9 +5920,9 @@
     "size_bytes": 18029,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5931,9 +5931,9 @@
     "size_bytes": 19198,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5942,9 +5942,9 @@
     "size_bytes": 17483,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5953,9 +5953,9 @@
     "size_bytes": 18727,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5964,9 +5964,9 @@
     "size_bytes": 18057,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5975,9 +5975,9 @@
     "size_bytes": 19474,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5986,9 +5986,9 @@
     "size_bytes": 18127,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -5997,9 +5997,9 @@
     "size_bytes": 15467,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6008,9 +6008,9 @@
     "size_bytes": 14682,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6019,9 +6019,9 @@
     "size_bytes": 16888,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6030,9 +6030,9 @@
     "size_bytes": 14348,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6041,9 +6041,9 @@
     "size_bytes": 18260,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6052,9 +6052,9 @@
     "size_bytes": 17661,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6063,9 +6063,9 @@
     "size_bytes": 18551,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6074,9 +6074,9 @@
     "size_bytes": 16991,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6085,9 +6085,9 @@
     "size_bytes": 15824,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6096,9 +6096,9 @@
     "size_bytes": 15203,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6107,9 +6107,9 @@
     "size_bytes": 16212,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6118,9 +6118,9 @@
     "size_bytes": 14532,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6129,9 +6129,9 @@
     "size_bytes": 18021,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6140,9 +6140,9 @@
     "size_bytes": 17462,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6151,9 +6151,9 @@
     "size_bytes": 18389,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6162,9 +6162,9 @@
     "size_bytes": 17010,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
@@ -6173,9 +6173,9 @@
     "size_bytes": 46879,
     "extension": ".png",
     "classification": "legacy_visualization",
-    "action": "archive_separately",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Visualization artifact kept only for historical visual comparison.",
+    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
     "source_notebook_links": []
   },
   {
