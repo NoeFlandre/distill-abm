@@ -104,6 +104,20 @@ class NotebookFromNetLogoCsvDefaults(BaseModel):
     interval: int = 50
 
 
+class NotebookSummaryModelDefaults(BaseModel):
+    """Notebook-4 summary workflow defaults per model family."""
+
+    num_plots: int
+
+
+class NotebookSummaryGenerationDefaults(BaseModel):
+    """Captures per-model plot counts used by summary-generation notebooks."""
+
+    fauna: NotebookSummaryModelDefaults
+    grazing: NotebookSummaryModelDefaults
+    milk: NotebookSummaryModelDefaults
+
+
 class NotebookExperimentSettings(BaseModel):
     """Stores canonical notebook experiment references and defaults."""
 
@@ -112,5 +126,6 @@ class NotebookExperimentSettings(BaseModel):
     fauna_from_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
     grazint_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
     milk_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
+    summary_generation: NotebookSummaryGenerationDefaults
     qualitative_example_text_dir: str
     human_reference_dir: str

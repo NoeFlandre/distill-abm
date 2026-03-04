@@ -24,4 +24,7 @@ def test_load_notebook_experiment_settings_config() -> None:
     assert settings.fauna_from_netlogo_to_csv.saved_experiment_parameters["init-foragers"] == 20
     assert settings.grazint_netlogo_to_csv.saved_experiment_parameters["number-households"] == 60
     assert settings.milk_netlogo_to_csv.saved_experiment_parameters["network-parameter"] == 8
+    assert settings.summary_generation.fauna.num_plots == 14
+    assert settings.summary_generation.grazing.num_plots == 10
+    assert settings.summary_generation.milk.num_plots == 12
     assert "notebook_prompt_assets" in settings.qualitative_example_text_dir
