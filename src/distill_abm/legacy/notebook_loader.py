@@ -14,8 +14,6 @@ import nbformat
 
 NOTEBOOK_ROOT = Path("archive/legacy_repo/Code")
 REQUIRED_NOTEBOOK_FUNCTIONS: tuple[str, ...] = (
-    "calculate_sst",
-    "calculate_sums_and_sst",
     "return_csv",
     "return_csv_2",
 )

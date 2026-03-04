@@ -171,6 +171,56 @@ def test_notebook_parity_for_read_csv_to_df(tmp_path: Path) -> None:
     assert compat.read_csv_to_df(csv_path).equals(notebook_read(csv_path))
 
 
+def test_notebook_parity_for_calculate_sums_and_sst_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
+    frame = pd.DataFrame(
+        {
+            "Intercept_evaluating_BLEU": [1.0, 1.0, 1.0, 1.0],
+            "PromptA_evaluating_BLEU": [-1.0, 1.0, -1.0, 1.0],
+            "PromptB_evaluating_BLEU": [-1.0, -1.0, 1.0, 1.0],
+        }
+    )
+    notebook_fn = get_notebook_function("calculate_sums_and_sst")
+    notebook_sums, notebook_sst = notebook_fn(frame, "BLEU", 2)
+
+    def raise_missing(_name: str) -> FunctionType:
+        raise KeyError("missing")
+
+    monkeypatch.setattr("distill_abm.legacy.notebook_loader.get_notebook_function", raise_missing)
+    fallback_sums, fallback_sst = compat.calculate_sums_and_sst(frame, "BLEU", 2)
+
+    assert [name for name, _ in fallback_sums] == [name for name, _ in notebook_sums]
+    for (_name_a, value_a), (_name_b, value_b) in zip(fallback_sums, notebook_sums, strict=True):
+        assert value_a == pytest.approx(value_b)
+    assert fallback_sst == pytest.approx(notebook_sst)
+
+
+def test_notebook_parity_for_calculate_sst_fallback(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sst.csv"
+    pd.DataFrame(
+        {
+            "PromptA": [-1, 1, -1, 1],
+            "PromptB": [-1, -1, 1, 1],
+            "BLEU": [0.1, 0.2, 0.3, 0.4],
+        }
+    ).to_csv(csv_path, index=False)
+    notebook_fn = get_notebook_function("calculate_sst")
+    notebook_list, notebook_experiments = notebook_fn(csv_path, 2)
+
+    def raise_missing(_name: str) -> FunctionType:
+        raise KeyError("missing")
+
+    monkeypatch.setattr("distill_abm.legacy.notebook_loader.get_notebook_function", raise_missing)
+    fallback_list, fallback_experiments = compat.calculate_sst(csv_path, 2)
+
+    assert fallback_experiments == notebook_experiments
+    assert len(fallback_list) == len(notebook_list)
+    for (fallback_sums, fallback_sst), (notebook_sums, notebook_sst) in zip(fallback_list, notebook_list, strict=True):
+        assert [name for name, _ in fallback_sums] == [name for name, _ in notebook_sums]
+        for (_name_a, value_a), (_name_b, value_b) in zip(fallback_sums, notebook_sums, strict=True):
+            assert value_a == pytest.approx(value_b)
+        assert fallback_sst == pytest.approx(notebook_sst)
+
+
 def test_external_wrapper_paths_are_mockable(monkeypatch: pytest.MonkeyPatch) -> None:
     calls: list[tuple[str, str | None]] = []
 
