@@ -157,12 +157,29 @@ uv run distill-abm smoke-qwen \
   --skip-sweep
 ```
 
+Three-branch debug smoke (one response per case with different style/summarizer settings):
+
+```bash
+uv run distill-abm smoke-qwen \
+  --csv-path path/to/reduced.csv \
+  --parameters-path path/to/params.txt \
+  --documentation-path path/to/docs.txt \
+  --provider openrouter \
+  --model qwen/qwen3-vl-235b-a22b-thinking \
+  --profile three-branches \
+  --skip-qualitative \
+  --skip-sweep
+```
+
 `smoke-qwen` is resumable by default (`--resume`): completed successful cases/DoE outputs are reused, and existing sweep combinations are skipped to avoid duplicate experiments.
 
 Smoke outputs are written under `results/smoke_qwen/` by default:
 
 - `smoke_report.md` and `smoke_report.json` with full matrix status and errors
 - `cases/<case-id>/` per-mode artifacts (prompts, responses, `report.csv`, `pipeline_run_metadata.json`, `case_manifest.json`)
+- `cases/<case-id>/case_responses.csv` plus `responses/context/response_bundle.csv` and `responses/trend/response_bundle.csv`
+- `master_responses.csv` in the smoke output directory (all case response rows for that run)
+- `results/master_responses.csv` (global concatenated overview across smoke runs)
 - `doe/anova_factorial_contributions.csv`
 - `sweep/combinations_report.csv`
 

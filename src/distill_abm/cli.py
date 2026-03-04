@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated, cast
+from typing import Annotated, Literal, cast
 
 import typer
 
@@ -20,7 +20,13 @@ from distill_abm.pipeline.run import (
     SummarizationMode,
     run_pipeline,
 )
-from distill_abm.pipeline.smoke import SmokeCase, SmokeSuiteInputs, default_smoke_cases, run_qwen_smoke_suite
+from distill_abm.pipeline.smoke import (
+    SmokeCase,
+    SmokeSuiteInputs,
+    default_branch_smoke_cases,
+    default_smoke_cases,
+    run_qwen_smoke_suite,
+)
 
 app = typer.Typer(help="Run ABM distillation workflows.")
 RUNTIME_DEFAULTS = get_runtime_defaults()
@@ -220,6 +226,10 @@ def smoke_qwen(
         bool,
         typer.Option(help="Skip prompt-combination sweep execution in the smoke suite."),
     ] = not RUNTIME_DEFAULTS.smoke.run_sweep,
+    profile: Annotated[
+        Literal["matrix", "three-branches"],
+        typer.Option(help="Smoke profile: full matrix or compact three-branch debug profile."),
+    ] = "matrix",
     case_id: Annotated[
         list[str] | None,
         typer.Option(
@@ -248,7 +258,7 @@ def smoke_qwen(
             plot_description = abm_config.plot_descriptions[0]
         sweep_plot_descriptions = list(abm_config.plot_descriptions)
         scoring_reference_path = _resolve_scoring_reference_path(abm)
-    selected_cases = _select_smoke_cases(case_ids=case_id, max_cases=max_cases)
+    selected_cases = _select_smoke_cases(case_ids=case_id, max_cases=max_cases, profile=profile)
     adapter = create_adapter(provider=provider, model=model)
     result = run_qwen_smoke_suite(
         inputs=SmokeSuiteInputs(
@@ -314,11 +324,15 @@ def _resolve_scoring_reference_path(abm: str) -> Path:
     return Path(mapping[abm])
 
 
-def _select_smoke_cases(case_ids: list[str] | None, max_cases: int | None) -> list[SmokeCase] | None:
-    all_cases = default_smoke_cases()
+def _select_smoke_cases(
+    case_ids: list[str] | None, max_cases: int | None, profile: Literal["matrix", "three-branches"]
+) -> list[SmokeCase] | None:
+    all_cases = default_smoke_cases() if profile == "matrix" else default_branch_smoke_cases()
     if not case_ids:
-        if max_cases is None:
+        if max_cases is None and profile == "matrix":
             return None
+        if max_cases is None:
+            return all_cases
         return all_cases[:max_cases]
 
     by_id = {case.case_id: case for case in all_cases}

@@ -273,6 +273,7 @@ Use `smoke-qwen` to run the validation matrix in one command:
 - optional qualitative checks for coverage and faithfulness
 - provider/model are explicit CLI inputs (`--provider`, `--model`)
 - optional case filtering (`--case-id ...`, `--max-cases N`) enables tiny smoke runs for quick debugging
+- `--profile three-branches` runs a compact 3-case branch set (different style features + summarizer variants)
 
 The command writes:
 
@@ -281,6 +282,16 @@ The command writes:
   - prompts, responses, stats table, `report.csv`, `pipeline_run_metadata.json`, and `case_manifest.json`
 - `doe/anova_factorial_contributions.csv`
 - `sweep/combinations_report.csv`
+- `master_responses.csv` at run root (all response rows for that smoke run)
+- `results/master_responses.csv` at repo results root (global concatenated overview)
+
+Per-case organization:
+
+- `cases/<case-id>/inputs/` copied input artifacts (`simulation.csv`, `parameters.txt`, `documentation.txt`, optional `ground_truth.txt`)
+- `cases/<case-id>/prompts/` prompt text files
+- `cases/<case-id>/responses/context/response_bundle.csv` and `.../trend/response_bundle.csv`
+- `cases/<case-id>/evidence/` plot and stats table files
+- `cases/<case-id>/outputs/` report and metadata copies
 
 Resumability:
 

@@ -6,7 +6,13 @@ import pytest
 
 from distill_abm.configs.models import PromptsConfig
 from distill_abm.llm.adapters.base import LLMAdapter, LLMRequest, LLMResponse
-from distill_abm.pipeline.smoke import SmokeCase, SmokeSuiteInputs, default_smoke_cases, run_qwen_smoke_suite
+from distill_abm.pipeline.smoke import (
+    SmokeCase,
+    SmokeSuiteInputs,
+    default_branch_smoke_cases,
+    default_smoke_cases,
+    run_qwen_smoke_suite,
+)
 
 
 class SmokeFakeAdapter(LLMAdapter):
@@ -42,6 +48,20 @@ def test_default_smoke_cases_cover_full_matrix() -> None:
         ("plot+table", "both", "both"),
     }
     assert observed == expected
+
+
+def test_default_branch_smoke_cases_cover_three_variants() -> None:
+    cases = default_branch_smoke_cases()
+    assert len(cases) == 3
+    assert {case.case_id for case in cases} == {
+        "branch-role-full",
+        "branch-insights-summary-t5",
+        "branch-role-insights-summary-longformer",
+    }
+    assert cases[0].enabled_style_features == ("role",)
+    assert cases[1].enabled_style_features == ("insights",)
+    assert cases[1].additional_summarizers == ("t5",)
+    assert cases[2].additional_summarizers == ("longformer_ext",)
 
 
 def test_run_qwen_smoke_suite_writes_matrix_and_reports(tmp_path: Path) -> None:
@@ -90,9 +110,14 @@ def test_run_qwen_smoke_suite_writes_matrix_and_reports(tmp_path: Path) -> None:
     assert result.success is True
     assert result.report_markdown_path.exists()
     assert result.report_json_path.exists()
+    assert result.run_master_csv_path is not None and result.run_master_csv_path.exists()
+    assert result.global_master_csv_path is not None and result.global_master_csv_path.exists()
     assert len(result.cases) == 9
     assert all(case.status == "ok" for case in result.cases)
     assert all(case.case_manifest_path is not None for case in result.cases)
+    assert all(case.case_rows_csv_path is not None for case in result.cases)
+    assert all((case.output_dir / "responses" / "context" / "response_bundle.csv").exists() for case in result.cases)
+    assert all((case.output_dir / "responses" / "trend" / "response_bundle.csv").exists() for case in result.cases)
 
     payload = json.loads(result.report_json_path.read_text(encoding="utf-8"))
     assert payload["model"] == "qwen3.5:0.8b"

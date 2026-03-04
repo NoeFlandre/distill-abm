@@ -69,6 +69,7 @@ Defined in `src/distill_abm/cli.py`.
 | `run_qualitative` | `true` (`--skip-qualitative` disables) |
 | `run_sweep` | `true` (`--skip-sweep` disables) |
 | `doe_input_csv` | `null` (optional) |
+| `profile` | `"matrix"` (`"three-branches"` available) |
 | `case_id` | `[]` (optional filter) |
 | `max_cases` | `null` (optional cap) |
 
