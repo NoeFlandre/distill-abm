@@ -14,6 +14,7 @@ Provide functional continuity between legacy notebook workflows and production p
 6. `tests/regression/test_prompt_reference_equivalence.py` locks runtime prompts against `configs/notebook_prompt_reference.yaml`.
 7. `docs/archive_full_manifest.json` marks notebook files still required by `distill_abm.legacy.notebook_loader` as `runtime_required`, preventing accidental deletion before migration.
 8. Archive CSV artifacts and visualization files (`.png/.jpg/.jpeg/.svg`) are retained for reproducibility; they are not marked as discardable.
+9. `docs/runtime_notebook_dependencies.json` provides the one-to-many mapping of runtime-required notebook files to required compatibility function names.
 
 ## Scope
 
