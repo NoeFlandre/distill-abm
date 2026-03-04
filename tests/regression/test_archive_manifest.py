@@ -60,3 +60,13 @@ def test_archive_manifest_marks_runtime_required_notebooks_explicitly() -> None:
         assert row["action"] in {"migrate", "retain_record_only"}
         assert row["action"] != "discard_with_rationale"
         assert row["target_path"] is not None and str(row["target_path"]).strip()
+
+
+def test_archive_manifest_keeps_csv_and_plot_artifacts() -> None:
+    rows = json.loads(Path("docs/archive_full_manifest.json").read_text(encoding="utf-8"))
+    keep_exts = {".csv", ".png", ".jpg", ".jpeg", ".svg"}
+    for row in rows:
+        if row["extension"] not in keep_exts:
+            continue
+        assert row["action"] in {"retain_record_only", "migrate"}
+        assert row["action"] != "discard_with_rationale"

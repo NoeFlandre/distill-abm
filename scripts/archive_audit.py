@@ -107,9 +107,9 @@ def _classify(path: Path) -> tuple[Classification, Action, str | None, str]:
     if ext in {".png", ".jpg", ".jpeg", ".svg"}:
         return (
             "legacy_visualization",
-            "archive_separately",
+            "retain_record_only",
             None,
-            "Visualization artifact kept only for historical visual comparison.",
+            "Visualization artifact retained for historical comparison and reproducibility.",
         )
     if ext in {".csv", ".xlsx", ".numbers", ".log", ".aux", ".out", ".spl", ".pptx", ".pdf", ".tex", ".gz"}:
         return (
