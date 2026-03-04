@@ -55,7 +55,7 @@ Defined in `src/distill_abm/cli.py`.
 | Option | Default |
 | --- | --- |
 | `output_dir` | `results/smoke_qwen` |
-| `model` | `qwen2.5:latest` |
+| `model` | `qwen3.5:0.8b` |
 | `metric_pattern` | `"mean"` |
 | `metric_description` | `"simulation trend"` |
 | `plot_description` | `null` |
@@ -122,7 +122,7 @@ Defined in `configs/models.yaml`.
 | `gpt4o` | `openai` | `gpt-4o` |
 | `claude_sonnet` | `anthropic` | `claude-3-sonnet-20240229` |
 | `deepseek_r1` | `ollama` | `deepseek-r1` |
-| `qwen_ollama` | `ollama` | `qwen2.5:latest` |
+| `qwen_ollama` | `ollama` | `qwen3.5:0.8b` |
 | `janus_pro` | `janus` | `janus-pro` |
 
 For Ollama adapter calls:

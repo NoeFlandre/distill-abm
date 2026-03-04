@@ -74,7 +74,7 @@ def test_run_qwen_smoke_suite_writes_matrix_and_reports(tmp_path: Path) -> None:
             parameters_path=params,
             documentation_path=docs,
             output_dir=tmp_path / "smoke",
-            model="qwen2.5:latest",
+            model="qwen3.5:0.8b",
             metric_pattern="mean-incum",
             metric_description="weekly milk trend",
             plot_description="plot description text",
@@ -94,7 +94,7 @@ def test_run_qwen_smoke_suite_writes_matrix_and_reports(tmp_path: Path) -> None:
     assert all(case.case_manifest_path is not None for case in result.cases)
 
     payload = json.loads(result.report_json_path.read_text(encoding="utf-8"))
-    assert payload["model"] == "qwen2.5:latest"
+    assert payload["model"] == "qwen3.5:0.8b"
     assert len(payload["cases"]) == 9
     assert payload["sweep_status"] == "ok"
     assert payload["doe_status"] == "ok"
@@ -123,7 +123,7 @@ def test_run_qwen_smoke_suite_records_pipeline_failure(tmp_path: Path, monkeypat
             parameters_path=params,
             documentation_path=docs,
             output_dir=tmp_path / "smoke",
-            model="qwen2.5:latest",
+            model="qwen3.5:0.8b",
             metric_pattern="mean-incum",
             metric_description="weekly milk trend",
         ),

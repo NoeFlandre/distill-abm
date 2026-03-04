@@ -131,7 +131,7 @@ uv run distill-abm smoke-qwen \
   --parameters-path path/to/params.txt \
   --documentation-path path/to/docs.txt \
   --doe-input-csv path/to/FinalResultsYesNo.csv \
-  --model qwen2.5:latest \
+  --model qwen3.5:0.8b \
   --metric-pattern mean-incum \
   --metric-description "average weekly whole milk consumption per agent" \
   --plot-description "weekly whole milk consumption trend"
