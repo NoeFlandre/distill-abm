@@ -12,6 +12,33 @@ Production Python package for ABM-to-LLM distillation, extracted from legacy not
 - `archive/legacy_repo/` - full legacy repository snapshot (notebooks + assets)
 - `docs/` - architecture and parity documentation
 
+## Codebase organization
+
+```text
+distill-abm/
+├── configs/
+│   ├── models.yaml
+│   ├── prompts.yaml
+│   ├── evaluation.yaml
+│   ├── notebook_prompt_reference.yaml
+│   ├── notebook_experiment_settings.yaml
+│   └── notebook_prompt_assets/
+├── src/distill_abm/
+│   ├── configs/           # typed config loaders and models
+│   ├── eval/              # scoring and statistical workflows
+│   ├── ingest/            # NetLogo and CSV preprocessing
+│   ├── legacy/            # loader, compatibility, migration safety
+│   ├── llm/               # provider adapters and model selection
+│   ├── pipeline/          # end-to-end CLI orchestration
+│   ├── summarize/         # text cleanup and summarization options
+│   └── viz/               # plot and stats-table generation
+├── docs/                  # parity, coverage, and manifest evidence
+├── archive/legacy_repo/   # retained legacy notebooks and raw inputs
+└── tests/                 # unit, integration, regression, e2e
+```
+
+The top-level runtime entrypoint is `src/distill_abm/cli.py`. The parity surface is in `src/distill_abm/legacy/compat.py`, with dispatch governed by `src/distill_abm/legacy/notebook_loader.py`.
+
 ## Quickstart
 
 ```bash
@@ -67,6 +94,36 @@ uv run distill-abm run \
   --documentation-path path/to/docs.txt \
   --evidence-mode "plot+stats" \
   --skip-summarization
+```
+
+Run notebook-style combination sweeps from code (role/example/insights variants across multiple images):
+
+```python
+from pathlib import Path
+
+from distill_abm.pipeline.run import PipelineInputs, run_pipeline_sweep
+from distill_abm.configs.loader import load_prompts_config
+from distill_abm.llm.factory import create_adapter
+
+prompts = load_prompts_config(Path("configs/prompts.yaml"))
+adapter = create_adapter("openai", model="gpt-4o")
+
+output_csv = run_pipeline_sweep(
+    inputs=PipelineInputs(
+        csv_path=Path("results/reduced.csv"),
+        parameters_path=Path("params.txt"),
+        documentation_path=Path("documentation.txt"),
+        output_dir=Path("results/sweep"),
+        model="gpt-4o",
+        metric_pattern="mean-incum",
+        metric_description="weekly milk trend",
+    ),
+    prompts=prompts,
+    adapter=adapter,
+    image_paths=[Path("results/plots/p1.png"), Path("results/plots/p2.png")],
+    plot_descriptions=["Plot 1 description", "Plot 2 description"],
+)
+print(output_csv)
 ```
 
 Run qualitative evaluation (Coverage/Faithfulness scored by LLM):
@@ -159,9 +216,13 @@ docker run --rm distill-abm
 - `docs/runtime_notebook_dependencies.json` maps each runtime-required notebook to the exact required function names currently sourced from it.
 - Legacy CSV outputs and legacy plot/image artifacts are explicitly retained (not discarded) for reproducibility and reference.
 - Notebook prompt sources are preserved in `configs/notebook_prompt_reference.yaml`, with runtime prompts in `configs/prompts.yaml` regression-locked to it.
-- `configs/notebook_experiment_settings.yaml` now also preserves defaults from Fauna's "From NetLogo to CSV" notebook (reporters, run loop settings, and both parameter dictionaries).
+- `configs/notebook_experiment_settings.yaml` now also preserves defaults from Fauna, Grazing, and Milk Consumption "From NetLogo to CSV" workflows (reporters, run loop settings, and parameter dictionaries).
 - Regenerate parity/audit artifacts with `python scripts/refresh_parity_artifacts.py`.
-- Notebook-discard sequence: remove `archive/**/*.ipynb`, run `python scripts/refresh_parity_artifacts.py`, then run full gates.
+- Notebooks removed from runtime usage now include:
+  - `archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb`
+  - `archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb`
+  - `archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb`
+- Notebook-discard sequence is now: remove deprecated files, run `python scripts/refresh_parity_artifacts.py`, then run full gates.
 - `distill_abm.legacy.notebook_loader` builds a callable registry from notebooks and prefers sources in this order:
   - non-`archives` notebooks
   - non-checkpoint notebooks
@@ -169,7 +230,7 @@ docker run --rm distill-abm
 - Pipeline prompt assembly mirrors notebook structure:
   - context prompt: optional `style_features.role` + context template
   - trend prompt: optional `style_features.role`, trend template, optional `style_features.example`, optional `style_features.insights`, then plot description
-  - ABM runs (`--abm`) use the first `plot_descriptions` entry by default (overridable via `--plot-description`)
+- `run_pipeline` uses the pipeline default plot prompt unless `--plot-description` is explicitly provided.
 - `distill_abm.legacy.compat` dispatches notebook-first for selected deterministic helpers and falls back to refactored package implementations when notebook loading/calls fail.
 - `tests/regression/test_notebook_equivalence.py` validates behavior parity for migrated core utilities.
 - `tests/regression/test_notebook_function_coverage.py` ensures every notebook function name is accounted for in the new codebase (`distill_abm.legacy.compat`) or explicitly exempted.
