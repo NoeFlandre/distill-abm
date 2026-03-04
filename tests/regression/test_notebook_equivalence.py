@@ -157,6 +157,12 @@ def test_notebook_parity_for_remaining_deterministic_doe_helpers(tmp_path: Path)
             assert compat_value == pytest.approx(notebook_value)
 
 
+def test_notebook_parity_for_remove_evaluating_suffix() -> None:
+    notebook_remove_suffix = get_notebook_function("remove_evaluating_suffix")
+    value = "Role_AND_Example_evaluating_BLEU"
+    assert compat.remove_evaluating_suffix(value) == notebook_remove_suffix(value)
+
+
 def test_external_wrapper_paths_are_mockable(monkeypatch: pytest.MonkeyPatch) -> None:
     calls: list[tuple[str, str | None]] = []
 
