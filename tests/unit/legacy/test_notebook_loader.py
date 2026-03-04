@@ -12,6 +12,7 @@ from distill_abm.legacy.notebook_loader import (
     get_notebook_function,
     get_notebook_source_path,
     missing_required_notebook_functions,
+    required_notebook_dependencies_by_path,
     required_notebook_function_sources,
 )
 
@@ -79,3 +80,13 @@ def test_required_function_sources_resolve_for_notebook_deletion_planning() -> N
     for source in sources.values():
         assert source.exists()
         assert source.is_relative_to(Path("archive/legacy_repo/Code"))
+
+
+def test_required_dependencies_group_by_notebook_path() -> None:
+    grouped = required_notebook_dependencies_by_path()
+    assert grouped
+    flattened = [name for names in grouped.values() for name in names]
+    assert sorted(flattened) == sorted(REQUIRED_NOTEBOOK_FUNCTIONS)
+    for source, names in grouped.items():
+        assert source.exists()
+        assert names == sorted(names)

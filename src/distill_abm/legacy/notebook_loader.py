@@ -79,6 +79,16 @@ def required_notebook_function_sources() -> dict[str, Path]:
     return {name: get_notebook_source_path(name) for name in REQUIRED_NOTEBOOK_FUNCTIONS}
 
 
+def required_notebook_dependencies_by_path() -> dict[Path, list[str]]:
+    """Returns notebook-path dependency groups for required compatibility functions."""
+    grouped: dict[Path, list[str]] = {}
+    for name, source_path in required_notebook_function_sources().items():
+        grouped.setdefault(source_path, []).append(name)
+    for names in grouped.values():
+        names.sort()
+    return dict(sorted(grouped.items(), key=lambda item: item[0].as_posix()))
+
+
 def get_notebook_function(name: str) -> Callable[..., Any]:
     """Returns a callable that matches the selected notebook implementation."""
     try:
