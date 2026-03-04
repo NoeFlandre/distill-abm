@@ -705,7 +705,7 @@ def test_cli_smoke_qwen_forwards_inputs_and_reports_paths(tmp_path: Path, monkey
             "--output-dir",
             str(tmp_path / "smoke"),
             "--model",
-            "qwen2.5:latest",
+            "qwen3.5:0.8b",
             "--metric-pattern",
             "mean-incum",
             "--metric-description",
@@ -722,7 +722,7 @@ def test_cli_smoke_qwen_forwards_inputs_and_reports_paths(tmp_path: Path, monkey
     assert "smoke report (json):" in result.output
     assert "inputs" in captured
     smoke_inputs = cast(Any, captured["inputs"])
-    assert smoke_inputs.model == "qwen2.5:latest"
+    assert smoke_inputs.model == "qwen3.5:0.8b"
     assert smoke_inputs.metric_pattern == "mean-incum"
     assert smoke_inputs.metric_description == "weekly milk"
     assert smoke_inputs.plot_description == "plot desc"

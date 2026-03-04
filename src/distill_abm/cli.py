@@ -191,7 +191,7 @@ def smoke_qwen(
         typer.Option(exists=True),
     ] = Path("configs/prompts.yaml"),
     output_dir: Annotated[Path, typer.Option()] = Path("results/smoke_qwen"),
-    model: Annotated[str, typer.Option()] = "qwen2.5:latest",
+    model: Annotated[str, typer.Option()] = "qwen3.5:0.8b",
     metric_pattern: Annotated[str, typer.Option()] = "mean",
     metric_description: Annotated[str, typer.Option()] = "simulation trend",
     plot_description: Annotated[str | None, typer.Option()] = None,

@@ -144,15 +144,15 @@ def test_ollama_adapter_forwards_max_tokens_as_num_predict() -> None:
 
     def _chat(**payload):  # type: ignore[no-untyped-def]
         seen.update(payload)
-        return {"message": {"content": "hi"}, "model": "qwen2.5:latest"}
+        return {"message": {"content": "hi"}, "model": "qwen3.5:0.8b"}
 
     request = LLMRequest(
-        model="qwen2.5:latest",
+        model="qwen3.5:0.8b",
         messages=[LLMMessage(role="user", content="hello")],
         max_tokens=321,
         temperature=0.5,
     )
-    OllamaAdapter(model="qwen2.5:latest", client=SimpleNamespace(chat=_chat)).complete(request)
+    OllamaAdapter(model="qwen3.5:0.8b", client=SimpleNamespace(chat=_chat)).complete(request)
     options = seen["options"]
     assert isinstance(options, dict)
     assert options["temperature"] == 0.5
