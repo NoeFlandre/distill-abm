@@ -50,10 +50,10 @@
     "sha256": "ab1843640705c58785ca634b38b7c4def6e59a043d9e78264cb648cac91234b6",
     "size_bytes": 14111,
     "extension": ".ipynb",
-    "classification": "runtime_required",
+    "classification": "historical_nonruntime",
     "action": "retain_record_only",
-    "target_path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/C\u00e9dric DoE Analysis averaging the repetitions.ipynb",
-    "rationale": "Notebook file currently required by runtime loader for compatibility dispatch; retained in place.",
+    "target_path": null,
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/DOE/Archives/C\u00e9dric DoE Analysis averaging the repetitions.ipynb"
     ]

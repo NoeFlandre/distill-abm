@@ -201,6 +201,7 @@ def test_notebook_parity_for_calculate_sst_fallback(tmp_path: Path, monkeypatch:
             "PromptA": [-1, 1, -1, 1],
             "PromptB": [-1, -1, 1, 1],
             "BLEU": [0.1, 0.2, 0.3, 0.4],
+            "ROUGE": [0.2, 0.3, 0.4, 0.5],
         }
     ).to_csv(csv_path, index=False)
     notebook_fn = get_notebook_function("calculate_sst")
@@ -219,6 +220,57 @@ def test_notebook_parity_for_calculate_sst_fallback(tmp_path: Path, monkeypatch:
         for (_name_a, value_a), (_name_b, value_b) in zip(fallback_sums, notebook_sums, strict=True):
             assert value_a == pytest.approx(value_b)
         assert fallback_sst == pytest.approx(notebook_sst)
+
+
+def test_notebook_parity_for_return_csv_fallback(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "return_input.csv"
+    pd.DataFrame(
+        {
+            "PromptA": [-1, 1, -1, 1],
+            "PromptB": [-1, -1, 1, 1],
+            "BLEU": [0.1, 0.2, 0.3, 0.4],
+            "ROUGE": [0.2, 0.3, 0.4, 0.5],
+        }
+    ).to_csv(csv_path, index=False)
+    notebook_out_prefix = str(tmp_path / "notebook_return")
+    fallback_out_prefix = str(tmp_path / "fallback_return")
+    notebook_fn = get_notebook_function("return_csv")
+    notebook_fn(str(csv_path), notebook_out_prefix, 2)
+
+    def raise_missing(_name: str) -> FunctionType:
+        raise KeyError("missing")
+
+    monkeypatch.setattr("distill_abm.legacy.notebook_loader.get_notebook_function", raise_missing)
+    compat.return_csv(csv_path, fallback_out_prefix, 2)
+
+    notebook_df = pd.read_csv(Path(notebook_out_prefix + ".csv"))
+    fallback_df = pd.read_csv(Path(fallback_out_prefix + ".csv"))
+    assert fallback_df.equals(notebook_df)
+
+
+def test_notebook_parity_for_return_csv_2_fallback(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "return2_input.csv"
+    pd.DataFrame(
+        {
+            "PromptA": [-1, 1, -1, 1],
+            "PromptB": [-1, -1, 1, 1],
+            "BLEU": [0.1, 0.2, 0.3, 0.4],
+        }
+    ).to_csv(csv_path, index=False)
+    notebook_out_prefix = str(tmp_path / "notebook_return2")
+    fallback_out_prefix = str(tmp_path / "fallback_return2")
+    notebook_fn = get_notebook_function("return_csv_2")
+    notebook_fn(str(csv_path), notebook_out_prefix, 2)
+
+    def raise_missing(_name: str) -> FunctionType:
+        raise KeyError("missing")
+
+    monkeypatch.setattr("distill_abm.legacy.notebook_loader.get_notebook_function", raise_missing)
+    compat.return_csv_2(csv_path, fallback_out_prefix, 2)
+
+    notebook_df = pd.read_csv(Path(notebook_out_prefix + ".csv"))
+    fallback_df = pd.read_csv(Path(fallback_out_prefix + ".csv"))
+    assert fallback_df.equals(notebook_df)
 
 
 def test_external_wrapper_paths_are_mockable(monkeypatch: pytest.MonkeyPatch) -> None:

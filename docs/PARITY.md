@@ -12,9 +12,9 @@ Provide functional continuity between legacy notebook workflows and production p
 4. `tests/regression/test_notebook_function_coverage.py` parses all notebook function definitions from `archive/legacy_repo/Code` and asserts every function is represented in the compatibility surface or explicitly exempt (`main`).
 5. `docs/archive_full_manifest.json` provides file-level classification/action mapping for every archived artifact (runtime, prompt references, human ground truth, experiment settings, or historical-only).
 6. `tests/regression/test_prompt_reference_equivalence.py` locks runtime prompts against `configs/notebook_prompt_reference.yaml`.
-7. `docs/archive_full_manifest.json` marks notebook files still required by `distill_abm.legacy.notebook_loader` as `runtime_required`, preventing accidental deletion before migration.
+7. `docs/archive_full_manifest.json` marks notebook files required by `distill_abm.legacy.notebook_loader` as `runtime_required`; current status is zero runtime-required notebook functions.
 8. Archive CSV artifacts and visualization files (`.png/.jpg/.jpeg/.svg`) are retained for reproducibility; they are not marked as discardable.
-9. `docs/runtime_notebook_dependencies.json` provides the one-to-many mapping of runtime-required notebook files to required compatibility function names.
+9. `docs/runtime_notebook_dependencies.json` provides the one-to-many mapping of runtime-required notebook files to required compatibility function names (currently empty).
 
 ## Scope
 

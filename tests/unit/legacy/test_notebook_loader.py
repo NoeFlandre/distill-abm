@@ -84,7 +84,6 @@ def test_required_function_sources_resolve_for_notebook_deletion_planning() -> N
 
 def test_required_dependencies_group_by_notebook_path() -> None:
     grouped = required_notebook_dependencies_by_path()
-    assert grouped
     flattened = [name for names in grouped.values() for name in names]
     assert sorted(flattened) == sorted(REQUIRED_NOTEBOOK_FUNCTIONS)
     for source, names in grouped.items():

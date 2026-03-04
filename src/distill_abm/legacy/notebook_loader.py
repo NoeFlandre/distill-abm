@@ -13,10 +13,7 @@ from typing import Any, cast
 import nbformat
 
 NOTEBOOK_ROOT = Path("archive/legacy_repo/Code")
-REQUIRED_NOTEBOOK_FUNCTIONS: tuple[str, ...] = (
-    "return_csv",
-    "return_csv_2",
-)
+REQUIRED_NOTEBOOK_FUNCTIONS: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

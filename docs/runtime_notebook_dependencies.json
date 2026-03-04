@@ -1,10 +1,1 @@
-[
-  {
-    "notebook_path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/C\u00e9dric DoE Analysis averaging the repetitions.ipynb",
-    "required_functions": [
-      "return_csv",
-      "return_csv_2"
-    ],
-    "function_count": 2
-  }
-]
+[]
