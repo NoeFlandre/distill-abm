@@ -19,7 +19,6 @@ REQUIRED_NOTEBOOK_FUNCTIONS: tuple[str, ...] = (
     "compute_results",
     "create_factorial_design",
     "read_and_parse_csv",
-    "read_csv_to_df",
     "return_csv",
     "return_csv_2",
 )
