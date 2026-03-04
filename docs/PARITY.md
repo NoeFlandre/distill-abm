@@ -13,8 +13,9 @@ Provide functional continuity between legacy notebook workflows and production p
 5. `docs/archive_full_manifest.json` provides file-level classification/action mapping for every archived artifact (runtime, prompt references, human ground truth, experiment settings, or historical-only).
 6. `tests/regression/test_prompt_reference_equivalence.py` locks runtime prompts against `configs/notebook_prompt_reference.yaml`.
 7. `docs/archive_full_manifest.json` marks notebook files required by `distill_abm.legacy.notebook_loader` as `runtime_required`; current status is zero runtime-required notebook functions.
-8. Archive CSV artifacts and visualization files (`.png/.jpg/.jpeg/.svg`) are retained for reproducibility; they are not marked as discardable.
-9. `docs/runtime_notebook_dependencies.json` provides the one-to-many mapping of runtime-required notebook files to required compatibility function names (currently empty).
+8. `distill_abm.legacy.compat` now consults `notebook_loader.should_dispatch_notebook` before any notebook-first call, so runtime execution does not depend on notebooks when the required set is empty.
+9. Archive CSV artifacts and visualization files (`.png/.jpg/.jpeg/.svg`) are retained for reproducibility; they are not marked as discardable.
+10. `docs/runtime_notebook_dependencies.json` provides the one-to-many mapping of runtime-required notebook files to required compatibility function names (currently empty).
 
 ## Scope
 
