@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import traceback
 from datetime import UTC, datetime
+from itertools import cycle
 from pathlib import Path
 from typing import Literal
 
@@ -80,6 +81,7 @@ class SmokeSuiteInputs(BaseModel):
     metric_pattern: str
     metric_description: str
     plot_description: str | None = None
+    sweep_plot_descriptions: list[str] | None = None
     additional_summarizers: tuple[Literal["t5", "longformer_ext"], ...] = ()
 
 
@@ -91,6 +93,7 @@ class SmokeSuiteResult(BaseModel):
     started_at_utc: str
     finished_at_utc: str
     inputs: SmokeSuiteInputs
+    qualitative_policy: Literal["debug_same_model"] = "debug_same_model"
     success: bool
     failed_cases: list[str] = Field(default_factory=list)
     cases: list[SmokeCaseResult] = Field(default_factory=list)
@@ -177,6 +180,7 @@ def run_qwen_smoke_suite(
         started_at_utc=started_at.isoformat(),
         finished_at_utc=finished_at.isoformat(),
         inputs=inputs,
+        qualitative_policy="debug_same_model",
         success=success,
         failed_cases=failed_cases,
         cases=case_results,
@@ -384,9 +388,17 @@ def _run_sweep_if_requested(
 ) -> tuple[SmokeStatus, Path | None, str | None]:
     if not run_sweep:
         return "skipped", None, None
-    first_plot = next((case.plot_path for case in case_results if case.plot_path is not None), None)
-    if first_plot is None:
+    sweep_descriptions = inputs.sweep_plot_descriptions or [inputs.plot_description or inputs.metric_description]
+    available_plots = [case.plot_path for case in case_results if case.plot_path is not None]
+    if not available_plots:
         return "failed", None, "no successful case produced a plot image for sweep execution"
+    plot_count = len(sweep_descriptions)
+    if plot_count <= 0:
+        return "failed", None, "sweep plot descriptions cannot be empty"
+    if len(available_plots) >= plot_count:
+        sweep_image_paths = available_plots[:plot_count]
+    else:
+        sweep_image_paths = [plot for _, plot in zip(range(plot_count), cycle(available_plots), strict=False)]
     sweep_output = output_root / "sweep" / "combinations_report.csv"
     try:
         run_pipeline_sweep(
@@ -403,8 +415,8 @@ def _run_sweep_if_requested(
             ),
             prompts=prompts,
             adapter=adapter,
-            image_paths=[first_plot],
-            plot_descriptions=[inputs.plot_description or inputs.metric_description],
+            image_paths=sweep_image_paths,
+            plot_descriptions=sweep_descriptions,
             output_csv=sweep_output,
         )
     except Exception:
@@ -422,6 +434,7 @@ def _render_markdown_report(result: SmokeSuiteResult) -> str:
     lines.append(f"- Started (UTC): `{result.started_at_utc}`")
     lines.append(f"- Finished (UTC): `{result.finished_at_utc}`")
     lines.append(f"- Success: `{result.success}`")
+    lines.append("- Qualitative policy: `debug_same_model` (debug-only: same generation model is reused for scoring)")
     lines.append("")
     lines.append("## Inputs")
     lines.append("")

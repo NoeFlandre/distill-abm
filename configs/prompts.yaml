@@ -63,4 +63,5 @@ faithfulness_eval_prompt: |
   Return "Faithfulness score: <1-5>" and brief reasoning.
 style_features:
   role: You are an expert in agent-based modeling and statistics.
+  example: Include one concise concrete example from the provided evidence.
   insights: Keep interpretation objective and concise.

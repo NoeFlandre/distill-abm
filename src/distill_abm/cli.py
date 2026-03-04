@@ -200,6 +200,7 @@ def smoke_qwen(
     metric_pattern: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.metric_pattern,
     metric_description: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.metric_description,
     plot_description: Annotated[str | None, typer.Option()] = None,
+    abm: Annotated[str | None, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = None,
     additional_summarizer: Annotated[
         list[str] | None,
         typer.Option(
@@ -218,6 +219,14 @@ def smoke_qwen(
 ) -> None:
     """Runs full Qwen smoke validation across evidence/text modes plus DoE and sweep artifacts."""
     prompts = load_prompts_config(prompts_path)
+    sweep_plot_descriptions: list[str] | None = None
+    if abm:
+        abm_config = load_abm_config(Path("configs/abms") / f"{abm}.yaml")
+        metric_pattern = abm_config.metric_pattern
+        metric_description = abm_config.metric_description
+        if plot_description is None and abm_config.plot_descriptions:
+            plot_description = abm_config.plot_descriptions[0]
+        sweep_plot_descriptions = list(abm_config.plot_descriptions)
     adapter = create_adapter(provider="ollama", model=model)
     result = run_qwen_smoke_suite(
         inputs=SmokeSuiteInputs(
@@ -229,6 +238,7 @@ def smoke_qwen(
             metric_pattern=metric_pattern,
             metric_description=metric_description,
             plot_description=plot_description,
+            sweep_plot_descriptions=sweep_plot_descriptions,
             additional_summarizers=_parse_additional_summarizers(additional_summarizer),
         ),
         prompts=prompts,

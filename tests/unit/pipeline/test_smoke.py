@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from distill_abm.configs.models import PromptsConfig
 from distill_abm.llm.adapters.base import LLMAdapter, LLMRequest, LLMResponse
@@ -98,6 +99,7 @@ def test_run_qwen_smoke_suite_writes_matrix_and_reports(tmp_path: Path) -> None:
     assert len(payload["cases"]) == 9
     assert payload["sweep_status"] == "ok"
     assert payload["doe_status"] == "ok"
+    assert payload["qualitative_policy"] == "debug_same_model"
 
 
 def test_run_qwen_smoke_suite_records_pipeline_failure(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -138,3 +140,54 @@ def test_run_qwen_smoke_suite_records_pipeline_failure(tmp_path: Path, monkeypat
     assert result.failed_cases
     assert result.report_markdown_path.exists()
     assert "boom" in result.report_json_path.read_text(encoding="utf-8")
+
+
+def test_run_qwen_smoke_suite_uses_multiple_images_for_sweep(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    params.write_text("param=1\n", encoding="utf-8")
+    docs = tmp_path / "docs.txt"
+    docs.write_text("documentation block\n", encoding="utf-8")
+    doe_input_csv = tmp_path / "doe.csv"
+    pd.DataFrame({"Model": ["Qwen", "Qwen"], "WithExamples": ["Yes", "No"], "BLEU": [0.4, 0.2]}).to_csv(
+        doe_input_csv, index=False
+    )
+
+    captured: dict[str, object] = {}
+
+    def fake_run_pipeline_sweep(*, image_paths, plot_descriptions, **kwargs):  # type: ignore[no-untyped-def]
+        captured["count"] = len(image_paths)
+        captured["descriptions"] = list(plot_descriptions)
+        output_csv = kwargs["output_csv"]
+        output_csv.parent.mkdir(parents=True, exist_ok=True)
+        output_csv.write_text("Combination Description,Context Prompt,Context Response\n", encoding="utf-8")
+        return output_csv
+
+    monkeypatch.setattr("distill_abm.pipeline.smoke.run_pipeline_sweep", fake_run_pipeline_sweep)
+    prompts = PromptsConfig(
+        context_prompt="Context {parameters} {documentation}",
+        trend_prompt="Trend {description} {context}",
+        style_features={"role": "ROLE", "example": "EXAMPLE", "insights": "INSIGHTS"},
+    )
+    result = run_qwen_smoke_suite(
+        inputs=SmokeSuiteInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "smoke",
+            model="qwen3.5:0.8b",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk trend",
+            sweep_plot_descriptions=["plot-1", "plot-2", "plot-3", "plot-4", "plot-5"],
+        ),
+        prompts=prompts,
+        adapter=SmokeFakeAdapter(),
+        run_qualitative=False,
+        doe_input_csv=doe_input_csv,
+        run_sweep=True,
+    )
+
+    assert result.success is True
+    assert captured["count"] == 5
+    assert captured["descriptions"] == ["plot-1", "plot-2", "plot-3", "plot-4", "plot-5"]
