@@ -2,7 +2,6 @@
 
 import hashlib
 import json
-from collections.abc import Callable
 from datetime import UTC, datetime
 from itertools import combinations
 from pathlib import Path
@@ -17,12 +16,6 @@ from distill_abm.eval.metrics import SummaryScores, score_summary
 from distill_abm.ingest.csv_ingest import load_simulation_csv
 from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline import helpers
-from distill_abm.summarize.models import (
-    summarize_with_bart,
-    summarize_with_bert,
-    summarize_with_longformer_ext,
-    summarize_with_t5,
-)
 from distill_abm.viz.plots import MetricPlotBundle, plot_metric_bundles
 
 EvidenceMode = Literal["plot", "table", "plot+table"]
@@ -45,6 +38,7 @@ class PipelineInputs(BaseModel):
     text_source_mode: TextSourceMode = "summary_only"
     evidence_mode: EvidenceMode = "plot+table"
     summarizers: tuple[SummarizerId, ...] = ("bart", "bert", "t5", "longformer_ext")
+    allow_summary_fallback: bool = False
     enabled_style_features: tuple[str, ...] | None = None
     scoring_reference_path: Path | None = None
     resume_existing: bool = False
@@ -142,6 +136,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         text=trend_raw,
         text_source_mode=inputs.text_source_mode,
         summarizers=inputs.summarizers,
+        allow_summary_fallback=inputs.allow_summary_fallback,
     )
     selected_text_source: TextSourceMode = "summary_only" if trend_summary is not None else "full_text_only"
     report_trend = trend_summary if trend_summary is not None else trend_full
@@ -178,6 +173,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         trend_full=trend_full,
         trend_summary=trend_summary,
         selected_text_source=selected_text_source,
+        allow_summary_fallback=inputs.allow_summary_fallback,
         full_scores=full_scores,
         summary_scores=summary_scores,
         selected_scores=selected_scores,
@@ -567,28 +563,15 @@ def _summarize_report_text(
     text: str,
     text_source_mode: TextSourceMode,
     summarizers: tuple[SummarizerId, ...],
+    allow_summary_fallback: bool,
 ) -> tuple[str, str | None]:
     """Resolve and generate trend text variants based on selected text-source mode."""
-    if text_source_mode == "full_text_only":
-        return text, None
-    runners: dict[SummarizerId, Callable[[str], str]] = {
-        "bart": summarize_with_bart,
-        "bert": summarize_with_bert,
-        "t5": summarize_with_t5,
-        "longformer_ext": summarize_with_longformer_ext,
-    }
-    summary_parts: list[str] = []
-    ordered = summarizers or ("bart", "bert", "t5", "longformer_ext")
-    for summarizer_id in ordered:
-        runner = runners[summarizer_id]
-        try:
-            value = runner(text).strip()
-        except Exception:
-            continue
-        if value:
-            summary_parts.append(value)
-    summary = "\n".join(summary_parts).strip()
-    return text, summary or None
+    return helpers.summarize_report_text_pair_for_ids(
+        text=text,
+        skip_summarization=text_source_mode == "full_text_only",
+        summarizer_ids=summarizers,
+        allow_fallback=allow_summary_fallback,
+    )
 
 
 def _write_report(
@@ -626,6 +609,7 @@ def _write_run_metadata(
     trend_full: str,
     trend_summary: str | None,
     selected_text_source: TextSourceMode,
+    allow_summary_fallback: bool,
     full_scores: SummaryScores | None,
     summary_scores: SummaryScores | None,
     include_extended: bool,
@@ -664,6 +648,7 @@ def _write_run_metadata(
             "output_dir": str(inputs.output_dir),
             "scoring_reference_path": str(scoring_reference_path) if scoring_reference_path is not None else None,
             "resume_existing": inputs.resume_existing,
+            "allow_summary_fallback": allow_summary_fallback,
         },
         "artifacts": {
             "plot_path": str(plot_path),
@@ -731,13 +716,13 @@ def _write_run_metadata(
                 "max_input_length": 1024,
                 "min_summary_length": 50,
                 "max_summary_length": 100,
-                "enabled": True,
+                "enabled": "bart" in inputs.summarizers,
             },
             "bert": {
                 "max_input_length": 512,
                 "min_summary_length": 100,
                 "max_summary_length": 150,
-                "enabled": True,
+                "enabled": "bert" in inputs.summarizers,
             },
             "t5": {
                 "model": "t5-small",

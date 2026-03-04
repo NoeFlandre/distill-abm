@@ -46,10 +46,10 @@ def test_run_pipeline_summary_only_uses_all_requested_summarizers(
 ) -> None:
     csv_path, parameters_path, documentation_path = _write_inputs(tmp_path)
 
-    monkeypatch.setattr(run_module, "summarize_with_bart", lambda text: f"bart::{text}")
-    monkeypatch.setattr(run_module, "summarize_with_bert", lambda text: f"bert::{text}")
-    monkeypatch.setattr(run_module, "summarize_with_t5", lambda text: f"t5::{text}")
-    monkeypatch.setattr(run_module, "summarize_with_longformer_ext", lambda text: f"led::{text}")
+    monkeypatch.setattr(run_module.helpers, "summarize_with_bart", lambda text: f"bart::{text}")
+    monkeypatch.setattr(run_module.helpers, "summarize_with_bert", lambda text: f"bert::{text}")
+    monkeypatch.setattr(run_module.helpers, "summarize_with_t5", lambda text: f"t5::{text}")
+    monkeypatch.setattr(run_module.helpers, "summarize_with_longformer_ext", lambda text: f"led::{text}")
 
     adapter = FakeAdapter()
     result = run_pipeline(
@@ -80,6 +80,10 @@ def test_run_pipeline_summary_only_uses_all_requested_summarizers(
     assert metadata["inputs"]["text_source_mode"] == "summary_only"
     assert metadata["inputs"]["selected_text_source"] == "summary_only"
     assert metadata["inputs"]["summarizers"] == ["bart", "bert", "t5", "longformer_ext"]
+    assert metadata["summarizers"]["bart"]["enabled"] is True
+    assert metadata["summarizers"]["bert"]["enabled"] is True
+    assert metadata["summarizers"]["t5"]["enabled"] is True
+    assert metadata["summarizers"]["longformer_ext"]["enabled"] is True
 
 
 def test_run_pipeline_full_text_only_bypasses_summarizers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -117,6 +121,71 @@ def test_run_pipeline_full_text_only_bypasses_summarizers(tmp_path: Path, monkey
     metadata = json.loads(result.metadata_path.read_text(encoding="utf-8"))
     assert metadata["inputs"]["text_source_mode"] == "full_text_only"
     assert metadata["inputs"]["selected_text_source"] == "full_text_only"
+
+
+def test_run_pipeline_summary_only_with_strict_mode_fails_if_all_summarizers_fallback_none(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csv_path, parameters_path, documentation_path = _write_inputs(tmp_path)
+
+    monkeypatch.setattr(run_module.helpers, "summarize_with_bart", lambda _text: "")
+    monkeypatch.setattr(run_module.helpers, "summarize_with_bert", lambda _text: "")
+    monkeypatch.setattr(run_module.helpers, "summarize_with_t5", lambda _text: "")
+    monkeypatch.setattr(run_module.helpers, "summarize_with_longformer_ext", lambda _text: "")
+
+    with pytest.raises(RuntimeError, match="No configured summarizer produced"):
+        run_pipeline(
+            inputs=PipelineInputs(
+                csv_path=csv_path,
+                parameters_path=parameters_path,
+                documentation_path=documentation_path,
+                output_dir=tmp_path / "out",
+                model="fake-model",
+                metric_pattern="mean-incum",
+                metric_description="weekly milk",
+                text_source_mode="summary_only",
+                evidence_mode="plot",
+                allow_summary_fallback=False,
+            ),
+            prompts=_prompts(),
+            adapter=FakeAdapter(),
+        )
+
+
+def test_run_pipeline_summary_only_metadata_respects_selected_summarizers(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csv_path, parameters_path, documentation_path = _write_inputs(tmp_path)
+
+    monkeypatch.setattr(run_module.helpers, "summarize_with_bart", lambda text: "")
+    monkeypatch.setattr(run_module.helpers, "summarize_with_bert", lambda text: "bert")
+
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=parameters_path,
+            documentation_path=documentation_path,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            text_source_mode="summary_only",
+            evidence_mode="plot",
+            allow_summary_fallback=True,
+            summarizers=("bert",),
+        ),
+        prompts=_prompts(),
+        adapter=FakeAdapter(),
+    )
+
+    assert result.metadata_path is not None
+    metadata = json.loads(result.metadata_path.read_text(encoding="utf-8"))
+    assert metadata["inputs"]["summarizers"] == ["bert"]
+    assert metadata["summarizers"]["bart"]["enabled"] is False
+    assert metadata["summarizers"]["bert"]["enabled"] is True
+    assert metadata["summarizers"]["t5"]["enabled"] is False
+    assert metadata["summarizers"]["longformer_ext"]["enabled"] is False
+    assert metadata["inputs"]["allow_summary_fallback"] is True
 
 
 def test_run_pipeline_table_mode_uses_text_only_evidence(tmp_path: Path) -> None:

@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from distill_abm.configs.models import PromptsConfig
 from distill_abm.eval.metrics import SummaryScores
@@ -323,6 +324,17 @@ def test_summarize_report_text_pair_skips_failing_additional_summarizer() -> Non
     )
 
     assert summary == "bart:raw\nbert:raw"
+
+
+def test_summarize_report_text_pair_raises_when_fallback_is_disabled() -> None:
+    with pytest.raises(RuntimeError, match="No configured summarizer produced"):
+        helpers.summarize_report_text_pair(
+            text="raw",
+            skip_summarization=False,
+            summarize_with_bart_fn=lambda _text: "",
+            summarize_with_bert_fn=lambda _text: "",
+            allow_fallback=False,
+        )
 
 
 def test_write_report_with_both_full_and_summary_scores(tmp_path: Path) -> None:

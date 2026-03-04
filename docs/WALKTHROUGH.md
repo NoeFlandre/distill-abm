@@ -16,8 +16,13 @@ uv run distill-abm run \
   --model-id kimi_k2_5 \
   --evidence-mode plot+table \
   --text-source-mode summary_only \
+  --allow-summary-fallback \
   --summarizer bart --summarizer bert --summarizer t5 --summarizer longformer_ext
 ```
+
+`--allow-summary-fallback` is optional. By default, summary-only runs are strict: if every selected summarizer returns no output, the command fails.
+
+See [Failure Semantics](FAILURE_SEMANTICS.md) for the full policy.
 
 ## 3. Run Full-Text Only Ablation
 

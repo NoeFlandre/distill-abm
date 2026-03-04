@@ -101,6 +101,10 @@ def run(
             help="Summary backend roster. Repeatable: bart, bert, t5, longformer_ext.",
         ),
     ] = None,
+    allow_summary_fallback: Annotated[
+        bool,
+        typer.Option(help="Allow summary-only mode to fall back to full-text when summarizers fail."),
+    ] = False,
     abm: Annotated[str | None, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = None,
 ) -> None:
     """Run one end-to-end pipeline execution from CSV to scored report."""
@@ -131,6 +135,7 @@ def run(
             plot_description=plot_description,
             evidence_mode=evidence_mode,
             text_source_mode=text_source_mode,
+            allow_summary_fallback=allow_summary_fallback,
             summarizers=_parse_summarizers(summarizer, fallback=DEFAULT_SUMMARIZERS),
             scoring_reference_path=scoring_reference_path,
         ),
@@ -230,6 +235,10 @@ def smoke_qwen(
     plot_description: Annotated[str | None, typer.Option()] = None,
     evidence_mode: Annotated[EvidenceMode, typer.Option()] = RUNTIME_DEFAULTS.smoke.evidence_mode,
     text_source_mode: Annotated[TextSourceMode, typer.Option()] = RUNTIME_DEFAULTS.smoke.text_source_mode,
+    allow_summary_fallback: Annotated[
+        bool,
+        typer.Option(help="Allow smoke summary-only mode to fall back to full-text when summarizers fail."),
+    ] = False,
     abm: Annotated[str | None, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = None,
     summarizer: Annotated[
         list[str] | None,
@@ -293,6 +302,7 @@ def smoke_qwen(
             metric_description=metric_description,
             plot_description=plot_description,
             sweep_plot_descriptions=sweep_plot_descriptions,
+            allow_summary_fallback=allow_summary_fallback,
             summarizers=_parse_summarizers(summarizer, fallback=RUNTIME_DEFAULTS.smoke.summarizers),
             text_source_mode=text_source_mode,
             evidence_mode=evidence_mode,
