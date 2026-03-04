@@ -1,12 +1,5 @@
 [
   {
-    "notebook_path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
-    "required_functions": [
-      "analyze_factorial_contributions"
-    ],
-    "function_count": 1
-  },
-  {
     "notebook_path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/C\u00e9dric DoE Analysis averaging the repetitions.ipynb",
     "required_functions": [
       "calculate_sst",

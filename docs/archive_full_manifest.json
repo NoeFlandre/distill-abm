@@ -15,10 +15,10 @@
     "sha256": "02af6fcf85c3b7c6d8ad9e46df93c7065b867ee892da3dc2a1f3aa4244f1c883",
     "size_bytes": 26645,
     "extension": ".ipynb",
-    "classification": "runtime_required",
+    "classification": "historical_nonruntime",
     "action": "retain_record_only",
-    "target_path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
-    "rationale": "Notebook file currently required by runtime loader for compatibility dispatch; retained in place.",
+    "target_path": null,
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb"
     ]
