@@ -6,6 +6,8 @@
   - CSV ingestion and NetLogo preprocessing orchestration
   - `netlogo.py`: extraction helpers (`extract_code`, `extract_parameters`, `extract_documentation`)
   - `netlogo_notebook_workflow.py`: notebook-compatible run loop and artifact generation
+  - `netlogo_notebook_artifacts.py`: reusable artifact builders (parameters, docs, code, narratives)
+  - `netlogo_notebook_steps.py`: reusable NetLogo execution primitives (parameter coercion, single-run capture)
 - `distill_abm.viz`:
   - metric plotting for repeated simulations
   - stats table computation (`generate_stats_table`)

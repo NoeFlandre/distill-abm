@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import base64
-import csv
 from itertools import combinations
 from pathlib import Path
 from typing import Literal
@@ -14,16 +12,10 @@ from pydantic import BaseModel, Field
 from distill_abm.configs.models import PromptsConfig
 from distill_abm.eval.metrics import SummaryScores, score_summary
 from distill_abm.ingest.csv_ingest import load_simulation_csv
-from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMRequest
+from distill_abm.llm.adapters.base import LLMAdapter
+from distill_abm.pipeline import helpers
 from distill_abm.summarize.models import summarize_with_bart, summarize_with_bert
-from distill_abm.summarize.text import clean_markdown_symbols, strip_think_prefix
-from distill_abm.viz.plots import (
-    MetricPlotBundle,
-    generate_stats_table,
-    plot_metric_bundles,
-    render_stats_table_image,
-    render_stats_table_markdown,
-)
+from distill_abm.viz.plots import MetricPlotBundle, plot_metric_bundles
 
 EvidenceMode = Literal["plot", "stats-markdown", "stats-image", "plot+stats"]
 SweepCsvColumnStyle = Literal["trend", "plot"]
@@ -76,6 +68,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     """Executes the notebook-equivalent workflow through pure Python components."""
     frame = load_simulation_csv(inputs.csv_path)
     inputs.output_dir.mkdir(parents=True, exist_ok=True)
+
     plot_path = plot_metric_bundles(
         frame=frame,
         bundles=[
@@ -87,8 +80,9 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         ],
         output_dir=inputs.output_dir,
     )[0]
-    stats_table = generate_stats_table(frame, include_pattern=inputs.metric_pattern)
-    stats_markdown = render_stats_table_markdown(stats_table)
+
+    stats_table = helpers.build_stats_table(frame=frame, include_pattern=inputs.metric_pattern)
+    stats_markdown = helpers.build_stats_markdown(stats_table)
     stats_image_path = _write_stats_image_if_needed(
         stats_table=stats_table,
         output_dir=inputs.output_dir,
@@ -114,6 +108,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     trend = _summarize_report_text(trend_raw, skip_summarization=inputs.skip_summarization)
     scores = score_summary(reference=context, candidate=trend)
     report_csv = _write_report(inputs.output_dir, context, trend, scores)
+
     return PipelineResult(
         plot_path=plot_path,
         report_csv=report_csv,
@@ -207,90 +202,31 @@ def write_combinations_csv(
     csv_column_style: SweepCsvColumnStyle = "trend",
     resume_existing: bool = False,
 ) -> Path:
-    """Writes notebook-style wide CSV format with one prompt+response column pair per trend image."""
+    """Writes notebook-style wide CSV format with one prompt+response pair per trend image."""
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     max_items = max((len(row.trend_analysis_prompts) for row in rows), default=0)
     headers = _sweep_headers(max_items=max_items, csv_column_style=csv_column_style)
     if resume_existing:
         return _write_combinations_csv_resume(output_csv=output_csv, rows=rows, headers=headers)
-
-    with output_csv.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(headers)
-        for row in rows:
-            writer.writerow(_row_to_record(row))
+    helpers.write_sweep_rows(output_csv=output_csv, rows=rows, headers=headers)
     return output_csv
 
 
 def _sweep_headers(max_items: int, csv_column_style: SweepCsvColumnStyle) -> list[str]:
-    headers = ["Combination Description", "Context Prompt", "Context Response"]
-    for index in range(1, max_items + 1):
-        if csv_column_style == "plot":
-            headers.append(f"Plot {index} Prompt")
-            headers.append(f"Plot {index} Analysis")
-        else:
-            headers.append(f"Trend Analysis Prompt {index}")
-            headers.append(f"Trend Analysis Response {index}")
-    return headers
+    return helpers.sweep_headers(max_items=max_items, csv_column_style=csv_column_style)
 
 
 def _row_to_record(row: SweepRunResult) -> list[str]:
-    record: list[str] = [
-        row.combination_description,
-        row.context_prompt,
-        row.context_response,
-    ]
-    for prompt, response in zip(row.trend_analysis_prompts, row.trend_analysis_responses, strict=True):
-        record.extend([prompt, response])
-    return record
+    return helpers.row_to_record(row)
 
 
 def _write_combinations_csv_resume(output_csv: Path, rows: list[SweepRunResult], headers: list[str]) -> Path:
-    existing = _load_existing_rows_if_compatible(output_csv, headers)
-    for sweep_row in rows:
-        new_record = _row_to_record(sweep_row)
-        merged = existing.get(sweep_row.combination_description, [""] * len(headers))
-        if len(merged) < len(headers):
-            merged = merged + [""] * (len(headers) - len(merged))
-        merged[0] = sweep_row.combination_description
-        if len(new_record) > 1 and not merged[1]:
-            merged[1] = new_record[1]
-        if len(new_record) > 2 and not merged[2]:
-            merged[2] = new_record[2]
-        for index in range(3, len(headers), 2):
-            next_index = index + 1
-            if next_index >= len(headers):
-                break
-            source_prompt = new_record[index] if index < len(new_record) else ""
-            source_response = new_record[next_index] if next_index < len(new_record) else ""
-            if (not merged[index]) and (not merged[next_index]) and (source_prompt or source_response):
-                merged[index] = source_prompt
-                merged[next_index] = source_response
-        existing[sweep_row.combination_description] = merged
-
-    with output_csv.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(headers)
-        for key in existing:
-            writer.writerow(existing[key])
+    helpers.write_sweep_rows_resume(output_csv=output_csv, rows=rows, headers=headers)
     return output_csv
 
 
 def _load_existing_rows_if_compatible(output_csv: Path, headers: list[str]) -> dict[str, list[str]]:
-    if not output_csv.exists():
-        return {}
-    with output_csv.open("r", encoding="utf-8", newline="") as handle:
-        reader = csv.reader(handle)
-        file_headers = next(reader, None)
-        if file_headers != headers:
-            return {}
-        records: dict[str, list[str]] = {}
-        for row in reader:
-            if not row:
-                continue
-            key = row[0]
-            records[key] = row
-    return records
+    return helpers.load_existing_rows_if_compatible(output_csv=output_csv, headers=headers)
 
 
 def build_style_feature_combinations(
@@ -312,71 +248,33 @@ def _context_prompt(
     prompts: PromptsConfig,
     enabled_style_features: set[str] | None = None,
 ) -> str:
-    parameters = inputs.parameters_path.read_text(encoding="utf-8")
-    documentation = inputs.documentation_path.read_text(encoding="utf-8")
-    base = prompts.context_prompt.format(parameters=parameters, documentation=documentation)
-    role = prompts.style_features.get("role", "").strip()
-    include_role = enabled_style_features is None or "role" in enabled_style_features
-    if role and include_role:
-        return f"{role}\n\n{base}"
-    return base
+    return helpers.build_context_prompt(
+        inputs_csv_path=inputs.parameters_path,
+        inputs_doc_path=inputs.documentation_path,
+        prompts=prompts,
+        enabled=enabled_style_features,
+    )
 
 
 def _invoke_adapter(adapter: LLMAdapter, model: str, prompt: str, image_b64: str | None = None) -> str:
-    request = LLMRequest(model=model, messages=[LLMMessage(role="user", content=prompt)], image_b64=image_b64)
-    response = adapter.complete(request)
-    return clean_markdown_symbols(strip_think_prefix(response.text))
+    return helpers.invoke_adapter(adapter=adapter, model=model, prompt=prompt, image_b64=image_b64)
 
 
 def _encode_image(path: Path) -> str:
-    data = path.read_bytes()
-    return base64.b64encode(data).decode("utf-8")
+    return helpers.encode_image(path)
 
 
 def _write_report(output_dir: Path, context: str, trend: str, scores: SummaryScores) -> Path:
-    report_path = output_dir / "report.csv"
-    with report_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(
-            [
-                "context_response",
-                "trend_response",
-                "token_f1",
-                "bleu",
-                "meteor",
-                "rouge1",
-                "rouge2",
-                "rouge_l",
-                "flesch_reading_ease",
-            ]
-        )
-        writer.writerow(
-            [
-                context,
-                trend,
-                scores.token_f1,
-                scores.bleu,
-                scores.meteor,
-                scores.rouge1,
-                scores.rouge2,
-                scores.rouge_l,
-                scores.flesch_reading_ease,
-            ]
-        )
-    return report_path
+    return helpers.write_report(output_dir=output_dir, context=context, trend=trend, scores=scores)
 
 
 def _summarize_report_text(text: str, skip_summarization: bool) -> str:
-    if skip_summarization:
-        return text
-    try:
-        bart = summarize_with_bart(text).strip()
-        bert = summarize_with_bert(text).strip()
-    except Exception:
-        # Keep direct-report mode as a robust fallback when summarizers are unavailable.
-        return text
-    combined = "\n".join(part for part in [bart, bert] if part)
-    return combined if combined else text
+    return helpers.summarize_report_text(
+        text=text,
+        skip_summarization=skip_summarization,
+        summarize_with_bart_fn=summarize_with_bart,
+        summarize_with_bert_fn=summarize_with_bert,
+    )
 
 
 def _build_trend_prompt(
@@ -388,23 +286,15 @@ def _build_trend_prompt(
     stats_markdown: str,
     enabled_style_features: set[str] | None = None,
 ) -> str:
-    parts: list[str] = []
-    enabled = enabled_style_features or set()
-    role = prompts.style_features.get("role", "").strip()
-    include_all = enabled_style_features is None
-    if role and (include_all or "role" in enabled):
-        parts.append(role)
-    parts.append(prompts.trend_prompt.format(description=metric_description, context=context))
-    example = prompts.style_features.get("example", "").strip()
-    if example and (include_all or "example" in enabled):
-        parts.append(example)
-    insights = prompts.style_features.get("insights", "").strip()
-    if insights and (include_all or "insights" in enabled):
-        parts.append(insights)
-    parts = _append_plot_description_parts(parts, plot_description)
-    if evidence_mode in {"stats-markdown", "plot+stats"}:
-        parts.append(f"Stats table:\n{stats_markdown}")
-    return "\n\n".join(parts)
+    return helpers.build_trend_prompt(
+        prompts=prompts,
+        metric_description=metric_description,
+        context=context,
+        plot_description=plot_description,
+        evidence_mode=evidence_mode,
+        stats_markdown=stats_markdown,
+        enabled=enabled_style_features,
+    )
 
 
 def _write_stats_image_if_needed(
@@ -413,10 +303,12 @@ def _write_stats_image_if_needed(
     include_pattern: str,
     evidence_mode: EvidenceMode,
 ) -> Path | None:
-    if evidence_mode != "stats-image":
-        return None
-    path = output_dir / f"{_slug(include_pattern)}_stats.png"
-    return render_stats_table_image(stats_table, path)
+    return helpers.write_stats_image_if_needed(
+        stats_table=stats_table,
+        output_dir=output_dir,
+        include_pattern=include_pattern,
+        evidence_mode=evidence_mode,
+    )
 
 
 def _encode_image_for_evidence(
@@ -424,27 +316,12 @@ def _encode_image_for_evidence(
     plot_path: Path,
     stats_image_path: Path | None,
 ) -> str | None:
-    if evidence_mode in {"plot", "plot+stats"}:
-        return _encode_image(plot_path)
-    if evidence_mode == "stats-image" and stats_image_path is not None:
-        return _encode_image(stats_image_path)
-    return None
-
-
-def _slug(pattern: str) -> str:
-    return pattern.strip().replace(" ", "_").replace("/", "_").lower()
-
-
-def _append_plot_description_parts(parts: list[str], plot_description: str | None) -> list[str]:
-    if plot_description:
-        stripped = plot_description.strip()
-        if stripped:
-            parts.append(stripped)
-    return parts
+    return helpers.encode_evidence_image(
+        evidence_mode=evidence_mode,
+        plot_path=plot_path,
+        stats_image_path=stats_image_path,
+    )
 
 
 def _append_plot_description(base_prompt: str, plot_description: str) -> str:
-    stripped = plot_description.strip()
-    if not stripped:
-        return base_prompt
-    return f"{base_prompt}\n\n{stripped}"
+    return helpers.append_plot_description(base_prompt=base_prompt, plot_description=plot_description)

@@ -14,7 +14,7 @@ def should_skip_row(row: Mapping[str, object], column_name: str) -> bool:
     value = row[column_name]
     if _is_missing(value):
         return False
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return value > 0
     if isinstance(value, str):
         return bool(value.strip())
