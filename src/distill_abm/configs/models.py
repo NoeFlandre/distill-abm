@@ -141,3 +141,63 @@ class NotebookExperimentSettings(BaseModel):
     scoring: NotebookScoringDefaults
     qualitative_example_text_dir: str
     human_reference_dir: str
+
+
+RuntimeEvidenceMode = Literal["plot", "table-csv", "plot+table", "stats-markdown", "stats-image", "plot+stats"]
+RuntimeSummarizationMode = Literal["full", "summary", "both"]
+RuntimeScoreMode = Literal["full", "summary", "both"]
+
+
+class RuntimeLLMRequestDefaults(BaseModel):
+    """Defines default request sampling parameters across providers."""
+
+    temperature: float = 0.5
+    max_tokens: int = 1000
+
+
+class RuntimeRunDefaults(BaseModel):
+    """Defines CLI defaults for the main `run` command."""
+
+    provider: ProviderName = "echo"
+    model: str = "echo-model"
+    output_dir: str = "results/pipeline"
+    metric_pattern: str = "mean"
+    metric_description: str = "simulation trend"
+    evidence_mode: RuntimeEvidenceMode = "plot"
+    summarization_mode: RuntimeSummarizationMode = "both"
+    score_on: RuntimeScoreMode = "both"
+
+
+class RuntimeQualitativeDefaults(BaseModel):
+    """Defines CLI defaults for qualitative evaluation command."""
+
+    provider: ProviderName = "echo"
+    model: str = "echo-model"
+
+
+class RuntimeSmokeDefaults(BaseModel):
+    """Defines CLI defaults for the local Qwen smoke command."""
+
+    output_dir: str = "results/smoke_qwen"
+    model: str = "qwen3.5:0.8b"
+    metric_pattern: str = "mean"
+    metric_description: str = "simulation trend"
+    run_qualitative: bool = True
+    run_sweep: bool = True
+
+
+class RuntimeDoEDefaults(BaseModel):
+    """Defines CLI defaults for DOE analysis command."""
+
+    output_csv: str = "results/doe/anova_factorial_contributions.csv"
+    max_interaction_order: int = 2
+
+
+class RuntimeDefaultsConfig(BaseModel):
+    """Centralized runtime defaults consumed by CLI, adapters, and pipeline metadata."""
+
+    llm_request: RuntimeLLMRequestDefaults = RuntimeLLMRequestDefaults()
+    run: RuntimeRunDefaults = RuntimeRunDefaults()
+    qualitative: RuntimeQualitativeDefaults = RuntimeQualitativeDefaults()
+    smoke: RuntimeSmokeDefaults = RuntimeSmokeDefaults()
+    doe: RuntimeDoEDefaults = RuntimeDoEDefaults()

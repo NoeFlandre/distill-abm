@@ -11,6 +11,7 @@ from distill_abm.configs.loader import (
     load_models_config,
     load_notebook_experiment_settings,
     load_prompts_config,
+    load_runtime_defaults_config,
 )
 
 
@@ -73,7 +74,15 @@ def test_non_mapping_yaml_raises_config_error(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(
-    "loader", [load_models_config, load_prompts_config, load_abm_config, load_evaluation_config, load_logging_config]
+    "loader",
+    [
+        load_models_config,
+        load_prompts_config,
+        load_abm_config,
+        load_evaluation_config,
+        load_logging_config,
+        load_runtime_defaults_config,
+    ],
 )
 def test_missing_config_file_raises(tmp_path: Path, loader: Callable[[Path], object]) -> None:
     path = tmp_path / "missing.yaml"
@@ -89,6 +98,7 @@ def test_missing_config_file_raises(tmp_path: Path, loader: Callable[[Path], obj
         (load_abm_config, "name: 1"),
         (load_evaluation_config, "use_reference_metrics: not-bool"),
         (load_notebook_experiment_settings, "llm_defaults: not-a-dict"),
+        (load_runtime_defaults_config, "llm_request: 7"),
     ],
 )
 def test_invalid_config_payload_raises(

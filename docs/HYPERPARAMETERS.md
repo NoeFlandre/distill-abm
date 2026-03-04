@@ -3,6 +3,10 @@
 This is the publication-facing reference for explicit runtime defaults and hyperparameters.
 If a value is not listed here, it is either required input data or provider-side behavior outside this repository.
 
+Central source of runtime defaults:
+
+- `configs/runtime_defaults.yaml`
+
 ## 1. Core LLM request defaults
 
 Defined in `src/distill_abm/llm/adapters/base.py` (`LLMRequest`):

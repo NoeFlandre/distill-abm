@@ -1,0 +1,29 @@
+llm_request:
+  temperature: 0.5
+  max_tokens: 1000
+
+run:
+  provider: echo
+  model: echo-model
+  output_dir: results/pipeline
+  metric_pattern: mean
+  metric_description: simulation trend
+  evidence_mode: plot
+  summarization_mode: both
+  score_on: both
+
+qualitative:
+  provider: echo
+  model: echo-model
+
+smoke:
+  output_dir: results/smoke_qwen
+  model: qwen3.5:0.8b
+  metric_pattern: mean
+  metric_description: simulation trend
+  run_qualitative: true
+  run_sweep: true
+
+doe:
+  output_csv: results/doe/anova_factorial_contributions.csv
+  max_interaction_order: 2

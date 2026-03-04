@@ -11,6 +11,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from distill_abm.configs.models import PromptsConfig
+from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import evaluate_qualitative_score
 from distill_abm.llm.adapters.base import LLMAdapter
@@ -412,6 +413,7 @@ def _run_sweep_if_requested(
 
 
 def _render_markdown_report(result: SmokeSuiteResult) -> str:
+    runtime_defaults = get_runtime_defaults()
     lines: list[str] = []
     lines.append("# Qwen Smoke Suite Report")
     lines.append("")
@@ -430,7 +432,11 @@ def _render_markdown_report(result: SmokeSuiteResult) -> str:
     lines.append(f"- Metric pattern: `{result.inputs.metric_pattern}`")
     lines.append(f"- Metric description: `{result.inputs.metric_description}`")
     lines.append(f"- Plot description: `{result.inputs.plot_description}`")
-    lines.append("- Request defaults: `temperature=0.5`, `max_tokens=1000`")
+    lines.append(
+        "- Request defaults: "
+        f"`temperature={runtime_defaults.llm_request.temperature}`, "
+        f"`max_tokens={runtime_defaults.llm_request.max_tokens}`"
+    )
     lines.append("")
     lines.append("## Case Matrix")
     lines.append("")

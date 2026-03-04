@@ -7,6 +7,7 @@ Production Python package for ABM-to-LLM distillation, report generation, and ev
 - `src/distill_abm/` - production code
 - `tests/` - unit, integration, and end-to-end tests
 - `configs/` - runtime defaults for prompts, ABMs, evaluation, and logging
+- `configs/runtime_defaults.yaml` - centralized defaults for model/provider/modes and generation parameters
 - `configs/notebook_prompt_reference.yaml` - frozen reference prompt templates (filename retained for compatibility)
 - `configs/notebook_experiment_settings.yaml` - frozen reference experiment settings (filename retained for compatibility)
 - `archive/reference_repo/` - preserved reference implementation snapshot (scripts + artifacts)
@@ -19,6 +20,7 @@ Production Python package for ABM-to-LLM distillation, report generation, and ev
 distill-abm/
 ├── configs/
 │   ├── models.yaml
+│   ├── runtime_defaults.yaml
 │   ├── prompts.yaml
 │   ├── evaluation.yaml
 │   ├── logging.yaml

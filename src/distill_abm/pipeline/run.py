@@ -12,6 +12,7 @@ import pandas as pd
 from pydantic import BaseModel, Field
 
 from distill_abm.configs.models import PromptsConfig
+from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.metrics import SummaryScores, score_summary
 from distill_abm.ingest.csv_ingest import load_simulation_csv
 from distill_abm.llm.adapters.base import LLMAdapter
@@ -466,6 +467,9 @@ def _write_run_metadata(
     trend_image_attached: bool,
 ) -> Path:
     """Persist deterministic run metadata for reproducibility and auditability."""
+    runtime_defaults = get_runtime_defaults()
+    default_temperature = runtime_defaults.llm_request.temperature
+    default_max_tokens = runtime_defaults.llm_request.max_tokens
     metadata = {
         "run_timestamp_utc": datetime.now(UTC).isoformat(),
         "inputs": {
@@ -494,19 +498,19 @@ def _write_run_metadata(
             "provider": adapter.provider,
             "model": inputs.model,
             "request": {
-                "temperature": 0.5,
-                "max_tokens": 1000,
+                "temperature": default_temperature,
+                "max_tokens": default_max_tokens,
             },
             "requests": {
                 "context": {
                     "image_attached": False,
-                    "temperature": 0.5,
-                    "max_tokens": 1000,
+                    "temperature": default_temperature,
+                    "max_tokens": default_max_tokens,
                 },
                 "trend": {
                     "image_attached": trend_image_attached,
-                    "temperature": 0.5,
-                    "max_tokens": 1000,
+                    "temperature": default_temperature,
+                    "max_tokens": default_max_tokens,
                 },
             },
         },

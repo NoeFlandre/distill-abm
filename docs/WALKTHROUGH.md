@@ -206,6 +206,7 @@ Configuration files:
 
 - `configs/prompts.yaml` : editable prompt templates and style features
 - `configs/models.yaml` : provider aliases and model defaults
+- `configs/runtime_defaults.yaml` : centralized runtime defaults for commands, model/provider defaults, and request hyperparameters
 - `configs/notebook_prompt_reference.yaml` : frozen reference templates (filename retained for compatibility)
 - `configs/notebook_experiment_settings.yaml` : frozen ABM experiment settings (filename retained for compatibility)
 - `configs/abms/*.yaml` : model-specific defaults used by `--abm`

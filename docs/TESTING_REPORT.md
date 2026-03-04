@@ -28,10 +28,10 @@ uv run pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85
 
 Latest validated baseline:
 
-- Total tests: `190`
-- Passing tests: `190`
+- Total tests: `195`
+- Passing tests: `195`
 - Coverage threshold: `>=85%`
-- Observed coverage: `85.68%`
+- Observed coverage: `85.93%`
 - Failing gates: `0`
 
 ## 4. Test Taxonomy
