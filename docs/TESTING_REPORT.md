@@ -1,20 +1,20 @@
-# Testing Evidence Report
+# Testing Report
 
-This document is a compact but complete record of verification performed for reviewer-facing confidence and reproducibility.
+This is the single authoritative testing reference for the project.
+Use this document as the publication-facing source for what is tested, how it is tested, and what constitutes a passing release.
 
-## Scope
+## 1. Purpose
 
-The suite validates:
+Testing enforces four guarantees:
 
-- Reference parity against retained implementation artifacts.
-- Compatibility loader behavior and fallback safety.
-- Pipeline end-to-end behavior across evidence modes, summarization modes, scoring modes, and sweep behavior.
-- Deterministic ingestion and CSV/metadata generation.
-- Static quality checks used in CI.
+1. Runtime correctness for production workflows (ingest, prompting, evidence ablations, summarization, scoring, report export).
+2. Stability of compatibility behavior for reference-aligned helper surfaces.
+3. Reproducibility through deterministic metadata and strict quality gates.
+4. Regression protection for future refactors.
 
-## Verification Commands
+## 2. Release Gate (Required)
 
-Run from repository root with `uv`:
+A change is release-eligible only if all checks pass:
 
 ```bash
 uv run pre-commit run --all-files
@@ -24,58 +24,148 @@ uv run mypy src tests
 uv run pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85
 ```
 
-## Expected CI-equivalent Gate Set
+## 3. Current Baseline
 
-The project CI executes the same command set:
+Latest validated baseline:
 
-1. `pre-commit run --all-files`
-2. `ruff check .`
-3. `black --check .`
-4. `mypy src tests`
-5. `pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85`
+- Total tests: `185`
+- Passing tests: `185`
+- Coverage threshold: `>=85%`
+- Observed coverage: `85.86%`
+- Failing gates: `0`
 
-## Current Baseline Result
+## 4. Test Taxonomy
 
-- Total tests: 175
-- Passing: 175
-- Coverage: 85.29% (threshold 85%)
-- Failures: 0
+### Unit tests
 
-## Targeted Test Areas
+Validate deterministic behavior of isolated modules:
 
-### Core regression and migration
+- `tests/unit/ingest/`: CSV and NetLogo ingestion utilities
+- `tests/unit/viz/`: plot rendering and stats table generation
+- `tests/unit/summarize/`: summarizer runners, batch summarization, text cleanup
+- `tests/unit/eval/`: lexical metrics, qualitative parsing, DoE helpers
+- `tests/unit/pipeline/`: prompt composition, mode resolution, CSV writers, sweep helpers
+- `tests/unit/compat/`: compatibility wrappers, reference loader behavior, fallback dispatch
+- `tests/unit/configs/`: strict typed config loading/validation
+- `tests/unit/repo/`: repo-level policy checks (layout/devops assets)
+
+### Integration tests
+
+Validate multi-module runtime behavior:
+
+- `tests/integration/test_pipeline_run.py`:
+  - evidence modes (`plot`, `table-csv`, `plot+table`)
+  - summarization modes (`full`, `summary`, `both`)
+  - scoring modes (`full`, `summary`, `both`)
+  - metadata output integrity
+  - adapter request behavior (image/text paths)
+- `tests/integration/test_pipeline_uses_abm_and_full_metrics.py`: ABM config defaults with full metric output.
+
+### End-to-end tests
+
+Validate CLI entrypoints and option forwarding:
+
+- `tests/e2e/test_cli.py`
+  - `run`
+  - `analyze-doe`
+  - `evaluate-qualitative`
+  - mode/option wiring and invalid-option rejection
+
+### Regression tests
+
+Protect compatibility/replay guarantees:
+
 - `tests/regression/test_reference_equivalence.py`
 - `tests/regression/test_reference_function_coverage.py`
 - `tests/regression/test_runtime_reference_dependencies.py`
-- `tests/regression/test_archive_retired.py`
+- `tests/regression/test_prompt_reference_equivalence.py`
 - `tests/regression/test_archive_manifest.py`
+- `tests/regression/test_archive_retired.py`
 - `tests/regression/test_model_assets_migration.py`
 - `tests/regression/test_evaluation_assets_migration.py`
 
-### Pipeline behavior and sweep parity
-- `tests/integration/test_pipeline_run.py`
-- `tests/integration/test_pipeline_uses_abm_and_full_metrics.py`
-- `tests/unit/pipeline/test_helpers.py`
-- `tests/unit/pipeline/test_sweep.py`
+## 5. What Is Explicitly Verified
 
-### Summarization and LLM text/evaluation flow
-- `tests/unit/summarize/test_*`
-- `tests/unit/eval/test_*`
-- `tests/unit/compat/test_compat_*`
+### Pipeline behavior
 
-### CLI and repo quality
-- `tests/e2e/test_cli.py`
-- `tests/unit/repo/*`
+- Context prompt composition from model parameters + documentation + style features.
+- Trend prompt composition with controlled evidence ablations.
+- Evidence-path contract:
+  - `plot`: image only
+  - `table-csv`: CSV text table only, no vision attachment
+  - `plot+table`: image plus CSV table text
+- Summarization contract:
+  - full text only
+  - summary only
+  - dual path (both)
+- Optional add-on summarizers:
+  - `t5`
+  - `longformer_ext`
+  - robust fallback when one backend is unavailable.
 
-## Reproducibility artifacts
+### Scoring behavior
 
-- Each pipeline run writes `pipeline_run_metadata.json` in the output directory.
-- Use this artifact in combination with `report.csv` and generated plots/images for replay and audit.
+- Metric computation for selected text path(s).
+- Extended report columns when dual scoring is enabled.
+- Qualitative score extraction contract (`coverage`, `faithfulness`).
 
-## Interpretation
+### Artifact behavior
 
-Passing this set is the acceptance gate for:
+- Output files are created in expected paths.
+- `pipeline_run_metadata.json` includes requested/resolved settings and model hyperparameters.
+- CSV report headers match selected mode behavior.
 
-- Publishing-ready releases.
-- Any future structural refactors.
-- Any extension work in prompts, evidence modes, or scoring policy.
+## 6. Reproducibility and Audit
+
+Every production run persists:
+
+- `report.csv`
+- plot artifact(s)
+- `pipeline_run_metadata.json`
+
+`pipeline_run_metadata.json` is the reproducibility key and captures:
+
+- input paths
+- requested + resolved runtime modes
+- prompt signatures/lengths
+- provider/model request metadata
+- summarizer configuration
+- selected score outputs
+
+## 7. CI Alignment
+
+CI runs the same gate sequence as local release validation. There is no separate “hidden” CI-only requirement.
+
+Workflow file:
+
+- `.github/workflows/ci.yml`
+
+## 8. Failure Triage Rules
+
+When a gate fails:
+
+1. Reproduce locally with the exact failing command.
+2. Fix root cause, not test expectations.
+3. Re-run full gate sequence (not just the failing test file).
+4. Do not lower coverage threshold without explicit approval.
+
+## 9. Acceptance Criteria for New Changes
+
+A new feature/refactor is accepted only when:
+
+1. Targeted tests are added first or updated with clear intent.
+2. Existing tests stay green unless behavior change is deliberate and documented.
+3. All release gates pass.
+4. User-facing docs are updated if behavior/CLI changes.
+
+## 10. Canonical Command Set
+
+Quick full validation:
+
+```bash
+uv run pre-commit run --all-files \
+  && uv run ruff check . \
+  && uv run black --check . \
+  && uv run mypy src tests \
+  && uv run pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85
+```
