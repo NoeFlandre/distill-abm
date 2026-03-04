@@ -5,13 +5,13 @@ import subprocess
 import unicodedata
 from pathlib import Path
 
-LEGACY_EVAL_ROOT = Path("archive/legacy_repo/Code/Evaluation")
+REFERENCE_EVAL_ROOT = Path("archive/reference_repo/Code/Evaluation")
 MIRRORED_EVAL_ROOT = Path("tests/fixtures/notebook_parity/evaluation_assets/Evaluation")
 
 
 def _tracked_evaluation_files() -> list[Path]:
     result = subprocess.run(
-        ["git", "ls-files", "-z", "--", str(LEGACY_EVAL_ROOT)],
+        ["git", "ls-files", "-z", "--", str(REFERENCE_EVAL_ROOT)],
         check=True,
         capture_output=True,
         text=False,
@@ -42,7 +42,7 @@ def test_mirrored_evaluation_assets_cover_all_tracked_files() -> None:
         if path.is_file() and path.name != ".DS_Store" and ".ipynb_checkpoints" not in path.parts
     )
     observed = {_normalized_relative(path, MIRRORED_EVAL_ROOT) for path in mirrored_files}
-    expected = {_normalized_relative(path, LEGACY_EVAL_ROOT) for path in tracked_files}
+    expected = {_normalized_relative(path, REFERENCE_EVAL_ROOT) for path in tracked_files}
     assert expected.issubset(observed)
 
 
@@ -52,8 +52,8 @@ def test_mirrored_evaluation_assets_are_byte_equivalent() -> None:
         for path in MIRRORED_EVAL_ROOT.rglob("*")
         if path.is_file() and path.name != ".DS_Store" and ".ipynb_checkpoints" not in path.parts
     }
-    for legacy_path in _tracked_evaluation_files():
-        key = _normalized_relative(legacy_path, LEGACY_EVAL_ROOT)
+    for reference_path in _tracked_evaluation_files():
+        key = _normalized_relative(reference_path, REFERENCE_EVAL_ROOT)
         mirrored_path = mirrored_index.get(key)
         assert mirrored_path is not None
-        assert _sha256(legacy_path) == _sha256(mirrored_path)
+        assert _sha256(reference_path) == _sha256(mirrored_path)

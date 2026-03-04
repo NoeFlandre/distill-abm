@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field
 
 ProviderName = Literal["openai", "anthropic", "ollama", "janus", "echo"]
 
@@ -63,7 +63,10 @@ class ABMConfig(BaseModel):
 class EvaluationConfig(BaseModel):
     """Defines default evaluation behavior for summary scoring."""
 
-    use_legacy_metrics: bool = True
+    use_reference_metrics: bool = Field(
+        default=True,
+        validation_alias=AliasChoices("use_reference_metrics"),
+    )
     use_token_f1: bool = True
 
 

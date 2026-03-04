@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from distill_abm.eval.legacy_scores import LegacyScores, score_summaries_csv_batch
+from distill_abm.eval.reference_scores import ReferenceScores, score_summaries_csv_batch
 
 
 def test_score_summaries_csv_batch_writes_notebook_metric_columns(tmp_path: Path) -> None:
@@ -19,10 +19,10 @@ def test_score_summaries_csv_batch_writes_notebook_metric_columns(tmp_path: Path
 
     calls: list[tuple[str, str]] = []
 
-    def fake_scores(ground_truth: str, summary: str) -> LegacyScores:
+    def fake_scores(ground_truth: str, summary: str) -> ReferenceScores:
         calls.append((ground_truth, summary))
         base = float(len(summary.split()))
-        return LegacyScores(
+        return ReferenceScores(
             bleu=base,
             meteor=base + 1.0,
             rouge1=base + 2.0,

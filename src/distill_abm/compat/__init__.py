@@ -34,7 +34,7 @@ def get_response_with_pdf_and_images(question: str, pdf_path: str | Path, image_
 
 
 def summarize_text_with_models(text: str) -> dict[str, str]:  # type: ignore[no-redef]
-    """Generate legacy-compatible summary outputs for both BART and BERT."""
+    """Generate parity-compatible summary outputs for BART and BERT."""
     return {"bart": summarize_with_bart(text), "bert": summarize_with_bert(text)}
 
 

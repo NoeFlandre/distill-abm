@@ -46,9 +46,9 @@ def _set_note_root(monkeypatch: pytest.MonkeyPatch, root: Path) -> None:
 
 
 def test_priority_flags_are_case_insensitive() -> None:
-    lower_archive = Path("archive/legacy_repo/Code/evaluation/doe/archives/sample.ipynb")
-    lower_copy = Path("archive/legacy_repo/Code/models/fauna/example-copy1.ipynb")
-    checkpoint = Path("archive/legacy_repo/Code/models/fauna/.ipynb_checkpoints/sample.ipynb")
+    lower_archive = Path("archive/reference_repo/Code/evaluation/doe/archives/sample.ipynb")
+    lower_copy = Path("archive/reference_repo/Code/models/fauna/example-copy1.ipynb")
+    checkpoint = Path("archive/reference_repo/Code/models/fauna/.ipynb_checkpoints/sample.ipynb")
 
     assert _path_priority(lower_archive)[0] == 0
     assert _path_priority(lower_copy)[2] == 0
@@ -56,10 +56,10 @@ def test_priority_flags_are_case_insensitive() -> None:
 
 
 def test_better_source_prefers_primary_over_archive_copy_checkpoint() -> None:
-    primary = Path("archive/legacy_repo/Code/Evaluation/DOE/DoE.ipynb")
-    archive = Path("archive/legacy_repo/Code/Evaluation/DOE/archives/DoE.ipynb")
-    copied = Path("archive/legacy_repo/Code/Models/Fauna/example-copy1.ipynb")
-    checkpoint = Path("archive/legacy_repo/Code/Evaluation/DOE/.ipynb_checkpoints/DoE-checkpoint.ipynb")
+    primary = Path("archive/reference_repo/Code/Evaluation/DOE/DoE.ipynb")
+    archive = Path("archive/reference_repo/Code/Evaluation/DOE/archives/DoE.ipynb")
+    copied = Path("archive/reference_repo/Code/Models/Fauna/example-copy1.ipynb")
+    checkpoint = Path("archive/reference_repo/Code/Evaluation/DOE/.ipynb_checkpoints/DoE-checkpoint.ipynb")
 
     assert _is_better_source(primary, archive)
     assert _is_better_source(primary, copied)

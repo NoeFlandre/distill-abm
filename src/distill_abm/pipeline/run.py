@@ -377,7 +377,7 @@ def _select_report_outputs(
     full_scores: SummaryScores | None,
     summary_scores: SummaryScores | None,
 ) -> tuple[str, SummaryScores]:
-    """Pick the text and score tuple that will be written into legacy report columns."""
+    """Select the trend text and score tuple that the report writer should persist."""
     if score_on == "full" or summary_scores is None:
         if full_scores is None:
             return trend_full, score_summary(reference=trend_full, candidate=trend_full)

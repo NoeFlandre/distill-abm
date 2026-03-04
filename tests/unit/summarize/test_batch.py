@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from distill_abm.summarize.legacy import summarize_csv_batch
+from distill_abm.summarize.reference_text import summarize_csv_batch
 
 
 def test_summarize_csv_batch_applies_notebook_lengths_and_formats(tmp_path: Path) -> None:

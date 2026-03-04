@@ -87,7 +87,7 @@ def test_missing_config_file_raises(tmp_path: Path, loader: Callable[[Path], obj
         (load_models_config, "models:\n  openai: 1"),
         (load_prompts_config, "context_prompt: ['bad']"),
         (load_abm_config, "name: 1"),
-        (load_evaluation_config, "use_legacy_metrics: not-bool"),
+        (load_evaluation_config, "use_reference_metrics: not-bool"),
         (load_notebook_experiment_settings, "llm_defaults: not-a-dict"),
     ],
 )

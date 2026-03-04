@@ -65,7 +65,7 @@ def test_archive_manifest_has_no_unresolved_required_mappings() -> None:
             "human_ground_truth",
             "experiment_setting",
             "historical_nonruntime",
-            "legacy_visualization",
+            "reference_visualization",
         }
         assert action in {"migrate", "retain_record_only"}
         assert isinstance(rationale, str) and rationale.strip()

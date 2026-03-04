@@ -9,7 +9,7 @@ Production Python package for ABM-to-LLM distillation with reference-parity vali
 - `configs/` - runtime defaults for prompts, ABMs, evaluation, and logging
 - `configs/notebook_prompt_reference.yaml` - reference templates extracted from scripts
 - `configs/notebook_experiment_settings.yaml` - captured experiment defaults for ingestion and summarization
-- `archive/legacy_repo/` - preserved reference implementation snapshot (scripts + artifacts)
+- `archive/reference_repo/` - preserved reference implementation snapshot (scripts + artifacts)
 - `tests/fixtures/notebook_parity/` - canonical mirrored fixtures used for migration coverage
 - `docs/` - architecture, parity, and audit evidence
 
@@ -36,7 +36,7 @@ distill-abm/
 │   └── viz/                # plot and stats-table rendering
 ├── docs/                  # architecture + parity evidence
 ├── tests/
-└── archive/legacy_repo/   # retained reference scripts
+└── archive/reference_repo/   # retained reference scripts
 ```
 
 Compatibility imports are preserved as `distill_abm.compat` shims for backward compatibility.
@@ -229,7 +229,7 @@ GitHub Actions configuration is at `.github/workflows/ci.yml` and runs:
 
 ### Reference artifacts
 
-- `archive/legacy_repo/` retains source reference scripts and artifacts.
+- `archive/reference_repo/` retains source reference scripts and artifacts.
 - `tests/fixtures/notebook_parity/` stores byte-equivalent mirrors used by migration audits.
 - `archive/` is retained for auditability and does not drive runtime execution.
 

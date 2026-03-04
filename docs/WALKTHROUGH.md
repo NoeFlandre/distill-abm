@@ -118,7 +118,7 @@ By default (`summarization_mode=both`, `score_on=both`), pipeline summarization 
   - `summarize_with_t5`
   - `summarize_with_longformer_ext`
 
-You can force full-text usage with `--summarization-mode full` (or legacy `--skip-summarization`) or capture both text versions with `--summarization-mode both`.
+You can force full-text usage with `--summarization-mode full` (equivalent to `--skip-summarization`) or capture both text versions with `--summarization-mode both`.
 
 ### Dual-path and scoring modes
 
@@ -151,14 +151,14 @@ Post-processing always runs before writing final outputs:
 - normalize whitespace and punctuation
 - strip artifacts from model side effects
 
-Functions are in `distill_abm.summarize.postprocess` and `distill_abm.summarize.legacy`.
+Functions are in `distill_abm.summarize.postprocess` and `distill_abm.summarize.reference_text`.
 
 ## 8) Scoring
 
 Scoring modules are in `distill_abm.eval`:
 
 - token overlap and `SummaryScores` in `distill_abm.eval.metrics`
-- lexical/quality style metrics in `distill_abm.eval.legacy_scores`
+- lexical/quality style metrics in `distill_abm.eval.reference_scores`
 - qualitative parser/extractor helpers in `distill_abm.eval.qualitative`
 
 ## 9) Prompt sweeps

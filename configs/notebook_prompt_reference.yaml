@@ -1,4 +1,4 @@
-source_archive_root: archive/legacy_repo/Code
+source_archive_root: archive/reference_repo/Code
 provenance:
   context_prompt: Models/Milk Consumption/3. (GPT) With combinations.ipynb
   trend_prompt: Models/Milk Consumption/3. (GPT) With combinations.ipynb

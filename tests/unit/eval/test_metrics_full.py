@@ -1,7 +1,7 @@
 from distill_abm.eval.metrics import score_summary
 
 
-def test_score_summary_includes_legacy_metrics() -> None:
+def test_score_summary_includes_reference_metrics() -> None:
     scores = score_summary(
         reference="the quick brown fox jumps over the lazy dog",
         candidate="the quick fox jumps over dog",

@@ -6,8 +6,8 @@ import re
 from typing import cast
 
 from distill_abm.compat.compat_callables import _call_notebook_first
-from distill_abm.summarize.legacy import clean_context_response as _clean_context_response_refactored
-from distill_abm.summarize.legacy import clean_symbols as _clean_symbols_refactored
+from distill_abm.summarize.reference_text import clean_context_response as _clean_context_response_refactored
+from distill_abm.summarize.reference_text import clean_symbols as _clean_symbols_refactored
 
 
 def clean_context_response(text: str) -> str:

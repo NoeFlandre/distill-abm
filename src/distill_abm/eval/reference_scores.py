@@ -10,7 +10,7 @@ import pandas as pd
 
 
 @dataclass(frozen=True)
-class LegacyScores:
+class ReferenceScores:
     """Typed container for lexical metric outputs."""
 
     bleu: float
@@ -21,7 +21,7 @@ class LegacyScores:
     flesch_reading_ease: float
 
 
-def compute_scores(ground_truth: str, summary: str) -> LegacyScores:
+def compute_scores(ground_truth: str, summary: str) -> ReferenceScores:
     """Compute BLEU/METEOR/ROUGE/Flesch scores."""
     try:
         return _compute_with_external_metrics(ground_truth, summary)
@@ -29,7 +29,7 @@ def compute_scores(ground_truth: str, summary: str) -> LegacyScores:
         return _compute_fallback_scores(ground_truth, summary)
 
 
-def _compute_with_external_metrics(ground_truth: str, summary: str) -> LegacyScores:
+def _compute_with_external_metrics(ground_truth: str, summary: str) -> ReferenceScores:
     import textstat
     from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
     from nltk.translate.meteor_score import meteor_score
@@ -43,7 +43,7 @@ def _compute_with_external_metrics(ground_truth: str, summary: str) -> LegacySco
     scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
     rouge = scorer.score(ground_truth, summary)
     flesch = textstat.flesch_reading_ease(summary)
-    return LegacyScores(
+    return ReferenceScores(
         bleu=bleu,
         meteor=meteor,
         rouge1=rouge["rouge1"].fmeasure,
@@ -53,7 +53,7 @@ def _compute_with_external_metrics(ground_truth: str, summary: str) -> LegacySco
     )
 
 
-def _compute_fallback_scores(ground_truth: str, summary: str) -> LegacyScores:
+def _compute_fallback_scores(ground_truth: str, summary: str) -> ReferenceScores:
     gt_tokens = ground_truth.lower().split()
     sum_tokens = summary.lower().split()
     overlap = len(set(gt_tokens).intersection(sum_tokens))
@@ -61,7 +61,7 @@ def _compute_fallback_scores(ground_truth: str, summary: str) -> LegacyScores:
     recall = _safe_divide(overlap, len(gt_tokens))
     f1 = _safe_divide(2 * precision * recall, precision + recall)
     flesch = max(0.0, 100.0 - len(summary.split()) * 0.8)
-    return LegacyScores(
+    return ReferenceScores(
         bleu=f1,
         meteor=f1,
         rouge1=f1,
@@ -83,7 +83,7 @@ def score_summaries_csv_batch(
     ground_truth_text: str,
     bart_column: str = "Summary (BART) Reduced",
     bert_column: str = "Summary (BERT) Reduced",
-    score_fn: Callable[[str, str], LegacyScores] | None = None,
+    score_fn: Callable[[str, str], ReferenceScores] | None = None,
 ) -> pd.DataFrame:
     """Run lexical scoring for BART and BERT summary columns."""
     frame = pd.read_csv(input_csv)
@@ -118,7 +118,7 @@ def _score_column(
     frame: pd.DataFrame,
     column: str,
     ground_truth_text: str,
-    score_fn: Callable[[str, str], LegacyScores],
+    score_fn: Callable[[str, str], ReferenceScores],
 ) -> tuple[list[float], list[float], list[float], list[float], list[float], list[float]]:
     bleu_scores: list[float] = []
     meteor_scores: list[float] = []

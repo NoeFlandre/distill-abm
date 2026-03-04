@@ -1,4 +1,4 @@
-"""Loads notebook-defined functions into a deterministic runtime registry."""
+"""Loads reference-defined functions into a deterministic runtime registry."""
 
 from __future__ import annotations
 
@@ -12,13 +12,13 @@ from typing import Any, cast
 
 import nbformat
 
-NOTEBOOK_ROOT = Path("archive/legacy_repo/Code")
+NOTEBOOK_ROOT = Path("archive/reference_repo/Code")
 REQUIRED_NOTEBOOK_FUNCTIONS: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
 class NotebookFunction:
-    """Stores one callable extracted from notebook code plus provenance."""
+    """Stores one callable extracted from reference code plus provenance."""
 
     name: str
     function: Callable[..., Any]
@@ -47,7 +47,7 @@ def _build_registry() -> dict[str, NotebookFunction]:
 
 
 def available_function_names() -> list[str]:
-    """Returns sorted function names extracted from archived notebooks."""
+    """Returns sorted function names extracted from reference notebooks."""
     return sorted(_build_registry().keys())
 
 
@@ -58,7 +58,7 @@ def missing_required_notebook_functions() -> list[str]:
 
 
 def should_dispatch_notebook(name: str) -> bool:
-    """Indicates whether compat should attempt notebook-first dispatch for a function name."""
+    """Indicates whether compatibility dispatch should attempt reference-first execution."""
     return name in REQUIRED_NOTEBOOK_FUNCTIONS
 
 

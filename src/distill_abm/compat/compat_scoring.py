@@ -8,8 +8,8 @@ from typing import Any, TypeVar, cast
 
 import pandas as pd
 
-from distill_abm.eval.legacy_scores import compute_scores
 from distill_abm.eval.qualitative import extract_coverage_score, extract_faithfulness_score
+from distill_abm.eval.reference_scores import compute_scores
 from distill_abm.summarize.models import summarize_with_bart, summarize_with_bert
 
 _SUMMARY_METRICS_MAPPING: dict[str, dict[str, str]] = {

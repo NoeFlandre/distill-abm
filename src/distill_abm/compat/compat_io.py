@@ -1,4 +1,4 @@
-"""Compatibility helpers for compatibility I/O and small file utilities."""
+"""Compatibility helpers for interoperability-oriented file utilities."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ import json
 from pathlib import Path
 
 from distill_abm.ingest.netlogo import remove_default_elements, remove_urls_from_data
-from distill_abm.summarize.legacy import process_csv_context as _process_csv_context_refactored
 from distill_abm.summarize.postprocess import clean_non_unicode
+from distill_abm.summarize.reference_text import process_csv_context as _process_csv_context_refactored
 
 
 def append_to_csv(
@@ -65,8 +65,8 @@ def process_csv(input_file: str | Path, output_file: str | Path) -> None:
 
 
 def remove_non_unicode(text: str) -> str:
-    temp = Path("/tmp/.legacy_non_unicode_in.csv")
-    out = Path("/tmp/.legacy_non_unicode_out.csv")
+    temp = Path("/tmp/.reference_non_unicode_in.csv")
+    out = Path("/tmp/.reference_non_unicode_out.csv")
     temp.write_text(text, encoding="utf-8")
     clean_non_unicode(temp, out)
     return out.read_text(encoding="utf-8")
