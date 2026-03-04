@@ -10,7 +10,7 @@ Provide executable parity coverage across ingestion, plotting, scoring, prompt c
 2. `distill_abm.legacy.notebook_loader` builds a runtime function registry from notebooks and records provenance (`get_notebook_source_path`) while preferring non-archive, non-checkpoint, non-copy sources.
 3. `distill_abm.legacy.compat` consults `notebook_loader.should_dispatch_notebook` before any notebook-first call, so production does not depend on notebooks when required coverage is empty.
 4. `tests/regression/test_notebook_equivalence.py` compares notebook behavior against production implementations and compatibility wrappers where needed.
-5. `tests/regression/test_notebook_function_coverage.py` parses all notebook function definitions from `archive/legacy_repo/Code` and validates that each supported name is represented in production or explicitly exempt.
+5. `tests/regression/test_notebook_function_coverage.py` validates snapshot notebook function coverage from `docs/notebook_coverage_matrix.json` against implemented production callables.
 6. `tests/unit/pipeline/test_sweep.py` validates the notebook-style prompt-combination sweep (`role`, `example`, `insights`) and multi-image trend generation parity.
 7. `docs/archive_full_manifest.json` provides file-level classification/action mapping for all archived artifacts.
 8. `tests/regression/test_prompt_reference_equivalence.py` locks runtime prompts against `configs/notebook_prompt_reference.yaml`.
@@ -22,12 +22,14 @@ Provide executable parity coverage across ingestion, plotting, scoring, prompt c
 14. `tests/regression/test_model_assets_migration.py` enforces full file coverage and byte-equivalence between legacy ABM asset folders and the canonical mirror.
 15. `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/` is the canonical non-archive mirror for legacy evaluation artifacts.
 16. `tests/regression/test_evaluation_assets_migration.py` enforces full tracked-file coverage and byte-equivalence for the mirrored evaluation tree.
+17. `tests/fixtures/notebook_parity/archive_assets/legacy_repo/` mirrors remaining legacy `Results/` artifacts after `archive/` retirement.
 
 ## Current parity status
 
 - Runtime-required notebook functions: `0` (`docs/archive_full_manifest.json`).
 - Notebook-first runtime dependency map: empty (`docs/runtime_notebook_dependencies.json`).
 - Legacy notebook execution is not required for core runtime flows.
+- `archive/` has been fully removed from the repository; preserved legacy artifacts live under `tests/fixtures/notebook_parity/`.
 
 The following runtime-deprecated notebooks have been replaced by production implementations and removed from runtime dependency:
 
