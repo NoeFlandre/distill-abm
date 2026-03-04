@@ -10,6 +10,7 @@ from distill_abm.llm.adapters.echo_adapter import EchoAdapter
 from distill_abm.llm.adapters.janus_adapter import JanusAdapter
 from distill_abm.llm.adapters.ollama_adapter import OllamaAdapter
 from distill_abm.llm.adapters.openai_adapter import OpenAIAdapter
+from distill_abm.llm.adapters.openrouter_adapter import OpenRouterAdapter
 
 
 def create_adapter(provider: str, model: str, **kwargs: Any) -> LLMAdapter:
@@ -17,6 +18,15 @@ def create_adapter(provider: str, model: str, **kwargs: Any) -> LLMAdapter:
     key = provider.strip().lower()
     if key == "openai":
         return OpenAIAdapter(model=model, client=kwargs.get("client"))
+    if key == "openrouter":
+        return OpenRouterAdapter(
+            model=model,
+            client=kwargs.get("client"),
+            base_url=kwargs.get("base_url", "https://openrouter.ai/api/v1"),
+            api_key=kwargs.get("api_key"),
+            site_url=kwargs.get("site_url"),
+            app_name=kwargs.get("app_name", "distill-abm"),
+        )
     if key == "anthropic":
         return AnthropicAdapter(model=model, client=kwargs.get("client"))
     if key == "ollama":

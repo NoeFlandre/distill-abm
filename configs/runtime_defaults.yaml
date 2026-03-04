@@ -1,6 +1,8 @@
 llm_request:
   temperature: 0.5
   max_tokens: 1000
+  max_retries: 2
+  retry_backoff_seconds: 2.0
 
 run:
   provider: echo
@@ -17,6 +19,7 @@ qualitative:
   model: echo-model
 
 smoke:
+  provider: ollama
   output_dir: results/smoke_qwen
   model: qwen3.5:0.8b
   metric_pattern: mean

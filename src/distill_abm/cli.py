@@ -20,7 +20,7 @@ from distill_abm.pipeline.run import (
     SummarizationMode,
     run_pipeline,
 )
-from distill_abm.pipeline.smoke import SmokeSuiteInputs, run_qwen_smoke_suite
+from distill_abm.pipeline.smoke import SmokeCase, SmokeSuiteInputs, default_smoke_cases, run_qwen_smoke_suite
 
 app = typer.Typer(help="Run ABM distillation workflows.")
 RUNTIME_DEFAULTS = get_runtime_defaults()
@@ -191,14 +191,15 @@ def smoke_qwen(
         typer.Option(..., exists=True, file_okay=True, dir_okay=False),
     ],
     doe_input_csv: Annotated[
-        Path,
-        typer.Option(..., exists=True, file_okay=True, dir_okay=False),
-    ],
+        Path | None,
+        typer.Option(exists=True, file_okay=True, dir_okay=False),
+    ] = None,
     prompts_path: Annotated[
         Path,
         typer.Option(exists=True),
     ] = Path("configs/prompts.yaml"),
     output_dir: Annotated[Path, typer.Option()] = Path(RUNTIME_DEFAULTS.smoke.output_dir),
+    provider: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.provider,
     model: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.model,
     metric_pattern: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.metric_pattern,
     metric_description: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.metric_description,
@@ -219,6 +220,17 @@ def smoke_qwen(
         bool,
         typer.Option(help="Skip prompt-combination sweep execution in the smoke suite."),
     ] = not RUNTIME_DEFAULTS.smoke.run_sweep,
+    case_id: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--case-id",
+            help="Optional smoke case id filter. Repeat this option to run a subset of the matrix.",
+        ),
+    ] = None,
+    max_cases: Annotated[
+        int | None,
+        typer.Option(min=1, help="Optional cap on number of smoke cases after filtering."),
+    ] = None,
     resume: Annotated[
         bool,
         typer.Option("--resume/--no-resume", help="Reuse existing smoke artifacts and skip already completed work."),
@@ -236,7 +248,8 @@ def smoke_qwen(
             plot_description = abm_config.plot_descriptions[0]
         sweep_plot_descriptions = list(abm_config.plot_descriptions)
         scoring_reference_path = _resolve_scoring_reference_path(abm)
-    adapter = create_adapter(provider="ollama", model=model)
+    selected_cases = _select_smoke_cases(case_ids=case_id, max_cases=max_cases)
+    adapter = create_adapter(provider=provider, model=model)
     result = run_qwen_smoke_suite(
         inputs=SmokeSuiteInputs(
             csv_path=csv_path,
@@ -256,6 +269,7 @@ def smoke_qwen(
         run_qualitative=not skip_qualitative,
         doe_input_csv=doe_input_csv,
         run_sweep=not skip_sweep,
+        cases=selected_cases,
         resume_existing=resume,
     )
     typer.echo(f"smoke report (markdown): {result.report_markdown_path}")
@@ -298,6 +312,32 @@ def _resolve_scoring_reference_path(abm: str) -> Path:
             f"unsupported ABM for scoring reference: {abm}. Allowed: fauna, grazing, milk_consumption."
         )
     return Path(mapping[abm])
+
+
+def _select_smoke_cases(case_ids: list[str] | None, max_cases: int | None) -> list[SmokeCase] | None:
+    all_cases = default_smoke_cases()
+    if not case_ids:
+        if max_cases is None:
+            return None
+        return all_cases[:max_cases]
+
+    by_id = {case.case_id: case for case in all_cases}
+    unknown = [value for value in case_ids if value not in by_id]
+    if unknown:
+        known = ", ".join(sorted(by_id))
+        raise typer.BadParameter(f"unknown --case-id value(s): {', '.join(unknown)}. Known cases: {known}")
+    seen: set[str] = set()
+    selected: list[SmokeCase] = []
+    for value in case_ids:
+        if value in seen:
+            continue
+        seen.add(value)
+        selected.append(by_id[value])
+    if max_cases is not None:
+        selected = selected[:max_cases]
+    if not selected:
+        raise typer.BadParameter("at least one smoke case must be selected")
+    return selected
 
 
 if __name__ == "__main__":

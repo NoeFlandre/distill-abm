@@ -72,7 +72,7 @@ uv run pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85
 uv sync --extra dev
 ```
 
-2. Configure provider credentials in your environment (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`) for remote adapters.
+2. Configure provider credentials in your environment (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`) for remote adapters.
 
 3. Run either local commands or containerized workflow:
 
@@ -91,7 +91,7 @@ All hyperparameter values used by the runtime are documented in:
 
 This includes:
 
-- LLM request defaults (`temperature`, `max_tokens`)
+- LLM request defaults (`temperature`, `max_tokens`, retry/backoff)
 - summarizer backend parameters (BART, BERT, T5, Longformer-like)
 - evidence/summarization/scoring mode defaults
 - DoE and ingestion defaults
@@ -127,21 +127,37 @@ uv run distill-abm run ... --evidence-mode table-csv
 uv run distill-abm run ... --evidence-mode plot+table
 ```
 
-Run a full local Qwen smoke suite (all evidence/text paths + DoE + prompt sweep + qualitative checks):
+Run a full smoke suite (provider/model selectable):
 
 ```bash
 uv run distill-abm smoke-qwen \
   --csv-path path/to/reduced.csv \
   --parameters-path path/to/params.txt \
   --documentation-path path/to/docs.txt \
-  --doe-input-csv path/to/FinalResultsYesNo.csv \
+  --provider ollama \
   --model qwen3.5:0.8b \
+  --doe-input-csv path/to/FinalResultsYesNo.csv \
   --metric-pattern mean-incum \
   --metric-description "average weekly whole milk consumption per agent" \
   --plot-description "weekly whole milk consumption trend"
 ```
 
-`smoke-qwen` is resumable by default (`--resume`): completed cases/DoE outputs are reused, and existing sweep combinations are skipped to avoid duplicate experiments.
+Quick smoke (single case, 2 inference calls) for prompt/response debugging:
+
+```bash
+uv run distill-abm smoke-qwen \
+  --csv-path path/to/reduced.csv \
+  --parameters-path path/to/params.txt \
+  --documentation-path path/to/docs.txt \
+  --provider openrouter \
+  --model qwen/qwen3-vl-235b-a22b-thinking \
+  --case-id plot-full-full \
+  --max-cases 1 \
+  --skip-qualitative \
+  --skip-sweep
+```
+
+`smoke-qwen` is resumable by default (`--resume`): completed successful cases/DoE outputs are reused, and existing sweep combinations are skipped to avoid duplicate experiments.
 
 Smoke outputs are written under `results/smoke_qwen/` by default:
 
@@ -152,7 +168,7 @@ Smoke outputs are written under `results/smoke_qwen/` by default:
 
 For debugging, each `pipeline_run_metadata.json` includes full prompts, responses, attached evidence image path, and metric reference provenance (`scores.reference.source/path/signature`).
 
-The smoke matrix runs these combinations with Ollama Qwen:
+The default smoke matrix runs these combinations:
 
 - evidence mode: `plot`, `table-csv`, `plot+table`
 - summarization/scoring: `full/full`, `summary/summary`, `both/both`
@@ -331,7 +347,7 @@ Compatibility checks:
 ### Reproducibility manifest
 
 - `pipeline_run_metadata.json` is emitted for each `run` execution.
-- It captures input artifact paths, full prompt texts and signatures, provider settings (`temperature`, `max_tokens`), and score outputs.
+- It captures input artifact paths, full prompt texts and signatures, provider settings (`temperature`, `max_tokens`, `max_retries`, `retry_backoff_seconds`), and score outputs.
 - The metadata file is intended to be versioned together with `report.csv` and generated plot files.
 
 ## License

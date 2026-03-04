@@ -6,10 +6,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-import matplotlib.pyplot as plt
+import matplotlib
 import pandas as pd
 
 from distill_abm.ingest.csv_ingest import matching_columns
+
+# Force a non-interactive backend so tests/CLI runs are stable in headless environments.
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 
 class PlotError(RuntimeError):

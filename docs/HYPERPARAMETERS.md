@@ -15,6 +15,8 @@ Defined in `src/distill_abm/llm/adapters/base.py` (`LLMRequest`):
 | --- | --- |
 | `temperature` | `0.5` |
 | `max_tokens` | `1000` |
+| `max_retries` | `2` |
+| `retry_backoff_seconds` | `2.0` |
 | `image_b64` | `null` |
 | `metadata` | `{}` |
 
@@ -58,6 +60,7 @@ Defined in `src/distill_abm/cli.py`.
 
 | Option | Default |
 | --- | --- |
+| `provider` | `"ollama"` |
 | `output_dir` | `results/smoke_qwen` |
 | `model` | `qwen3.5:0.8b` |
 | `metric_pattern` | `"mean"` |
@@ -65,6 +68,9 @@ Defined in `src/distill_abm/cli.py`.
 | `plot_description` | `null` |
 | `run_qualitative` | `true` (`--skip-qualitative` disables) |
 | `run_sweep` | `true` (`--skip-sweep` disables) |
+| `doe_input_csv` | `null` (optional) |
+| `case_id` | `[]` (optional filter) |
+| `max_cases` | `null` (optional cap) |
 
 ## 3. Evidence mode values
 
@@ -125,6 +131,7 @@ Defined in `configs/models.yaml`.
 | --- | --- | --- |
 | `gpt4o` | `openai` | `gpt-4o` |
 | `claude_sonnet` | `anthropic` | `claude-3-sonnet-20240229` |
+| `qwen_openrouter` | `openrouter` | `qwen/qwen3-vl-235b-a22b-thinking` |
 | `deepseek_r1` | `ollama` | `deepseek-r1` |
 | `qwen_ollama` | `ollama` | `qwen3.5:0.8b` |
 | `janus_pro` | `janus` | `janus-pro` |
