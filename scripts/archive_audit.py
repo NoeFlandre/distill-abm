@@ -18,7 +18,7 @@ Classification = Literal[
     "historical_nonruntime",
     "legacy_visualization",
 ]
-Action = Literal["migrate", "retain_record_only", "archive_separately", "discard_with_rationale"]
+Action = Literal["migrate", "retain_record_only"]
 
 ROOT = Path("archive")
 NOTEBOOK_ROOT = Path("archive/legacy_repo/Code")
