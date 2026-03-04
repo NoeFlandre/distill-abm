@@ -121,6 +121,16 @@ By default (`summarization_mode=both`, `score_on=both`), pipeline summarization 
 
 You can force full-text usage with `--summarization-mode full` (equivalent to `--skip-summarization`) or capture both text versions with `--summarization-mode both`.
 
+For strict summary-only runs, use:
+
+- `--summarization-mode summary`
+- `--score-on summary`
+
+For strict full-text-only runs, use:
+
+- `--summarization-mode full` (or `--skip-summarization`)
+- `--score-on full`
+
 ### Dual-path and scoring modes
 
 `run_pipeline` accepts `score_on` to choose scoring source:
