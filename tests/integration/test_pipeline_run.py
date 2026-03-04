@@ -65,6 +65,102 @@ def test_run_pipeline_creates_artifacts(tmp_path: Path) -> None:
     assert adapter.calls == 2
 
 
+def test_run_pipeline_resume_existing_ignores_metadata_signature_mismatch(tmp_path: Path) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+    output_dir = tmp_path / "out"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    (output_dir / "plot.png").touch()
+    (output_dir / "report.csv").write_text("context_response,trend_full_response\n", encoding="utf-8")
+    (output_dir / "pipeline_run_metadata.json").write_text(
+        json.dumps(
+            {
+                "reproducibility": {"run_signature": "stale-signature"},
+                "artifacts": {"plot_path": "plot.png", "report_csv": "report.csv"},
+                "scores": {
+                    "selected_scores": {
+                        "token_f1": 0.1,
+                        "precision": 0.1,
+                        "recall": 0.2,
+                        "bleu": 0.3,
+                        "meteor": 0.4,
+                        "rouge1": 0.5,
+                        "rouge2": 0.6,
+                        "rouge_l": 0.7,
+                        "flesch_reading_ease": 70.0,
+                        "reference_length": 10,
+                        "candidate_length": 8,
+                    }
+                },
+                "responses": {"context_response": "context", "trend_full_response": "trend"},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    adapter = FakeAdapter()
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=output_dir,
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            resume_existing=True,
+        ),
+        prompts=PromptsConfig(
+            context_prompt="Context {parameters} {documentation}",
+            trend_prompt="Trend {description}",
+        ),
+        adapter=adapter,
+    )
+
+    assert result.plot_path.exists()
+    assert adapter.calls == 2
+
+
+def test_run_pipeline_resume_existing_handles_invalid_metadata_by_recomputing(tmp_path: Path) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+    output_dir = tmp_path / "out"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    (output_dir / "pipeline_run_metadata.json").write_text("{", encoding="utf-8")
+
+    adapter = FakeAdapter()
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=output_dir,
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            resume_existing=True,
+        ),
+        prompts=PromptsConfig(
+            context_prompt="Context {parameters} {documentation}",
+            trend_prompt="Trend {description}",
+        ),
+        adapter=adapter,
+    )
+
+    assert result.plot_path.exists()
+    assert adapter.calls == 2
+
+
 def test_run_pipeline_defaults_to_both_modes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")

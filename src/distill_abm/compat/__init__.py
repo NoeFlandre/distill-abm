@@ -12,6 +12,8 @@ from distill_abm.compat.compat import (
     summarize_with_bart,
     summarize_with_bert,
 )
+from distill_abm.compat.compat_io import create_collage, process_documentation
+from distill_abm.compat.compat_text import clean_context_response
 
 _WRAPPER_OVERRIDES = {
     "get_response_with_images",
@@ -39,3 +41,7 @@ def summarize_text_with_models(text: str) -> dict[str, str]:  # type: ignore[no-
 
 
 __all__ = [name for name in globals() if not name.startswith("_")]
+
+# Keep compatibility shims explicit so type checkers and re-export checks
+# do not treat these runtime imports as dead code.
+_compatibility_text_exports = (create_collage, process_documentation, clean_context_response)

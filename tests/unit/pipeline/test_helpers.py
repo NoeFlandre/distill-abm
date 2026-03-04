@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -9,6 +10,7 @@ from distill_abm.configs.models import PromptsConfig
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError, LLMRequest, LLMResponse
 from distill_abm.pipeline import helpers
+from distill_abm.pipeline import run as run_module
 
 
 def test_build_context_prompt_includes_role_only_when_enabled(tmp_path: Path) -> None:
@@ -154,6 +156,90 @@ def test_load_existing_rows_if_compatible_rejects_schema_mismatch() -> None:
         writer.writerow(["x", "y"])
     rows = helpers.load_existing_rows_if_compatible(path, ["a"])
     assert rows == {}
+
+
+def test_load_resumable_pipeline_result_returns_none_on_signature_mismatch(tmp_path: Path) -> None:
+    plot_path = tmp_path / "plot.png"
+    report_csv = tmp_path / "report.csv"
+    metadata = {
+        "reproducibility": {"run_signature": "matching-signature"},
+        "artifacts": {
+            "plot_path": str(plot_path),
+            "report_csv": str(report_csv),
+        },
+        "scores": {
+            "selected_scores": {
+                "token_f1": 0.1,
+                "precision": 0.1,
+                "recall": 0.2,
+                "bleu": 0.3,
+                "meteor": 0.4,
+                "rouge1": 0.5,
+                "rouge2": 0.6,
+                "rouge_l": 0.7,
+                "flesch_reading_ease": 70.0,
+                "reference_length": 10,
+                "candidate_length": 8,
+            }
+        },
+        "responses": {},
+    }
+    (tmp_path / "pipeline_run_metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
+
+    resumed = run_module._load_resumable_pipeline_result(output_dir=tmp_path, run_signature="requested-signature")
+    assert resumed is None
+
+
+def test_load_resumable_pipeline_result_returns_none_when_artifacts_missing(tmp_path: Path) -> None:
+    plot_path = tmp_path / "plot.png"
+    report_csv = tmp_path / "report.csv"
+    metadata = {
+        "reproducibility": {"run_signature": "signature"},
+        "artifacts": {
+            "plot_path": str(plot_path),
+            "report_csv": str(report_csv),
+        },
+        "scores": {
+            "selected_scores": {
+                "token_f1": 0.1,
+                "precision": 0.1,
+                "recall": 0.2,
+                "bleu": 0.3,
+                "meteor": 0.4,
+                "rouge1": 0.5,
+                "rouge2": 0.6,
+                "rouge_l": 0.7,
+                "flesch_reading_ease": 70.0,
+                "reference_length": 10,
+                "candidate_length": 8,
+            }
+        },
+        "responses": {"context_response": "context", "trend_full_response": "trend"},
+    }
+    (tmp_path / "pipeline_run_metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
+
+    resumed = run_module._load_resumable_pipeline_result(output_dir=tmp_path, run_signature="signature")
+    assert resumed is None
+
+
+def test_load_resumable_pipeline_result_returns_none_when_scores_payload_is_invalid(tmp_path: Path) -> None:
+    plot_path = tmp_path / "plot.png"
+    report_csv = tmp_path / "report.csv"
+    plot_path.write_text("plot", encoding="utf-8")
+    report_csv.write_text("csv", encoding="utf-8")
+    metadata = {
+        "reproducibility": {"run_signature": "signature"},
+        "artifacts": {
+            "plot_path": str(plot_path),
+            "report_csv": str(report_csv),
+        },
+        "scores": {},
+        "responses": {"context_response": "context", "trend_full_response": "trend"},
+    }
+    (tmp_path / "pipeline_run_metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
+
+    resumed = run_module._load_resumable_pipeline_result(output_dir=tmp_path, run_signature="signature")
+    assert resumed is None
 
 
 def test_summarize_report_text_prefers_summary_when_enabled_with_mounted_summarizers() -> None:

@@ -16,7 +16,16 @@ def test_dockerignore_excludes_local_artifacts() -> None:
     dockerignore = Path(".dockerignore")
     assert dockerignore.exists()
     entries = dockerignore.read_text(encoding="utf-8")
-    for required in [".git", ".venv", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"]:
+    for required in [
+        ".git",
+        ".venv",
+        "__pycache__",
+        ".pytest_cache",
+        ".mypy_cache",
+        ".ruff_cache",
+        "results",
+        "Results",
+    ]:
         assert required in entries
 
 

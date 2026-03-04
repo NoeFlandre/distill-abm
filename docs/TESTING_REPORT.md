@@ -28,11 +28,20 @@ uv run pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85
 
 Latest validated baseline:
 
-- Total tests: `195`
-- Passing tests: `195`
+- Total tests: `227`
+- Passing tests: `227`
 - Coverage threshold: `>=85%`
-- Observed coverage: `85.93%`
+- Observed coverage: `85.62%`
 - Failing gates: `0`
+
+
+### Repository hygiene checks
+
+The repository policy tests now enforce:
+
+- root artifact folder normalization: `results/` is required in clean state,
+- explicit ignore coverage in `.gitignore` and `.dockerignore` for both `results` and `Results`,
+- deterministic behavior under rerun-resume contracts.
 
 ## 4. Test Taxonomy
 

@@ -370,3 +370,23 @@ Compatibility checks:
 ## License
 
 See repository license file.
+
+
+## Quality and validation
+
+Run this command before merging:
+
+```bash
+uv run ruff check .
+uv run black --check .
+uv run mypy src tests
+uv run pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85
+```
+
+Latest observed baseline:
+- Total tests: `227`
+- Passing tests: `227`
+- Coverage: `85.62%`
+
+Root artifact policy enforced by repo checks:
+- `results/` and `Results/` are ignored in `.gitignore` and `.dockerignore`.

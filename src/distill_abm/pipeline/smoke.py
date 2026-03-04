@@ -609,16 +609,18 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
     if metadata_payload is None:
         return [_build_fallback_error_row(case_result=case_result, smoke_inputs=smoke_inputs)]
 
-    inputs_block = _dict(metadata_payload.get("inputs"))
-    llm_block = _dict(metadata_payload.get("llm"))
-    request_block = _dict(llm_block.get("request"))
-    prompts_block = _dict(metadata_payload.get("prompts"))
-    responses_block = _dict(metadata_payload.get("responses"))
-    artifacts_block = _dict(metadata_payload.get("artifacts"))
-    scores_block = _dict(metadata_payload.get("scores"))
-    reference_block = _dict(scores_block.get("reference"))
-    reproducibility_block = _dict(metadata_payload.get("reproducibility"))
-    summarizers_block = _dict(metadata_payload.get("summarizers"))
+    (
+        inputs_block,
+        llm_block,
+        request_block,
+        prompts_block,
+        responses_block,
+        artifacts_block,
+        scores_block,
+        reference_block,
+        reproducibility_block,
+        summarizers_block,
+    ) = _extract_metadata_blocks(metadata_payload)
 
     selected_scores = _dict(scores_block.get("selected_scores"))
     full_scores = _dict(scores_block.get("full_scores"))
@@ -652,27 +654,9 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
         "report_csv_path": _stringify(artifacts_block.get("report_csv")),
         "metadata_path": str(case_result.metadata_path) if case_result.metadata_path else "",
         "case_manifest_path": str(case_result.case_manifest_path) if case_result.case_manifest_path else "",
-        "selected_token_f1": _stringify(selected_scores.get("token_f1")),
-        "selected_bleu": _stringify(selected_scores.get("bleu")),
-        "selected_meteor": _stringify(selected_scores.get("meteor")),
-        "selected_rouge1": _stringify(selected_scores.get("rouge1")),
-        "selected_rouge2": _stringify(selected_scores.get("rouge2")),
-        "selected_rouge_l": _stringify(selected_scores.get("rouge_l")),
-        "selected_flesch_reading_ease": _stringify(selected_scores.get("flesch_reading_ease")),
-        "full_token_f1": _stringify(full_scores.get("token_f1")),
-        "full_bleu": _stringify(full_scores.get("bleu")),
-        "full_meteor": _stringify(full_scores.get("meteor")),
-        "full_rouge1": _stringify(full_scores.get("rouge1")),
-        "full_rouge2": _stringify(full_scores.get("rouge2")),
-        "full_rouge_l": _stringify(full_scores.get("rouge_l")),
-        "full_flesch_reading_ease": _stringify(full_scores.get("flesch_reading_ease")),
-        "summary_token_f1": _stringify(summary_scores.get("token_f1")),
-        "summary_bleu": _stringify(summary_scores.get("bleu")),
-        "summary_meteor": _stringify(summary_scores.get("meteor")),
-        "summary_rouge1": _stringify(summary_scores.get("rouge1")),
-        "summary_rouge2": _stringify(summary_scores.get("rouge2")),
-        "summary_rouge_l": _stringify(summary_scores.get("rouge_l")),
-        "summary_flesch_reading_ease": _stringify(summary_scores.get("flesch_reading_ease")),
+        **_flatten_score_fields(selected_scores, "selected"),
+        **_flatten_score_fields(full_scores, "full"),
+        **_flatten_score_fields(summary_scores, "summary"),
         "error": _stringify(case_result.error),
         "inputs_json": json.dumps(inputs_block, sort_keys=True),
         "llm_json": json.dumps(llm_block, sort_keys=True),
@@ -681,34 +665,114 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
         "summarizers_json": json.dumps(summarizers_block, sort_keys=True),
     }
 
-    context_prompt = _stringify(prompts_block.get("context_prompt"))
-    trend_prompt = _stringify(prompts_block.get("trend_prompt"))
-    context_response = _stringify(responses_block.get("context_response"))
-    trend_response = _stringify(responses_block.get("trend_full_response"))
+    metadata_fields = (prompts_block, reproducibility_block, responses_block)
+    return [
+        _build_case_response_row(
+            base=base,
+            case_result=case_result,
+            metadata_fields=metadata_fields,
+            response_kind="context",
+            prompt_path=case_result.context_prompt_path,
+            response_path=case_result.context_response_path,
+        ),
+        _build_case_response_row(
+            base=base,
+            case_result=case_result,
+            metadata_fields=metadata_fields,
+            response_kind="trend",
+            prompt_path=case_result.trend_prompt_path,
+            response_path=case_result.trend_full_response_path,
+        ),
+    ]
 
-    context_row = {
-        **base,
-        "response_kind": "context",
-        "prompt_path": str(case_result.context_prompt_path) if case_result.context_prompt_path else "",
-        "prompt_text": context_prompt,
-        "prompt_signature": _stringify(reproducibility_block.get("context_prompt_signature")),
-        "prompt_length": _stringify(reproducibility_block.get("context_prompt_length")),
-        "response_path": str(case_result.context_response_path) if case_result.context_response_path else "",
-        "response_text": context_response,
-        "response_length": str(len(context_response)),
+
+def _extract_metadata_blocks(metadata_payload: dict[str, object] | None) -> tuple[
+    dict[str, object],
+    dict[str, object],
+    dict[str, object],
+    dict[str, object],
+    dict[str, object],
+    dict[str, object],
+    dict[str, object],
+    dict[str, object],
+    dict[str, object],
+    dict[str, object],
+]:
+    payload = metadata_payload or {}
+    inputs_block = _dict(payload.get("inputs"))
+    llm_block = _dict(payload.get("llm"))
+    request_block = _dict(llm_block.get("request"))
+    prompts_block = _dict(payload.get("prompts"))
+    responses_block = _dict(payload.get("responses"))
+    artifacts_block = _dict(payload.get("artifacts"))
+    scores_block = _dict(payload.get("scores"))
+    reference_block = _dict(scores_block.get("reference"))
+    reproducibility_block = _dict(payload.get("reproducibility"))
+    summarizers_block = _dict(payload.get("summarizers"))
+    return (
+        inputs_block,
+        llm_block,
+        request_block,
+        prompts_block,
+        responses_block,
+        artifacts_block,
+        scores_block,
+        reference_block,
+        reproducibility_block,
+        summarizers_block,
+    )
+
+
+def _flatten_score_fields(scores: dict[str, object], prefix: str) -> dict[str, str]:
+    return {
+        f"{prefix}_token_f1": _stringify(scores.get("token_f1")),
+        f"{prefix}_bleu": _stringify(scores.get("bleu")),
+        f"{prefix}_meteor": _stringify(scores.get("meteor")),
+        f"{prefix}_rouge1": _stringify(scores.get("rouge1")),
+        f"{prefix}_rouge2": _stringify(scores.get("rouge2")),
+        f"{prefix}_rouge_l": _stringify(scores.get("rouge_l")),
+        f"{prefix}_flesch_reading_ease": _stringify(scores.get("flesch_reading_ease")),
     }
-    trend_row = {
-        **base,
-        "response_kind": "trend",
-        "prompt_path": str(case_result.trend_prompt_path) if case_result.trend_prompt_path else "",
-        "prompt_text": trend_prompt,
-        "prompt_signature": _stringify(reproducibility_block.get("trend_prompt_signature")),
-        "prompt_length": _stringify(reproducibility_block.get("trend_prompt_length")),
-        "response_path": str(case_result.trend_full_response_path) if case_result.trend_full_response_path else "",
-        "response_text": trend_response,
-        "response_length": str(len(trend_response)),
-    }
-    return [context_row, trend_row]
+
+
+def _build_case_response_row(
+    *,
+    base: dict[str, str],
+    case_result: SmokeCaseResult,
+    metadata_fields: tuple[dict[str, object], dict[str, object], dict[str, object]],
+    response_kind: str,
+    prompt_path: Path | None,
+    response_path: Path | None,
+) -> dict[str, str]:
+    prompts_block, reproducibility_block, responses_block = metadata_fields
+    is_context = response_kind == "context"
+    if is_context:
+        prompt_text = _stringify(prompts_block.get("context_prompt"))
+        response_text = _stringify(responses_block.get("context_response"))
+        response_path_value = response_path if response_path is not None else case_result.context_response_path
+        prompt_signature = _stringify(reproducibility_block.get("context_prompt_signature"))
+        prompt_length = _stringify(reproducibility_block.get("context_prompt_length"))
+    else:
+        prompt_text = _stringify(prompts_block.get("trend_prompt"))
+        response_text = _stringify(responses_block.get("trend_full_response"))
+        response_path_value = response_path if response_path is not None else case_result.trend_full_response_path
+        prompt_signature = _stringify(reproducibility_block.get("trend_prompt_signature"))
+        prompt_length = _stringify(reproducibility_block.get("trend_prompt_length"))
+
+    row = dict(base)
+    row.update(
+        {
+            "response_kind": response_kind,
+            "prompt_path": str(prompt_path) if prompt_path else "",
+            "prompt_text": prompt_text,
+            "prompt_signature": prompt_signature,
+            "prompt_length": prompt_length,
+            "response_path": str(response_path_value) if response_path_value else "",
+            "response_text": response_text,
+            "response_length": str(len(response_text)),
+        }
+    )
+    return row
 
 
 def _build_fallback_error_row(case_result: SmokeCaseResult, smoke_inputs: SmokeSuiteInputs) -> dict[str, str]:

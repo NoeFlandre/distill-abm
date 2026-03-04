@@ -305,33 +305,18 @@ def _load_resumable_pipeline_result(output_dir: Path, run_signature: str) -> Pip
     if str(reproducibility.get("run_signature", "")) != run_signature:
         return None
 
-    artifacts = payload.get("artifacts", {})
-    scores_payload = payload.get("scores", {})
-    responses = payload.get("responses", {})
-
     try:
-        plot_path = Path(str(artifacts["plot_path"]))
-        report_csv = Path(str(artifacts["report_csv"]))
-        if not plot_path.exists() or not report_csv.exists():
+        artifacts = _as_dict(payload.get("artifacts"))
+        scores_payload = _as_dict(payload.get("scores"))
+        responses = _as_dict(payload.get("responses"))
+
+        plot_path, report_csv, stats_table_csv, stats_image_path = _extract_resumable_artifacts(artifacts)
+        if plot_path is None or report_csv is None:
             return None
 
-        stats_image_raw = artifacts.get("stats_image_path")
-        stats_image_path = Path(str(stats_image_raw)) if isinstance(stats_image_raw, str) and stats_image_raw else None
-        if stats_image_path is not None and not stats_image_path.exists():
-            stats_image_path = None
-
-        stats_table_csv: str | None = None
-        stats_table_csv_raw = artifacts.get("stats_table_csv_path")
-        if isinstance(stats_table_csv_raw, str) and stats_table_csv_raw:
-            stats_table_csv_path = Path(stats_table_csv_raw)
-            if stats_table_csv_path.exists():
-                stats_table_csv = stats_table_csv_path.read_text(encoding="utf-8")
-
-        selected_scores = SummaryScores.model_validate(scores_payload["selected_scores"])
-        full_scores_raw = scores_payload.get("full_scores")
-        summary_scores_raw = scores_payload.get("summary_scores")
-        full_scores = SummaryScores.model_validate(full_scores_raw) if full_scores_raw else None
-        summary_scores = SummaryScores.model_validate(summary_scores_raw) if summary_scores_raw else None
+        selected_scores, full_scores, summary_scores = _extract_resumable_scores(scores_payload)
+        if selected_scores is None:
+            return None
 
         trend_full = str(responses.get("trend_full_response", ""))
         trend_summary_raw = responses.get("trend_summary_response")
@@ -360,6 +345,44 @@ def _load_resumable_pipeline_result(output_dir: Path, run_signature: str) -> Pip
         )
     except (KeyError, TypeError, ValueError):
         return None
+
+
+def _as_dict(value: object) -> dict[str, object]:
+    if isinstance(value, dict):
+        return value
+    return {}
+
+
+def _extract_resumable_artifacts(artifacts_payload: dict[str, object]) -> tuple[Path, Path, str | None, Path | None]:
+    plot_path = Path(str(artifacts_payload["plot_path"]))
+    report_csv = Path(str(artifacts_payload["report_csv"]))
+    if not plot_path.exists() or not report_csv.exists():
+        raise ValueError("resumable artifacts are incomplete")
+
+    stats_table_csv: str | None = None
+    stats_table_csv_raw = artifacts_payload.get("stats_table_csv_path")
+    if isinstance(stats_table_csv_raw, str) and stats_table_csv_raw:
+        stats_table_csv_path = Path(stats_table_csv_raw)
+        if stats_table_csv_path.exists():
+            stats_table_csv = stats_table_csv_path.read_text(encoding="utf-8")
+
+    stats_image_raw = artifacts_payload.get("stats_image_path")
+    stats_image_path = Path(str(stats_image_raw)) if isinstance(stats_image_raw, str) and stats_image_raw else None
+    if stats_image_path is not None and not stats_image_path.exists():
+        stats_image_path = None
+
+    return plot_path, report_csv, stats_table_csv, stats_image_path
+
+
+def _extract_resumable_scores(
+    scores_payload: dict[str, object],
+) -> tuple[SummaryScores, SummaryScores | None, SummaryScores | None]:
+    selected_scores = SummaryScores.model_validate(scores_payload["selected_scores"])
+    full_scores_raw = scores_payload.get("full_scores")
+    summary_scores_raw = scores_payload.get("summary_scores")
+    full_scores = SummaryScores.model_validate(full_scores_raw) if full_scores_raw else None
+    summary_scores = SummaryScores.model_validate(summary_scores_raw) if summary_scores_raw else None
+    return selected_scores, full_scores, summary_scores
 
 
 def run_pipeline_sweep(

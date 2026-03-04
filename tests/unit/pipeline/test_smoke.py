@@ -8,7 +8,9 @@ from distill_abm.configs.models import PromptsConfig
 from distill_abm.llm.adapters.base import LLMAdapter, LLMRequest, LLMResponse
 from distill_abm.pipeline.smoke import (
     SmokeCase,
+    SmokeCaseResult,
     SmokeSuiteInputs,
+    _build_case_response_rows,
     default_branch_smoke_cases,
     default_smoke_cases,
     run_qwen_smoke_suite,
@@ -286,3 +288,194 @@ def test_run_qwen_smoke_suite_resumes_existing_successful_case_without_rerun(
     assert len(result.cases) == 1
     assert result.cases[0].status == "ok"
     assert result.cases[0].resumed_from_existing is True
+
+
+def test_build_case_response_rows_serializes_complete_metadata_path() -> None:
+    metadata_path = Path("metadata.json")
+    metadata = {
+        "inputs": {
+            "evidence_mode": "plot",
+            "summarization_mode": "both",
+            "score_on": "both",
+            "enabled_style_features": ["role"],
+            "additional_summarizers": ["t5"],
+            "csv_path": "sim.csv",
+            "parameters_path": "params.txt",
+            "documentation_path": "docs.txt",
+        },
+        "llm": {
+            "provider": "fake",
+            "model": "fake-model",
+            "request": {
+                "temperature": 0.5,
+                "max_tokens": 1000,
+                "max_retries": 2,
+                "retry_backoff_seconds": 0.1,
+            },
+        },
+        "prompts": {
+            "context_prompt": "context prompt text",
+            "trend_prompt": "trend prompt text",
+        },
+        "responses": {
+            "context_response": "context response text",
+            "trend_full_response": "trend response text",
+        },
+        "artifacts": {
+            "trend_evidence_image_path": "plot.png",
+            "plot_path": "plot.png",
+            "stats_table_csv_path": "stats.csv",
+            "report_csv": "report.csv",
+        },
+        "scores": {
+            "selected_scores": {
+                "token_f1": 0.5,
+                "bleu": 0.6,
+                "meteor": 0.7,
+                "rouge1": 0.8,
+                "rouge2": 0.9,
+                "rouge_l": 1.0,
+                "flesch_reading_ease": 70.0,
+            },
+            "full_scores": {
+                "token_f1": 0.4,
+                "bleu": 0.3,
+                "meteor": 0.2,
+                "rouge1": 0.1,
+                "rouge2": 0.2,
+                "rouge_l": 0.3,
+                "flesch_reading_ease": 60.0,
+            },
+            "summary_scores": {
+                "token_f1": 0.9,
+                "bleu": 0.8,
+                "meteor": 0.7,
+                "rouge1": 0.6,
+                "rouge2": 0.5,
+                "rouge_l": 0.4,
+                "flesch_reading_ease": 65.0,
+            },
+            "reference": {
+                "path": "ground_truth.txt",
+                "source": "human_ground_truth_file",
+                "text": "reference text",
+            },
+        },
+        "reproducibility": {
+            "context_prompt_signature": "ctx_sig",
+            "trend_prompt_signature": "trend_sig",
+            "context_prompt_length": 5,
+            "trend_prompt_length": 6,
+            "trend_summary_present": False,
+        },
+        "summarizers": {},
+    }
+
+    metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+    case = SmokeCase(case_id="plot-full-full", evidence_mode="plot", summarization_mode="full", score_on="full")
+    case_result = SmokeCaseResult(
+        case=case,
+        status="ok",
+        output_dir=Path("outputs/case"),
+        report_csv=Path("outputs/report.csv"),
+        plot_path=Path("outputs/plot.png"),
+        metadata_path=metadata_path,
+        context_prompt_path=Path("outputs/context_prompt.txt"),
+        trend_prompt_path=Path("outputs/trend_prompt.txt"),
+        context_response_path=Path("outputs/context_response.txt"),
+        trend_full_response_path=Path("outputs/trend_full_response.txt"),
+        case_manifest_path=Path("outputs/case_manifest.json"),
+    )
+    inputs = SmokeSuiteInputs(
+        csv_path=Path("sim.csv"),
+        parameters_path=Path("params.txt"),
+        documentation_path=Path("docs.txt"),
+        output_dir=Path("outputs"),
+        model="fake-model",
+        metric_pattern="mean-incum",
+        metric_description="test",
+    )
+
+    rows = _build_case_response_rows(case_result=case_result, smoke_inputs=inputs)
+
+    assert len(rows) == 2
+    context_row = rows[0]
+    trend_row = rows[1]
+    assert context_row["response_kind"] == "context"
+    assert trend_row["response_kind"] == "trend"
+    assert context_row["provider"] == "fake"
+    assert context_row["temperature"] == "0.5"
+    assert context_row["response_text"] == "context response text"
+    assert trend_row["response_text"] == "trend response text"
+    assert context_row["selected_token_f1"] == "0.5"
+    assert trend_row["summary_rouge1"] == "0.6"
+
+
+def test_build_case_response_rows_returns_fallback_row_for_invalid_metadata(tmp_path: Path) -> None:
+    metadata_path = tmp_path / "pipeline_run_metadata.json"
+    metadata_path.write_text("{", encoding="utf-8")
+    case = SmokeCase(case_id="plot-full-full", evidence_mode="plot", summarization_mode="full", score_on="full")
+    case_result = SmokeCaseResult(
+        case=case,
+        status="ok",
+        output_dir=tmp_path,
+        metadata_path=metadata_path,
+    )
+    inputs = SmokeSuiteInputs(
+        csv_path=tmp_path / "sim.csv",
+        parameters_path=tmp_path / "params.txt",
+        documentation_path=tmp_path / "docs.txt",
+        output_dir=tmp_path,
+        model="fake-model",
+        metric_pattern="mean-incum",
+        metric_description="test",
+    )
+
+    rows = _build_case_response_rows(case_result=case_result, smoke_inputs=inputs)
+
+    assert len(rows) == 1
+    assert rows[0]["response_kind"] == "context"
+    assert rows[0]["provider"] == ""
+    assert rows[0]["case_status"] == "ok"
+
+
+def test_build_case_response_rows_stringifies_missing_prompt_and_response_fields(tmp_path: Path) -> None:
+    metadata_path = tmp_path / "pipeline_run_metadata.json"
+    metadata_path.write_text(
+        json.dumps(
+            {
+                "inputs": {},
+                "llm": {"provider": "fake", "model": "fake-model", "request": {}},
+                "artifacts": {},
+                "scores": {"selected_scores": {}},
+                "reproducibility": {},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    case = SmokeCase(case_id="plot-full-full", evidence_mode="plot", summarization_mode="full", score_on="full")
+    case_result = SmokeCaseResult(
+        case=case,
+        status="ok",
+        output_dir=tmp_path,
+        metadata_path=metadata_path,
+    )
+    inputs = SmokeSuiteInputs(
+        csv_path=tmp_path / "sim.csv",
+        parameters_path=tmp_path / "params.txt",
+        documentation_path=tmp_path / "docs.txt",
+        output_dir=tmp_path,
+        model="fake-model",
+        metric_pattern="mean-incum",
+        metric_description="test",
+    )
+
+    context_row, trend_row = _build_case_response_rows(case_result=case_result, smoke_inputs=inputs)
+
+    assert context_row["prompt_text"] == ""
+    assert context_row["prompt_path"] == ""
+    assert context_row["response_text"] == ""
+    assert context_row["response_length"] == "0"
+    assert trend_row["prompt_text"] == ""
+    assert trend_row["response_text"] == ""

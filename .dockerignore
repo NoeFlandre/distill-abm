@@ -9,5 +9,6 @@ __pycache__
 htmlcov
 coverage.xml
 results
+Results
 *.log
 .DS_Store
