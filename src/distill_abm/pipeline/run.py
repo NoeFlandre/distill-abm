@@ -1,7 +1,8 @@
 """Pipeline orchestration from CSV ingestion to scored report export."""
 
-from __future__ import annotations
-
+import hashlib
+import json
+from datetime import UTC, datetime
 from itertools import combinations
 from pathlib import Path
 from typing import Literal
@@ -60,6 +61,7 @@ class PipelineResult(BaseModel):
     rouge2: float
     rouge_l: float
     flesch_reading_ease: float
+    metadata_path: Path | None = None
 
 
 class SweepRunResult(BaseModel):
@@ -121,6 +123,8 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         requested_score_on=inputs.score_on,
         summarization_mode=summarization_mode,
     )
+
+    # Compute full and/or summary trend variants first, then apply scoring policy.
     trend_full, trend_summary = _summarize_report_text(trend_raw, mode=summarization_mode)
 
     full_scores = None
@@ -153,6 +157,28 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         include_extended_columns=include_extended,
     )
 
+    # Persist resolved runtime settings, prompt composition, and scoring settings for auditability.
+    metadata_path = _write_run_metadata(
+        output_dir=inputs.output_dir,
+        inputs=inputs,
+        context_prompt=context_prompt,
+        plot_path=plot_path,
+        report_csv=report_csv,
+        stats_image_path=stats_image_path,
+        trend_prompt=trend_prompt,
+        trend_full=trend_full,
+        trend_summary=trend_summary,
+        summarization_mode=summarization_mode,
+        score_on=score_on,
+        full_scores=full_scores,
+        summary_scores=summary_scores,
+        selected_scores=selected_scores,
+        include_extended=include_extended,
+        include_pattern=inputs.metric_pattern,
+        evidence_mode=inputs.evidence_mode,
+        adapter=adapter,
+    )
+
     return PipelineResult(
         plot_path=plot_path,
         report_csv=report_csv,
@@ -171,6 +197,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         rouge2=selected_scores.rouge2,
         rouge_l=selected_scores.rouge_l,
         flesch_reading_ease=selected_scores.flesch_reading_ease,
+        metadata_path=metadata_path,
     )
 
 
@@ -305,6 +332,7 @@ def _encode_image(path: Path) -> str:
 
 
 def _summarize_report_text(text: str, mode: SummarizationMode) -> tuple[str, str | None]:
+    """Resolve and generate trend text variants based on the selected summarization mode."""
     if mode == "full":
         return text, None
     _, summary = helpers.summarize_report_text_pair(
@@ -322,6 +350,7 @@ def _resolve_summarization_mode(
     skip_summarization: bool,
     requested_mode: SummarizationMode,
 ) -> SummarizationMode:
+    """Skip summarization requests force full-text trend mode."""
     if skip_summarization:
         return "full"
     return requested_mode
@@ -331,6 +360,7 @@ def _resolve_score_mode(
     requested_score_on: ScoreMode,
     summarization_mode: SummarizationMode,
 ) -> ScoreMode:
+    """Resolve score mode to a valid combination given unavailable summary path."""
     if requested_score_on == "summary" and summarization_mode == "full":
         return "full"
     if requested_score_on == "both" and summarization_mode == "full":
@@ -347,6 +377,7 @@ def _select_report_outputs(
     full_scores: SummaryScores | None,
     summary_scores: SummaryScores | None,
 ) -> tuple[str, SummaryScores]:
+    """Pick the text and score tuple that will be written into legacy report columns."""
     if score_on == "full" or summary_scores is None:
         if full_scores is None:
             return trend_full, score_summary(reference=trend_full, candidate=trend_full)
@@ -376,6 +407,110 @@ def _write_report(
         summary_scores=summary_scores,
         include_extended_columns=include_extended_columns,
     )
+
+
+def _write_run_metadata(
+    output_dir: Path,
+    inputs: PipelineInputs,
+    context_prompt: str,
+    plot_path: Path,
+    report_csv: Path,
+    stats_image_path: Path | None,
+    trend_prompt: str,
+    trend_full: str,
+    trend_summary: str | None,
+    summarization_mode: SummarizationMode,
+    score_on: ScoreMode,
+    full_scores: SummaryScores | None,
+    summary_scores: SummaryScores | None,
+    include_extended: bool,
+    include_pattern: str,
+    evidence_mode: EvidenceMode,
+    adapter: LLMAdapter,
+    selected_scores: SummaryScores,
+) -> Path:
+    """Persist deterministic run metadata for reproducibility and auditability."""
+    metadata = {
+        "run_timestamp_utc": datetime.now(UTC).isoformat(),
+        "inputs": {
+            "csv_path": str(inputs.csv_path),
+            "parameters_path": str(inputs.parameters_path),
+            "documentation_path": str(inputs.documentation_path),
+            "metric_pattern": inputs.metric_pattern,
+            "metric_description": inputs.metric_description,
+            "plot_description": inputs.plot_description,
+            "evidence_mode": evidence_mode,
+            "summarization_mode": summarization_mode,
+            "score_on": score_on,
+            "skip_summarization": inputs.skip_summarization,
+            "summarization_mode_requested": inputs.summarization_mode,
+            "score_on_requested": inputs.score_on,
+            "output_dir": str(inputs.output_dir),
+        },
+        "artifacts": {
+            "plot_path": str(plot_path),
+            "report_csv": str(report_csv),
+            "stats_image_path": str(stats_image_path) if stats_image_path is not None else None,
+        },
+        "llm": {
+            "provider": adapter.provider,
+            "model": inputs.model,
+            "request": {
+                "temperature": 0.5,
+                "max_tokens": 1000,
+            },
+        },
+        "reproducibility": {
+            "include_pattern": include_pattern,
+            "context_prompt_signature": hashlib.sha256(context_prompt.encode("utf-8")).hexdigest(),
+            "trend_prompt_signature": hashlib.sha256(trend_prompt.encode("utf-8")).hexdigest(),
+            "context_prompt_length": len(context_prompt),
+            "trend_prompt_length": len(trend_prompt),
+            "trend_full_length": len(trend_full),
+            "trend_summary_present": trend_summary is not None,
+            "trend_summary_length": len(trend_summary) if trend_summary is not None else None,
+            "include_extended_columns": include_extended,
+            "csv_encoding": "utf-8",
+            "delimiter": ",",
+        },
+        "summarizers": {
+            "bart": {
+                "model": "sshleifer/distilbart-cnn-12-6",
+                "max_input_length": 1024,
+                "min_summary_length": 50,
+                "max_summary_length": 100,
+            },
+            "bert": {
+                "max_input_length": 512,
+                "min_summary_length": 100,
+                "max_summary_length": 150,
+            },
+            "t5": {
+                "model": "t5-small",
+                "max_input_length": 1024,
+                "min_summary_length": 40,
+                "max_summary_length": 120,
+            },
+            "longformer_like": {
+                "model": "allenai/led-base-16384",
+                "max_input_length": 2048,
+                "min_summary_length": 64,
+                "max_summary_length": 180,
+            },
+        },
+        "scores": {
+            "selected_scores": selected_scores.model_dump(),
+            "full_scores": full_scores.model_dump() if full_scores is not None else None,
+            "summary_scores": summary_scores.model_dump() if summary_scores is not None else None,
+        },
+    }
+
+    metadata_path = output_dir / "pipeline_run_metadata.json"
+    metadata_path.write_text(
+        json.dumps(metadata, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
+    return metadata_path
 
 
 def _build_trend_prompt(

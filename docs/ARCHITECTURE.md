@@ -67,3 +67,15 @@
 4. `llm` adapters submit image/context requests.
 5. Qualitative and lexical scorers evaluate outputs.
 6. `distill_abm.compat` and `distill_abm.compat.reference_loader` provide safe fallbacks for parity-critical helpers.
+
+## Deployment and reproducibility
+
+- `uv sync --extra dev` installs the project and development tooling.
+- `docker build -t distill-abm .` creates a reproducible runtime image.
+- `uv run distill-abm run ...` executes deterministic CLI workflows with explicit modes and paths.
+- Each run writes `pipeline_run_metadata.json` and captures:
+  - input artifact paths
+  - resolved evidence/summarization modes
+  - prompt signatures (`context` and `trend`)
+  - model/provider and request hyperparameters
+  - trend/tracker score outputs and generated artifact paths

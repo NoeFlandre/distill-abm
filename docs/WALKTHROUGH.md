@@ -204,6 +204,28 @@ Compatibility behavior:
 - if reference call fails or is not required, deterministic production implementations are used
 - archive evidence and audit files validate this behavior (`docs/archive_full_manifest.md`, `docs/runtime_notebook_dependencies.json`)
 
+## 12) Reproducibility Artifacts
+
+Every `run` invocation writes `pipeline_run_metadata.json` in the same output directory as `report.csv` and the generated plot.
+
+The metadata contains:
+
+- absolute and relative input paths used for that run
+- resolved LLM provider/model and request hyperparameters
+- context and trend prompt signatures (SHA-256) plus prompt lengths
+- evidence/summarization mode settings (`evidence_mode`, `summarization_mode`, `score_on`)
+- score summaries and output artifact locations
+
+To replay a result:
+
+1. Keep `pipeline_run_metadata.json` with the corresponding outputs.
+2. Reuse the same:
+   - `csv_path`, `parameters_path`, `documentation_path`
+   - `metric_pattern`, `metric_description`
+   - `--evidence-mode`, `--summarization-mode`, `--score-on`
+   - `plot_description` and prompt templates in `configs/prompts.yaml`
+3. Run the same command with the same provider and model.
+
 ## Summary
 
 You can trace every production output from:
