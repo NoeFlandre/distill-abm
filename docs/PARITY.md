@@ -28,8 +28,14 @@ Provide executable parity coverage across ingestion, plotting, scoring, prompt c
 The following runtime-deprecated notebooks have been replaced by production implementations and removed from runtime dependency:
 
 - `archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb`
+- `archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb`
+- `archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb`
 - `archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb`
+- `archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb`
+- `archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb`
 - `archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb`
+- `archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb`
+- `archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb`
 
 ## Scope
 

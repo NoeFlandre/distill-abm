@@ -1,7 +1,7 @@
 # Notebook Function Inventory
 
-- Total definitions: 231
-- Unique notebook files with definitions: 35
+- Total definitions: 185
+- Unique notebook files with definitions: 29
 
 ## Functions by Notebook
 
@@ -94,25 +94,7 @@
 - `remove_urls`
 - `update_parameters`
 
-### `archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb`
-- `analyze_image_with_janus`
-- `append_analysis_to_csv`
-- `encode_image`
-- `get_llm_response`
-- `get_llm_response_no_image`
-- `load_existing_rows`
-- `main`
-- `setup_janus_model`
-
 ### `archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb`
-- `append_to_csv`
-- `append_to_csv2`
-- `encode_image`
-- `get_llm_response`
-- `get_llm_response2`
-- `main`
-
-### `archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb`
 - `append_to_csv`
 - `append_to_csv2`
 - `encode_image`
@@ -159,23 +141,7 @@
 ### `archive/legacy_repo/Code/Models/Grazing/2. Plotting the data.ipynb`
 - `plot_columns`
 
-### `archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb`
-- `analyze_image_with_janus`
-- `append_analysis_to_csv`
-- `get_llm_response`
-- `load_existing_rows`
-- `main`
-- `setup_janus_model`
-
 ### `archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb`
-- `append_to_csv`
-- `append_to_csv2`
-- `encode_image`
-- `get_llm_response`
-- `get_llm_response2`
-- `main`
-
-### `archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb`
 - `append_to_csv`
 - `append_to_csv2`
 - `encode_image`
@@ -222,23 +188,7 @@
 ### `archive/legacy_repo/Code/Models/Milk Consumption/2. Plotting the Data.ipynb`
 - `plot_columns`
 
-### `archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb`
-- `analyze_image_with_janus`
-- `append_analysis_to_csv`
-- `get_llm_response`
-- `load_existing_rows`
-- `main`
-- `setup_janus_model`
-
 ### `archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb`
-- `append_to_csv`
-- `append_to_csv2`
-- `encode_image`
-- `get_llm_response`
-- `get_llm_response2`
-- `main`
-
-### `archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb`
 - `append_to_csv`
 - `append_to_csv2`
 - `encode_image`
