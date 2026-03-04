@@ -70,5 +70,112 @@ fauna_from_netlogo_to_csv:
     food-value-females: 27
     regrowth-time: 3
     food-storage: true
-qualitative_example_text_dir: configs/notebook_prompt_assets/Evaluation/Qualitative Assessment using LLMs/Examples/Text
+grazint_netlogo_to_csv:
+  netlogo_home: /Volumes/NetLogo-6.2.0/NetLogo 6.2.0
+  model_path: NetLogo/model.nlogo
+  output_csv_path: CSV/netlogo_experiment_results.csv
+  reporters:
+    - mean-incum
+    - mean-alt
+    - incum-total-try
+    - alt-total-try
+    - choice-total
+    - mean [incum-quantity] of turtles
+    - mean [alt-quantity] of turtles
+    - mean [habit-factor-incum] of turtles
+    - mean [habit-factor-alt] of turtles
+    - mean [choice-function-deviation] of turtles
+    - mean [value-health-deviation] of turtles
+    - mean [value-env-deviation] of turtles
+  runtime_experiment_parameters:
+    behavioral-type: E-RO
+    number-SAT: 0
+    number-E-RO: 20
+    number-TRAD: 0
+    b: 0
+    number-MAX: 0
+    rain-mean: 200
+    resting-threshold: 0.1
+    gr1: 0.5
+    number-E-LBD: 20
+    gr2: 0.1
+    number-E-RO-SL1: 20
+    timesteps: 100
+    w: 0.8
+    number-random: 0
+    livestock-init: 90
+    rain-std: 100
+  saved_experiment_parameters:
+    behavioral-type: E-RO
+    number-SAT: 0
+    number-E-RO: 20
+    number-TRAD: 0
+    resting?: false
+    b: 0
+    number-MAX: 0
+    rain-mean: 200
+    homog-behav-types?: true
+    risk-att-init: 0.5
+    resting-threshold: 0.1
+    gr1: 0.5
+    number-E-LBD: 20
+    satisficing-threshold: 0
+    gr2: 0.1
+    number-E-RO-SL1: 20
+    timesteps: 100
+    w: 0.8
+    start-on-homepatch?: true
+    intrinsic-preference: 0
+    SL2-strategy-switch?: false
+    number-random: 0
+    number-households: 60
+    extension-model?: true
+    livestock-init: 90
+    risk-mode?: true
+    satisficing-trials: 21
+    rain-std: 100
+    global-rain?: true
+    social-susceptibility: 0
+    knowledge-radius: 1
+milk_netlogo_to_csv:
+  netlogo_home: /Volumes/NetLogo-6.2.0/NetLogo 6.2.0
+  model_path: NetLogo/model.nlogo
+  output_csv_path: CSV/netlogo_experiment_results.csv
+  reporters:
+    - mean-incum
+    - mean-alt
+    - incum-total-try
+    - alt-total-try
+    - choice-total
+    - mean [incum-quantity] of turtles
+    - mean [alt-quantity] of turtles
+    - mean [habit-factor-incum] of turtles
+    - mean [habit-factor-alt] of turtles
+    - mean [choice-function-deviation] of turtles
+    - mean [value-health-deviation] of turtles
+    - mean [value-env-deviation] of turtles
+  runtime_experiment_parameters:
+    number-of-agents: 1000
+    habit-on?: true
+    network-type: '"watts-strogatz"'
+    norms: true
+    social-conformity: 0.28
+  saved_experiment_parameters:
+    number-of-agents: 1000
+    habit-on?: true
+    network-type: '"watts-strogatz"'
+    norms: true
+    network-parameter: 8
+    memory-lifetime: 5
+    habit-threshold: 2
+    cognitive-dissonance-threshold: 0.15
+    p-interact: 0.3
+    social-blindness: 0.51
+    social-conformity: 0.28
+    social-susceptibility: 0.2
+    alt-health-mean-initial: 1.69
+    alt-env-mean-initial: 1.12
+    incumbent-initial-habit: 10
+    justification: 0.61
+ qualitative_example_text_dir: configs/notebook_prompt_assets/Evaluation/Qualitative Assessment using LLMs/Examples/Text
 human_reference_dir: tests/fixtures/notebook_parity/human_reference/All Results
