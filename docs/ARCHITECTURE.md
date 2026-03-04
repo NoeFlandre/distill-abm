@@ -18,7 +18,7 @@
   - unified request schema (`LLMRequest`) and provider factory
 - `distill_abm.summarize`:
   - prompt-safe text cleanup
-  - BART/BERT summarization runners
+  - summarization runners for BART, BERT, T5, and Longformer-like models
   - report post-processing utilities (`clean_markdown_symbols`, etc.)
 - `distill_abm.eval`:
   - token overlap metrics
