@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import base64
 import csv
+from itertools import combinations
 from pathlib import Path
 from typing import Literal
 
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from distill_abm.configs.models import PromptsConfig
 from distill_abm.eval.metrics import SummaryScores, score_summary
@@ -58,6 +59,16 @@ class PipelineResult(BaseModel):
     rouge2: float
     rouge_l: float
     flesch_reading_ease: float
+
+
+class SweepRunResult(BaseModel):
+    """Represents one notebook-style combination run across multiple trend prompts."""
+
+    combination_description: str
+    context_prompt: str
+    context_response: str
+    trend_analysis_prompts: list[str] = Field(default_factory=list)
+    trend_analysis_responses: list[str] = Field(default_factory=list)
 
 
 def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAdapter) -> PipelineResult:
@@ -119,12 +130,110 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     )
 
 
-def _context_prompt(inputs: PipelineInputs, prompts: PromptsConfig) -> str:
+def run_pipeline_sweep(
+    inputs: PipelineInputs,
+    prompts: PromptsConfig,
+    adapter: LLMAdapter,
+    image_paths: list[Path],
+    plot_descriptions: list[str],
+    style_feature_keys: list[str] | None = None,
+    output_csv: Path | None = None,
+) -> Path:
+    """Runs all style-feature prompt combinations and writes notebook-style wide CSV outputs."""
+    if not image_paths:
+        raise ValueError("image_paths cannot be empty")
+    if len(image_paths) != len(plot_descriptions):
+        raise ValueError("image_paths and plot_descriptions must have the same length")
+
+    combinations_to_run = build_style_feature_combinations(prompts, style_feature_keys)
+    rows: list[SweepRunResult] = []
+    for description, enabled_features in combinations_to_run:
+        context_prompt = _context_prompt(inputs, prompts, enabled_style_features=enabled_features)
+        context_response = _invoke_adapter(adapter, model=inputs.model, prompt=context_prompt)
+        trend_prompt_base = _build_trend_prompt(
+            prompts=prompts,
+            metric_description=inputs.metric_description,
+            context=context_response,
+            plot_description=None,
+            evidence_mode="plot",
+            stats_markdown="",
+            enabled_style_features=enabled_features,
+        )
+        prompts_for_images: list[str] = []
+        responses_for_images: list[str] = []
+        for image_path, plot_description in zip(image_paths, plot_descriptions, strict=True):
+            trend_prompt = _append_plot_description(trend_prompt_base, plot_description)
+            response = _invoke_adapter(
+                adapter,
+                model=inputs.model,
+                prompt=trend_prompt,
+                image_b64=_encode_image(image_path),
+            )
+            prompts_for_images.append(trend_prompt)
+            responses_for_images.append(response)
+        rows.append(
+            SweepRunResult(
+                combination_description=description,
+                context_prompt=context_prompt,
+                context_response=context_response,
+                trend_analysis_prompts=prompts_for_images,
+                trend_analysis_responses=responses_for_images,
+            )
+        )
+
+    out = output_csv or (inputs.output_dir / "combinations_report.csv")
+    return write_combinations_csv(out, rows)
+
+
+def write_combinations_csv(output_csv: Path, rows: list[SweepRunResult]) -> Path:
+    """Writes notebook-style wide CSV format with one prompt+response column pair per trend image."""
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
+    max_items = max((len(row.trend_analysis_prompts) for row in rows), default=0)
+    headers = ["Combination Description", "Context Prompt", "Context Response"]
+    for index in range(1, max_items + 1):
+        headers.append(f"Trend Analysis Prompt {index}")
+        headers.append(f"Trend Analysis Response {index}")
+
+    with output_csv.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(headers)
+        for row in rows:
+            record: list[str] = [
+                row.combination_description,
+                row.context_prompt,
+                row.context_response,
+            ]
+            for prompt, response in zip(row.trend_analysis_prompts, row.trend_analysis_responses, strict=True):
+                record.extend([prompt, response])
+            writer.writerow(record)
+    return output_csv
+
+
+def build_style_feature_combinations(
+    prompts: PromptsConfig,
+    style_feature_keys: list[str] | None = None,
+) -> list[tuple[str, set[str]]]:
+    """Builds notebook-style all-combination feature sets (role/example/insights by default)."""
+    requested = style_feature_keys or ["role", "example", "insights"]
+    available = [key for key in requested if prompts.style_features.get(key, "").strip()]
+    combinations_to_run: list[tuple[str, set[str]]] = [("None", set())]
+    for size in range(1, len(available) + 1):
+        for combo in combinations(available, size):
+            combinations_to_run.append((" + ".join(combo), set(combo)))
+    return combinations_to_run
+
+
+def _context_prompt(
+    inputs: PipelineInputs,
+    prompts: PromptsConfig,
+    enabled_style_features: set[str] | None = None,
+) -> str:
     parameters = inputs.parameters_path.read_text(encoding="utf-8")
     documentation = inputs.documentation_path.read_text(encoding="utf-8")
     base = prompts.context_prompt.format(parameters=parameters, documentation=documentation)
     role = prompts.style_features.get("role", "").strip()
-    if role:
+    include_role = enabled_style_features is None or "role" in enabled_style_features
+    if role and include_role:
         return f"{role}\n\n{base}"
     return base
 
@@ -193,22 +302,22 @@ def _build_trend_prompt(
     plot_description: str | None,
     evidence_mode: EvidenceMode,
     stats_markdown: str,
+    enabled_style_features: set[str] | None = None,
 ) -> str:
     parts: list[str] = []
+    enabled = enabled_style_features or set()
     role = prompts.style_features.get("role", "").strip()
-    if role:
+    include_all = enabled_style_features is None
+    if role and (include_all or "role" in enabled):
         parts.append(role)
     parts.append(prompts.trend_prompt.format(description=metric_description, context=context))
     example = prompts.style_features.get("example", "").strip()
-    if example:
+    if example and (include_all or "example" in enabled):
         parts.append(example)
     insights = prompts.style_features.get("insights", "").strip()
-    if insights:
+    if insights and (include_all or "insights" in enabled):
         parts.append(insights)
-    if plot_description:
-        stripped = plot_description.strip()
-        if stripped:
-            parts.append(stripped)
+    parts = _append_plot_description_parts(parts, plot_description)
     if evidence_mode in {"stats-markdown", "plot+stats"}:
         parts.append(f"Stats table:\n{stats_markdown}")
     return "\n\n".join(parts)
@@ -240,3 +349,18 @@ def _encode_image_for_evidence(
 
 def _slug(pattern: str) -> str:
     return pattern.strip().replace(" ", "_").replace("/", "_").lower()
+
+
+def _append_plot_description_parts(parts: list[str], plot_description: str | None) -> list[str]:
+    if plot_description:
+        stripped = plot_description.strip()
+        if stripped:
+            parts.append(stripped)
+    return parts
+
+
+def _append_plot_description(base_prompt: str, plot_description: str) -> str:
+    stripped = plot_description.strip()
+    if not stripped:
+        return base_prompt
+    return f"{base_prompt}\n\n{stripped}"
