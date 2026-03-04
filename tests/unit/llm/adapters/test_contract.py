@@ -65,12 +65,53 @@ def test_openai_adapter_success() -> None:
     assert response.text == "hello"
 
 
+def test_openai_adapter_includes_image_payload_when_present() -> None:
+    seen: dict[str, object] = {}
+
+    def _create(**payload):  # type: ignore[no-untyped-def]
+        seen.update(payload)
+        return SimpleNamespace(
+            choices=[SimpleNamespace(message=SimpleNamespace(content="hello"))],
+            model="gpt-4o",
+        )
+
+    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=_create)))
+    request = LLMRequest(
+        model="gpt-4o",
+        messages=[LLMMessage(role="user", content="hello")],
+        image_b64="abc",
+    )
+    OpenAIAdapter(model="gpt-4o", client=client).complete(request)
+    messages = seen["messages"]
+    assert isinstance(messages, list)
+    assert isinstance(messages[0]["content"], list)
+
+
 def test_anthropic_adapter_success() -> None:
     result = SimpleNamespace(content=[SimpleNamespace(type="text", text="hello")], model="claude-3-sonnet")
     client = SimpleNamespace(messages=SimpleNamespace(create=lambda **_: result))
     response = AnthropicAdapter(model="claude-3-sonnet", client=client).complete(make_request())
     assert response.provider == "anthropic"
     assert response.text == "hello"
+
+
+def test_anthropic_adapter_includes_image_payload_when_present() -> None:
+    seen: dict[str, object] = {}
+
+    def _create(**payload):  # type: ignore[no-untyped-def]
+        seen.update(payload)
+        return SimpleNamespace(content=[SimpleNamespace(type="text", text="hello")], model="claude-3-sonnet")
+
+    client = SimpleNamespace(messages=SimpleNamespace(create=_create))
+    request = LLMRequest(
+        model="claude-3-sonnet",
+        messages=[LLMMessage(role="user", content="hello")],
+        image_b64="abc",
+    )
+    AnthropicAdapter(model="claude-3-sonnet", client=client).complete(request)
+    messages = seen["messages"]
+    assert isinstance(messages, list)
+    assert isinstance(messages[0]["content"], list)
 
 
 def test_ollama_adapter_success() -> None:
