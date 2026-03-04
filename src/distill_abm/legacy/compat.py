@@ -80,6 +80,8 @@ _SUMMARY_METRICS_MAPPING: dict[str, dict[str, str]] = {
 
 
 def _call_notebook_first(name: str, fallback: Callable[..., T], *args: Any, **kwargs: Any) -> T:
+    if not notebook_loader.should_dispatch_notebook(name):
+        return fallback(*args, **kwargs)
     try:
         notebook_callable = notebook_loader.get_notebook_function(name)
     except KeyError:

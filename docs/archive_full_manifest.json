@@ -11,41 +11,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
-    "sha256": "02af6fcf85c3b7c6d8ad9e46df93c7065b867ee892da3dc2a1f3aa4244f1c883",
-    "size_bytes": 26645,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb"
-    ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/FinalResultsYesNo.csv",
-    "sha256": "ffcb661945fadf7f1af417c7af36dfb1826769f4e1c7a9bdcc060a2da6033d57",
-    "size_bytes": 19097,
-    "extension": ".csv",
-    "classification": "experiment_setting",
-    "action": "migrate",
-    "target_path": "tests/fixtures/notebook_parity/experiment_settings/Evaluation/DOE/Archives/Ce\u0301dric Version/FinalResultsYesNo.csv",
-    "rationale": "Canonical notebook experiment input/settings datasets.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/factorial_contributions.csv",
-    "sha256": "bb29b0a2dfe19461eeb4049167c25eb445042ca5cd4f8409f5efb5f0baa07302",
-    "size_bytes": 2582,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/C\u00e9dric DoE Analysis averaging the repetitions.ipynb",
     "sha256": "ab1843640705c58785ca634b38b7c4def6e59a043d9e78264cb648cac91234b6",
     "size_bytes": 14111,
@@ -57,6 +22,41 @@
     "source_notebook_links": [
       "Evaluation/DOE/Archives/C\u00e9dric DoE Analysis averaging the repetitions.ipynb"
     ]
+  },
+  {
+    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/C\u00e9dric Version/DoEFeatureImportance.ipynb",
+    "sha256": "02af6fcf85c3b7c6d8ad9e46df93c7065b867ee892da3dc2a1f3aa4244f1c883",
+    "size_bytes": 26645,
+    "extension": ".ipynb",
+    "classification": "historical_nonruntime",
+    "action": "retain_record_only",
+    "target_path": null,
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
+    "source_notebook_links": [
+      "Evaluation/DOE/Archives/C\u00e9dric Version/DoEFeatureImportance.ipynb"
+    ]
+  },
+  {
+    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/C\u00e9dric Version/FinalResultsYesNo.csv",
+    "sha256": "ffcb661945fadf7f1af417c7af36dfb1826769f4e1c7a9bdcc060a2da6033d57",
+    "size_bytes": 19097,
+    "extension": ".csv",
+    "classification": "experiment_setting",
+    "action": "migrate",
+    "target_path": "tests/fixtures/notebook_parity/experiment_settings/Evaluation/DOE/Archives/C\u00e9dric Version/FinalResultsYesNo.csv",
+    "rationale": "Canonical notebook experiment input/settings datasets.",
+    "source_notebook_links": []
+  },
+  {
+    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/C\u00e9dric Version/factorial_contributions.csv",
+    "sha256": "bb29b0a2dfe19461eeb4049167c25eb445042ca5cd4f8409f5efb5f0baa07302",
+    "size_bytes": 2582,
+    "extension": ".csv",
+    "classification": "historical_nonruntime",
+    "action": "retain_record_only",
+    "target_path": null,
+    "rationale": "Historical output/result artifact not required for production runtime.",
+    "source_notebook_links": []
   },
   {
     "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/test2.csv",
@@ -468,19 +468,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/.ipynb_checkpoints/Final Sheet-checkpoint.ipynb",
-    "sha256": "7e7ac9dbff16db27f1c72cb073050c9af19ed0775d75ad3d102a94f4fb9feddb",
-    "size_bytes": 83003,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Evaluation/Making the Sheet Structure/.ipynb_checkpoints/Final Sheet-checkpoint.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet/updated_structured_data.csv",
     "sha256": "e215a406caf006e70b820443376110dae424dec7e4d1fabefd669e3da34bebd2",
     "size_bytes": 1262701,
@@ -514,138 +501,6 @@
     "source_notebook_links": [
       "Evaluation/Making the Sheet Structure/Archives/Final Sheet.ipynb"
     ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/Archives/FaunaCLAUDE.csv",
-    "sha256": "d9ad446b3b24e82469be99757b56daef4064b495a34517bbcf9064e3b9b835a2",
-    "size_bytes": 504880,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/Archives/FaunaGPT.csv",
-    "sha256": "91c87ed93e99d8cb523819e8dd393cef94c1a5d545607a278a7e1a06b7e82a2f",
-    "size_bytes": 543198,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/Archives/GrazingCLAUDE.csv",
-    "sha256": "15d3121bf97c9400c9ab4715ef17314588c095943c78d955b93f2964ef958112",
-    "size_bytes": 355678,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/Archives/GrazingGPT.csv",
-    "sha256": "f70d58d65db48599ece7be1bbd62998222ddf91fa3e19ae1ee47e3ca5fac9b3c",
-    "size_bytes": 397080,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/FaunaCLAUDE.csv",
-    "sha256": "9756c61433c8a6f4b5e534df8ff719b37ff7139bbc125ba52609618aa4a840d5",
-    "size_bytes": 503823,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/FaunaGPT.csv",
-    "sha256": "b1b333b46aff3d897bbb0fc3de0a5bdfbd66b2b7246b84aab09530c320c9f328",
-    "size_bytes": 541153,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/GrazingCLAUDE.csv",
-    "sha256": "586f080c6aabff86446943d179e63eb468f5f2e08228e90e9cb5f580b8b2e8ac",
-    "size_bytes": 358485,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/GrazingGPT.csv",
-    "sha256": "7559a07b106699da5d54197cff817e79f5a19554fd801682619fb18672b653b3",
-    "size_bytes": 406846,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/MilkCLAUDE.csv",
-    "sha256": "6f97885e3c957ac2acedf0a6f46d22b6653ecc90f635d5270cfd2895434db3d0",
-    "size_bytes": 381464,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/MilkCLAUDE2.csv",
-    "sha256": "9e0600d39686768f0743e236f369cfb0f2dbc43114aeb028e33909d18b71bbb6",
-    "size_bytes": 389232,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/MilkGPT.csv",
-    "sha256": "8dd6adb8a80791292ddfd1ecd6e80431fe6981ba6499af2e64a9e6b91817b5bc",
-    "size_bytes": 421964,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/MilkGPT2.csv",
-    "sha256": "4c19d50d2e5a99a424ca956649d2c74a0e2075805457f0a4ac5978ef005e0ed2",
-    "size_bytes": 421167,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
   },
   {
     "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Structure/structured_data.csv",
@@ -703,182 +558,6 @@
     "source_notebook_links": [
       "Evaluation/Making the Sheet Structure/Final Sheet.ipynb"
     ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/Archives/FaunaCLAUDE.csv",
-    "sha256": "d9ad446b3b24e82469be99757b56daef4064b495a34517bbcf9064e3b9b835a2",
-    "size_bytes": 504880,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/Archives/FaunaGPT.csv",
-    "sha256": "91c87ed93e99d8cb523819e8dd393cef94c1a5d545607a278a7e1a06b7e82a2f",
-    "size_bytes": 543198,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/Archives/GrazingCLAUDE.csv",
-    "sha256": "15d3121bf97c9400c9ab4715ef17314588c095943c78d955b93f2964ef958112",
-    "size_bytes": 355678,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/Archives/GrazingGPT.csv",
-    "sha256": "f70d58d65db48599ece7be1bbd62998222ddf91fa3e19ae1ee47e3ca5fac9b3c",
-    "size_bytes": 397080,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/FaunaCLAUDE.csv",
-    "sha256": "9756c61433c8a6f4b5e534df8ff719b37ff7139bbc125ba52609618aa4a840d5",
-    "size_bytes": 503823,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/FaunaGPT.csv",
-    "sha256": "b1b333b46aff3d897bbb0fc3de0a5bdfbd66b2b7246b84aab09530c320c9f328",
-    "size_bytes": 541153,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/FaunaR1JANUS.csv",
-    "sha256": "011bc293cd13ba2dfff9a943a183ce1d7682e1a141eb913cca7e2d66c2e81e08",
-    "size_bytes": 479754,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/GrazingCLAUDE.csv",
-    "sha256": "586f080c6aabff86446943d179e63eb468f5f2e08228e90e9cb5f580b8b2e8ac",
-    "size_bytes": 358485,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/GrazingGPT.csv",
-    "sha256": "7559a07b106699da5d54197cff817e79f5a19554fd801682619fb18672b653b3",
-    "size_bytes": 406846,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/GrazingR1Janus.csv",
-    "sha256": "8cba4fdf307153644b0a1ea666163bba01e98a944b7d34dcf3f5a820d93bd8ef",
-    "size_bytes": 329999,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/MilkCLAUDE.csv",
-    "sha256": "6f97885e3c957ac2acedf0a6f46d22b6653ecc90f635d5270cfd2895434db3d0",
-    "size_bytes": 381464,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/MilkCLAUDE2.csv",
-    "sha256": "9e0600d39686768f0743e236f369cfb0f2dbc43114aeb028e33909d18b71bbb6",
-    "size_bytes": 389232,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/MilkGPT.csv",
-    "sha256": "8dd6adb8a80791292ddfd1ecd6e80431fe6981ba6499af2e64a9e6b91817b5bc",
-    "size_bytes": 421964,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/MilkGPT2.csv",
-    "sha256": "4c19d50d2e5a99a424ca956649d2c74a0e2075805457f0a4ac5978ef005e0ed2",
-    "size_bytes": 421167,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/MilkR1Janus.csv",
-    "sha256": "3d989f3ca76459193a4d67f82b19408f582396d6b28a88eb70d079cc894f255f",
-    "size_bytes": 353132,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Results/Yes-No Format.csv",
-    "sha256": "1eb564d51ac5272feb0770da45a03292891cdc5c131ec3370b1852fabb8a2a41",
-    "size_bytes": 12820,
-    "extension": ".csv",
-    "classification": "experiment_setting",
-    "action": "migrate",
-    "target_path": "tests/fixtures/notebook_parity/experiment_settings/Evaluation/Making the Sheet Structure/Results/Yes-No Format.csv",
-    "rationale": "Canonical notebook experiment input/settings datasets.",
-    "source_notebook_links": []
   },
   {
     "path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Structure/structured_data.csv",
@@ -4749,17 +4428,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Paper/Journal Article/With Human Assessment/elsarticle/Main.log",
-    "sha256": "75aa6edf8017f65ded1c7b27de7adf8674b7812713c04d4673151b71c10e9695",
-    "size_bytes": 43295,
-    "extension": ".log",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Paper/Journal Article/With Human Assessment/elsarticle/Main.out",
     "sha256": "d564a01d1cdfda6996d2a0b9bd6d354d3c102320da65b3023bd9892519af1448",
     "size_bytes": 3151,
@@ -4837,17 +4505,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Paper/Journal Article/With Human Assessment/elsarticle/SupplementaryMaterial.log",
-    "sha256": "6ad15432c3cd66971651adb7298163949f983db66c4a5d0013ac33063c581b9a",
-    "size_bytes": 38446,
-    "extension": ".log",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Paper/Journal Article/With Human Assessment/elsarticle/SupplementaryMaterial.out",
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "size_bytes": 0,
@@ -4914,17 +4571,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Paper/Journal Article/With Human Assessment/elsarticle/elsarticle-template-num.log",
-    "sha256": "cacf22511c3380a7a56c67dc08eecf598361e8811ed05285d6f3f2883e663114",
-    "size_bytes": 33311,
-    "extension": ".log",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Paper/Journal Article/With Human Assessment/elsarticle/elsarticle-template-num.out",
     "sha256": "cc2b63b314c8470ffa3f064448033a69a0b48018f8e5b46db0367e5f755457a8",
     "size_bytes": 1107,
@@ -4984,17 +4630,6 @@
     "sha256": "bddc451d1ff4f87ff9b7f3b321bafc8c15b6f64c6f9a35cfd0dcda1323d040ae",
     "size_bytes": 8545,
     "extension": ".aux",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Paper/Journal Article/With LLM Assessment/elsarticle copy/Main.log",
-    "sha256": "e369bd8e394c41bf469c42dcfc8105787baa0b2ca82a97864de752218edba423",
-    "size_bytes": 43958,
-    "extension": ".log",
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
@@ -5079,17 +4714,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Paper/Journal Article/With LLM Assessment/elsarticle copy/SupplementaryMaterial.log",
-    "sha256": "6ad15432c3cd66971651adb7298163949f983db66c4a5d0013ac33063c581b9a",
-    "size_bytes": 38446,
-    "extension": ".log",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Paper/Journal Article/With LLM Assessment/elsarticle copy/SupplementaryMaterial.out",
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "size_bytes": 0,
@@ -5149,17 +4773,6 @@
     "sha256": "bc122b27d1995c9dd5602e75ff63090917c0c62be7d293d06065244cd2610ffa",
     "size_bytes": 3619,
     "extension": ".aux",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Paper/Journal Article/With LLM Assessment/elsarticle copy/elsarticle-template-num.log",
-    "sha256": "cacf22511c3380a7a56c67dc08eecf598361e8811ed05285d6f3f2883e663114",
-    "size_bytes": 33311,
-    "extension": ".log",
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,
@@ -5376,7 +4989,7 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Readings/Ce\u0301dric's/hicss.pdf",
+    "path": "archive/legacy_repo/Readings/C\u00e9dric's/hicss.pdf",
     "sha256": "a8e35f14a0b495b841cecd59a502d82dbc1da6283fe920e9fdf46bec81c0510d",
     "size_bytes": 934172,
     "extension": ".pdf",
@@ -5387,7 +5000,7 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Readings/Ce\u0301dric's/ieee.pdf",
+    "path": "archive/legacy_repo/Readings/C\u00e9dric's/ieee.pdf",
     "sha256": "c1dc5083bd8f99c29ed5374a1dc3ba14e333cef0ecfa4607587f920efb2affc3",
     "size_bytes": 904802,
     "extension": ".pdf",
@@ -5710,633 +5323,6 @@
     "sha256": "71b4b9ee20ad5d1e536fbbd7b80a55a7a3ed55ac06c82c27192ec91b3921b2a1",
     "size_bytes": 592507,
     "extension": ".pdf",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Archives/DOE/Each model as a repetition/Factorial Results.csv",
-    "sha256": "2e4387933399f70d8cd529476434a5aa9a83f76307ad23785057f672fde4fa6e",
-    "size_bytes": 2609,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Archives/DOE/For each Model/Fauna/Fauna1.csv",
-    "sha256": "db0626cc81f137dee12103dab8a085a5e46a76616deed03a3ee49b4c738e167f",
-    "size_bytes": 2515,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Archives/DOE/For each Model/Grazing/Grazing1.csv",
-    "sha256": "06e27f6d18da79d4840055ce1b9e3a7172534ba5bf14fd9b54b133f4cbfab6e6",
-    "size_bytes": 2615,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Archives/DOE/For each Model/Milk/Milk1.csv",
-    "sha256": "e68d194b46ffdd09ae71e089c87fb6cd5bc12b1b1064e9aa75ff8fc237359838",
-    "size_bytes": 2590,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Archives/Reports/1 and -1 Format.csv",
-    "sha256": "c58d6e645cde9b2af886ae333916b65bcd83e8c53ffbb46166e3ec78508e9650",
-    "size_bytes": 11909,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Archives/Reports/1 and -1 Sorted.csv",
-    "sha256": "1504eaf4be31186449599a1c255aa03cebf6674f0b16b19189ae1f7bedcd9a58",
-    "size_bytes": 11909,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Archives/Reports/Full Format.csv",
-    "sha256": "ca4778b374460564b4b22db61f314dd7a22ab5e871cb84216290e6b5f52f939f",
-    "size_bytes": 1702780,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Archives/Reports/Yes-No Format.csv",
-    "sha256": "1eb564d51ac5272feb0770da45a03292891cdc5c131ec3370b1852fabb8a2a41",
-    "size_bytes": 12820,
-    "extension": ".csv",
-    "classification": "experiment_setting",
-    "action": "migrate",
-    "target_path": "tests/fixtures/notebook_parity/experiment_settings/archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Archives/Reports/Yes-No Format.csv",
-    "rationale": "Canonical notebook experiment input/settings datasets.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/FinalResultsYesNo.csv",
-    "sha256": "ffcb661945fadf7f1af417c7af36dfb1826769f4e1c7a9bdcc060a2da6033d57",
-    "size_bytes": 19097,
-    "extension": ".csv",
-    "classification": "experiment_setting",
-    "action": "migrate",
-    "target_path": "tests/fixtures/notebook_parity/experiment_settings/archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/FinalResultsYesNo.csv",
-    "rationale": "Canonical notebook experiment input/settings datasets.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/BLEU/boxplot_BLEU_by_Example.png",
-    "sha256": "84c5780e7f8309aad2b09adcb2ca155eeb932e9308b42558c3cd39a71d111942",
-    "size_bytes": 15262,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/BLEU/boxplot_BLEU_by_Insight.png",
-    "sha256": "bd259d01c67e3cc78f84d8491a04bc1e2698717e3c5f61844f9e0cefd3e3bfac",
-    "size_bytes": 14652,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/BLEU/boxplot_BLEU_by_LLM.png",
-    "sha256": "8e3d27e1feefb1457e41e0eb1500c42d7b414a0213eb6e212f2309b6e7b77857",
-    "size_bytes": 15262,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/BLEU/boxplot_BLEU_by_Role.png",
-    "sha256": "c262215b7b6c65f4f3f1967eb16f1c0b8b84dfd4693b726f5ff77f861f562354",
-    "size_bytes": 14082,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Coverage_Claude/boxplot_Coverage_Claude_by_Example.png",
-    "sha256": "39ca6a0f54f6e007ad48a8bc3ac95b111bca3426ab10af45d322c684b7d386a9",
-    "size_bytes": 18925,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Coverage_Claude/boxplot_Coverage_Claude_by_Insight.png",
-    "sha256": "31a1f9504055bb9ec7dfc317f05258b2e26ad0bf66299fe76d0c5d2e168f1b16",
-    "size_bytes": 18399,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Coverage_Claude/boxplot_Coverage_Claude_by_LLM.png",
-    "sha256": "bc615cd3dc795f9b0fd3455a41e1cf30ceb971f7ad50272d2969539c6bf1bbe9",
-    "size_bytes": 19221,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Coverage_Claude/boxplot_Coverage_Claude_by_Role.png",
-    "sha256": "abbbf6b26b1164de1e2a2a88690e6b80504b386807b9d85bb2da08e2233557e3",
-    "size_bytes": 17992,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Faithfulness_GPT/boxplot_Faithfulness_GPT_by_Example.png",
-    "sha256": "a4b1517c55a92a0a4301c7201eca9a34862097c3a2339d38a17efc1bf9f85408",
-    "size_bytes": 18557,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Faithfulness_GPT/boxplot_Faithfulness_GPT_by_Insight.png",
-    "sha256": "56f95eea493e5a5a3c57fa7a2f7bb31f8f26b511d8a68de3d211a41471616ca5",
-    "size_bytes": 18029,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Faithfulness_GPT/boxplot_Faithfulness_GPT_by_LLM.png",
-    "sha256": "99670b02653d54280e9c995fd98f96bc20f2697ae25406e80c9ab8b92e36d9ef",
-    "size_bytes": 19198,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Faithfulness_GPT/boxplot_Faithfulness_GPT_by_Role.png",
-    "sha256": "8138c58ee7bc983531ed51ba2889f34893af1f4f9bfddeb32f91eb54d130f6de",
-    "size_bytes": 17483,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Flesch_Reading_Ease/boxplot_Flesch_Reading_Ease_by_Example.png",
-    "sha256": "df1d01fe4875aae9e21eb0a1d1f1f53cac88db0e999ac394bf57831e4177cae3",
-    "size_bytes": 18727,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Flesch_Reading_Ease/boxplot_Flesch_Reading_Ease_by_Insight.png",
-    "sha256": "4d3c1920854454052c7a2947becec993e0d1401570bdff2c8facfef98d0cf823",
-    "size_bytes": 18057,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Flesch_Reading_Ease/boxplot_Flesch_Reading_Ease_by_LLM.png",
-    "sha256": "2f5a72596fadee84d63099f9e23cb81630f64f79e49f85afb54a86175139153e",
-    "size_bytes": 19474,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/Flesch_Reading_Ease/boxplot_Flesch_Reading_Ease_by_Role.png",
-    "sha256": "a8287f59efd470f1be77095e3e176fd33c05788ee1320567d62a53f57ede6daf",
-    "size_bytes": 18127,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/METEOR/boxplot_METEOR_by_Example.png",
-    "sha256": "984d47daf49736ea7f7b862099ec63303581cadfa6e135b40bcddae1c866741b",
-    "size_bytes": 15467,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/METEOR/boxplot_METEOR_by_Insight.png",
-    "sha256": "6a03ffcbbb7ed0bf13f53f148c4db1e901219d57c13e157416e0dd9bb9c525f4",
-    "size_bytes": 14682,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/METEOR/boxplot_METEOR_by_LLM.png",
-    "sha256": "c52762a776bbca1952d32cb2ecfa01e5caf5cf9fabad7d5230fdbde2a2af67fa",
-    "size_bytes": 16888,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/METEOR/boxplot_METEOR_by_Role.png",
-    "sha256": "a2279349df5f2fdf6732bdbc16570d9616b7195ad01ed5b6712ed7a7e7b387e2",
-    "size_bytes": 14348,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_1/boxplot_ROUGE_1_by_Example.png",
-    "sha256": "fa6ebc5de1770cd288bac95d74e5b4003b5bf005e023edde3104cc2247426f9d",
-    "size_bytes": 18260,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_1/boxplot_ROUGE_1_by_Insight.png",
-    "sha256": "38c1fe4e29f09c3cc1ddd2aa48b4eb9a848a2e0c6f0256da839644d101b7eca5",
-    "size_bytes": 17661,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_1/boxplot_ROUGE_1_by_LLM.png",
-    "sha256": "38d74bc643d48bf52bac8ca6f21d78105f4668f409dc1c70b653ea362803fbd8",
-    "size_bytes": 18551,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_1/boxplot_ROUGE_1_by_Role.png",
-    "sha256": "6e1c8aa892650312ce83e52377130d0548a369d7dea84203e316abd84daecc50",
-    "size_bytes": 16991,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_2/boxplot_ROUGE_2_by_Example.png",
-    "sha256": "50c4889a4c53227601fdc2d16973d789422af6c5a6f24c40f007e6c350d65d32",
-    "size_bytes": 15824,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_2/boxplot_ROUGE_2_by_Insight.png",
-    "sha256": "34aa9649fa2af5871759d524845720d229706075a3d9a9f609b20ab4cf67ff8d",
-    "size_bytes": 15203,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_2/boxplot_ROUGE_2_by_LLM.png",
-    "sha256": "f7bd2e0ffdb8f40002fde8597262726a32500aa3b0799c2ef1426b2c4d7176fb",
-    "size_bytes": 16212,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_2/boxplot_ROUGE_2_by_Role.png",
-    "sha256": "ad5f9cfa7a2f25c033e04e4e471dbd7123621334f8e7bbc4dd3c2e1c4693f257",
-    "size_bytes": 14532,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_L/boxplot_ROUGE_L_by_Example.png",
-    "sha256": "2aab31264dfefabf90a097a9ee2debc127a17049faaa806d062f38780056d957",
-    "size_bytes": 18021,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_L/boxplot_ROUGE_L_by_Insight.png",
-    "sha256": "e70bd54e3be9bec7fe0d5fdc06e22dbde7507ca97a7ce5f6229d59bbd9b38530",
-    "size_bytes": 17462,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_L/boxplot_ROUGE_L_by_LLM.png",
-    "sha256": "8b03b69d1cb3ead30feb5fca3298113b982b118cce995cd641cc1ad0f5bde2cc",
-    "size_bytes": 18389,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/boxplots/ROUGE_L/boxplot_ROUGE_L_by_Role.png",
-    "sha256": "4fc42b069424a4af27a4542d56cea096d18ab809ccfd418e224221f59abd81ea",
-    "size_bytes": 17010,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/plots/correlation/correlation_matrix.png",
-    "sha256": "7be612efa6d81426b7a8160c67e2574645ab84a14542879456c86afe0f2ea13c",
-    "size_bytes": 46879,
-    "extension": ".png",
-    "classification": "legacy_visualization",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Visualization artifact retained for historical comparison and reproducibility.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/text/anova_results.txt",
-    "sha256": "5d106de6aaf7345e773ca22c67ac7caef562614d4941a3e5ed5bbf7f5e75dc4c",
-    "size_bytes": 3913,
-    "extension": ".txt",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/text/correlation_matrix.txt",
-    "sha256": "04369ef3f9fc2af6ef0df69ece6293e0b509deb0b2394770d81105ce481d427a",
-    "size_bytes": 1133,
-    "extension": ".txt",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/text/deepseek_analysis.txt",
-    "sha256": "2b096c8f1f1e9ac277e48a4c061116ca53c3e3e75f25c30bada3acc1ce82d8d6",
-    "size_bytes": 1999,
-    "extension": ".txt",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results/text/descriptive_stats.txt",
-    "sha256": "86aba0f9f43125cabd1d8ff412d7bcbcadea68e52a9ac75d407b964e0d839c70",
-    "size_bytes": 1097,
-    "extension": ".txt",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Unreferenced archival artifact retained for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Data Analysis/results_analysis.ipynb",
-    "sha256": "9900d10a9062b21ec792e1e966e9471e227aaee3b7f2c0f71eafec7b5d16df25",
-    "size_bytes": 9977,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Reports/FinalResultsYesNo.csv",
-    "sha256": "ffcb661945fadf7f1af417c7af36dfb1826769f4e1c7a9bdcc060a2da6033d57",
-    "size_bytes": 19097,
-    "extension": ".csv",
-    "classification": "experiment_setting",
-    "action": "migrate",
-    "target_path": "tests/fixtures/notebook_parity/experiment_settings/archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Reports/FinalResultsYesNo.csv",
-    "rationale": "Canonical notebook experiment input/settings datasets.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Quantitative Assessment/Global Results/Final Sheet.ipynb",
-    "sha256": "45cf077b9c0ac09a313c758dcc0f6a171397c08de861587212072412ff344dde",
-    "size_bytes": 83204,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Quantitative Assessment/Global Results/structured_data.csv",
-    "sha256": "35b347409baaf78c96484824760904586d5273ff90b86398129668c83106c340",
-    "size_bytes": 3969,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Quantitative Assessment/Global Results/updated_structured_data2.csv",
-    "sha256": "ab95ed2c372e553ee4f9db4997653a2e8aed1ee743e952a8c0de4631db12239f",
-    "size_bytes": 1267564,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Quantitative Assessment/Results for each models/FaunaCLAUDE.csv",
-    "sha256": "9756c61433c8a6f4b5e534df8ff719b37ff7139bbc125ba52609618aa4a840d5",
-    "size_bytes": 503823,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Quantitative Assessment/Results for each models/FaunaGPT.csv",
-    "sha256": "b1b333b46aff3d897bbb0fc3de0a5bdfbd66b2b7246b84aab09530c320c9f328",
-    "size_bytes": 541153,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Quantitative Assessment/Results for each models/GrazingCLAUDE.csv",
-    "sha256": "586f080c6aabff86446943d179e63eb468f5f2e08228e90e9cb5f580b8b2e8ac",
-    "size_bytes": 358485,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Quantitative Assessment/Results for each models/GrazingGPT.csv",
-    "sha256": "7559a07b106699da5d54197cff817e79f5a19554fd801682619fb18672b653b3",
-    "size_bytes": 406846,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Quantitative Assessment/Results for each models/MilkCLAUDE2.csv",
-    "sha256": "9e0600d39686768f0743e236f369cfb0f2dbc43114aeb028e33909d18b71bbb6",
-    "size_bytes": 389232,
-    "extension": ".csv",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Quantitative Assessment/Results for each models/MilkGPT2.csv",
-    "sha256": "4c19d50d2e5a99a424ca956649d2c74a0e2075805457f0a4ac5978ef005e0ed2",
-    "size_bytes": 421167,
-    "extension": ".csv",
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
     "target_path": null,

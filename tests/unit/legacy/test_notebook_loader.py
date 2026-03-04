@@ -14,6 +14,7 @@ from distill_abm.legacy.notebook_loader import (
     missing_required_notebook_functions,
     required_notebook_dependencies_by_path,
     required_notebook_function_sources,
+    should_dispatch_notebook,
 )
 
 
@@ -89,3 +90,7 @@ def test_required_dependencies_group_by_notebook_path() -> None:
     for source, names in grouped.items():
         assert source.exists()
         assert names == sorted(names)
+
+
+def test_should_dispatch_notebook_tracks_required_function_set() -> None:
+    assert should_dispatch_notebook("clean_context_response") is False

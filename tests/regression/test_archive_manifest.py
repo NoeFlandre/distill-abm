@@ -1,13 +1,49 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import unicodedata
 from pathlib import Path
+
+
+def _tracked_archive_files() -> list[Path]:
+    result = subprocess.run(
+        ["git", "ls-files", "-z", "--", "archive"],
+        check=True,
+        capture_output=True,
+        text=False,
+    )
+    raw_items = [item for item in result.stdout.split(b"\x00") if item]
+    files = [Path(item.decode("utf-8", errors="surrogateescape")) for item in raw_items]
+    return sorted(path for path in files if path.is_file() and path.name != ".DS_Store")
+
+
+def _path_exists_with_unicode_normalization(path_str: str) -> bool:
+    path = Path(path_str)
+    if path.exists():
+        return True
+    if path.is_absolute():
+        return False
+    candidates: list[Path] = [Path(".")]
+    for part in path.parts:
+        normalized_part = unicodedata.normalize("NFC", part)
+        next_candidates: list[Path] = []
+        for base in candidates:
+            if not base.exists() or not base.is_dir():
+                continue
+            for child in base.iterdir():
+                if unicodedata.normalize("NFC", child.name) == normalized_part:
+                    next_candidates.append(child)
+        candidates = next_candidates
+        if not candidates:
+            return False
+    return any(candidate.exists() for candidate in candidates)
 
 
 def test_archive_manifest_covers_every_archive_file() -> None:
     manifest_path = Path("docs/archive_full_manifest.json")
     rows = json.loads(manifest_path.read_text(encoding="utf-8"))
-    archive_files = sorted(path for path in Path("archive").rglob("*") if path.is_file() and path.name != ".DS_Store")
+    archive_files = _tracked_archive_files()
     assert len(rows) == len(archive_files)
 
 
@@ -33,7 +69,7 @@ def test_archive_manifest_has_no_unresolved_required_mappings() -> None:
             assert target_path is not None and str(target_path).strip()
         if action == "migrate":
             assert target_path is not None and str(target_path).strip()
-            assert Path(str(target_path)).exists()
+            assert _path_exists_with_unicode_normalization(str(target_path))
 
 
 def test_archive_manifest_migrate_targets_exclude_junk_temp_files() -> None:

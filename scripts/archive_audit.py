@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 import sys
 from collections import Counter
 from dataclasses import asdict, dataclass
@@ -132,8 +133,23 @@ def _source_links(path: Path) -> list[str]:
     return []
 
 
+def _tracked_archive_files() -> list[Path]:
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "-z", "--", str(ROOT)],
+            check=True,
+            capture_output=True,
+            text=False,
+        )
+    except Exception:
+        return sorted(path for path in ROOT.rglob("*") if path.is_file() and path.name != ".DS_Store")
+    raw_items = [item for item in result.stdout.split(b"\x00") if item]
+    files = [Path(item.decode("utf-8", errors="surrogateescape")) for item in raw_items]
+    return sorted(path for path in files if path.is_file() and path.name != ".DS_Store")
+
+
 def build_manifest() -> list[ManifestRow]:
-    files = sorted(path for path in ROOT.rglob("*") if path.is_file() and path.name != ".DS_Store")
+    files = _tracked_archive_files()
     rows: list[ManifestRow] = []
     for path in files:
         classification, action, target_path, rationale = _classify(path)
