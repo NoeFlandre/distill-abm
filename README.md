@@ -249,7 +249,7 @@ GitHub Actions configuration is at `.github/workflows/ci.yml` and runs:
 - `docs/WALKTHROUGH.md`: reviewer-oriented end-to-end behavior.
 - `docs/ARCHITECTURE.md`: module boundaries and data flow.
 - `docs/PARITY.md`: parity policy and proof by test.
-- `docs/TESTING_REPORT.md`: complete verification commands, scope, and outcomes.
+- `docs/TESTING_REPORT.md`: single authoritative testing reference (scope, methods, gates, and outcomes).
 - `docs/archive_full_manifest.json`: migration and retention policy for every archived file.
 - `docs/runtime_notebook_dependencies.json`: reference dispatch dependencies for audit.
 - `configs/notebook_prompt_reference.yaml`: reference prompt texts for behavior lock.
