@@ -1,7 +1,7 @@
 [
   {
     "path": "archive/.DS_Store",
-    "sha256": "dd26550fe23032b1ca63c5e4d1b01d1edf70574f85cef83b81791021a4320df1",
+    "sha256": "9bbe5104aeeed0d866c0caedb00397fa3e131d584565f17fac6d528d0391279a",
     "size_bytes": 8196,
     "extension": "",
     "classification": "historical_nonruntime",
@@ -12,7 +12,7 @@
   },
   {
     "path": "archive/legacy_repo/.DS_Store",
-    "sha256": "d7fe534e0c6c47278b3f521fb48cf30b62f5ba037343da8b6d85a1054d18e0f2",
+    "sha256": "0729be334be7888bc52c75e953abec0a3a4d1b0a8239e35a309c616034a82de3",
     "size_bytes": 10244,
     "extension": "",
     "classification": "historical_nonruntime",
@@ -23,7 +23,7 @@
   },
   {
     "path": "archive/legacy_repo/Code/.DS_Store",
-    "sha256": "efeda3ca4ef119ae39f267c0b5fd624c5af30f78e972e398e29827cef7af0385",
+    "sha256": "7303fc42f52ab908ca1de624a598f0113d97ffc97647f8bcb21ef4c850a20d3b",
     "size_bytes": 14340,
     "extension": "",
     "classification": "historical_nonruntime",
@@ -34,8 +34,19 @@
   },
   {
     "path": "archive/legacy_repo/Code/Evaluation/.DS_Store",
-    "sha256": "5d6b7226bfd408c1b3a9e14398aa92b796e33bbb51fda9c1d39711cbae085c2f",
+    "sha256": "79ca49654c63e51cc5868fb3ee98200ce56a657400dcdb88dbae637763a40166",
     "size_bytes": 14340,
+    "extension": "",
+    "classification": "historical_nonruntime",
+    "action": "retain_record_only",
+    "target_path": null,
+    "rationale": "Temporary/editor artifact retained only for historical traceability.",
+    "source_notebook_links": []
+  },
+  {
+    "path": "archive/legacy_repo/Code/Evaluation/DOE/.DS_Store",
+    "sha256": "48c213c773eb119702f764e2d88c65abe64a0b9c663dd65fcc479c8195c74ca0",
+    "size_bytes": 6148,
     "extension": "",
     "classification": "historical_nonruntime",
     "action": "retain_record_only",
@@ -53,19 +64,6 @@
     "target_path": null,
     "rationale": "Historical output/result artifact not required for production runtime.",
     "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb",
-    "sha256": "ab1843640705c58785ca634b38b7c4def6e59a043d9e78264cb648cac91234b6",
-    "size_bytes": 14111,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
-    "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
-    "source_notebook_links": [
-      "Evaluation/DOE/Archives/Ce\u0301dric DoE Analysis averaging the repetitions.ipynb"
-    ]
   },
   {
     "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/Ce\u0301dric Version/DoEFeatureImportance.ipynb",
@@ -101,6 +99,19 @@
     "target_path": null,
     "rationale": "Historical output/result artifact not required for production runtime.",
     "source_notebook_links": []
+  },
+  {
+    "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/C\u00e9dric DoE Analysis averaging the repetitions.ipynb",
+    "sha256": "ab1843640705c58785ca634b38b7c4def6e59a043d9e78264cb648cac91234b6",
+    "size_bytes": 14111,
+    "extension": ".ipynb",
+    "classification": "historical_nonruntime",
+    "action": "discard_with_rationale",
+    "target_path": null,
+    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "source_notebook_links": [
+      "Evaluation/DOE/Archives/C\u00e9dric DoE Analysis averaging the repetitions.ipynb"
+    ]
   },
   {
     "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/test2.csv",
