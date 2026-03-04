@@ -36,13 +36,5 @@
       "append_faithfulness_score"
     ],
     "function_count": 2
-  },
-  {
-    "notebook_path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",
-    "required_functions": [
-      "clean_context_response",
-      "clean_symbols"
-    ],
-    "function_count": 2
   }
 ]

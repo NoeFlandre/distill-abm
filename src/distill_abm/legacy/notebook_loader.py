@@ -19,8 +19,6 @@ REQUIRED_NOTEBOOK_FUNCTIONS: tuple[str, ...] = (
     "append_faithfulness_score",
     "calculate_sst",
     "calculate_sums_and_sst",
-    "clean_context_response",
-    "clean_symbols",
     "compute_results",
     "create_factorial_design",
     "fill_faithfulness_scores",
