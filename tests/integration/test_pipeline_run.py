@@ -92,10 +92,10 @@ def test_run_pipeline_full_text_only_bypasses_summarizers(tmp_path: Path, monkey
     def _fail(_: str) -> str:
         raise AssertionError("summarizer should not be called for full_text_only")
 
-    monkeypatch.setattr(run_module, "summarize_with_bart", _fail)
-    monkeypatch.setattr(run_module, "summarize_with_bert", _fail)
-    monkeypatch.setattr(run_module, "summarize_with_t5", _fail)
-    monkeypatch.setattr(run_module, "summarize_with_longformer_ext", _fail)
+    monkeypatch.setattr(run_module.helpers, "summarize_with_bart", _fail)
+    monkeypatch.setattr(run_module.helpers, "summarize_with_bert", _fail)
+    monkeypatch.setattr(run_module.helpers, "summarize_with_t5", _fail)
+    monkeypatch.setattr(run_module.helpers, "summarize_with_longformer_ext", _fail)
 
     adapter = FakeAdapter()
     result = run_pipeline(
@@ -250,6 +250,7 @@ def test_run_pipeline_uses_scoring_reference_file_when_provided(
             metric_description="weekly milk",
             text_source_mode="summary_only",
             evidence_mode="plot",
+            allow_summary_fallback=True,
             scoring_reference_path=reference_path,
         ),
         prompts=_prompts(),

@@ -195,7 +195,9 @@ def summarize_report_text_pair_for_ids(
     )
 
 
-def _summarizer_specs_from_ids(summarizer_ids: tuple[SummarizerId, ...]) -> tuple[tuple[str, Callable[[str], str]], ...]:
+def _summarizer_specs_from_ids(
+    summarizer_ids: tuple[SummarizerId, ...],
+) -> tuple[tuple[str, Callable[[str], str]], ...]:
     spec_by_id: dict[SummarizerId, Callable[[str], str]] = {
         "bart": summarize_with_bart,
         "bert": summarize_with_bert,

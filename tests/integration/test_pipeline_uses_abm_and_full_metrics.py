@@ -34,6 +34,7 @@ def test_pipeline_outputs_full_metrics_with_abm_config(tmp_path: Path) -> None:
             model="fake-model",
             metric_pattern=abm.metric_pattern,
             metric_description=abm.metric_description,
+            allow_summary_fallback=True,
         ),
         prompts=PromptsConfig(
             context_prompt="Context {parameters} {documentation}",

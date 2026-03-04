@@ -41,6 +41,16 @@ BENCHMARK_MODELS: set[tuple[str, str]] = {
 }
 DEBUG_MODEL: tuple[str, str] = ("openrouter", "qwen/qwen3-vl-235b-a22b-thinking")
 
+__all__ = [
+    "analyze_doe",
+    "app",
+    "evaluate_qualitative",
+    "main",
+    "run",
+    "smoke_qwen",
+    "subprocess",
+]
+
 
 @app.callback()
 def cli() -> None:
