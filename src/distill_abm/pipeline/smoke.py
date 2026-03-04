@@ -157,6 +157,7 @@ class SmokeSuiteInputs(BaseModel):
         "t5",
         "longformer_ext",
     )
+    allow_summary_fallback: bool = False
     text_source_mode: TextSourceMode = "summary_only"
     evidence_mode: EvidenceMode = "plot+table"
     scoring_reference_path: Path | None = None
@@ -340,6 +341,7 @@ def _run_smoke_case(
                 plot_description=inputs.plot_description,
                 evidence_mode=case.evidence_mode,
                 text_source_mode=case.text_source_mode,
+                allow_summary_fallback=inputs.allow_summary_fallback,
                 summarizers=case.summarizers or inputs.summarizers,
                 enabled_style_features=case.enabled_style_features,
                 scoring_reference_path=inputs.scoring_reference_path,

@@ -11,16 +11,22 @@ from typing import Literal, Protocol
 
 import pandas as pd
 
-from distill_abm.configs.models import PromptsConfig
+from distill_abm.configs.models import PromptsConfig, SummarizerId
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMProviderError, LLMRequest
-from distill_abm.summarize.models import summarize_with_bart, summarize_with_bert
+from distill_abm.summarize.models import (
+    summarize_with_bart,
+    summarize_with_bert,
+    summarize_with_longformer_ext,
+    summarize_with_t5,
+)
 from distill_abm.summarize.text import clean_markdown_symbols, strip_think_prefix
 from distill_abm.viz.plots import generate_stats_table
 
 EvidenceMode = Literal["plot", "table", "plot+table"]
 ResolvedEvidenceMode = Literal["plot", "table", "plot+table"]
+TextSourceMode = Literal["summary_only", "full_text_only"]
 
 
 class SweepRow(Protocol):
@@ -130,6 +136,7 @@ def summarize_report_text(
     summarize_with_bart_fn: Callable[[str], str] = summarize_with_bart,
     summarize_with_bert_fn: Callable[[str], str] = summarize_with_bert,
     additional_summarizers: Sequence[tuple[str, Callable[[str], str]]] = (),
+    allow_fallback: bool = True,
 ) -> str:
     """Apply dual summarization pass-through unless summarization is disabled."""
     _, summary = summarize_report_text_pair(
@@ -138,6 +145,7 @@ def summarize_report_text(
         summarize_with_bart_fn=summarize_with_bart_fn,
         summarize_with_bert_fn=summarize_with_bert_fn,
         additional_summarizers=additional_summarizers,
+        allow_fallback=allow_fallback,
     )
     if summary is None:
         return text
@@ -150,12 +158,57 @@ def summarize_report_text_pair(
     summarize_with_bart_fn: Callable[[str], str] = summarize_with_bart,
     summarize_with_bert_fn: Callable[[str], str] = summarize_with_bert,
     additional_summarizers: Sequence[tuple[str, Callable[[str], str]]] = (),
+    summarizer_ids: tuple[SummarizerId, ...] | None = None,
+    allow_fallback: bool = True,
 ) -> tuple[str, str | None]:
     """Return raw trend text plus optional summary for dual-path operation."""
     if skip_summarization:
         return text, None
+
+    specs = (
+        [("bart", summarize_with_bart_fn), ("bert", summarize_with_bert_fn), *additional_summarizers]
+        if summarizer_ids is None
+        else list(_summarizer_specs_from_ids(summarizer_ids))
+    )
+
+    summary = _collect_summary(text=text, summarizer_specs=specs)
+    if summary:
+        return text, summary
+
+    if allow_fallback:
+        return text, None
+    raise RuntimeError("No configured summarizer produced a valid summary for this text mode")
+
+
+def summarize_report_text_pair_for_ids(
+    text: str,
+    skip_summarization: bool,
+    summarizer_ids: tuple[SummarizerId, ...],
+    allow_fallback: bool = True,
+) -> tuple[str, str | None]:
+    """Return raw trend text plus optional summary for selected summarizer IDs."""
+    return summarize_report_text_pair(
+        text=text,
+        skip_summarization=skip_summarization,
+        summarizer_ids=summarizer_ids,
+        allow_fallback=allow_fallback,
+    )
+
+
+def _summarizer_specs_from_ids(summarizer_ids: tuple[SummarizerId, ...]) -> tuple[tuple[str, Callable[[str], str]], ...]:
+    spec_by_id: dict[SummarizerId, Callable[[str], str]] = {
+        "bart": summarize_with_bart,
+        "bert": summarize_with_bert,
+        "t5": summarize_with_t5,
+        "longformer_ext": summarize_with_longformer_ext,
+    }
+    return tuple((summarizer_id, spec_by_id[summarizer_id]) for summarizer_id in summarizer_ids)
+
+
+def _collect_summary(text: str, summarizer_specs: Sequence[tuple[str, Callable[[str], str]]]) -> str:
+    """Run all configured summarizers and combine non-empty summaries in order."""
     summary_parts: list[str] = []
-    for _name, runner in [("bart", summarize_with_bart_fn), ("bert", summarize_with_bert_fn), *additional_summarizers]:
+    for _name, runner in summarizer_specs:
         try:
             value = runner(text).strip()
         except Exception:
@@ -163,10 +216,7 @@ def summarize_report_text_pair(
             continue
         if value:
             summary_parts.append(value)
-    summary = "\n".join(summary_parts).strip()
-    if not summary:
-        return text, None
-    return text, summary
+    return "\n".join(summary_parts).strip()
 
 
 def select_trend_response(trend_full: str, trend_summary: str | None, use_summary: bool) -> str:
