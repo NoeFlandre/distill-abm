@@ -177,5 +177,5 @@ milk_netlogo_to_csv:
     alt-env-mean-initial: 1.12
     incumbent-initial-habit: 10
     justification: 0.61
- qualitative_example_text_dir: configs/notebook_prompt_assets/Evaluation/Qualitative Assessment using LLMs/Examples/Text
+qualitative_example_text_dir: configs/notebook_prompt_assets/Evaluation/Qualitative Assessment using LLMs/Examples/Text
 human_reference_dir: tests/fixtures/notebook_parity/human_reference/All Results

@@ -2378,19 +2378,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/2. Plotting the data.ipynb",
-    "sha256": "7b5adece148055b3a49600c638bc43ef4068d7a2cf222008dd9589c78564e4c1",
-    "size_bytes": 2687887,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Fauna/2. Plotting the data.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb",
     "sha256": "f06b543a21e09984e2514ec0824db2150db61b1040eb507e5ae750f0afabb556",
     "size_bytes": 134450,
@@ -3041,19 +3028,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/2. Plotting the data.ipynb",
-    "sha256": "8be45691d6e4b6ed50518f23b040f9a965e4ce2e4b7c972a10e0b3d6f9e0b980",
-    "size_bytes": 2620860,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Grazing/2. Plotting the data.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb",
     "sha256": "0f9593c6f1d7b6cbb2f1059ea69627e74e82277aa68c8bc3dbd99097b084547c",
     "size_bytes": 57268,
@@ -3658,19 +3632,6 @@
     "target_path": "tests/fixtures/notebook_parity/experiment_settings/Models/Grazing/TXT/narrativeCombined200.txt",
     "rationale": "Model parameter/documentation inputs used in notebook runs.",
     "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/2. Plotting the Data.ipynb",
-    "sha256": "30fb6a37a3c492a50c28981a5c2ee0c51720a75863dc7c6ad07afc1e314dfe74",
-    "size_bytes": 1813528,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Milk Consumption/2. Plotting the Data.ipynb"
-    ]
   },
   {
     "path": "archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb",

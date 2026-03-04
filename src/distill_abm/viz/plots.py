@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
@@ -15,6 +16,17 @@ class PlotError(RuntimeError):
     """Raised when plotting inputs do not contain requested metrics."""
 
 
+@dataclass(frozen=True)
+class MetricPlotBundle:
+    """Describes one notebook-style metric plot request."""
+
+    include_pattern: str
+    title: str
+    y_label: str
+    exclude_pattern: str | None = None
+    show_mean_line: bool = True
+
+
 def plot_metric_bundle(
     frame: pd.DataFrame,
     include_pattern: str,
@@ -22,6 +34,7 @@ def plot_metric_bundle(
     title: str,
     y_label: str,
     exclude_pattern: str | None = None,
+    show_mean_line: bool = True,
 ) -> Path:
     """Creates one metric plot so LLM prompts can consume image evidence."""
     columns = matching_columns(list(frame.columns), include_pattern, exclude_pattern)
@@ -30,8 +43,32 @@ def plot_metric_bundle(
     numeric = _numeric_frame(frame, columns)
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / f"{_slug(include_pattern)}.png"
-    _draw_plot(numeric, output_path, title=title, y_label=y_label)
+    _draw_plot(numeric, output_path, title=title, y_label=y_label, show_mean_line=show_mean_line)
     return output_path
+
+
+def plot_metric_bundles(
+    frame: pd.DataFrame,
+    bundles: list[MetricPlotBundle],
+    output_dir: Path,
+) -> list[Path]:
+    """Creates many notebook-style metric plots from one CSV frame in a single call."""
+    if not bundles:
+        raise PlotError("no metric bundles provided")
+    output_paths: list[Path] = []
+    for bundle in bundles:
+        output_paths.append(
+            plot_metric_bundle(
+                frame=frame,
+                include_pattern=bundle.include_pattern,
+                output_dir=output_dir,
+                title=bundle.title,
+                y_label=bundle.y_label,
+                exclude_pattern=bundle.exclude_pattern,
+                show_mean_line=bundle.show_mean_line,
+            )
+        )
+    return output_paths
 
 
 def generate_stats_table(
@@ -141,11 +178,12 @@ def _numeric_frame(frame: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     return cast(pd.DataFrame, converted.ffill().fillna(0.0))
 
 
-def _draw_plot(data: pd.DataFrame, output_path: Path, title: str, y_label: str) -> None:
+def _draw_plot(data: pd.DataFrame, output_path: Path, title: str, y_label: str, show_mean_line: bool) -> None:
     figure, axis = plt.subplots(figsize=(10, 6))
     for column in data.columns:
-        axis.plot(data.index, data[column], alpha=0.25, linewidth=1.0)
-    axis.plot(data.index, data.mean(axis=1), color="black", linewidth=2.0, label="mean")
+        axis.plot(data.index, data[column], alpha=0.25, linewidth=1.0, label=str(column))
+    if show_mean_line:
+        axis.plot(data.index, data.mean(axis=1), color="black", linewidth=2.0, label="mean")
     axis.set_title(title)
     axis.set_xlabel("time step")
     axis.set_ylabel(y_label)
