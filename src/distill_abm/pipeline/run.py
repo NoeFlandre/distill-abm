@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from collections.abc import Callable
 from datetime import UTC, datetime
 from itertools import combinations
 from pathlib import Path
@@ -15,13 +16,19 @@ from distill_abm.eval.metrics import SummaryScores, score_summary
 from distill_abm.ingest.csv_ingest import load_simulation_csv
 from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline import helpers
-from distill_abm.summarize.models import summarize_with_bart, summarize_with_bert
+from distill_abm.summarize.models import (
+    summarize_with_bart,
+    summarize_with_bert,
+    summarize_with_longformer_ext,
+    summarize_with_t5,
+)
 from distill_abm.viz.plots import MetricPlotBundle, plot_metric_bundles
 
 EvidenceMode = Literal["plot", "stats-markdown", "stats-image", "plot+stats"]
 SummarizationMode = Literal["full", "summary", "both"]
 ScoreMode = Literal["full", "summary", "both"]
 SweepCsvColumnStyle = Literal["trend", "plot"]
+AdditionalSummarizer = Literal["t5", "longformer_ext"]
 
 
 class PipelineInputs(BaseModel):
@@ -39,6 +46,7 @@ class PipelineInputs(BaseModel):
     summarization_mode: SummarizationMode = "both"
     score_on: ScoreMode = "both"
     evidence_mode: EvidenceMode = "plot"
+    additional_summarizers: tuple[AdditionalSummarizer, ...] = ()
 
 
 class PipelineResult(BaseModel):
@@ -125,7 +133,11 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     )
 
     # Compute full and/or summary trend variants first, then apply scoring policy.
-    trend_full, trend_summary = _summarize_report_text(trend_raw, mode=summarization_mode)
+    trend_full, trend_summary = _summarize_report_text(
+        trend_raw,
+        mode=summarization_mode,
+        additional_summarizers=inputs.additional_summarizers,
+    )
 
     full_scores = None
     summary_scores = None
@@ -331,19 +343,37 @@ def _encode_image(path: Path) -> str:
     return helpers.encode_image(path)
 
 
-def _summarize_report_text(text: str, mode: SummarizationMode) -> tuple[str, str | None]:
+def _summarize_report_text(
+    text: str,
+    mode: SummarizationMode,
+    additional_summarizers: tuple[AdditionalSummarizer, ...] = (),
+) -> tuple[str, str | None]:
     """Resolve and generate trend text variants based on the selected summarization mode."""
     if mode == "full":
         return text, None
+    extra = _resolve_additional_summarizer_runners(additional_summarizers)
     _, summary = helpers.summarize_report_text_pair(
         text=text,
         skip_summarization=False,
         summarize_with_bart_fn=summarize_with_bart,
         summarize_with_bert_fn=summarize_with_bert,
+        additional_summarizers=extra,
     )
     if mode == "summary":
         return text, summary
     return text, summary
+
+
+def _resolve_additional_summarizer_runners(
+    additional_summarizers: tuple[AdditionalSummarizer, ...],
+) -> list[tuple[str, Callable[[str], str]]]:
+    runners: list[tuple[str, Callable[[str], str]]] = []
+    for name in additional_summarizers:
+        if name == "t5":
+            runners.append(("t5", summarize_with_t5))
+        elif name == "longformer_ext":
+            runners.append(("longformer_ext", summarize_with_longformer_ext))
+    return runners
 
 
 def _resolve_summarization_mode(
@@ -445,6 +475,7 @@ def _write_run_metadata(
             "skip_summarization": inputs.skip_summarization,
             "summarization_mode_requested": inputs.summarization_mode,
             "score_on_requested": inputs.score_on,
+            "additional_summarizers": list(inputs.additional_summarizers),
             "output_dir": str(inputs.output_dir),
         },
         "artifacts": {
@@ -479,23 +510,27 @@ def _write_run_metadata(
                 "max_input_length": 1024,
                 "min_summary_length": 50,
                 "max_summary_length": 100,
+                "enabled": True,
             },
             "bert": {
                 "max_input_length": 512,
                 "min_summary_length": 100,
                 "max_summary_length": 150,
+                "enabled": True,
             },
             "t5": {
                 "model": "t5-small",
                 "max_input_length": 1024,
                 "min_summary_length": 40,
                 "max_summary_length": 120,
+                "enabled": "t5" in inputs.additional_summarizers,
             },
             "longformer_like": {
                 "model": "allenai/led-base-16384",
                 "max_input_length": 2048,
                 "min_summary_length": 64,
                 "max_summary_length": 180,
+                "enabled": "longformer_ext" in inputs.additional_summarizers,
             },
         },
         "scores": {

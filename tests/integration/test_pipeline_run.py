@@ -462,3 +462,50 @@ def test_run_pipeline_applies_notebook_style_prompt_parts_and_plot_description(t
     assert "\n\nEXAMPLE" in user_prompt
     assert "\n\nINSIGHTS" in user_prompt
     assert user_prompt.endswith("PLOT DESCRIPTION")
+
+
+def test_run_pipeline_uses_requested_additional_summarizers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bart", lambda text: f"bart::{text}")
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bert", lambda text: f"bert::{text}")
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_t5", lambda text: f"t5::{text}")
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_longformer_ext", lambda text: f"led::{text}")
+
+    adapter = FakeAdapter()
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            summarization_mode="both",
+            score_on="summary",
+            additional_summarizers=("t5", "longformer_ext"),
+        ),
+        prompts=PromptsConfig(
+            context_prompt="Context {parameters} {documentation}",
+            trend_prompt="Trend {description}",
+        ),
+        adapter=adapter,
+    )
+
+    assert result.trend_summary_response is not None
+    assert "bart::resp-2" in result.trend_summary_response
+    assert "bert::resp-2" in result.trend_summary_response
+    assert "t5::resp-2" in result.trend_summary_response
+    assert "led::resp-2" in result.trend_summary_response
+    assert result.metadata_path is not None
+    metadata = json.loads(result.metadata_path.read_text(encoding="utf-8"))
+    assert metadata["inputs"]["additional_summarizers"] == ["t5", "longformer_ext"]
+    assert metadata["summarizers"]["t5"]["enabled"] is True
+    assert metadata["summarizers"]["longformer_like"]["enabled"] is True

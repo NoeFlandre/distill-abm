@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, cast
 
 import typer
 
@@ -11,7 +11,14 @@ from distill_abm.configs.loader import load_abm_config, load_prompts_config
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
 from distill_abm.llm.factory import create_adapter
-from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, ScoreMode, SummarizationMode, run_pipeline
+from distill_abm.pipeline.run import (
+    AdditionalSummarizer,
+    EvidenceMode,
+    PipelineInputs,
+    ScoreMode,
+    SummarizationMode,
+    run_pipeline,
+)
 
 app = typer.Typer(help="Run ABM distillation workflows.")
 
@@ -60,6 +67,13 @@ def run(
         SummarizationMode,
         typer.Option(help="full: keep raw trend text, summary: use summarized trend text, both: store/report both."),
     ] = "both",
+    additional_summarizer: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--additional-summarizer",
+            help="Optional extra summary backends in addition to BART/BERT. Repeatable: t5, longformer_ext.",
+        ),
+    ] = None,
     score_on: Annotated[
         ScoreMode,
         typer.Option(
@@ -91,6 +105,7 @@ def run(
             evidence_mode=evidence_mode,
             skip_summarization=skip_summarization,
             summarization_mode=summarization_mode,
+            additional_summarizers=_parse_additional_summarizers(additional_summarizer),
             score_on=score_on,
         ),
         prompts=prompts,
@@ -153,6 +168,17 @@ def evaluate_qualitative(
 def main() -> None:
     """Preserves setuptools/uv script compatibility with explicit callable."""
     app()
+
+
+def _parse_additional_summarizers(values: list[str] | None) -> tuple[AdditionalSummarizer, ...]:
+    allowed = {"t5", "longformer_ext"}
+    normalized = tuple(dict.fromkeys(values or []))
+    invalid = [value for value in normalized if value not in allowed]
+    if invalid:
+        raise typer.BadParameter(
+            f"unsupported additional summarizer(s): {', '.join(invalid)}. Allowed: t5, longformer_ext."
+        )
+    return cast(tuple[AdditionalSummarizer, ...], normalized)
 
 
 if __name__ == "__main__":
