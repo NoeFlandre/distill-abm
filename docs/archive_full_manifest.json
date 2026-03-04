@@ -2378,19 +2378,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb",
-    "sha256": "715b58283ca93f29a002775c5e3215aa33ec566f38471cbb3c929295b1e7274c",
-    "size_bytes": 61133,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Models/Fauna/2. Plotting the data.ipynb",
     "sha256": "7b5adece148055b3a49600c638bc43ef4068d7a2cf222008dd9589c78564e4c1",
     "size_bytes": 2687887,
