@@ -696,10 +696,10 @@
     "sha256": "64001a147d1887a35e6feba232b0cd44ddd5a82749daa0877428d0222dcfb998",
     "size_bytes": 121009,
     "extension": ".ipynb",
-    "classification": "runtime_required",
+    "classification": "historical_nonruntime",
     "action": "retain_record_only",
-    "target_path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet.ipynb",
-    "rationale": "Notebook file currently required by runtime loader for compatibility dispatch; retained in place.",
+    "target_path": null,
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/Making the Sheet Structure/Final Sheet.ipynb"
     ]

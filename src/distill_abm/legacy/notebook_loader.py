@@ -19,13 +19,11 @@ REQUIRED_NOTEBOOK_FUNCTIONS: tuple[str, ...] = (
     "calculate_sums_and_sst",
     "compute_results",
     "create_factorial_design",
-    "fill_faithfulness_scores",
     "read_and_parse_csv",
     "read_csv_to_df",
     "remove_evaluating_suffix",
     "return_csv",
     "return_csv_2",
-    "update_structured_df",
 )
 
 
