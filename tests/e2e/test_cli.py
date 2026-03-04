@@ -728,3 +728,75 @@ def test_cli_smoke_qwen_forwards_inputs_and_reports_paths(tmp_path: Path, monkey
     assert smoke_inputs.plot_description == "plot desc"
     assert captured["run_qualitative"] is False
     assert captured["run_sweep"] is False
+
+
+def test_cli_smoke_qwen_abm_overrides_metric_defaults(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    params.write_text("param=1\n", encoding="utf-8")
+    docs = tmp_path / "docs.txt"
+    docs.write_text("doc\n", encoding="utf-8")
+    prompts = tmp_path / "prompts.yaml"
+    prompts.write_text(
+        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
+        encoding="utf-8",
+    )
+    doe_csv = tmp_path / "doe.csv"
+    doe_csv.write_text("Model,WithExamples,BLEU\nQwen,Yes,0.4\nQwen,No,0.3\n", encoding="utf-8")
+
+    captured: dict[str, object] = {}
+
+    class _Result:
+        def __init__(self, output_dir: Path) -> None:
+            self.success = True
+            self.failed_cases: list[str] = []
+            self.report_markdown_path = output_dir / "smoke_report.md"
+            self.report_json_path = output_dir / "smoke_report.json"
+            self.doe_output_csv: Path | None = output_dir / "anova.csv"
+            self.sweep_output_csv: Path | None = output_dir / "sweep.csv"
+
+    def fake_run_qwen_smoke_suite(*, inputs, **kwargs):  # type: ignore[no-untyped-def]
+        captured["inputs"] = inputs
+        inputs.output_dir.mkdir(parents=True, exist_ok=True)
+        result = _Result(inputs.output_dir)
+        result.report_markdown_path.write_text("# smoke\n", encoding="utf-8")
+        result.report_json_path.write_text("{}", encoding="utf-8")
+        return result
+
+    def fake_load_abm_config(_path: Path) -> ABMConfig:
+        return ABMConfig(
+            name="fauna",
+            metric_pattern="count-species",
+            metric_description="species abundance dynamics across repeated fauna simulations",
+            plot_descriptions=["p1", "p2", "p3", "p4", "p5"],
+        )
+
+    monkeypatch.setattr("distill_abm.cli.run_qwen_smoke_suite", fake_run_qwen_smoke_suite)
+    monkeypatch.setattr("distill_abm.cli.load_abm_config", fake_load_abm_config)
+    result = runner.invoke(
+        app,
+        [
+            "smoke-qwen",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--doe-input-csv",
+            str(doe_csv),
+            "--prompts-path",
+            str(prompts),
+            "--output-dir",
+            str(tmp_path / "smoke"),
+            "--abm",
+            "fauna",
+        ],
+    )
+
+    assert result.exit_code == 0
+    smoke_inputs = cast(Any, captured["inputs"])
+    assert smoke_inputs.metric_pattern == "count-species"
+    assert smoke_inputs.metric_description.startswith("species abundance")
+    assert smoke_inputs.sweep_plot_descriptions == ["p1", "p2", "p3", "p4", "p5"]
