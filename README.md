@@ -111,6 +111,8 @@ uv run distill-abm run \
   --model gpt-4o
 ```
 
+When `--abm` is provided, lexical metrics (BLEU/METEOR/ROUGE/Flesch) are computed against the ABM human-reference text from `configs/notebook_ground_truth/*.txt` instead of the generated context text.
+
 Override trend description text:
 
 ```bash
@@ -139,12 +141,16 @@ uv run distill-abm smoke-qwen \
   --plot-description "weekly whole milk consumption trend"
 ```
 
+`smoke-qwen` is resumable by default (`--resume`): completed cases/DoE outputs are reused, and existing sweep combinations are skipped to avoid duplicate experiments.
+
 Smoke outputs are written under `results/smoke_qwen/` by default:
 
 - `smoke_report.md` and `smoke_report.json` with full matrix status and errors
 - `cases/<case-id>/` per-mode artifacts (prompts, responses, `report.csv`, `pipeline_run_metadata.json`, `case_manifest.json`)
 - `doe/anova_factorial_contributions.csv`
 - `sweep/combinations_report.csv`
+
+For debugging, each `pipeline_run_metadata.json` includes full prompts, responses, attached evidence image path, and metric reference provenance (`scores.reference.source/path/signature`).
 
 The smoke matrix runs these combinations with Ollama Qwen:
 

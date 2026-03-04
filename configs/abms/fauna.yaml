@@ -2,8 +2,17 @@ name: fauna
 metric_pattern: count-species
 metric_description: species abundance dynamics across repeated fauna simulations
 plot_descriptions:
-  - total species abundance over time
-  - predator-prey balance evolution
-  - extinction and recovery phases
-  - variability across runs
-  - stabilization dynamics
+  - "This plot represents the number of human hunter-gatherer bands currently active in the simulation."
+  - "This plot represents the total energy available to all forager bands, reflecting their energy status which is influenced by hunting success and movement costs."
+  - "This plot represents the cumulative number of male prey animals hunted and killed by forager bands."
+  - "This plot represents the cumulative number of female prey animals hunted and killed by forager bands."
+  - "This plot represents the cumulative number of postpartum female prey animals (females with offspring) hunted and killed by forager bands."
+  - "This plot represents the cumulative number of births among the prey animal population."
+  - "This plot represents the cumulative number of deaths among the prey animal population, from both natural causes and predation by foragers."
+  - "This plot represents the current number of male prey animals in the simulation."
+  - "This plot represents the current number of female prey animals in the simulation."
+  - "This plot represents the current total number of all prey animals (both males and females) in the simulation."
+  - "This plot represents the combined total energy available in the population of male prey animals."
+  - "This plot represents the combined total energy available in the population of female prey animals."
+  - "This plot represents the combined total energy available in all prey animals within the simulation."
+  - "This plot represents the percentage of landscape patches that are currently vegetated (i.e., green), indicating the availability of fodder (grass) for the prey animals."

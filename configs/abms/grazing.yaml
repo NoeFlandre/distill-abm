@@ -1,9 +1,14 @@
 name: grazing
-metric_pattern: grass-density
+metric_pattern: household-risk-att-init
 metric_description: grazing pressure and vegetation regeneration dynamics
 plot_descriptions:
-  - mean grass density over time
-  - livestock pressure dynamics
-  - regeneration cycles
-  - variability across runs
-  - long-run equilibrium
+  - "This plot represents the average initial risk attitude of all social learning agents, used to store and report their initial disposition to deviate from the recommended number of livestock."
+  - "This plot represents the average degree of deviation from the recommended number of livestock for all extension agents during the simulation."
+  - "This plot represents the average amount of reserve biomass available across all patches, indicating the overall biomass condition in the model's grazing system."
+  - "This plot represents the average amount of actual available green biomass across all patches, accounting for reductions due to grazing."
+  - "This plot represents the average total number of livestock, including both healthy livestock and those that have been destocked, across all households."
+  - "This plot represents the average number of livestock that have been destocked, or removed due to insufficient resources, across all households."
+  - "This plot represents the inequality in the distribution of healthy livestock across all households."
+  - "This plot represents the number of households that have engaged in social learning, indicated by the variable household-SL being true."
+  - "This plot represents the average cumulative number of livestock that have been destocked across all households."
+  - "This plot represents the number of households that follow the E-RO strategy, indicating households with non learning agents."

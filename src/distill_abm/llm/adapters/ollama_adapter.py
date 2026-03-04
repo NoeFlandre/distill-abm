@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeoutError
 from typing import Any
 
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError, LLMRequest, LLMResponse
@@ -12,9 +14,16 @@ class OllamaAdapter(LLMAdapter):
 
     provider = "ollama"
 
-    def __init__(self, model: str, client: Any | None = None, host: str | None = None) -> None:
+    def __init__(
+        self,
+        model: str,
+        client: Any | None = None,
+        host: str | None = None,
+        timeout_seconds: float = 90.0,
+    ) -> None:
         self.model = model
         self.host = host
+        self.timeout_seconds = timeout_seconds
         self._client = client
 
     def complete(self, request: LLMRequest) -> LLMResponse:
@@ -27,12 +36,18 @@ class OllamaAdapter(LLMAdapter):
             "options": options,
         }
         try:
-            result = self._client_for_request().chat(**payload)
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                future = pool.submit(self._client_for_request().chat, **payload)
+                result = future.result(timeout=self.timeout_seconds)
+        except FuturesTimeoutError as exc:
+            raise LLMProviderError(f"ollama completion timed out after {self.timeout_seconds:.1f}s") from exc
         except Exception as exc:
             raise LLMProviderError(f"ollama completion failed: {exc}") from exc
-        content = result.get("message", {}).get("content", "")
-        model = str(result.get("model", request.model))
-        return LLMResponse(provider=self.provider, model=model, text=content, raw=result)
+        normalized = _normalize_chat_result(result)
+        message = normalized.get("message", {})
+        content = str(message.get("content", "")) if isinstance(message, dict) else ""
+        model = str(normalized.get("model", request.model))
+        return LLMResponse(provider=self.provider, model=model, text=content, raw=normalized)
 
     def _client_for_request(self) -> Any:
         if self._client is not None:
@@ -56,3 +71,30 @@ def _build_messages(request: LLMRequest) -> list[dict[str, Any]]:
             messages[index]["images"] = [request.image_b64]
             break
     return messages
+
+
+def _normalize_chat_result(result: Any) -> dict[str, Any]:
+    if isinstance(result, dict):
+        payload: dict[str, Any] = result
+    elif hasattr(result, "model_dump"):
+        payload = dict(result.model_dump())
+    elif hasattr(result, "dict"):
+        payload = dict(result.dict())
+    else:
+        payload = {}
+
+    if not payload:
+        model = getattr(result, "model", None)
+        message_obj = getattr(result, "message", None)
+        content = getattr(message_obj, "content", None)
+        if model is not None:
+            payload["model"] = model
+        if content is not None:
+            payload["message"] = {"content": content}
+
+    message = payload.get("message")
+    if message is not None and not isinstance(message, dict):
+        content = getattr(message, "content", None)
+        if content is not None:
+            payload["message"] = {"content": content}
+    return payload

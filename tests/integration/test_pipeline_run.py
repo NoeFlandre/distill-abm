@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from distill_abm.configs.models import PromptsConfig
+from distill_abm.eval.metrics import SummaryScores
 from distill_abm.llm.adapters.base import LLMAdapter, LLMRequest, LLMResponse
 from distill_abm.pipeline.run import PipelineInputs, run_pipeline
 
@@ -499,6 +500,10 @@ def test_run_pipeline_writes_reproducibility_metadata(tmp_path: Path, monkeypatc
     assert metadata["summarizers"]["longformer_like"]["model"] == "allenai/led-base-16384"
     assert metadata["scores"]["selected_scores"]["token_f1"] == result.token_f1
     assert metadata["scores"]["summary_scores"] is not None
+    assert metadata["scores"]["reference"]["source"] == "context_response"
+    assert metadata["scores"]["reference"]["path"] is None
+    assert metadata["responses"]["context_response"] == "resp-1"
+    assert metadata["responses"]["trend_full_response"] == "resp-2"
 
 
 def test_run_pipeline_applies_notebook_style_prompt_parts_and_plot_description(tmp_path: Path) -> None:
@@ -595,3 +600,64 @@ def test_run_pipeline_uses_requested_additional_summarizers(tmp_path: Path, monk
     assert metadata["inputs"]["additional_summarizers"] == ["t5", "longformer_ext"]
     assert metadata["summarizers"]["t5"]["enabled"] is True
     assert metadata["summarizers"]["longformer_like"]["enabled"] is True
+
+
+def test_run_pipeline_uses_scoring_reference_file_when_provided(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+    reference_path = tmp_path / "ground_truth.txt"
+    reference_path.write_text("HUMAN-GROUND-TRUTH", encoding="utf-8")
+
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bart", lambda text: f"bart::{text}")
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bert", lambda text: f"bert::{text}")
+
+    references: list[str] = []
+
+    def fake_score_summary(reference: str, candidate: str):  # type: ignore[no-untyped-def]
+        references.append(reference)
+        _ = candidate
+        return SummaryScores(
+            token_f1=0.1,
+            precision=0.1,
+            recall=0.1,
+            bleu=0.1,
+            meteor=0.1,
+            rouge1=0.1,
+            rouge2=0.1,
+            rouge_l=0.1,
+            flesch_reading_ease=0.1,
+            reference_length=1,
+            candidate_length=1,
+        )
+
+    monkeypatch.setattr("distill_abm.pipeline.run.score_summary", fake_score_summary)
+
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            summarization_mode="both",
+            score_on="both",
+            scoring_reference_path=reference_path,
+        ),
+        prompts=PromptsConfig(
+            context_prompt="Context {parameters} {documentation}",
+            trend_prompt="Trend {description}",
+        ),
+        adapter=FakeAdapter(),
+    )
+
+    assert result.report_csv.exists()
+    assert references
+    assert all(reference == "HUMAN-GROUND-TRUTH" for reference in references)

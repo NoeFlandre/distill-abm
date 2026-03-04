@@ -49,6 +49,8 @@ class PipelineInputs(BaseModel):
     score_on: ScoreMode = "both"
     evidence_mode: EvidenceMode = "plot"
     additional_summarizers: tuple[AdditionalSummarizer, ...] = ()
+    scoring_reference_path: Path | None = None
+    resume_existing: bool = False
 
 
 class PipelineResult(BaseModel):
@@ -86,8 +88,14 @@ class SweepRunResult(BaseModel):
 
 def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAdapter) -> PipelineResult:
     """Executes the notebook-equivalent workflow through pure Python components."""
-    frame = load_simulation_csv(inputs.csv_path)
     inputs.output_dir.mkdir(parents=True, exist_ok=True)
+    run_signature = _build_run_signature(inputs=inputs, prompts=prompts, adapter=adapter)
+    if inputs.resume_existing:
+        resumed = _load_resumable_pipeline_result(output_dir=inputs.output_dir, run_signature=run_signature)
+        if resumed is not None:
+            return resumed
+
+    frame = load_simulation_csv(inputs.csv_path)
 
     plot_path = plot_metric_bundles(
         frame=frame,
@@ -104,6 +112,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     resolved_evidence_mode = _resolve_evidence_mode(inputs.evidence_mode)
     stats_table = helpers.build_stats_table(frame=frame, include_pattern=inputs.metric_pattern)
     stats_table_csv = helpers.build_stats_csv(stats_table)
+    stats_table_csv_path = _write_stats_table_csv(output_dir=inputs.output_dir, stats_table_csv=stats_table_csv)
     stats_image_path = _write_stats_image_if_needed(
         stats_table=stats_table,
         output_dir=inputs.output_dir,
@@ -130,6 +139,10 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         skip_summarization=inputs.skip_summarization,
         requested_mode=inputs.summarization_mode,
     )
+    scoring_reference_text, scoring_reference_source, scoring_reference_path = _resolve_scoring_reference(
+        inputs=inputs,
+        context=context,
+    )
     score_on = _resolve_score_mode(
         requested_score_on=inputs.score_on,
         summarization_mode=summarization_mode,
@@ -145,9 +158,9 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     full_scores = None
     summary_scores = None
     if summarization_mode in {"full", "both"} or score_on == "full":
-        full_scores = score_summary(reference=context, candidate=trend_full)
+        full_scores = score_summary(reference=scoring_reference_text, candidate=trend_full)
     if trend_summary is not None and summarization_mode in {"summary", "both"} and score_on in {"summary", "both"}:
-        summary_scores = score_summary(reference=context, candidate=trend_summary)
+        summary_scores = score_summary(reference=scoring_reference_text, candidate=trend_summary)
 
     if summarization_mode == "both" and score_on == "both":
         include_extended = True
@@ -179,8 +192,10 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         context_prompt=context_prompt,
         plot_path=plot_path,
         report_csv=report_csv,
+        stats_table_csv_path=stats_table_csv_path,
         stats_image_path=stats_image_path,
         trend_prompt=trend_prompt,
+        context_response=context,
         trend_full=trend_full,
         trend_summary=trend_summary,
         summarization_mode=summarization_mode,
@@ -188,12 +203,16 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         full_scores=full_scores,
         summary_scores=summary_scores,
         selected_scores=selected_scores,
+        scoring_reference_text=scoring_reference_text,
+        scoring_reference_source=scoring_reference_source,
+        scoring_reference_path=scoring_reference_path,
         include_extended=include_extended,
         include_pattern=inputs.metric_pattern,
         evidence_mode=resolved_evidence_mode,
         requested_evidence_mode=inputs.evidence_mode,
         adapter=adapter,
         trend_image_attached=image_b64 is not None,
+        run_signature=run_signature,
     )
 
     return PipelineResult(
@@ -218,6 +237,125 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     )
 
 
+def _build_run_signature(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAdapter) -> str:
+    runtime_defaults = get_runtime_defaults()
+    payload = {
+        "inputs": {
+            "csv_path": str(inputs.csv_path.resolve()),
+            "parameters_path": str(inputs.parameters_path.resolve()),
+            "documentation_path": str(inputs.documentation_path.resolve()),
+            "metric_pattern": inputs.metric_pattern,
+            "metric_description": inputs.metric_description,
+            "plot_description": inputs.plot_description,
+            "skip_summarization": inputs.skip_summarization,
+            "summarization_mode": inputs.summarization_mode,
+            "score_on": inputs.score_on,
+            "evidence_mode": inputs.evidence_mode,
+            "additional_summarizers": list(inputs.additional_summarizers),
+            "scoring_reference_path": (
+                str(inputs.scoring_reference_path.resolve()) if inputs.scoring_reference_path is not None else None
+            ),
+        },
+        "input_file_hashes": {
+            "csv": _hash_file(inputs.csv_path),
+            "parameters": _hash_file(inputs.parameters_path),
+            "documentation": _hash_file(inputs.documentation_path),
+            "scoring_reference": _hash_file(inputs.scoring_reference_path),
+        },
+        "llm": {
+            "provider": adapter.provider,
+            "model": inputs.model,
+            "temperature": runtime_defaults.llm_request.temperature,
+            "max_tokens": runtime_defaults.llm_request.max_tokens,
+        },
+        "prompts": prompts.model_dump(mode="json"),
+    }
+    serialized = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+
+
+def _hash_file(path: Path | None) -> str | None:
+    if path is None:
+        return None
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _write_stats_table_csv(output_dir: Path, stats_table_csv: str) -> Path:
+    path = output_dir / "stats_table.csv"
+    path.write_text(stats_table_csv, encoding="utf-8")
+    return path
+
+
+def _load_resumable_pipeline_result(output_dir: Path, run_signature: str) -> PipelineResult | None:
+    metadata_path = output_dir / "pipeline_run_metadata.json"
+    if not metadata_path.exists():
+        return None
+    try:
+        payload = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+    reproducibility = payload.get("reproducibility", {})
+    if str(reproducibility.get("run_signature", "")) != run_signature:
+        return None
+
+    artifacts = payload.get("artifacts", {})
+    scores_payload = payload.get("scores", {})
+    responses = payload.get("responses", {})
+
+    try:
+        plot_path = Path(str(artifacts["plot_path"]))
+        report_csv = Path(str(artifacts["report_csv"]))
+        if not plot_path.exists() or not report_csv.exists():
+            return None
+
+        stats_image_raw = artifacts.get("stats_image_path")
+        stats_image_path = Path(str(stats_image_raw)) if isinstance(stats_image_raw, str) and stats_image_raw else None
+        if stats_image_path is not None and not stats_image_path.exists():
+            stats_image_path = None
+
+        stats_table_csv: str | None = None
+        stats_table_csv_raw = artifacts.get("stats_table_csv_path")
+        if isinstance(stats_table_csv_raw, str) and stats_table_csv_raw:
+            stats_table_csv_path = Path(stats_table_csv_raw)
+            if stats_table_csv_path.exists():
+                stats_table_csv = stats_table_csv_path.read_text(encoding="utf-8")
+
+        selected_scores = SummaryScores.model_validate(scores_payload["selected_scores"])
+        full_scores_raw = scores_payload.get("full_scores")
+        summary_scores_raw = scores_payload.get("summary_scores")
+        full_scores = SummaryScores.model_validate(full_scores_raw) if full_scores_raw else None
+        summary_scores = SummaryScores.model_validate(summary_scores_raw) if summary_scores_raw else None
+
+        trend_full = str(responses.get("trend_full_response", ""))
+        trend_summary_raw = responses.get("trend_summary_response")
+        trend_summary = str(trend_summary_raw) if isinstance(trend_summary_raw, str) else None
+        trend_response = trend_summary if trend_summary is not None else trend_full
+
+        return PipelineResult(
+            plot_path=plot_path,
+            report_csv=report_csv,
+            context_response=str(responses.get("context_response", "")),
+            trend_response=trend_response,
+            trend_full_response=trend_full,
+            trend_summary_response=trend_summary,
+            full_scores=full_scores,
+            summary_scores=summary_scores,
+            stats_table_csv=stats_table_csv,
+            stats_image_path=stats_image_path,
+            token_f1=selected_scores.token_f1,
+            bleu=selected_scores.bleu,
+            meteor=selected_scores.meteor,
+            rouge1=selected_scores.rouge1,
+            rouge2=selected_scores.rouge2,
+            rouge_l=selected_scores.rouge_l,
+            flesch_reading_ease=selected_scores.flesch_reading_ease,
+            metadata_path=metadata_path,
+        )
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
 def run_pipeline_sweep(
     inputs: PipelineInputs,
     prompts: PromptsConfig,
@@ -239,47 +377,61 @@ def run_pipeline_sweep(
     if len(image_paths) != len(plot_descriptions):
         raise ValueError("image_paths and plot_descriptions must have the same length")
 
+    out = output_csv or (inputs.output_dir / "combinations_report.csv")
     context_client = context_adapter or adapter
     trend_client = trend_adapter or adapter
     context_model_name = context_model or inputs.model
     trend_model_name = trend_model or inputs.model
     combinations_to_run = build_style_feature_combinations(prompts, style_feature_keys)
+    if resume_existing and out.exists():
+        existing_descriptions = _load_existing_combination_descriptions(out)
+        combinations_to_run = [
+            (description, enabled_features)
+            for description, enabled_features in combinations_to_run
+            if description not in existing_descriptions
+        ]
+        if not combinations_to_run:
+            return out
+
+    if resume_existing:
+        for description, enabled_features in combinations_to_run:
+            row = _run_sweep_combination(
+                description=description,
+                enabled_features=enabled_features,
+                inputs=inputs,
+                prompts=prompts,
+                context_client=context_client,
+                trend_client=trend_client,
+                context_model_name=context_model_name,
+                trend_model_name=trend_model_name,
+                image_paths=image_paths,
+                plot_descriptions=plot_descriptions,
+            )
+            write_combinations_csv(
+                out,
+                [row],
+                csv_column_style=csv_column_style,
+                resume_existing=True,
+            )
+        return out
+
     rows: list[SweepRunResult] = []
     for description, enabled_features in combinations_to_run:
-        context_prompt = _context_prompt(inputs, prompts, enabled_style_features=enabled_features)
-        context_response = _invoke_adapter(context_client, model=context_model_name, prompt=context_prompt)
-        trend_prompt_base = _build_trend_prompt(
-            prompts=prompts,
-            metric_description=inputs.metric_description,
-            context=context_response,
-            plot_description=None,
-            evidence_mode="plot",
-            stats_table_csv="",
-            enabled_style_features=enabled_features,
-        )
-        prompts_for_images: list[str] = []
-        responses_for_images: list[str] = []
-        for image_path, plot_description in zip(image_paths, plot_descriptions, strict=True):
-            trend_prompt = _append_plot_description(trend_prompt_base, plot_description)
-            response = _invoke_adapter(
-                trend_client,
-                model=trend_model_name,
-                prompt=trend_prompt,
-                image_b64=_encode_image(image_path),
-            )
-            prompts_for_images.append(trend_prompt)
-            responses_for_images.append(response)
         rows.append(
-            SweepRunResult(
-                combination_description=description,
-                context_prompt=context_prompt,
-                context_response=context_response,
-                trend_analysis_prompts=prompts_for_images,
-                trend_analysis_responses=responses_for_images,
+            _run_sweep_combination(
+                description=description,
+                enabled_features=enabled_features,
+                inputs=inputs,
+                prompts=prompts,
+                context_client=context_client,
+                trend_client=trend_client,
+                context_model_name=context_model_name,
+                trend_model_name=trend_model_name,
+                image_paths=image_paths,
+                plot_descriptions=plot_descriptions,
             )
         )
 
-    out = output_csv or (inputs.output_dir / "combinations_report.csv")
     return write_combinations_csv(
         out,
         rows,
@@ -311,6 +463,61 @@ def _sweep_headers(max_items: int, csv_column_style: SweepCsvColumnStyle) -> lis
 def _write_combinations_csv_resume(output_csv: Path, rows: list[SweepRunResult], headers: list[str]) -> Path:
     helpers.write_sweep_rows_resume(output_csv=output_csv, rows=rows, headers=headers)
     return output_csv
+
+
+def _load_existing_combination_descriptions(output_csv: Path) -> set[str]:
+    try:
+        frame = pd.read_csv(output_csv, keep_default_na=False)
+    except Exception:
+        return set()
+    if "Combination Description" not in frame.columns:
+        return set()
+    values = frame["Combination Description"].dropna().astype(str)
+    return {value.strip() for value in values if value.strip()}
+
+
+def _run_sweep_combination(
+    description: str,
+    enabled_features: set[str],
+    inputs: PipelineInputs,
+    prompts: PromptsConfig,
+    context_client: LLMAdapter,
+    trend_client: LLMAdapter,
+    context_model_name: str,
+    trend_model_name: str,
+    image_paths: list[Path],
+    plot_descriptions: list[str],
+) -> SweepRunResult:
+    context_prompt = _context_prompt(inputs, prompts, enabled_style_features=enabled_features)
+    context_response = _invoke_adapter(context_client, model=context_model_name, prompt=context_prompt)
+    trend_prompt_base = _build_trend_prompt(
+        prompts=prompts,
+        metric_description=inputs.metric_description,
+        context=context_response,
+        plot_description=None,
+        evidence_mode="plot",
+        stats_table_csv="",
+        enabled_style_features=enabled_features,
+    )
+    prompts_for_images: list[str] = []
+    responses_for_images: list[str] = []
+    for image_path, plot_description in zip(image_paths, plot_descriptions, strict=True):
+        trend_prompt = _append_plot_description(trend_prompt_base, plot_description)
+        response = _invoke_adapter(
+            trend_client,
+            model=trend_model_name,
+            prompt=trend_prompt,
+            image_b64=_encode_image(image_path),
+        )
+        prompts_for_images.append(trend_prompt)
+        responses_for_images.append(response)
+    return SweepRunResult(
+        combination_description=description,
+        context_prompt=context_prompt,
+        context_response=context_response,
+        trend_analysis_prompts=prompts_for_images,
+        trend_analysis_responses=responses_for_images,
+    )
 
 
 def build_style_feature_combinations(
@@ -450,8 +657,10 @@ def _write_run_metadata(
     context_prompt: str,
     plot_path: Path,
     report_csv: Path,
+    stats_table_csv_path: Path,
     stats_image_path: Path | None,
     trend_prompt: str,
+    context_response: str,
     trend_full: str,
     trend_summary: str | None,
     summarization_mode: SummarizationMode,
@@ -459,12 +668,16 @@ def _write_run_metadata(
     full_scores: SummaryScores | None,
     summary_scores: SummaryScores | None,
     include_extended: bool,
+    scoring_reference_text: str,
+    scoring_reference_source: str,
+    scoring_reference_path: Path | None,
     include_pattern: str,
     evidence_mode: ResolvedEvidenceMode,
     requested_evidence_mode: EvidenceMode,
     adapter: LLMAdapter,
     selected_scores: SummaryScores,
     trend_image_attached: bool,
+    run_signature: str,
 ) -> Path:
     """Persist deterministic run metadata for reproducibility and auditability."""
     runtime_defaults = get_runtime_defaults()
@@ -488,11 +701,19 @@ def _write_run_metadata(
             "score_on_requested": inputs.score_on,
             "additional_summarizers": list(inputs.additional_summarizers),
             "output_dir": str(inputs.output_dir),
+            "scoring_reference_path": str(scoring_reference_path) if scoring_reference_path is not None else None,
+            "resume_existing": inputs.resume_existing,
         },
         "artifacts": {
             "plot_path": str(plot_path),
             "report_csv": str(report_csv),
+            "stats_table_csv_path": str(stats_table_csv_path),
             "stats_image_path": str(stats_image_path) if stats_image_path is not None else None,
+            "trend_evidence_image_path": (
+                str(plot_path)
+                if evidence_mode in {"plot", "plot+table"}
+                else (str(stats_image_path) if stats_image_path else None)
+            ),
         },
         "llm": {
             "provider": adapter.provider,
@@ -518,6 +739,11 @@ def _write_run_metadata(
             "context_prompt": context_prompt,
             "trend_prompt": trend_prompt,
         },
+        "responses": {
+            "context_response": context_response,
+            "trend_full_response": trend_full,
+            "trend_summary_response": trend_summary,
+        },
         "reproducibility": {
             "include_pattern": include_pattern,
             "context_prompt_signature": hashlib.sha256(context_prompt.encode("utf-8")).hexdigest(),
@@ -530,6 +756,7 @@ def _write_run_metadata(
             "include_extended_columns": include_extended,
             "csv_encoding": "utf-8",
             "delimiter": ",",
+            "run_signature": run_signature,
         },
         "summarizers": {
             "bart": {
@@ -564,6 +791,12 @@ def _write_run_metadata(
             "selected_scores": selected_scores.model_dump(),
             "full_scores": full_scores.model_dump() if full_scores is not None else None,
             "summary_scores": summary_scores.model_dump() if summary_scores is not None else None,
+            "reference": {
+                "source": scoring_reference_source,
+                "path": str(scoring_reference_path) if scoring_reference_path is not None else None,
+                "length": len(scoring_reference_text),
+                "signature": hashlib.sha256(scoring_reference_text.encode("utf-8")).hexdigest(),
+            },
         },
     }
 
@@ -627,3 +860,12 @@ def _append_plot_description(base_prompt: str, plot_description: str) -> str:
 
 def _resolve_evidence_mode(evidence_mode: EvidenceMode) -> ResolvedEvidenceMode:
     return helpers.resolve_evidence_mode(evidence_mode)
+
+
+def _resolve_scoring_reference(inputs: PipelineInputs, context: str) -> tuple[str, str, Path | None]:
+    if inputs.scoring_reference_path is None:
+        return context, "context_response", None
+    reference_text = inputs.scoring_reference_path.read_text(encoding="utf-8").strip()
+    if not reference_text:
+        raise ValueError(f"scoring reference file is empty: {inputs.scoring_reference_path}")
+    return reference_text, "human_ground_truth_file", inputs.scoring_reference_path

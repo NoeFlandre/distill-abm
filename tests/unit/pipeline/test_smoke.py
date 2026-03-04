@@ -6,7 +6,7 @@ import pytest
 
 from distill_abm.configs.models import PromptsConfig
 from distill_abm.llm.adapters.base import LLMAdapter, LLMRequest, LLMResponse
-from distill_abm.pipeline.smoke import SmokeSuiteInputs, default_smoke_cases, run_qwen_smoke_suite
+from distill_abm.pipeline.smoke import SmokeCase, SmokeSuiteInputs, default_smoke_cases, run_qwen_smoke_suite
 
 
 class SmokeFakeAdapter(LLMAdapter):
@@ -191,3 +191,73 @@ def test_run_qwen_smoke_suite_uses_multiple_images_for_sweep(tmp_path: Path, mon
     assert result.success is True
     assert captured["count"] == 5
     assert captured["descriptions"] == ["plot-1", "plot-2", "plot-3", "plot-4", "plot-5"]
+
+
+def test_run_qwen_smoke_suite_resumes_existing_successful_case_without_rerun(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    params.write_text("param=1\n", encoding="utf-8")
+    docs = tmp_path / "docs.txt"
+    docs.write_text("documentation block\n", encoding="utf-8")
+    prompts = PromptsConfig(
+        context_prompt="Context {parameters} {documentation}",
+        trend_prompt="Trend {description} {context}",
+    )
+    case = SmokeCase(case_id="plot-full-full", evidence_mode="plot", summarization_mode="full", score_on="full")
+    case_dir = tmp_path / "smoke" / "cases" / case.case_id
+    case_dir.mkdir(parents=True, exist_ok=True)
+    case_manifest = case_dir / "case_manifest.json"
+    case_manifest.write_text(
+        json.dumps(
+            {
+                "case": case.model_dump(),
+                "status": "ok",
+                "output_dir": str(case_dir),
+                "report_csv": str(case_dir / "report.csv"),
+                "plot_path": str(case_dir / "plot.png"),
+                "metadata_path": str(case_dir / "pipeline_run_metadata.json"),
+                "context_prompt_path": str(case_dir / "context_prompt.txt"),
+                "trend_prompt_path": str(case_dir / "trend_prompt.txt"),
+                "stats_table_csv_path": None,
+                "context_response_path": str(case_dir / "context_response.txt"),
+                "trend_full_response_path": str(case_dir / "trend_full_response.txt"),
+                "trend_summary_response_path": None,
+                "case_manifest_path": str(case_manifest),
+                "qualitative": [],
+                "error": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    def should_not_run_pipeline(*_args, **_kwargs):  # type: ignore[no-untyped-def]
+        raise AssertionError("run_pipeline should not execute when resuming a successful case")
+
+    monkeypatch.setattr("distill_abm.pipeline.smoke.run_pipeline", should_not_run_pipeline)
+
+    result = run_qwen_smoke_suite(
+        inputs=SmokeSuiteInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "smoke",
+            model="qwen3.5:0.8b",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk trend",
+        ),
+        prompts=prompts,
+        adapter=SmokeFakeAdapter(),
+        run_qualitative=False,
+        doe_input_csv=None,
+        run_sweep=False,
+        cases=[case],
+        resume_existing=True,
+    )
+
+    assert result.success is True
+    assert len(result.cases) == 1
+    assert result.cases[0].status == "ok"
+    assert result.cases[0].resumed_from_existing is True

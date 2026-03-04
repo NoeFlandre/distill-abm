@@ -172,6 +172,11 @@ Scoring modules are in `distill_abm.eval`:
 - lexical/quality style metrics in `distill_abm.eval.reference_scores`
 - qualitative parser/extractor helpers in `distill_abm.eval.qualitative`
 
+Reference selection for lexical metrics:
+
+- if `PipelineInputs.scoring_reference_path` is set (CLI `--abm` flow), BLEU/METEOR/ROUGE/Flesch are computed against the human ground-truth text file
+- otherwise metrics fall back to context-vs-candidate comparison
+
 ## 9) Prompt sweeps
 
 `run_pipeline_sweep` is the dedicated API for combination runs:
@@ -230,6 +235,8 @@ The metadata contains:
 - evidence/summarization mode settings (`evidence_mode`, `summarization_mode`, `score_on`)
 - selected additional summarizers (`additional_summarizers`) and backend configs
 - score summaries and output artifact locations
+- scoring reference provenance (`scores.reference.source/path/signature/length`)
+- full LLM responses (`responses.context_response`, `responses.trend_full_response`, `responses.trend_summary_response`)
 
 To replay a result:
 
@@ -272,5 +279,12 @@ The command writes:
   - prompts, responses, stats table, `report.csv`, `pipeline_run_metadata.json`, and `case_manifest.json`
 - `doe/anova_factorial_contributions.csv`
 - `sweep/combinations_report.csv`
+
+Resumability:
+
+- `smoke-qwen` defaults to resume mode (`--resume`)
+- successful case manifests are reused instead of rerunning LLM calls
+- DoE output is reused when present
+- sweep execution skips combinations already present in `combinations_report.csv`
 
 This is the recommended first-line smoke test before sharing or revising outputs.

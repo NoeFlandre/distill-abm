@@ -66,6 +66,7 @@ class SmokeCaseResult(BaseModel):
     trend_full_response_path: Path | None = None
     trend_summary_response_path: Path | None = None
     case_manifest_path: Path | None = None
+    resumed_from_existing: bool = False
     qualitative: list[QualitativeOutcome] = Field(default_factory=list)
     error: str | None = None
 
@@ -83,6 +84,7 @@ class SmokeSuiteInputs(BaseModel):
     plot_description: str | None = None
     sweep_plot_descriptions: list[str] | None = None
     additional_summarizers: tuple[Literal["t5", "longformer_ext"], ...] = ()
+    scoring_reference_path: Path | None = None
 
 
 class SmokeSuiteResult(BaseModel):
@@ -138,6 +140,7 @@ def run_qwen_smoke_suite(
     doe_input_csv: Path | None,
     run_sweep: bool,
     cases: list[SmokeCase] | None = None,
+    resume_existing: bool = True,
 ) -> SmokeSuiteResult:
     """Execute a full Qwen smoke suite and emit human-readable plus JSON reports."""
     started_at = datetime.now(UTC)
@@ -153,6 +156,7 @@ def run_qwen_smoke_suite(
                 prompts=prompts,
                 adapter=adapter,
                 run_qualitative=run_qualitative,
+                resume_existing=resume_existing,
             )
         )
 
@@ -160,6 +164,7 @@ def run_qwen_smoke_suite(
     doe_status, doe_output_csv, doe_error = _run_doe_if_requested(
         output_root=inputs.output_dir,
         doe_input_csv=doe_input_csv,
+        resume_existing=resume_existing,
     )
     sweep_status, sweep_output_csv, sweep_error = _run_sweep_if_requested(
         output_root=inputs.output_dir,
@@ -168,6 +173,7 @@ def run_qwen_smoke_suite(
         adapter=adapter,
         case_results=case_results,
         run_sweep=run_sweep,
+        resume_existing=resume_existing,
     )
 
     success = not failed_cases and doe_status != "failed" and sweep_status != "failed"
@@ -204,9 +210,16 @@ def _run_smoke_case(
     prompts: PromptsConfig,
     adapter: LLMAdapter,
     run_qualitative: bool,
+    resume_existing: bool,
 ) -> SmokeCaseResult:
     case_dir = inputs.output_dir / "cases" / case.case_id
     case_dir.mkdir(parents=True, exist_ok=True)
+    case_manifest = case_dir / "case_manifest.json"
+    if resume_existing:
+        resumed = _load_resumable_case(case_manifest)
+        if resumed is not None:
+            resumed.resumed_from_existing = True
+            return resumed
     try:
         result = run_pipeline(
             inputs=PipelineInputs(
@@ -222,6 +235,7 @@ def _run_smoke_case(
                 summarization_mode=case.summarization_mode,
                 score_on=case.score_on,
                 additional_summarizers=inputs.additional_summarizers,
+                scoring_reference_path=inputs.scoring_reference_path,
             ),
             prompts=prompts,
             adapter=adapter,
@@ -286,8 +300,8 @@ def _run_smoke_case(
 
 def _write_case_manifest(case_result: SmokeCaseResult) -> SmokeCaseResult:
     manifest_path = case_result.output_dir / "case_manifest.json"
-    manifest_path.write_text(case_result.model_dump_json(indent=2), encoding="utf-8")
     case_result.case_manifest_path = manifest_path
+    manifest_path.write_text(case_result.model_dump_json(indent=2), encoding="utf-8")
     return case_result
 
 
@@ -364,10 +378,14 @@ def _run_case_qualitative(
     return outcomes
 
 
-def _run_doe_if_requested(output_root: Path, doe_input_csv: Path | None) -> tuple[SmokeStatus, Path | None, str | None]:
+def _run_doe_if_requested(
+    output_root: Path, doe_input_csv: Path | None, resume_existing: bool
+) -> tuple[SmokeStatus, Path | None, str | None]:
     if doe_input_csv is None:
         return "skipped", None, None
     output_csv = output_root / "doe" / "anova_factorial_contributions.csv"
+    if resume_existing and output_csv.exists():
+        return "ok", output_csv, None
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     try:
         frame = analyze_factorial_anova(doe_input_csv, output_csv, max_interaction_order=2)
@@ -385,12 +403,16 @@ def _run_sweep_if_requested(
     adapter: LLMAdapter,
     case_results: list[SmokeCaseResult],
     run_sweep: bool,
+    resume_existing: bool,
 ) -> tuple[SmokeStatus, Path | None, str | None]:
     if not run_sweep:
         return "skipped", None, None
+    sweep_output = output_root / "sweep" / "combinations_report.csv"
     sweep_descriptions = inputs.sweep_plot_descriptions or [inputs.plot_description or inputs.metric_description]
     available_plots = [case.plot_path for case in case_results if case.plot_path is not None]
     if not available_plots:
+        if resume_existing and sweep_output.exists():
+            return "ok", sweep_output, None
         return "failed", None, "no successful case produced a plot image for sweep execution"
     plot_count = len(sweep_descriptions)
     if plot_count <= 0:
@@ -399,7 +421,6 @@ def _run_sweep_if_requested(
         sweep_image_paths = available_plots[:plot_count]
     else:
         sweep_image_paths = [plot for _, plot in zip(range(plot_count), cycle(available_plots), strict=False)]
-    sweep_output = output_root / "sweep" / "combinations_report.csv"
     try:
         run_pipeline_sweep(
             inputs=PipelineInputs(
@@ -418,6 +439,7 @@ def _run_sweep_if_requested(
             image_paths=sweep_image_paths,
             plot_descriptions=sweep_descriptions,
             output_csv=sweep_output,
+            resume_existing=resume_existing,
         )
     except Exception:
         return "failed", sweep_output, traceback.format_exc()
@@ -445,6 +467,7 @@ def _render_markdown_report(result: SmokeSuiteResult) -> str:
     lines.append(f"- Metric pattern: `{result.inputs.metric_pattern}`")
     lines.append(f"- Metric description: `{result.inputs.metric_description}`")
     lines.append(f"- Plot description: `{result.inputs.plot_description}`")
+    lines.append(f"- Scoring reference path: `{result.inputs.scoring_reference_path}`")
     lines.append(
         "- Request defaults: "
         f"`temperature={runtime_defaults.llm_request.temperature}`, "
@@ -453,12 +476,14 @@ def _render_markdown_report(result: SmokeSuiteResult) -> str:
     lines.append("")
     lines.append("## Case Matrix")
     lines.append("")
-    lines.append("| Case | Evidence | Summarization | Score On | Status | Report CSV | Plot | Metadata | Manifest |")
-    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
+    lines.append(
+        "| Case | Evidence | Summarization | Score On | Status | Resumed | Report CSV | Plot | Metadata | Manifest |"
+    )
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for case in result.cases:
         lines.append(
             f"| `{case.case.case_id}` | `{case.case.evidence_mode}` | `{case.case.summarization_mode}` | "
-            f"`{case.case.score_on}` | `{case.status}` | `{case.report_csv}` | "
+            f"`{case.case.score_on}` | `{case.status}` | `{case.resumed_from_existing}` | `{case.report_csv}` | "
             f"`{case.plot_path}` | `{case.metadata_path}` | `{case.case_manifest_path}` |"
         )
 
@@ -507,3 +532,16 @@ def _render_markdown_report(result: SmokeSuiteResult) -> str:
     )
     lines.append("")
     return "\n".join(lines)
+
+
+def _load_resumable_case(case_manifest: Path) -> SmokeCaseResult | None:
+    if not case_manifest.exists():
+        return None
+    try:
+        loaded = SmokeCaseResult.model_validate_json(case_manifest.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if loaded.status != "ok":
+        return None
+    loaded.case_manifest_path = case_manifest
+    return loaded

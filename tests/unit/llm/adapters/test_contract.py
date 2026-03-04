@@ -1,3 +1,4 @@
+import time
 from types import SimpleNamespace
 
 import pytest
@@ -157,6 +158,37 @@ def test_ollama_adapter_forwards_max_tokens_as_num_predict() -> None:
     assert isinstance(options, dict)
     assert options["temperature"] == 0.5
     assert options["num_predict"] == 321
+
+
+def test_ollama_adapter_normalizes_chatresponse_objects() -> None:
+    class ChatResponse:
+        def __init__(self) -> None:
+            self.model = "qwen3.5:0.8b"
+            self.message = SimpleNamespace(content="hi-from-object")
+
+        def model_dump(self) -> dict[str, object]:
+            return {"model": self.model, "message": {"content": self.message.content}}
+
+    response = OllamaAdapter(
+        model="qwen3.5:0.8b",
+        client=SimpleNamespace(chat=lambda **_: ChatResponse()),
+    ).complete(make_request())
+    assert response.provider == "ollama"
+    assert response.text == "hi-from-object"
+    assert response.raw["message"]["content"] == "hi-from-object"
+
+
+def test_ollama_adapter_timeout_is_wrapped() -> None:
+    def _slow_chat(**_: object) -> dict[str, object]:
+        time.sleep(0.05)
+        return {"message": {"content": "late"}, "model": "qwen3.5:0.8b"}
+
+    with pytest.raises(LLMProviderError, match="timed out"):
+        OllamaAdapter(
+            model="qwen3.5:0.8b",
+            client=SimpleNamespace(chat=_slow_chat),
+            timeout_seconds=0.001,
+        ).complete(make_request())
 
 
 def test_janus_adapter_success() -> None:
