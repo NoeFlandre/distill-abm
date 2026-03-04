@@ -7,6 +7,8 @@ from typing import Any, ClassVar, Literal
 
 from pydantic import BaseModel, Field
 
+from distill_abm.configs.runtime_defaults import get_runtime_defaults
+
 Role = Literal["system", "user", "assistant"]
 
 
@@ -22,8 +24,8 @@ class LLMRequest(BaseModel):
 
     model: str
     messages: list[LLMMessage]
-    temperature: float | None = 0.5
-    max_tokens: int | None = 1000
+    temperature: float | None = Field(default_factory=lambda: get_runtime_defaults().llm_request.temperature)
+    max_tokens: int | None = Field(default_factory=lambda: get_runtime_defaults().llm_request.max_tokens)
     image_b64: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
 

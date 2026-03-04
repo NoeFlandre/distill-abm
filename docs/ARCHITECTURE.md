@@ -59,6 +59,7 @@ All numeric defaults and runtime hyperparameters are documented in:
 ## Configs
 
 - `configs/models.yaml`
+- `configs/runtime_defaults.yaml`
 - `configs/prompts.yaml`
 - `configs/abms/*.yaml`
 - `configs/evaluation.yaml`

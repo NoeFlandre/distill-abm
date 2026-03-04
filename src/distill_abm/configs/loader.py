@@ -15,6 +15,7 @@ from distill_abm.configs.models import (
     ModelsConfig,
     NotebookExperimentSettings,
     PromptsConfig,
+    RuntimeDefaultsConfig,
 )
 
 ModelType = TypeVar(
@@ -25,6 +26,7 @@ ModelType = TypeVar(
     ModelsConfig,
     NotebookExperimentSettings,
     PromptsConfig,
+    RuntimeDefaultsConfig,
 )
 
 
@@ -77,3 +79,8 @@ def load_logging_config(path: Path) -> LoggingConfig:
 def load_notebook_experiment_settings(path: Path) -> NotebookExperimentSettings:
     """Load and validate notebook experiment settings."""
     return _load_yaml_model(path, NotebookExperimentSettings)
+
+
+def load_runtime_defaults_config(path: Path) -> RuntimeDefaultsConfig:
+    """Load and validate centralized runtime defaults."""
+    return _load_yaml_model(path, RuntimeDefaultsConfig)

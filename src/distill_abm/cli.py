@@ -8,6 +8,7 @@ from typing import Annotated, cast
 import typer
 
 from distill_abm.configs.loader import load_abm_config, load_prompts_config
+from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
 from distill_abm.llm.factory import create_adapter
@@ -22,6 +23,10 @@ from distill_abm.pipeline.run import (
 from distill_abm.pipeline.smoke import SmokeSuiteInputs, run_qwen_smoke_suite
 
 app = typer.Typer(help="Run ABM distillation workflows.")
+RUNTIME_DEFAULTS = get_runtime_defaults()
+DEFAULT_EVIDENCE_MODE: EvidenceMode = RUNTIME_DEFAULTS.run.evidence_mode
+DEFAULT_SUMMARIZATION_MODE: SummarizationMode = RUNTIME_DEFAULTS.run.summarization_mode
+DEFAULT_SCORE_MODE: ScoreMode = RUNTIME_DEFAULTS.run.score_on
 
 
 @app.callback()
@@ -47,11 +52,11 @@ def run(
         Path,
         typer.Option(exists=True),
     ] = Path("configs/prompts.yaml"),
-    output_dir: Annotated[Path, typer.Option()] = Path("results/pipeline"),
-    provider: Annotated[str, typer.Option()] = "echo",
-    model: Annotated[str, typer.Option()] = "echo-model",
-    metric_pattern: Annotated[str, typer.Option()] = "mean",
-    metric_description: Annotated[str, typer.Option()] = "simulation trend",
+    output_dir: Annotated[Path, typer.Option()] = Path(RUNTIME_DEFAULTS.run.output_dir),
+    provider: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.run.provider,
+    model: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.run.model,
+    metric_pattern: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.run.metric_pattern,
+    metric_description: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.run.metric_description,
     plot_description: Annotated[
         str | None,
         typer.Option(help="Optional evidence description for the plotted metric."),
@@ -61,7 +66,7 @@ def run(
         typer.Option(
             help="Evidence ablation mode: plot (vision only), table-csv (text table only), or plot+table (both)."
         ),
-    ] = "plot",
+    ] = DEFAULT_EVIDENCE_MODE,
     skip_summarization: Annotated[
         bool,
         typer.Option(help="Skip BART/BERT summarization and keep the full LLM report text."),
@@ -69,7 +74,7 @@ def run(
     summarization_mode: Annotated[
         SummarizationMode,
         typer.Option(help="full: keep raw trend text, summary: use summarized trend text, both: store/report both."),
-    ] = "both",
+    ] = DEFAULT_SUMMARIZATION_MODE,
     additional_summarizer: Annotated[
         list[str] | None,
         typer.Option(
@@ -83,7 +88,7 @@ def run(
             help="Which text should be used for scoring: full, summary, or both. "
             "Both adds both score sets to report output."
         ),
-    ] = "both",
+    ] = DEFAULT_SCORE_MODE,
     abm: Annotated[str | None, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = None,
 ) -> None:
     """Runs one end-to-end pipeline execution from CSV to scored report."""
@@ -121,8 +126,8 @@ def run(
 @app.command("analyze-doe")
 def analyze_doe(
     input_csv: Annotated[Path, typer.Option(..., exists=True, file_okay=True, dir_okay=False)],
-    output_csv: Annotated[Path, typer.Option()] = Path("results/doe/anova_factorial_contributions.csv"),
-    max_interaction_order: Annotated[int, typer.Option()] = 2,
+    output_csv: Annotated[Path, typer.Option()] = Path(RUNTIME_DEFAULTS.doe.output_csv),
+    max_interaction_order: Annotated[int, typer.Option()] = RUNTIME_DEFAULTS.doe.max_interaction_order,
 ) -> None:
     """Runs full factorial ANOVA contribution analysis."""
     output_csv.parent.mkdir(parents=True, exist_ok=True)
@@ -150,8 +155,8 @@ def evaluate_qualitative(
         Path,
         typer.Option(exists=True),
     ] = Path("configs/prompts.yaml"),
-    provider: Annotated[str, typer.Option()] = "echo",
-    model: Annotated[str, typer.Option()] = "echo-model",
+    provider: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.qualitative.provider,
+    model: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.qualitative.model,
 ) -> None:
     """Evaluates coverage or faithfulness with an LLM and returns JSON output."""
     prompts = load_prompts_config(prompts_path)
@@ -190,10 +195,10 @@ def smoke_qwen(
         Path,
         typer.Option(exists=True),
     ] = Path("configs/prompts.yaml"),
-    output_dir: Annotated[Path, typer.Option()] = Path("results/smoke_qwen"),
-    model: Annotated[str, typer.Option()] = "qwen3.5:0.8b",
-    metric_pattern: Annotated[str, typer.Option()] = "mean",
-    metric_description: Annotated[str, typer.Option()] = "simulation trend",
+    output_dir: Annotated[Path, typer.Option()] = Path(RUNTIME_DEFAULTS.smoke.output_dir),
+    model: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.model,
+    metric_pattern: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.metric_pattern,
+    metric_description: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.metric_description,
     plot_description: Annotated[str | None, typer.Option()] = None,
     additional_summarizer: Annotated[
         list[str] | None,
@@ -205,11 +210,11 @@ def smoke_qwen(
     skip_qualitative: Annotated[
         bool,
         typer.Option(help="Skip qualitative coverage/faithfulness checks in the smoke suite."),
-    ] = False,
+    ] = not RUNTIME_DEFAULTS.smoke.run_qualitative,
     skip_sweep: Annotated[
         bool,
         typer.Option(help="Skip prompt-combination sweep execution in the smoke suite."),
-    ] = False,
+    ] = not RUNTIME_DEFAULTS.smoke.run_sweep,
 ) -> None:
     """Runs full Qwen smoke validation across evidence/text modes plus DoE and sweep artifacts."""
     prompts = load_prompts_config(prompts_path)
