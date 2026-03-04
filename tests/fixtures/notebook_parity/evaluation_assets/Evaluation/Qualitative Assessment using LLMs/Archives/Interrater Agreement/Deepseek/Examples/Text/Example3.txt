@@ -1,0 +1,3 @@
+The primary aim of the agent-based model is to replicate urban mobility patterns. The model's specific objective is to investigate how transportation preferences, the availability of public and private transport options, and urban infrastructure affect the daily movements and interactions of city residents.
+
+The mean distance traveled by private car by the agents starts at around 2700 units and rapidly decreases to about 1200 units over the first 5 time steps.

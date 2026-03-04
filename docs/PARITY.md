@@ -20,6 +20,8 @@ Provide executable parity coverage across ingestion, plotting, scoring, prompt c
 12. `tests/unit/legacy` validates loader priority, notebook dispatch behavior, fallback safety, and source resolution order.
 13. `tests/fixtures/notebook_parity/model_assets/Models/` is now the canonical non-archive mirror for ABM `CSV`, `JSON`, `TXT`, `NetLogo`, and `Images` assets.
 14. `tests/regression/test_model_assets_migration.py` enforces full file coverage and byte-equivalence between legacy ABM asset folders and the canonical mirror.
+15. `tests/fixtures/notebook_parity/evaluation_assets/Evaluation/` is the canonical non-archive mirror for legacy evaluation artifacts.
+16. `tests/regression/test_evaluation_assets_migration.py` enforces full tracked-file coverage and byte-equivalence for the mirrored evaluation tree.
 
 ## Current parity status
 
