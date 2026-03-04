@@ -75,9 +75,9 @@
     "size_bytes": 18773,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/DOE/DoE.ipynb"
     ]
@@ -473,9 +473,9 @@
     "size_bytes": 83003,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/Making the Sheet Structure/.ipynb_checkpoints/Final Sheet-checkpoint.ipynb"
     ]
@@ -508,9 +508,9 @@
     "size_bytes": 83003,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/Making the Sheet Structure/Archives/Final Sheet.ipynb"
     ]
@@ -897,9 +897,9 @@
     "size_bytes": 35486,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb"
     ]
@@ -910,9 +910,9 @@
     "size_bytes": 55594,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb"
     ]
@@ -923,9 +923,9 @@
     "size_bytes": 3190213,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb"
     ]
@@ -949,9 +949,9 @@
     "size_bytes": 1848,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/3. Adding 1 point to the answers.ipynb"
     ]
@@ -962,9 +962,9 @@
     "size_bytes": 1981,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/4. Modifying the final results to compute the DoE matrix.ipynb"
     ]
@@ -1151,9 +1151,9 @@
     "size_bytes": 14165,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/Deepseek/DeepseekCoverage.ipynb"
     ]
@@ -2704,9 +2704,9 @@
     "size_bytes": 61133,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Fauna/1. (WORKING) From NetLogo to CSV.ipynb"
     ]
@@ -2717,9 +2717,9 @@
     "size_bytes": 2687887,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Fauna/2. Plotting the data.ipynb"
     ]
@@ -2730,9 +2730,9 @@
     "size_bytes": 134450,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Fauna/3. (Deepseek) With combinations.ipynb"
     ]
@@ -2743,9 +2743,9 @@
     "size_bytes": 496613,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb"
     ]
@@ -2756,9 +2756,9 @@
     "size_bytes": 459626,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb"
     ]
@@ -2769,9 +2769,9 @@
     "size_bytes": 14223,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Fauna/4. Generating the summary-Copy1.ipynb"
     ]
@@ -2782,9 +2782,9 @@
     "size_bytes": 11493,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Fauna/5. Postprocessing-Copy1.ipynb"
     ]
@@ -2795,9 +2795,9 @@
     "size_bytes": 7900,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Fauna/6.Scoring-Copy1.ipynb"
     ]
@@ -3380,9 +3380,9 @@
     "size_bytes": 61196,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Grazing/1.(WORKING) From NetLogo to CSV-Copy1.ipynb"
     ]
@@ -3393,9 +3393,9 @@
     "size_bytes": 2620860,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Grazing/2. Plotting the data.ipynb"
     ]
@@ -3406,9 +3406,9 @@
     "size_bytes": 57268,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Grazing/3. (Deepseek) With combinations.ipynb"
     ]
@@ -3419,9 +3419,9 @@
     "size_bytes": 379374,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Grazing/3. With combinations-Copy1.ipynb"
     ]
@@ -3432,9 +3432,9 @@
     "size_bytes": 332527,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Grazing/3bis. (Claude) With combinations.ipynb"
     ]
@@ -3445,9 +3445,9 @@
     "size_bytes": 13463,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Grazing/4. Generating the summary-Copy1.ipynb"
     ]
@@ -3458,9 +3458,9 @@
     "size_bytes": 11493,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Grazing/5. Postprocessing-Copy1.ipynb"
     ]
@@ -3471,9 +3471,9 @@
     "size_bytes": 8206,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Grazing/6.Scoring-Copy1.ipynb"
     ]
@@ -4012,9 +4012,9 @@
     "size_bytes": 58671,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Milk Consumption/1. (Cleaned) From NetLogo to CSV.ipynb"
     ]
@@ -4025,9 +4025,9 @@
     "size_bytes": 1813528,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Milk Consumption/2. Plotting the Data.ipynb"
     ]
@@ -4038,9 +4038,9 @@
     "size_bytes": 30037,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Milk Consumption/3. (Deepseek) With combinations.ipynb"
     ]
@@ -4051,9 +4051,9 @@
     "size_bytes": 378817,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Milk Consumption/3. (GPT) With combinations.ipynb"
     ]
@@ -4064,9 +4064,9 @@
     "size_bytes": 347312,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Milk Consumption/3bis. (Claude) With combinations.ipynb"
     ]
@@ -4090,9 +4090,9 @@
     "size_bytes": 11493,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Milk Consumption/5. Postprocessing.ipynb"
     ]
@@ -4103,9 +4103,9 @@
     "size_bytes": 9956,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": [
       "Models/Milk Consumption/6.Scoring.ipynb"
     ]
@@ -6228,9 +6228,9 @@
     "size_bytes": 9977,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": []
   },
   {
@@ -6250,9 +6250,9 @@
     "size_bytes": 83204,
     "extension": ".ipynb",
     "classification": "historical_nonruntime",
-    "action": "discard_with_rationale",
+    "action": "retain_record_only",
     "target_path": null,
-    "rationale": "Notebook logic has been migrated and parity-tested in production modules.",
+    "rationale": "Notebook retained for full provenance, even when non-runtime.",
     "source_notebook_links": []
   },
   {

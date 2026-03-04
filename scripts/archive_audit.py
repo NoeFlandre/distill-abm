@@ -100,9 +100,9 @@ def _classify(path: Path) -> tuple[Classification, Action, str | None, str]:
     if ext == ".ipynb":
         return (
             "historical_nonruntime",
-            "discard_with_rationale",
+            "retain_record_only",
             None,
-            "Notebook logic has been migrated and parity-tested in production modules.",
+            "Notebook retained for full provenance, even when non-runtime.",
         )
     if ext in {".png", ".jpg", ".jpeg", ".svg"}:
         return (
