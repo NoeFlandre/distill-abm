@@ -1,9 +1,9 @@
 # Archive Full Manifest
 
-- Total files: 592
+- Total files: 570
 - Classification counts:
   - `experiment_setting`: 38
-  - `historical_nonruntime`: 332
+  - `historical_nonruntime`: 310
   - `human_ground_truth`: 32
   - `legacy_visualization`: 184
   - `prompt_reference`: 6
@@ -11,18 +11,13 @@
   - `archive_separately`: 184
   - `discard_with_rationale`: 39
   - `migrate`: 76
-  - `retain_record_only`: 293
+  - `retain_record_only`: 271
 - Unresolved mappings: 0
 
 ## Sample Rows
 
 | path | classification | action | target_path |
 | --- | --- | --- | --- |
-| `archive/.DS_Store` | `historical_nonruntime` | `retain_record_only` | `-` |
-| `archive/legacy_repo/.DS_Store` | `historical_nonruntime` | `retain_record_only` | `-` |
-| `archive/legacy_repo/Code/.DS_Store` | `historical_nonruntime` | `retain_record_only` | `-` |
-| `archive/legacy_repo/Code/Evaluation/.DS_Store` | `historical_nonruntime` | `retain_record_only` | `-` |
-| `archive/legacy_repo/Code/Evaluation/DOE/.DS_Store` | `historical_nonruntime` | `retain_record_only` | `-` |
 | `archive/legacy_repo/Code/Evaluation/DOE/Archives/1 and -1 Sorted.csv` | `historical_nonruntime` | `retain_record_only` | `-` |
 | `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric Version/DoEFeatureImportance.ipynb` | `historical_nonruntime` | `discard_with_rationale` | `-` |
 | `archive/legacy_repo/Code/Evaluation/DOE/Archives/Cédric Version/FinalResultsYesNo.csv` | `experiment_setting` | `migrate` | `tests/fixtures/notebook_parity/experiment_settings/Evaluation/DOE/Archives/Cédric Version/FinalResultsYesNo.csv` |
@@ -68,3 +63,8 @@
 | `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/.ipynb_checkpoints/Final Sheet-checkpoint.ipynb` | `historical_nonruntime` | `discard_with_rationale` | `-` |
 | `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet/updated_structured_data.csv` | `historical_nonruntime` | `retain_record_only` | `-` |
 | `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet/updated_structured_data2.csv` | `historical_nonruntime` | `retain_record_only` | `-` |
+| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Final Sheet.ipynb` | `historical_nonruntime` | `discard_with_rationale` | `-` |
+| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/Archives/FaunaCLAUDE.csv` | `historical_nonruntime` | `retain_record_only` | `-` |
+| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/Archives/FaunaGPT.csv` | `historical_nonruntime` | `retain_record_only` | `-` |
+| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/Archives/GrazingCLAUDE.csv` | `historical_nonruntime` | `retain_record_only` | `-` |
+| `archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Archives/Results/Archives/GrazingGPT.csv` | `historical_nonruntime` | `retain_record_only` | `-` |

@@ -7,7 +7,7 @@ from pathlib import Path
 def test_archive_manifest_covers_every_archive_file() -> None:
     manifest_path = Path("docs/archive_full_manifest.json")
     rows = json.loads(manifest_path.read_text(encoding="utf-8"))
-    archive_files = sorted(path for path in Path("archive").rglob("*") if path.is_file())
+    archive_files = sorted(path for path in Path("archive").rglob("*") if path.is_file() and path.name != ".DS_Store")
     assert len(rows) == len(archive_files)
 
 
@@ -44,3 +44,8 @@ def test_archive_manifest_migrate_targets_exclude_junk_temp_files() -> None:
         filename = Path(row["path"]).name
         assert filename != ".DS_Store"
         assert not filename.startswith("~$")
+
+
+def test_archive_manifest_excludes_ds_store_noise() -> None:
+    rows = json.loads(Path("docs/archive_full_manifest.json").read_text(encoding="utf-8"))
+    assert all(Path(row["path"]).name != ".DS_Store" for row in rows)
