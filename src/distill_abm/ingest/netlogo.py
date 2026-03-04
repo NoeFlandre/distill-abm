@@ -1,4 +1,4 @@
-"""NetLogo extraction helpers migrated from model notebooks."""
+"""NetLogo extraction helpers for model preprocessing pipelines."""
 
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ def update_parameters(gui_section: list[dict[str, Any]], experiment_parameters: 
 
 
 def format_json_oneline(data: dict[str, list[dict[str, Any]]]) -> str:
-    """Produces notebook-compatible single-line JSON items per section."""
+    """Produce compact single-line JSON items per section."""
     lines = ["{"]
     for section, items in data.items():
         lines.append(f'  "{section}": [')
@@ -161,7 +161,7 @@ def remove_urls_from_data(data: Any) -> Any:
 
 
 def process_documentation_remove_urls(input_json: Path, output_json: Path) -> None:
-    """Notebook-equivalent JSON cleaning stage that removes URLs recursively."""
+    """JSON cleaning stage that removes URLs recursively."""
     payload = json.loads(input_json.read_text(encoding="utf-8"))
     cleaned = remove_urls_from_data(payload)
     output_json.write_text(json.dumps(cleaned, indent=2), encoding="utf-8")
@@ -202,7 +202,7 @@ def process_documentation_remove_defaults(
 
 
 def clean_json_content(input_json: Path, output_txt: Path) -> None:
-    """Exports plain documentation text exactly like notebook cleanup cells."""
+    """Export cleaned plain documentation text."""
     payload = json.loads(input_json.read_text(encoding="utf-8"))
     documentation = str(payload.get("documentation", ""))
     cleaned = re.sub(r"## @#\$#@#\$#@\n\n\n", "", documentation)

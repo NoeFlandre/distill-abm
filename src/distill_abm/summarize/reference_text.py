@@ -1,4 +1,4 @@
-"""Summary helpers preserved for compatibility behavior."""
+"""Summary helpers for reusable text preprocessing and chunking."""
 
 from __future__ import annotations
 
@@ -43,7 +43,7 @@ def clean_context_response(text: str) -> str:
 
 
 def process_csv_context(input_file: Path, output_file: Path) -> None:
-    """Notebook-compatible CSV pass that cleans the `Context Response` column."""
+    """CSV pass that cleans the `Context Response` column."""
     with input_file.open("r", newline="", encoding="utf-8") as infile:
         reader = csv.DictReader(infile)
         fieldnames = reader.fieldnames

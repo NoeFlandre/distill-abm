@@ -10,7 +10,7 @@ from distill_abm.eval.reference_scores import compute_scores
 
 
 class SummaryScores(BaseModel):
-    """Captures lexical overlap plus compatibility scoring metrics."""
+    """Captures lexical overlap and scoring metrics."""
 
     token_f1: float
     precision: float

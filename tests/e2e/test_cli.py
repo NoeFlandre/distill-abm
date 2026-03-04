@@ -1,6 +1,8 @@
-import json
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Any, cast
+from types import SimpleNamespace
+from typing import Any
 
 import pytest
 import typer
@@ -9,15 +11,13 @@ from typer.testing import CliRunner
 import distill_abm.cli as cli_module
 from distill_abm.cli import app
 from distill_abm.configs.models import ABMConfig
-from distill_abm.llm.adapters.base import LLMAdapter, LLMRequest, LLMResponse
 
 runner = CliRunner()
 
 
-def test_cli_run_pipeline(tmp_path: Path) -> None:
+def _write_min_inputs(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-
     params = tmp_path / "params.txt"
     docs = tmp_path / "docs.txt"
     prompts = tmp_path / "prompts.yaml"
@@ -27,8 +27,30 @@ def test_cli_run_pipeline(tmp_path: Path) -> None:
         'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
         encoding="utf-8",
     )
+    return csv_path, params, docs, prompts
 
-    output_dir = tmp_path / "out"
+
+def test_cli_run_forwards_paper_modes_and_summarizers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
+    captured: dict[str, Any] = {}
+
+    class _Result:
+        def __init__(self, output_dir: Path) -> None:
+            self.plot_path = output_dir / "plot.png"
+            self.report_csv = output_dir / "report.csv"
+
+    def fake_run_pipeline(*, inputs, prompts, adapter):  # type: ignore[no-untyped-def]
+        captured["inputs"] = inputs
+        output_dir = inputs.output_dir
+        output_dir.mkdir(parents=True, exist_ok=True)
+        (output_dir / "plot.png").write_text("plot", encoding="utf-8")
+        (output_dir / "report.csv").write_text("report", encoding="utf-8")
+        return _Result(output_dir)
+
+    monkeypatch.setattr(cli_module, "_validate_model_policy", lambda **_: None)
+    monkeypatch.setattr(cli_module, "create_adapter", lambda provider, model: object())
+    monkeypatch.setattr(cli_module, "run_pipeline", fake_run_pipeline)
+
     result = runner.invoke(
         app,
         [
@@ -42,7 +64,7 @@ def test_cli_run_pipeline(tmp_path: Path) -> None:
             "--prompts-path",
             str(prompts),
             "--output-dir",
-            str(output_dir),
+            str(tmp_path / "out"),
             "--provider",
             "echo",
             "--model",
@@ -51,172 +73,227 @@ def test_cli_run_pipeline(tmp_path: Path) -> None:
             "mean-incum",
             "--metric-description",
             "weekly milk",
-            "--skip-summarization",
-        ],
-    )
-
-    assert result.exit_code == 0
-    assert (output_dir / "report.csv").exists()
-
-
-def test_cli_run_pipeline_table_csv_mode(tmp_path: Path) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-
-    params = tmp_path / "params.txt"
-    docs = tmp_path / "docs.txt"
-    prompts = tmp_path / "prompts.yaml"
-    params.write_text("p=1", encoding="utf-8")
-    docs.write_text("d=1", encoding="utf-8")
-    prompts.write_text(
-        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
-        encoding="utf-8",
-    )
-
-    output_dir = tmp_path / "out"
-    result = runner.invoke(
-        app,
-        [
-            "run",
-            "--csv-path",
-            str(csv_path),
-            "--parameters-path",
-            str(params),
-            "--documentation-path",
-            str(docs),
-            "--prompts-path",
-            str(prompts),
-            "--output-dir",
-            str(output_dir),
-            "--provider",
-            "echo",
-            "--model",
-            "echo-model",
-            "--metric-pattern",
-            "mean-incum",
-            "--metric-description",
-            "weekly milk",
-            "--skip-summarization",
             "--evidence-mode",
-            "table-csv",
+            "table",
+            "--text-source-mode",
+            "summary_only",
+            "--summarizer",
+            "bart",
+            "--summarizer",
+            "t5",
         ],
     )
 
     assert result.exit_code == 0
-    assert (output_dir / "report.csv").exists()
+    inputs = captured["inputs"]
+    assert inputs.evidence_mode == "table"
+    assert inputs.text_source_mode == "summary_only"
+    assert inputs.summarizers == ("bart", "t5")
 
 
-class QualFakeAdapter(LLMAdapter):
-    provider = "fake"
-
-    def complete(self, request: LLMRequest) -> LLMResponse:
-        _ = request
-        return LLMResponse(
-            provider="fake",
-            model="fake-model",
-            text="Coverage score: 3. Reasoning: Most core dynamics are represented.",
-            raw={},
-        )
-
-
-def test_cli_evaluate_qualitative_outputs_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    prompts = tmp_path / "prompts.yaml"
-    prompts.write_text(
-        "\n".join(
-            [
-                'context_prompt: "Context {parameters} {documentation}"',
-                'trend_prompt: "Trend {description}"',
-                'coverage_eval_prompt: "Evaluate coverage. Source: {source} Summary: {summary}"',
-                'faithfulness_eval_prompt: "Evaluate faithfulness. Source: {source} Summary: {summary}"',
-            ]
-        )
-        + "\n",
+def test_cli_run_with_model_id_uses_registry(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
+    models = tmp_path / "models.yaml"
+    models.write_text(
+        """
+models:
+  kimi:
+    provider: openrouter
+    model: moonshotai/kimi-k2.5
+""",
         encoding="utf-8",
     )
 
-    monkeypatch.setattr("distill_abm.cli.create_adapter", lambda provider, model: QualFakeAdapter())
+    captured: dict[str, Any] = {}
+
+    class _Result:
+        def __init__(self, output_dir: Path) -> None:
+            self.plot_path = output_dir / "plot.png"
+            self.report_csv = output_dir / "report.csv"
+
+    def fake_create_adapter(provider: str, model: str):  # type: ignore[no-untyped-def]
+        captured["provider"] = provider
+        captured["model"] = model
+        return object()
+
+    def fake_run_pipeline(*, inputs, prompts, adapter):  # type: ignore[no-untyped-def]
+        _ = prompts, adapter
+        output_dir = inputs.output_dir
+        output_dir.mkdir(parents=True, exist_ok=True)
+        (output_dir / "plot.png").write_text("plot", encoding="utf-8")
+        (output_dir / "report.csv").write_text("report", encoding="utf-8")
+        return _Result(output_dir)
+
+    monkeypatch.setattr(cli_module, "_validate_model_policy", lambda **_: None)
+    monkeypatch.setattr(cli_module, "create_adapter", fake_create_adapter)
+    monkeypatch.setattr(cli_module, "run_pipeline", fake_run_pipeline)
+
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--models-path",
+            str(models),
+            "--model-id",
+            "kimi",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["provider"] == "openrouter"
+    assert captured["model"] == "moonshotai/kimi-k2.5"
+
+
+def test_cli_run_with_abm_uses_scoring_reference(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
+    captured: dict[str, Any] = {}
+
+    def fake_load_abm_config(_path: Path) -> ABMConfig:
+        return ABMConfig(
+            name="grazing",
+            metric_pattern="household-risk-att-init",
+            metric_description="grazing dynamics",
+            plot_descriptions=["first plot description"],
+        )
+
+    class _Result:
+        def __init__(self, output_dir: Path) -> None:
+            self.plot_path = output_dir / "plot.png"
+            self.report_csv = output_dir / "report.csv"
+
+    def fake_run_pipeline(*, inputs, prompts, adapter):  # type: ignore[no-untyped-def]
+        captured["inputs"] = inputs
+        output_dir = inputs.output_dir
+        output_dir.mkdir(parents=True, exist_ok=True)
+        (output_dir / "plot.png").write_text("plot", encoding="utf-8")
+        (output_dir / "report.csv").write_text("report", encoding="utf-8")
+        return _Result(output_dir)
+
+    monkeypatch.setattr(cli_module, "_validate_model_policy", lambda **_: None)
+    monkeypatch.setattr(cli_module, "create_adapter", lambda provider, model: object())
+    monkeypatch.setattr(cli_module, "load_abm_config", fake_load_abm_config)
+    monkeypatch.setattr(cli_module, "_resolve_scoring_reference_path", lambda _abm: Path("ground_truth.txt"))
+    monkeypatch.setattr(cli_module, "run_pipeline", fake_run_pipeline)
+
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--provider",
+            "echo",
+            "--model",
+            "echo-model",
+            "--abm",
+            "grazing",
+        ],
+    )
+
+    assert result.exit_code == 0
+    inputs = captured["inputs"]
+    assert inputs.metric_pattern == "household-risk-att-init"
+    assert inputs.metric_description == "grazing dynamics"
+    assert inputs.plot_description == "first plot description"
+    assert inputs.scoring_reference_path == Path("ground_truth.txt")
+
+
+def test_cli_run_rejects_invalid_summarizer(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
+    monkeypatch.setattr(cli_module, "_validate_model_policy", lambda **_: None)
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--provider",
+            "echo",
+            "--model",
+            "echo-model",
+            "--summarizer",
+            "bad",
+        ],
+    )
+    assert result.exit_code != 0
+    assert result.exception is not None
+
+
+def test_cli_evaluate_qualitative_outputs_json(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(cli_module, "_validate_model_policy", lambda **_: None)
+    monkeypatch.setattr(cli_module, "create_adapter", lambda provider, model: object())
+    monkeypatch.setattr(
+        cli_module,
+        "evaluate_qualitative_score",
+        lambda **_: SimpleNamespace(model_dump_json=lambda: '{"score": 4, "reasoning": "ok"}'),
+    )
+
     result = runner.invoke(
         app,
         [
             "evaluate-qualitative",
             "--summary-text",
-            "This is a generated summary.",
+            "summary",
             "--source-text",
-            "This is source context.",
+            "source",
             "--metric",
             "coverage",
             "--provider",
-            "fake",
+            "echo",
             "--model",
-            "fake-model",
-            "--prompts-path",
-            str(prompts),
+            "echo-model",
+            "--allow-debug-model",
         ],
     )
 
     assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["score"] == 3
-    assert payload["reasoning"].startswith("Coverage score")
-    assert payload["model"] == "fake-model"
+    assert '"score": 4' in result.stdout
 
 
-def test_cli_run_with_abm_passes_first_plot_description(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-    params = tmp_path / "params.txt"
-    docs = tmp_path / "docs.txt"
-    prompts = tmp_path / "prompts.yaml"
-    params.write_text("p=1", encoding="utf-8")
-    docs.write_text("d=1", encoding="utf-8")
-    prompts.write_text(
-        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
-        encoding="utf-8",
-    )
+def test_cli_smoke_qwen_forwards_inputs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
+    captured: dict[str, Any] = {}
 
-    captured: dict[str, object] = {}
-
-    def fake_load_abm_config(_path: Path) -> ABMConfig:
-        return ABMConfig(
-            name="milk_consumption",
-            metric_pattern="mean-incum",
-            metric_description="weekly milk",
-            plot_descriptions=["first plot description", "second"],
+    def fake_run_smoke(*, inputs, prompts, adapter, run_qualitative, doe_input_csv, run_sweep, cases, resume_existing):  # type: ignore[no-untyped-def]
+        _ = prompts, adapter, run_qualitative, doe_input_csv, run_sweep, cases, resume_existing
+        captured["inputs"] = inputs
+        return SimpleNamespace(
+            report_markdown_path=Path("smoke.md"),
+            report_json_path=Path("smoke.json"),
+            doe_output_csv=None,
+            sweep_output_csv=None,
+            success=True,
+            failed_cases=[],
         )
 
-    class _Scoring:
-        fauna_ground_truth_path = "fauna.txt"
-        grazing_ground_truth_path = "grazing.txt"
-        milk_ground_truth_path = "milk.txt"
-
-    class _Settings:
-        scoring = _Scoring()
-
-    class _Result:
-        def __init__(self, output_dir: Path) -> None:
-            self.plot_path = output_dir / "plot.png"
-            self.report_csv = output_dir / "report.csv"
-
-    def fake_run_pipeline(*, inputs, prompts, adapter):  # type: ignore[no-untyped-def]
-        captured["inputs"] = inputs
-        captured["prompts"] = prompts
-        captured["adapter"] = adapter
-        output_dir = inputs.output_dir
-        output_dir.mkdir(parents=True, exist_ok=True)
-        plot_path = output_dir / "plot.png"
-        report_csv = output_dir / "report.csv"
-        plot_path.write_text("plot", encoding="utf-8")
-        report_csv.write_text("report", encoding="utf-8")
-        return _Result(output_dir)
-
-    monkeypatch.setattr("distill_abm.cli.load_abm_config", fake_load_abm_config)
-    monkeypatch.setattr("distill_abm.cli.load_notebook_experiment_settings", lambda _path: _Settings())
-    monkeypatch.setattr("distill_abm.cli.run_pipeline", fake_run_pipeline)
+    monkeypatch.setattr(cli_module, "_validate_model_policy", lambda **_: None)
+    monkeypatch.setattr(cli_module, "create_adapter", lambda provider, model: object())
+    monkeypatch.setattr(cli_module, "run_qwen_smoke_suite", fake_run_smoke)
 
     result = runner.invoke(
         app,
         [
-            "run",
+            "smoke-qwen",
             "--csv-path",
             str(csv_path),
             "--parameters-path",
@@ -225,756 +302,35 @@ def test_cli_run_with_abm_passes_first_plot_description(tmp_path: Path, monkeypa
             str(docs),
             "--prompts-path",
             str(prompts),
-            "--output-dir",
-            str(tmp_path / "out"),
             "--provider",
             "echo",
             "--model",
             "echo-model",
-            "--abm",
-            "milk_consumption",
-        ],
-    )
-
-    assert result.exit_code == 0
-    assert "inputs" in captured
-    inputs = captured["inputs"]
-    assert cast(Any, inputs).plot_description == "first plot description"
-    assert cast(Any, inputs).scoring_reference_path == Path("milk.txt")
-
-
-def test_cli_run_direct_call_with_abm_defaults_plot_description(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-
-    params = tmp_path / "params.txt"
-    docs = tmp_path / "docs.txt"
-    prompts = tmp_path / "prompts.yaml"
-    params.write_text("p=1", encoding="utf-8")
-    docs.write_text("d=1", encoding="utf-8")
-    prompts.write_text(
-        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
-        encoding="utf-8",
-    )
-
-    captured: dict[str, object] = {}
-
-    def fake_load_abm_config(_path: Path) -> ABMConfig:
-        return ABMConfig(
-            name="grazing",
-            metric_pattern="mean-incum",
-            metric_description="weekly grazing",
-            plot_descriptions=["auto plot", "fallback"],
-        )
-
-    class _Result:
-        def __init__(self, output_dir: Path) -> None:
-            self.plot_path = output_dir / "plot.png"
-            self.report_csv = output_dir / "report.csv"
-
-    def fake_run_pipeline(*, inputs, prompts, adapter):  # type: ignore[no-untyped-def]
-        captured["inputs"] = inputs
-        captured["prompts"] = prompts
-        captured["adapter"] = adapter
-        return _Result(inputs.output_dir)
-
-    monkeypatch.setattr("distill_abm.cli.load_abm_config", fake_load_abm_config)
-    monkeypatch.setattr("distill_abm.cli.run_pipeline", fake_run_pipeline)
-
-    cli_module.run(
-        csv_path=csv_path,
-        parameters_path=params,
-        documentation_path=docs,
-        prompts_path=prompts,
-        output_dir=tmp_path / "out",
-        provider="echo",
-        model="echo-model",
-        metric_pattern="mean-incum",
-        metric_description="manual",
-        plot_description=None,
-        evidence_mode="plot",
-        skip_summarization=False,
-        abm="grazing",
-    )
-
-    assert "inputs" in captured
-    assert cast(Any, captured["inputs"]).plot_description == "auto plot"
-
-
-def test_cli_run_pipeline_forwards_summarization_modes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-    params = tmp_path / "params.txt"
-    docs = tmp_path / "docs.txt"
-    prompts = tmp_path / "prompts.yaml"
-    params.write_text("p=1", encoding="utf-8")
-    docs.write_text("d=1", encoding="utf-8")
-    prompts.write_text(
-        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
-        encoding="utf-8",
-    )
-
-    captured: dict[str, object] = {}
-
-    class _Result:
-        def __init__(self, output_dir: Path) -> None:
-            self.plot_path = output_dir / "plot.png"
-            self.report_csv = output_dir / "report.csv"
-            self.context_response = "context"
-            self.trend_response = "trend"
-            self.trend_full_response = "trend"
-            self.trend_summary_response = None
-            self.full_scores = None
-            self.summary_scores = None
-            self.stats_table_csv = None
-            self.stats_image_path = None
-            self.token_f1 = 0.0
-            self.bleu = 0.0
-            self.meteor = 0.0
-            self.rouge1 = 0.0
-            self.rouge2 = 0.0
-            self.rouge_l = 0.0
-            self.flesch_reading_ease = 0.0
-
-    def fake_run_pipeline(*, inputs, prompts, adapter):  # type: ignore[no-untyped-def]
-        captured["inputs"] = inputs
-        return _Result(inputs.output_dir)
-
-    monkeypatch.setattr("distill_abm.cli.run_pipeline", fake_run_pipeline)
-    result = runner.invoke(
-        app,
-        [
-            "run",
-            "--csv-path",
-            str(csv_path),
-            "--parameters-path",
-            str(params),
-            "--documentation-path",
-            str(docs),
-            "--prompts-path",
-            str(prompts),
-            "--output-dir",
-            str(tmp_path / "out"),
-            "--provider",
-            "echo",
-            "--model",
-            "echo-model",
-            "--summarization-mode",
-            "both",
-            "--score-on",
-            "full",
             "--evidence-mode",
-            "plot",
+            "table",
+            "--text-source-mode",
+            "full_text_only",
+            "--summarizer",
+            "bert",
         ],
     )
 
     assert result.exit_code == 0
-    assert "inputs" in captured
-    captured_inputs = cast(Any, captured["inputs"])
-    assert captured_inputs.summarization_mode == "both"
-    assert captured_inputs.score_on == "full"
-    assert captured_inputs.skip_summarization is False
+    inputs = captured["inputs"]
+    assert inputs.evidence_mode == "table"
+    assert inputs.text_source_mode == "full_text_only"
+    assert inputs.summarizers == ("bert",)
 
 
-def test_cli_run_pipeline_forwards_summary_only_mode(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-    params = tmp_path / "params.txt"
-    docs = tmp_path / "docs.txt"
-    prompts = tmp_path / "prompts.yaml"
-    params.write_text("p=1", encoding="utf-8")
-    docs.write_text("d=1", encoding="utf-8")
-    prompts.write_text(
-        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
-        encoding="utf-8",
-    )
-
-    captured: dict[str, object] = {}
-
-    class _Result:
-        def __init__(self, output_dir: Path) -> None:
-            self.plot_path = output_dir / "plot.png"
-            self.report_csv = output_dir / "report.csv"
-            self.context_response = "context"
-            self.trend_response = "trend"
-            self.trend_full_response = "trend"
-            self.trend_summary_response = "summary"
-            self.full_scores = None
-            self.summary_scores = None
-            self.stats_table_csv = None
-            self.stats_image_path = None
-            self.token_f1 = 0.0
-            self.bleu = 0.0
-            self.meteor = 0.0
-            self.rouge1 = 0.0
-            self.rouge2 = 0.0
-            self.rouge_l = 0.0
-            self.flesch_reading_ease = 0.0
-
-    def fake_run_pipeline(*, inputs, prompts, adapter):  # type: ignore[no-untyped-def]
-        captured["inputs"] = inputs
-        return _Result(inputs.output_dir)
-
-    monkeypatch.setattr("distill_abm.cli.run_pipeline", fake_run_pipeline)
-    result = runner.invoke(
-        app,
-        [
-            "run",
-            "--csv-path",
-            str(csv_path),
-            "--parameters-path",
-            str(params),
-            "--documentation-path",
-            str(docs),
-            "--prompts-path",
-            str(prompts),
-            "--output-dir",
-            str(tmp_path / "out"),
-            "--provider",
-            "echo",
-            "--model",
-            "echo-model",
-            "--summarization-mode",
-            "summary",
-            "--score-on",
-            "summary",
-        ],
-    )
-
-    assert result.exit_code == 0
-    assert "inputs" in captured
-    captured_inputs = cast(Any, captured["inputs"])
-    assert captured_inputs.summarization_mode == "summary"
-    assert captured_inputs.score_on == "summary"
+def test_validate_model_policy_blocks_unsupported_model() -> None:
+    with pytest.raises(typer.BadParameter):
+        cli_module._validate_model_policy(provider="openai", model="gpt-4o", allow_debug_model=False)
 
 
-def test_cli_run_pipeline_forwards_additional_summarizers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-    params = tmp_path / "params.txt"
-    docs = tmp_path / "docs.txt"
-    prompts = tmp_path / "prompts.yaml"
-    params.write_text("p=1", encoding="utf-8")
-    docs.write_text("d=1", encoding="utf-8")
-    prompts.write_text(
-        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
-        encoding="utf-8",
-    )
-
-    captured: dict[str, object] = {}
-
-    class _Result:
-        def __init__(self, output_dir: Path) -> None:
-            self.plot_path = output_dir / "plot.png"
-            self.report_csv = output_dir / "report.csv"
-            self.context_response = "context"
-            self.trend_response = "trend"
-            self.trend_full_response = "trend"
-            self.trend_summary_response = None
-            self.full_scores = None
-            self.summary_scores = None
-            self.stats_table_csv = None
-            self.stats_image_path = None
-            self.token_f1 = 0.0
-            self.bleu = 0.0
-            self.meteor = 0.0
-            self.rouge1 = 0.0
-            self.rouge2 = 0.0
-            self.rouge_l = 0.0
-            self.flesch_reading_ease = 0.0
-
-    def fake_run_pipeline(*, inputs, prompts, adapter):  # type: ignore[no-untyped-def]
-        captured["inputs"] = inputs
-        return _Result(inputs.output_dir)
-
-    monkeypatch.setattr("distill_abm.cli.run_pipeline", fake_run_pipeline)
-    result = runner.invoke(
-        app,
-        [
-            "run",
-            "--csv-path",
-            str(csv_path),
-            "--parameters-path",
-            str(params),
-            "--documentation-path",
-            str(docs),
-            "--prompts-path",
-            str(prompts),
-            "--output-dir",
-            str(tmp_path / "out"),
-            "--provider",
-            "echo",
-            "--model",
-            "echo-model",
-            "--additional-summarizer",
-            "t5",
-            "--additional-summarizer",
-            "longformer_ext",
-        ],
-    )
-
-    assert result.exit_code == 0
-    assert "inputs" in captured
-    captured_inputs = cast(Any, captured["inputs"])
-    assert captured_inputs.additional_summarizers == ("t5", "longformer_ext")
-
-
-def test_cli_run_pipeline_rejects_invalid_additional_summarizer(tmp_path: Path) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-    params = tmp_path / "params.txt"
-    docs = tmp_path / "docs.txt"
-    prompts = tmp_path / "prompts.yaml"
-    params.write_text("p=1", encoding="utf-8")
-    docs.write_text("d=1", encoding="utf-8")
-    prompts.write_text(
-        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
-        encoding="utf-8",
-    )
-
-    result = runner.invoke(
-        app,
-        [
-            "run",
-            "--csv-path",
-            str(csv_path),
-            "--parameters-path",
-            str(params),
-            "--documentation-path",
-            str(docs),
-            "--prompts-path",
-            str(prompts),
-            "--output-dir",
-            str(tmp_path / "out"),
-            "--provider",
-            "echo",
-            "--model",
-            "echo-model",
-            "--additional-summarizer",
-            "bad-option",
-        ],
-    )
-
-    assert result.exit_code != 0
-    assert "unsupported additional summarizer" in result.output
-
-
-def test_cli_run_pipeline_defaults_summarization_and_score_modes_to_both(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-    params = tmp_path / "params.txt"
-    docs = tmp_path / "docs.txt"
-    prompts = tmp_path / "prompts.yaml"
-    params.write_text("p=1", encoding="utf-8")
-    docs.write_text("d=1", encoding="utf-8")
-    prompts.write_text(
-        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
-        encoding="utf-8",
-    )
-
-    captured: dict[str, object] = {}
-
-    class _Result:
-        def __init__(self, output_dir: Path) -> None:
-            self.plot_path = output_dir / "plot.png"
-            self.report_csv = output_dir / "report.csv"
-
-    def fake_run_pipeline(*, inputs, prompts, adapter):  # type: ignore[no-untyped-def]
-        captured["inputs"] = inputs
-        captured["prompts"] = prompts
-        captured["adapter"] = adapter
-        output_dir = inputs.output_dir
-        output_dir.mkdir(parents=True, exist_ok=True)
-        output_dir.joinpath("plot.png").write_text("plot", encoding="utf-8")
-        output_dir.joinpath("report.csv").write_text("report", encoding="utf-8")
-        return _Result(output_dir)
-
-    monkeypatch.setattr("distill_abm.cli.run_pipeline", fake_run_pipeline)
-    result = runner.invoke(
-        app,
-        [
-            "run",
-            "--csv-path",
-            str(csv_path),
-            "--parameters-path",
-            str(params),
-            "--documentation-path",
-            str(docs),
-            "--prompts-path",
-            str(prompts),
-            "--output-dir",
-            str(tmp_path / "out"),
-            "--provider",
-            "echo",
-            "--model",
-            "echo-model",
-            "--metric-pattern",
-            "mean-incum",
-            "--metric-description",
-            "weekly milk",
-        ],
-    )
-
-    assert result.exit_code == 0
-    captured_inputs = cast(Any, captured["inputs"])
-    assert captured_inputs.summarization_mode == "both"
-    assert captured_inputs.score_on == "both"
-
-
-def test_cli_analyze_doe_exit_without_result(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    input_csv = tmp_path / "input.csv"
-    input_csv.write_text("a,b,c\n1,2,3\n", encoding="utf-8")
-
-    def fake_analyze_factorial_anova(*_args: object, **_kwargs: object) -> None:
-        return None
-
-    monkeypatch.setattr("distill_abm.cli.analyze_factorial_anova", fake_analyze_factorial_anova)
-    with pytest.raises(typer.Exit) as exc_info:
-        cli_module.analyze_doe(input_csv=input_csv, output_csv=tmp_path / "results" / "out.csv")
-    assert exc_info.value.exit_code == 1
-
-
-def test_cli_main_invokes_app(monkeypatch: pytest.MonkeyPatch) -> None:
-    called = {"value": False}
-
-    class _DummyApp:
-        def __call__(self) -> None:
-            called["value"] = True
-
-    monkeypatch.setattr("distill_abm.cli.app", _DummyApp())
-    cli_module.main()
-    assert called["value"]
-
-
-def test_cli_smoke_qwen_forwards_inputs_and_reports_paths(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-    params = tmp_path / "params.txt"
-    params.write_text("param=1\n", encoding="utf-8")
-    docs = tmp_path / "docs.txt"
-    docs.write_text("doc\n", encoding="utf-8")
-    prompts = tmp_path / "prompts.yaml"
-    prompts.write_text(
-        "\n".join(
-            [
-                'context_prompt: "Context {parameters} {documentation}"',
-                'trend_prompt: "Trend {description}"',
-                'coverage_eval_prompt: "Coverage score: 4"',
-                'faithfulness_eval_prompt: "Faithfulness score: 4"',
-            ]
+def test_validate_model_policy_blocks_debug_model_without_flag() -> None:
+    with pytest.raises(typer.BadParameter):
+        cli_module._validate_model_policy(
+            provider="openrouter",
+            model="qwen/qwen3-vl-235b-a22b-thinking",
+            allow_debug_model=False,
         )
-        + "\n",
-        encoding="utf-8",
-    )
-    doe_csv = tmp_path / "doe.csv"
-    doe_csv.write_text("Model,WithExamples,BLEU\nQwen,Yes,0.4\nQwen,No,0.3\n", encoding="utf-8")
-
-    captured: dict[str, object] = {}
-
-    class _Result:
-        def __init__(self, output_dir: Path) -> None:
-            self.success = True
-            self.failed_cases: list[str] = []
-            self.report_markdown_path = output_dir / "smoke_report.md"
-            self.report_json_path = output_dir / "smoke_report.json"
-            self.doe_output_csv: Path | None = output_dir / "anova.csv"
-            self.sweep_output_csv: Path | None = output_dir / "sweep.csv"
-
-    def fake_run_qwen_smoke_suite(  # type: ignore[no-untyped-def]
-        *, inputs, prompts, adapter, run_qualitative, doe_input_csv, run_sweep, cases, resume_existing
-    ):
-        captured["inputs"] = inputs
-        captured["prompts"] = prompts
-        captured["adapter"] = adapter
-        captured["run_qualitative"] = run_qualitative
-        captured["doe_input_csv"] = doe_input_csv
-        captured["run_sweep"] = run_sweep
-        captured["cases"] = cases
-        captured["resume_existing"] = resume_existing
-        inputs.output_dir.mkdir(parents=True, exist_ok=True)
-        result = _Result(inputs.output_dir)
-        result.report_markdown_path.write_text("# smoke\n", encoding="utf-8")
-        result.report_json_path.write_text("{}", encoding="utf-8")
-        return result
-
-    monkeypatch.setattr("distill_abm.cli.run_qwen_smoke_suite", fake_run_qwen_smoke_suite)
-    result = runner.invoke(
-        app,
-        [
-            "smoke-qwen",
-            "--csv-path",
-            str(csv_path),
-            "--parameters-path",
-            str(params),
-            "--documentation-path",
-            str(docs),
-            "--doe-input-csv",
-            str(doe_csv),
-            "--prompts-path",
-            str(prompts),
-            "--output-dir",
-            str(tmp_path / "smoke"),
-            "--provider",
-            "echo",
-            "--model",
-            "qwen3.5:0.8b",
-            "--metric-pattern",
-            "mean-incum",
-            "--metric-description",
-            "weekly milk",
-            "--plot-description",
-            "plot desc",
-            "--skip-qualitative",
-            "--skip-sweep",
-        ],
-    )
-
-    assert result.exit_code == 0
-    assert "smoke report (markdown):" in result.output
-    assert "smoke report (json):" in result.output
-    assert "inputs" in captured
-    smoke_inputs = cast(Any, captured["inputs"])
-    assert smoke_inputs.model == "qwen3.5:0.8b"
-    assert smoke_inputs.metric_pattern == "mean-incum"
-    assert smoke_inputs.metric_description == "weekly milk"
-    assert smoke_inputs.plot_description == "plot desc"
-    assert cast(Any, captured["adapter"]).provider == "echo"
-    assert cast(Any, captured["cases"]) is None
-    assert captured["run_qualitative"] is False
-    assert captured["run_sweep"] is False
-    assert captured["resume_existing"] is True
-
-
-def test_cli_smoke_qwen_abm_overrides_metric_defaults(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-    params = tmp_path / "params.txt"
-    params.write_text("param=1\n", encoding="utf-8")
-    docs = tmp_path / "docs.txt"
-    docs.write_text("doc\n", encoding="utf-8")
-    prompts = tmp_path / "prompts.yaml"
-    prompts.write_text(
-        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
-        encoding="utf-8",
-    )
-    doe_csv = tmp_path / "doe.csv"
-    doe_csv.write_text("Model,WithExamples,BLEU\nQwen,Yes,0.4\nQwen,No,0.3\n", encoding="utf-8")
-
-    captured: dict[str, object] = {}
-
-    class _Result:
-        def __init__(self, output_dir: Path) -> None:
-            self.success = True
-            self.failed_cases: list[str] = []
-            self.report_markdown_path = output_dir / "smoke_report.md"
-            self.report_json_path = output_dir / "smoke_report.json"
-            self.doe_output_csv: Path | None = output_dir / "anova.csv"
-            self.sweep_output_csv: Path | None = output_dir / "sweep.csv"
-
-    def fake_run_qwen_smoke_suite(*, inputs, **kwargs):  # type: ignore[no-untyped-def]
-        captured["inputs"] = inputs
-        inputs.output_dir.mkdir(parents=True, exist_ok=True)
-        result = _Result(inputs.output_dir)
-        result.report_markdown_path.write_text("# smoke\n", encoding="utf-8")
-        result.report_json_path.write_text("{}", encoding="utf-8")
-        return result
-
-    def fake_load_abm_config(_path: Path) -> ABMConfig:
-        return ABMConfig(
-            name="fauna",
-            metric_pattern="count-species",
-            metric_description="species abundance dynamics across repeated fauna simulations",
-            plot_descriptions=["p1", "p2", "p3", "p4", "p5"],
-        )
-
-    class _Scoring:
-        fauna_ground_truth_path = "fauna_gt.txt"
-        grazing_ground_truth_path = "grazing_gt.txt"
-        milk_ground_truth_path = "milk_gt.txt"
-
-    class _Settings:
-        scoring = _Scoring()
-
-    monkeypatch.setattr("distill_abm.cli.run_qwen_smoke_suite", fake_run_qwen_smoke_suite)
-    monkeypatch.setattr("distill_abm.cli.load_abm_config", fake_load_abm_config)
-    monkeypatch.setattr("distill_abm.cli.load_notebook_experiment_settings", lambda _path: _Settings())
-    result = runner.invoke(
-        app,
-        [
-            "smoke-qwen",
-            "--csv-path",
-            str(csv_path),
-            "--parameters-path",
-            str(params),
-            "--documentation-path",
-            str(docs),
-            "--doe-input-csv",
-            str(doe_csv),
-            "--prompts-path",
-            str(prompts),
-            "--output-dir",
-            str(tmp_path / "smoke"),
-            "--abm",
-            "fauna",
-        ],
-    )
-
-    assert result.exit_code == 0
-    smoke_inputs = cast(Any, captured["inputs"])
-    assert smoke_inputs.metric_pattern == "count-species"
-    assert smoke_inputs.metric_description.startswith("species abundance")
-    assert smoke_inputs.sweep_plot_descriptions == ["p1", "p2", "p3", "p4", "p5"]
-    assert smoke_inputs.scoring_reference_path == Path("fauna_gt.txt")
-
-
-def test_cli_smoke_qwen_supports_case_selection(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-    params = tmp_path / "params.txt"
-    params.write_text("param=1\n", encoding="utf-8")
-    docs = tmp_path / "docs.txt"
-    docs.write_text("doc\n", encoding="utf-8")
-    prompts = tmp_path / "prompts.yaml"
-    prompts.write_text(
-        "\n".join(
-            [
-                'context_prompt: "Context {parameters} {documentation}"',
-                'trend_prompt: "Trend {description}"',
-            ]
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-
-    captured: dict[str, object] = {}
-
-    class _Result:
-        def __init__(self, output_dir: Path) -> None:
-            self.success = True
-            self.failed_cases: list[str] = []
-            self.report_markdown_path = output_dir / "smoke_report.md"
-            self.report_json_path = output_dir / "smoke_report.json"
-            self.doe_output_csv: Path | None = None
-            self.sweep_output_csv: Path | None = None
-
-    def fake_run_qwen_smoke_suite(*, inputs, cases, **kwargs):  # type: ignore[no-untyped-def]
-        captured["inputs"] = inputs
-        captured["cases"] = cases
-        inputs.output_dir.mkdir(parents=True, exist_ok=True)
-        result = _Result(inputs.output_dir)
-        result.report_markdown_path.write_text("# smoke\n", encoding="utf-8")
-        result.report_json_path.write_text("{}", encoding="utf-8")
-        return result
-
-    monkeypatch.setattr("distill_abm.cli.run_qwen_smoke_suite", fake_run_qwen_smoke_suite)
-    result = runner.invoke(
-        app,
-        [
-            "smoke-qwen",
-            "--csv-path",
-            str(csv_path),
-            "--parameters-path",
-            str(params),
-            "--documentation-path",
-            str(docs),
-            "--prompts-path",
-            str(prompts),
-            "--output-dir",
-            str(tmp_path / "smoke"),
-            "--provider",
-            "echo",
-            "--model",
-            "echo-model",
-            "--case-id",
-            "plot-full-full",
-            "--case-id",
-            "table-csv-full-full",
-            "--max-cases",
-            "1",
-            "--skip-qualitative",
-            "--skip-sweep",
-        ],
-    )
-
-    assert result.exit_code == 0
-    cases = cast(list[Any], captured["cases"])
-    assert len(cases) == 1
-    assert cases[0].case_id == "plot-full-full"
-
-
-def test_cli_smoke_qwen_supports_three_branch_profile(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
-    params = tmp_path / "params.txt"
-    params.write_text("param=1\n", encoding="utf-8")
-    docs = tmp_path / "docs.txt"
-    docs.write_text("doc\n", encoding="utf-8")
-    prompts = tmp_path / "prompts.yaml"
-    prompts.write_text(
-        "\n".join(
-            [
-                'context_prompt: "Context {parameters} {documentation}"',
-                'trend_prompt: "Trend {description}"',
-            ]
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-
-    captured: dict[str, object] = {}
-
-    class _Result:
-        def __init__(self, output_dir: Path) -> None:
-            self.success = True
-            self.failed_cases: list[str] = []
-            self.report_markdown_path = output_dir / "smoke_report.md"
-            self.report_json_path = output_dir / "smoke_report.json"
-            self.doe_output_csv: Path | None = None
-            self.sweep_output_csv: Path | None = None
-
-    def fake_run_qwen_smoke_suite(*, inputs, cases, **kwargs):  # type: ignore[no-untyped-def]
-        captured["cases"] = cases
-        inputs.output_dir.mkdir(parents=True, exist_ok=True)
-        result = _Result(inputs.output_dir)
-        result.report_markdown_path.write_text("# smoke\n", encoding="utf-8")
-        result.report_json_path.write_text("{}", encoding="utf-8")
-        return result
-
-    monkeypatch.setattr("distill_abm.cli.run_qwen_smoke_suite", fake_run_qwen_smoke_suite)
-    result = runner.invoke(
-        app,
-        [
-            "smoke-qwen",
-            "--csv-path",
-            str(csv_path),
-            "--parameters-path",
-            str(params),
-            "--documentation-path",
-            str(docs),
-            "--prompts-path",
-            str(prompts),
-            "--output-dir",
-            str(tmp_path / "smoke"),
-            "--provider",
-            "echo",
-            "--model",
-            "echo-model",
-            "--profile",
-            "three-branches",
-            "--skip-qualitative",
-            "--skip-sweep",
-        ],
-    )
-
-    assert result.exit_code == 0
-    cases = cast(list[Any], captured["cases"])
-    assert len(cases) == 3
-    assert {case.case_id for case in cases} == {
-        "branch-role-full",
-        "branch-insights-summary-t5",
-        "branch-role-insights-summary-longformer",
-    }

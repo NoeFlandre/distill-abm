@@ -1,0 +1,7 @@
+ground_truth:
+  fauna: configs/ground_truth/fauna_scoring_ground_truth.txt
+  grazing: configs/ground_truth/grazing_scoring_ground_truth.txt
+  milk_consumption: configs/ground_truth/milk_scoring_ground_truth.txt
+
+qualitative_example_text_dir: configs/prompt_assets/Evaluation/Qualitative Assessment using LLMs/Examples/Text
+human_reference_dir: data/human_reference

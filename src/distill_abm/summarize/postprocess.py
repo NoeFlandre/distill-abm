@@ -1,4 +1,4 @@
-"""Regex cleanup pipeline for compatibility output normalization."""
+"""Regex cleanup pipeline for output normalization."""
 
 from __future__ import annotations
 
@@ -90,12 +90,12 @@ def postprocess_csv_batch(
     """Run staged CSV postprocessing over BART/BERT summary columns."""
     frame = pd.read_csv(input_csv)
 
-    # Notebook first pass applies www filtering to both summary columns.
+    # First pass applies `www` filtering to both summary columns.
     for column in [bart_column, bert_column]:
         if column in frame.columns:
             frame[column] = frame[column].apply(lambda value: remove_sentences_with_www(str(value)))
 
-    # Notebook then applies these passes to BERT only.
+    # Then apply these passes to BERT only.
     if bert_column in frame.columns:
         frame[bert_column] = frame[bert_column].apply(
             lambda value: remove_hyphens_after_punctuation(value) if pd.notnull(value) else value
@@ -110,7 +110,7 @@ def postprocess_csv_batch(
             lambda value: capitalize_sentences(value) if pd.notnull(value) else value
         )
 
-    # Notebook applies space-before-dot cleanup to BART only.
+    # Apply space-before-dot cleanup to BART only.
     if bart_column in frame.columns:
         frame[bart_column] = frame[bart_column].apply(
             lambda value: remove_space_before_dot(value) if pd.notnull(value) else value

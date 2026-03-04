@@ -11,9 +11,9 @@ from pydantic import ValidationError
 from distill_abm.configs.models import (
     ABMConfig,
     EvaluationConfig,
+    ExperimentSettings,
     LoggingConfig,
     ModelsConfig,
-    NotebookExperimentSettings,
     PromptsConfig,
     RuntimeDefaultsConfig,
 )
@@ -22,9 +22,9 @@ ModelType = TypeVar(
     "ModelType",
     ABMConfig,
     EvaluationConfig,
+    ExperimentSettings,
     LoggingConfig,
     ModelsConfig,
-    NotebookExperimentSettings,
     PromptsConfig,
     RuntimeDefaultsConfig,
 )
@@ -76,9 +76,9 @@ def load_logging_config(path: Path) -> LoggingConfig:
     return _load_yaml_model(path, LoggingConfig)
 
 
-def load_notebook_experiment_settings(path: Path) -> NotebookExperimentSettings:
-    """Load and validate notebook experiment settings."""
-    return _load_yaml_model(path, NotebookExperimentSettings)
+def load_experiment_settings(path: Path) -> ExperimentSettings:
+    """Load and validate paper-aligned experiment settings."""
+    return _load_yaml_model(path, ExperimentSettings)
 
 
 def load_runtime_defaults_config(path: Path) -> RuntimeDefaultsConfig:

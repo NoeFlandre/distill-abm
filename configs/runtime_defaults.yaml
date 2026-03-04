@@ -5,25 +5,36 @@ llm_request:
   retry_backoff_seconds: 2.0
 
 run:
-  provider: echo
-  model: echo-model
+  provider: openrouter
+  model: moonshotai/kimi-k2.5
   output_dir: results/pipeline
   metric_pattern: mean
   metric_description: simulation trend
-  evidence_mode: plot
-  summarization_mode: both
-  score_on: both
+  evidence_mode: plot+table
+  text_source_mode: summary_only
+  summarizers:
+    - bart
+    - bert
+    - t5
+    - longformer_ext
 
 qualitative:
-  provider: echo
-  model: echo-model
+  provider: openrouter
+  model: qwen/qwen3-vl-235b-a22b-thinking
 
 smoke:
-  provider: ollama
-  output_dir: results/smoke_qwen
-  model: qwen3.5:0.8b
+  provider: openrouter
+  output_dir: results/smoke_debug
+  model: qwen/qwen3-vl-235b-a22b-thinking
   metric_pattern: mean
   metric_description: simulation trend
+  evidence_mode: plot+table
+  text_source_mode: summary_only
+  summarizers:
+    - bart
+    - bert
+    - t5
+    - longformer_ext
   run_qualitative: true
   run_sweep: true
 

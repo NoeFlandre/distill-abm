@@ -63,7 +63,7 @@ def test_build_trend_prompt_includes_optional_stats_csv_and_plot_description() -
         metric_description="coverage",
         context="context",
         plot_description="Line A",
-        evidence_mode="table-csv",
+        evidence_mode="table",
         stats_table_csv="time_step,mean,std,min,max,median\n0,1.0,0.1,0.8,1.2,1.0\n",
         enabled={"example"},
     )
@@ -142,10 +142,10 @@ def test_build_stats_csv_uses_expected_column_order() -> None:
     assert csv_text.startswith("time_step,mean,std,min,max,median\n")
 
 
-def test_resolve_evidence_mode_maps_compatibility_aliases() -> None:
-    assert helpers.resolve_evidence_mode("stats-markdown") == "table-csv"
-    assert helpers.resolve_evidence_mode("stats-image") == "table-csv"
-    assert helpers.resolve_evidence_mode("plot+stats") == "plot+table"
+def test_resolve_evidence_mode_accepts_canonical_modes_only() -> None:
+    assert helpers.resolve_evidence_mode("plot") == "plot"
+    assert helpers.resolve_evidence_mode("table") == "table"
+    assert helpers.resolve_evidence_mode("plot+table") == "plot+table"
 
 
 def test_load_existing_rows_if_compatible_rejects_schema_mismatch() -> None:

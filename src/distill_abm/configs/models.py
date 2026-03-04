@@ -1,4 +1,4 @@
-"""Typed configuration models used across the pipeline."""
+"""Typed configuration models used across the paper-aligned pipeline."""
 
 from __future__ import annotations
 
@@ -7,6 +7,9 @@ from typing import Literal
 from pydantic import AliasChoices, BaseModel, Field
 
 ProviderName = Literal["openai", "openrouter", "anthropic", "ollama", "janus", "echo"]
+SummarizerId = Literal["bart", "bert", "t5", "longformer_ext"]
+RuntimeEvidenceMode = Literal["plot", "table", "plot+table"]
+RuntimeTextSourceMode = Literal["summary_only", "full_text_only"]
 
 
 class ModelEntry(BaseModel):
@@ -25,7 +28,7 @@ class ModelsConfig(BaseModel):
 
 
 class PromptsConfig(BaseModel):
-    """Stores editable prompt templates to avoid notebook hardcoding."""
+    """Stores editable prompt templates and optional style-factor instructions."""
 
     context_prompt: str
     trend_prompt: str
@@ -49,7 +52,7 @@ class PromptsConfig(BaseModel):
 
 
 class ABMConfig(BaseModel):
-    """Defines case-study-specific defaults extracted from notebook workflows."""
+    """Defines case-study-specific defaults."""
 
     name: str
     metric_pattern: str
@@ -77,75 +80,20 @@ class LoggingConfig(BaseModel):
     format: str = "%(asctime)s %(levelname)s %(name)s %(message)s"
 
 
-class NotebookLLMDefaults(BaseModel):
-    """Captures notebook-era model invocation defaults."""
+class ExperimentGroundTruthConfig(BaseModel):
+    """Human reference files used for ABM-specific lexical scoring."""
 
-    openai_model: str = "gpt-4o"
-    anthropic_model: str = "claude-3-5-sonnet-20241022"
-    max_tokens: int = 1000
-    temperature: float = 0.5
-
-
-class NotebookDoEDefaults(BaseModel):
-    """Captures notebook DoE helper defaults."""
-
-    repetitions: int = 3
-    max_interaction_order: int = 2
+    fauna: str
+    grazing: str
+    milk_consumption: str
 
 
-class NotebookFromNetLogoCsvDefaults(BaseModel):
-    """Captures notebook defaults from 'From NetLogo to CSV' preprocessing workflow."""
+class ExperimentSettings(BaseModel):
+    """Paper-aligned experiment settings required by CLI and reproducibility tooling."""
 
-    netlogo_home: str
-    model_path: str
-    output_csv_path: str
-    reporters: list[str]
-    runtime_experiment_parameters: dict[str, bool | int | float | str]
-    saved_experiment_parameters: dict[str, bool | int | float | str]
-    num_runs: int = 40
-    max_ticks: int = 73000
-    interval: int = 50
-
-
-class NotebookSummaryModelDefaults(BaseModel):
-    """Notebook-4 summary workflow defaults per model family."""
-
-    num_plots: int
-
-
-class NotebookSummaryGenerationDefaults(BaseModel):
-    """Captures per-model plot counts used by summary-generation notebooks."""
-
-    fauna: NotebookSummaryModelDefaults
-    grazing: NotebookSummaryModelDefaults
-    milk: NotebookSummaryModelDefaults
-
-
-class NotebookScoringDefaults(BaseModel):
-    """Captures notebook-6 scoring references by ABM."""
-
-    fauna_ground_truth_path: str
-    grazing_ground_truth_path: str
-    milk_ground_truth_path: str
-
-
-class NotebookExperimentSettings(BaseModel):
-    """Stores canonical notebook experiment references and defaults."""
-
-    llm_defaults: NotebookLLMDefaults
-    doe_defaults: NotebookDoEDefaults
-    fauna_from_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
-    grazint_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
-    milk_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
-    summary_generation: NotebookSummaryGenerationDefaults
-    scoring: NotebookScoringDefaults
-    qualitative_example_text_dir: str
-    human_reference_dir: str
-
-
-RuntimeEvidenceMode = Literal["plot", "table-csv", "plot+table", "stats-markdown", "stats-image", "plot+stats"]
-RuntimeSummarizationMode = Literal["full", "summary", "both"]
-RuntimeScoreMode = Literal["full", "summary", "both"]
+    ground_truth: ExperimentGroundTruthConfig
+    qualitative_example_text_dir: str | None = None
+    human_reference_dir: str | None = None
 
 
 class RuntimeLLMRequestDefaults(BaseModel):
@@ -160,31 +108,34 @@ class RuntimeLLMRequestDefaults(BaseModel):
 class RuntimeRunDefaults(BaseModel):
     """Defines CLI defaults for the main `run` command."""
 
-    provider: ProviderName = "echo"
-    model: str = "echo-model"
+    provider: ProviderName = "openrouter"
+    model: str = "moonshotai/kimi-k2.5"
     output_dir: str = "results/pipeline"
     metric_pattern: str = "mean"
     metric_description: str = "simulation trend"
-    evidence_mode: RuntimeEvidenceMode = "plot"
-    summarization_mode: RuntimeSummarizationMode = "both"
-    score_on: RuntimeScoreMode = "both"
+    evidence_mode: RuntimeEvidenceMode = "plot+table"
+    text_source_mode: RuntimeTextSourceMode = "summary_only"
+    summarizers: tuple[SummarizerId, ...] = ("bart", "bert", "t5", "longformer_ext")
 
 
 class RuntimeQualitativeDefaults(BaseModel):
     """Defines CLI defaults for qualitative evaluation command."""
 
-    provider: ProviderName = "echo"
-    model: str = "echo-model"
+    provider: ProviderName = "openrouter"
+    model: str = "qwen/qwen3-vl-235b-a22b-thinking"
 
 
 class RuntimeSmokeDefaults(BaseModel):
-    """Defines CLI defaults for the local Qwen smoke command."""
+    """Defines CLI defaults for the debug smoke command."""
 
-    provider: ProviderName = "ollama"
-    output_dir: str = "results/smoke_qwen"
-    model: str = "qwen3.5:0.8b"
+    provider: ProviderName = "openrouter"
+    output_dir: str = "results/smoke_debug"
+    model: str = "qwen/qwen3-vl-235b-a22b-thinking"
     metric_pattern: str = "mean"
     metric_description: str = "simulation trend"
+    evidence_mode: RuntimeEvidenceMode = "plot+table"
+    text_source_mode: RuntimeTextSourceMode = "summary_only"
+    summarizers: tuple[SummarizerId, ...] = ("bart", "bert", "t5", "longformer_ext")
     run_qualitative: bool = True
     run_sweep: bool = True
 

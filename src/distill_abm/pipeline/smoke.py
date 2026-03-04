@@ -21,8 +21,7 @@ from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline.run import (
     EvidenceMode,
     PipelineInputs,
-    ScoreMode,
-    SummarizationMode,
+    TextSourceMode,
     run_pipeline,
     run_pipeline_sweep,
 )
@@ -43,10 +42,9 @@ RESPONSE_BUNDLE_COLUMNS: tuple[str, ...] = (
     "max_retries",
     "retry_backoff_seconds",
     "evidence_mode",
-    "summarization_mode",
-    "score_on",
+    "text_source_mode",
     "enabled_style_features",
-    "additional_summarizers",
+    "summarizers",
     "input_csv_path",
     "parameters_path",
     "documentation_path",
@@ -101,10 +99,9 @@ class SmokeCase(BaseModel):
 
     case_id: str
     evidence_mode: EvidenceMode
-    summarization_mode: SummarizationMode
-    score_on: ScoreMode
+    text_source_mode: TextSourceMode
     enabled_style_features: tuple[str, ...] | None = None
-    additional_summarizers: tuple[Literal["t5", "longformer_ext"], ...] | None = None
+    summarizers: tuple[Literal["bart", "bert", "t5", "longformer_ext"], ...] | None = None
 
 
 class QualitativeOutcome(BaseModel):
@@ -154,7 +151,14 @@ class SmokeSuiteInputs(BaseModel):
     metric_description: str
     plot_description: str | None = None
     sweep_plot_descriptions: list[str] | None = None
-    additional_summarizers: tuple[Literal["t5", "longformer_ext"], ...] = ()
+    summarizers: tuple[Literal["bart", "bert", "t5", "longformer_ext"], ...] = (
+        "bart",
+        "bert",
+        "t5",
+        "longformer_ext",
+    )
+    text_source_mode: TextSourceMode = "summary_only"
+    evidence_mode: EvidenceMode = "plot+table"
     scoring_reference_path: Path | None = None
 
 
@@ -183,23 +187,18 @@ class SmokeSuiteResult(BaseModel):
 
 
 def default_smoke_cases() -> list[SmokeCase]:
-    """Return the canonical smoke matrix for evidence and text-path ablations."""
+    """Return the canonical smoke matrix for evidence and text-source ablations."""
     cases: list[SmokeCase] = []
-    evidence_modes: tuple[EvidenceMode, ...] = ("plot", "table-csv", "plot+table")
-    summary_pairs: tuple[tuple[SummarizationMode, ScoreMode], ...] = (
-        ("full", "full"),
-        ("summary", "summary"),
-        ("both", "both"),
-    )
+    evidence_modes: tuple[EvidenceMode, ...] = ("plot", "table", "plot+table")
+    text_modes: tuple[TextSourceMode, ...] = ("full_text_only", "summary_only")
     for evidence_mode in evidence_modes:
-        for summarization_mode, score_on in summary_pairs:
-            case_id = f"{evidence_mode.replace('+', '_plus_')}-{summarization_mode}-{score_on}"
+        for text_source_mode in text_modes:
+            case_id = f"{evidence_mode.replace('+', '_plus_')}-{text_source_mode}"
             cases.append(
                 SmokeCase(
                     case_id=case_id,
                     evidence_mode=evidence_mode,
-                    summarization_mode=summarization_mode,
-                    score_on=score_on,
+                    text_source_mode=text_source_mode,
                 )
             )
     return cases
@@ -209,28 +208,25 @@ def default_branch_smoke_cases() -> list[SmokeCase]:
     """Return a compact three-branch smoke profile for debugging prompt/summarizer variants."""
     return [
         SmokeCase(
-            case_id="branch-role-full",
+            case_id="branch-role-full-text",
             evidence_mode="plot",
-            summarization_mode="full",
-            score_on="full",
+            text_source_mode="full_text_only",
             enabled_style_features=("role",),
-            additional_summarizers=(),
+            summarizers=("bart", "bert", "t5", "longformer_ext"),
         ),
         SmokeCase(
             case_id="branch-insights-summary-t5",
-            evidence_mode="table-csv",
-            summarization_mode="summary",
-            score_on="summary",
+            evidence_mode="table",
+            text_source_mode="summary_only",
             enabled_style_features=("insights",),
-            additional_summarizers=("t5",),
+            summarizers=("t5",),
         ),
         SmokeCase(
             case_id="branch-role-insights-summary-longformer",
             evidence_mode="plot+table",
-            summarization_mode="summary",
-            score_on="summary",
+            text_source_mode="summary_only",
             enabled_style_features=("role", "insights"),
-            additional_summarizers=("longformer_ext",),
+            summarizers=("longformer_ext",),
         ),
     ]
 
@@ -343,9 +339,8 @@ def _run_smoke_case(
                 metric_description=inputs.metric_description,
                 plot_description=inputs.plot_description,
                 evidence_mode=case.evidence_mode,
-                summarization_mode=case.summarization_mode,
-                score_on=case.score_on,
-                additional_summarizers=case.additional_summarizers or inputs.additional_summarizers,
+                text_source_mode=case.text_source_mode,
+                summarizers=case.summarizers or inputs.summarizers,
                 enabled_style_features=case.enabled_style_features,
                 scoring_reference_path=inputs.scoring_reference_path,
             ),
@@ -385,7 +380,7 @@ def _run_smoke_case(
         model=inputs.model,
         source_text=result.context_response,
         summary_text=result.trend_response,
-        source_image_path=result.plot_path if case.evidence_mode in {"plot", "plot+table", "plot+stats"} else None,
+        source_image_path=result.plot_path if case.evidence_mode in {"plot", "plot+table"} else None,
         run_qualitative=run_qualitative,
     )
     qualitative_failed = any(outcome.status == "failed" for outcome in qualitative)
@@ -544,7 +539,9 @@ def _run_sweep_if_requested(
                 metric_pattern=inputs.metric_pattern,
                 metric_description=inputs.metric_description,
                 plot_description=inputs.plot_description,
-                additional_summarizers=inputs.additional_summarizers,
+                text_source_mode=inputs.text_source_mode,
+                evidence_mode=inputs.evidence_mode,
+                summarizers=inputs.summarizers,
             ),
             prompts=prompts,
             adapter=adapter,
@@ -638,10 +635,9 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
         "max_retries": _stringify(request_block.get("max_retries")),
         "retry_backoff_seconds": _stringify(request_block.get("retry_backoff_seconds")),
         "evidence_mode": str(inputs_block.get("evidence_mode", case_result.case.evidence_mode)),
-        "summarization_mode": str(inputs_block.get("summarization_mode", case_result.case.summarization_mode)),
-        "score_on": str(inputs_block.get("score_on", case_result.case.score_on)),
+        "text_source_mode": str(inputs_block.get("text_source_mode", case_result.case.text_source_mode)),
         "enabled_style_features": _stringify(inputs_block.get("enabled_style_features")),
-        "additional_summarizers": _stringify(inputs_block.get("additional_summarizers")),
+        "summarizers": _stringify(inputs_block.get("summarizers")),
         "input_csv_path": str(inputs_block.get("csv_path", smoke_inputs.csv_path)),
         "parameters_path": str(inputs_block.get("parameters_path", smoke_inputs.parameters_path)),
         "documentation_path": str(inputs_block.get("documentation_path", smoke_inputs.documentation_path)),
@@ -789,12 +785,9 @@ def _build_fallback_error_row(case_result: SmokeCaseResult, smoke_inputs: SmokeS
         "max_retries": "",
         "retry_backoff_seconds": "",
         "evidence_mode": case_result.case.evidence_mode,
-        "summarization_mode": case_result.case.summarization_mode,
-        "score_on": case_result.case.score_on,
+        "text_source_mode": case_result.case.text_source_mode,
         "enabled_style_features": _stringify(case_result.case.enabled_style_features),
-        "additional_summarizers": _stringify(
-            case_result.case.additional_summarizers or smoke_inputs.additional_summarizers
-        ),
+        "summarizers": _stringify(case_result.case.summarizers or smoke_inputs.summarizers),
         "input_csv_path": str(smoke_inputs.csv_path),
         "parameters_path": str(smoke_inputs.parameters_path),
         "documentation_path": str(smoke_inputs.documentation_path),
@@ -963,14 +956,14 @@ def _render_markdown_report(result: SmokeSuiteResult) -> str:
     lines.append("## Case Matrix")
     lines.append("")
     lines.append(
-        "| Case | Evidence | Summarization | Score On | Style Features | Summarizers | "
+        "| Case | Evidence | Text Source | Style Features | Summarizers | "
         "Status | Resumed | Report CSV | Plot | Metadata | Manifest |"
     )
-    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for case in result.cases:
         lines.append(
-            f"| `{case.case.case_id}` | `{case.case.evidence_mode}` | `{case.case.summarization_mode}` | "
-            f"`{case.case.score_on}` | `{case.case.enabled_style_features}` | `{case.case.additional_summarizers}` | "
+            f"| `{case.case.case_id}` | `{case.case.evidence_mode}` | `{case.case.text_source_mode}` | "
+            f"`{case.case.enabled_style_features}` | `{case.case.summarizers}` | "
             f"`{case.status}` | `{case.resumed_from_existing}` | `{case.report_csv}` | "
             f"`{case.plot_path}` | `{case.metadata_path}` | `{case.case_manifest_path}` |"
         )

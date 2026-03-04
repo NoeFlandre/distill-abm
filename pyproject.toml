@@ -55,7 +55,6 @@ line-length = 120
 target-version = "py311"
 extend-exclude = [
     "archive",
-    "tests/fixtures/notebook_parity",
 ]
 
 [tool.ruff.lint]
