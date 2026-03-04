@@ -1,0 +1,161 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+
+from distill_abm.ingest.netlogo_notebook_workflow import (
+    build_parameter_narrative,
+    extract_code_to_text,
+    extract_documentation_to_json,
+    run_netlogo_experiment,
+    run_notebook_ingest_workflow,
+    save_experiment_parameters,
+    update_gui_with_experiment_parameters,
+)
+
+
+class _FakeNetLogoLink:
+    def __init__(self) -> None:
+        self.commands: list[str] = []
+        self.loaded_model: str | None = None
+        self.tick = 0
+
+    def load_model(self, model_path: str) -> None:
+        self.loaded_model = model_path
+
+    def command(self, command: str) -> None:
+        self.commands.append(command)
+        if command == "go":
+            self.tick += 1
+
+    def report(self, reporter: str) -> int:
+        # deterministic per call for test assertions
+        return self.tick * 10 + len(reporter)
+
+
+def test_run_netlogo_experiment_notebook_style_loop_and_csv(tmp_path: Path) -> None:
+    output_csv = tmp_path / "netlogo_experiment_results.csv"
+    factory_calls: list[dict[str, Any]] = []
+
+    def _factory(*, netlogo_home: str) -> _FakeNetLogoLink:
+        factory_calls.append({"netlogo_home": netlogo_home})
+        return _FakeNetLogoLink()
+
+    frame = run_netlogo_experiment(
+        netlogo_home="/fake/netlogo",
+        model_path="NetLogo/model.nlogo",
+        experiment_parameters={"norms": True, "number-of-agents": 1000},
+        reporters=["mean-incum", "mean-alt"],
+        num_runs=2,
+        max_ticks=100,
+        interval=50,
+        output_csv_path=output_csv,
+        netlogo_link_factory=_factory,
+    )
+
+    assert factory_calls == [{"netlogo_home": "/fake/netlogo"}]
+    assert output_csv.exists()
+    written = pd.read_csv(output_csv)
+    assert written.shape == frame.shape
+    assert written.values.tolist() == frame.values.tolist()
+    assert frame.shape[0] == 2
+    # notebook-style horizontal concat duplicates run columns
+    assert frame.columns.tolist() == ["mean-incum", "mean-alt", "tick", "mean-incum", "mean-alt", "tick"]
+    assert written.columns.tolist() == ["mean-incum", "mean-alt", "tick", "mean-incum.1", "mean-alt.1", "tick.1"]
+    assert frame.iloc[:, 2].tolist() == [0, 50]
+    assert frame.iloc[:, 5].tolist() == [0, 50]
+
+
+def test_save_update_and_narrative_workflow(tmp_path: Path) -> None:
+    experiment_path = tmp_path / "experiment_parameters100.json"
+    gui_path = tmp_path / "gui_parameters100.json"
+    updated_gui_path = tmp_path / "updated_gui_parameters100.json"
+    updated_exp_path = tmp_path / "updated_experiment_parameters100.json"
+    narrative_path = tmp_path / "narrativeCombined100.txt"
+
+    save_experiment_parameters({"slider-a": 3, "switch-b": True}, experiment_path)
+    assert json.loads(experiment_path.read_text(encoding="utf-8")) == {"slider-a": 3, "switch-b": True}
+
+    gui_payload = {
+        "sliders": [{"name": "slider-a", "min_value": 0, "max_value": 10}],
+        "switches": [{"name": "switch-b", "true_value": True, "false_value": False, "default_value": False}],
+        "monitors": [],
+    }
+    gui_path.write_text(json.dumps(gui_payload, indent=2), encoding="utf-8")
+
+    updated_gui, remaining = update_gui_with_experiment_parameters(
+        gui_parameters_path=gui_path,
+        experiment_parameters_path=experiment_path,
+        updated_gui_parameters_path=updated_gui_path,
+        updated_experiment_parameters_path=updated_exp_path,
+    )
+    assert remaining == {}
+    assert updated_gui["sliders"][0]["value"] == 3
+    assert updated_gui["switches"][0]["value"] is True
+    assert updated_gui_path.exists()
+    assert updated_exp_path.exists()
+
+    narrative = build_parameter_narrative(
+        gui_parameters_path=updated_gui_path,
+        experiment_parameters_path=updated_exp_path,
+        output_text_path=narrative_path,
+    )
+    assert narrative.startswith("We have 2 parameters:")
+    assert "slider-a, from 0 to 10. We set it to 3." in narrative
+    assert "switch-b. We set it to True." in narrative
+    assert narrative_path.read_text(encoding="utf-8") == narrative
+
+
+def test_extract_documentation_and_code_to_files(tmp_path: Path) -> None:
+    model_path = tmp_path / "model.nlogo"
+    documentation_json_path = tmp_path / "documentation100.json"
+    code_txt_path = tmp_path / "extracted_code100.txt"
+    model_path.write_text(
+        "globals [a b]\n" "to go\n" "end\n" "@#$#@#$#@\n" "## WHAT IS IT?\n\nDoc text\n" "@#$#@#$#@\n",
+        encoding="utf-8",
+    )
+
+    documentation = extract_documentation_to_json(model_path, documentation_json_path)
+    code = extract_code_to_text(model_path, code_txt_path)
+
+    assert documentation == "@#$#@#$#@\n## WHAT IS IT?\n\nDoc text"
+    assert code.startswith("globals [a b]")
+    assert json.loads(documentation_json_path.read_text(encoding="utf-8"))["documentation"] == documentation
+    assert code_txt_path.read_text(encoding="utf-8") == code
+
+
+def test_run_notebook_ingest_workflow_end_to_end(tmp_path: Path) -> None:
+    model_path = tmp_path / "model.nlogo"
+    model_path.write_text(
+        "globals [a b]\n"
+        "to go\n"
+        "end\n"
+        "@#$#@#$#@\n"
+        "## WHAT IS IT?\n\nDoc text\n"
+        "@#$#@#$#@\n"
+        "SLIDER 0 0 10 10 slider-a slider-a 0 10 1 5\n"
+        "SWITCH 0 0 10 10 switch-b switch-b 1 0 0\n",
+        encoding="utf-8",
+    )
+    output_dir = tmp_path / "output"
+    result = run_notebook_ingest_workflow(
+        model_path=model_path,
+        experiment_parameters={"slider-a": 3, "switch-b": True},
+        output_dir=output_dir,
+        suffix="100",
+    )
+
+    assert result["experiment_parameters_json"].exists()
+    assert result["gui_parameters_json"].exists()
+    assert result["updated_gui_parameters_json"].exists()
+    assert result["updated_experiment_parameters_json"].exists()
+    assert result["narrative_txt"].exists()
+    assert result["documentation_json"].exists()
+    assert result["cleaned_documentation_json"].exists()
+    assert result["documentation_without_default_json"].exists()
+    assert result["final_documentation_txt"].exists()
+    assert result["extracted_code_txt"].exists()
+    assert "We have 2 parameters:" in result["narrative_txt"].read_text(encoding="utf-8")

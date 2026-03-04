@@ -17,6 +17,7 @@ Provide functional continuity between legacy notebook workflows and production p
 9. Archive CSV artifacts and visualization files (`.png/.jpg/.jpeg/.svg`) are retained for reproducibility; they are not marked as discardable.
 10. `docs/runtime_notebook_dependencies.json` provides the one-to-many mapping of runtime-required notebook files to required compatibility function names (currently empty).
 11. Regression parity tests use deterministic baselines/snapshots and no longer execute notebook files directly.
+12. `distill_abm.ingest.netlogo_notebook_workflow` captures the notebook-style NetLogo run loop and file-generation workflow (parameter JSON, updated GUI JSON, narrative TXT, documentation/code outputs).
 
 ## Scope
 
