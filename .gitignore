@@ -10,5 +10,6 @@ __pycache__/
 coverage.xml
 htmlcov/
 results/
+Results/
 !tests/fixtures/notebook_parity/archive_assets/**
 *.log
