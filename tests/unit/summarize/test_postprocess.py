@@ -22,6 +22,7 @@ def test_regex_cleaners() -> None:
     assert remove_unnecessary_spaces_in_parentheses("( a )") == "(a)"
     assert remove_space_before_dot("a .") == "a."
     assert capitalize_sentences("hello. world") == "Hello. World"
+    assert capitalize_sentences("") == ""
 
 
 def test_clean_non_unicode_and_pipeline(tmp_path: Path) -> None:

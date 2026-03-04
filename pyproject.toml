@@ -30,9 +30,11 @@ metrics = [
 ]
 dev = [
   "pytest>=8.3.2",
+  "pytest-cov>=6.0.0",
   "black>=24.8.0",
   "ruff>=0.6.9",
   "mypy>=1.11.2",
+  "pre-commit>=4.0.1",
   "nbformat>=5.10.4",
   "pandas-stubs>=2.2.2.240807",
   "types-PyYAML>=6.0.12.20240917",
@@ -64,6 +66,14 @@ filterwarnings = [
   "ignore:For backward compatibility, 'str' dtypes are included by select_dtypes when 'object' dtype is specified.*",
   "ignore:is_categorical_dtype is deprecated and will be removed in a future version.*",
 ]
+
+[tool.coverage.run]
+source = ["src/distill_abm"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
 
 [tool.mypy]
 python_version = "3.11"

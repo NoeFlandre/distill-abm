@@ -219,4 +219,3 @@
 ### `archive/legacy_repo/Code/Models/Milk Consumption/6.Scoring.ipynb`
 - `compute_scores`
 - `main`
-

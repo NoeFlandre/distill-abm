@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import re
 import tempfile
+import unicodedata
 from pathlib import Path
 
 import pandas as pd
@@ -67,11 +68,7 @@ def clean_non_unicode(input_file: Path, output_file: Path) -> None:
 
 
 def _remove_non_unicode(text: str) -> str:
-    try:
-        from unidecode import unidecode
-    except Exception:
-        return text.encode("ascii", errors="ignore").decode("ascii")
-    return str(unidecode(text))
+    return unicodedata.normalize("NFKD", text).encode("ascii", errors="ignore").decode("ascii")
 
 
 def postprocess_summary(text: str) -> str:
