@@ -28,13 +28,5 @@
       "update_structured_df"
     ],
     "function_count": 2
-  },
-  {
-    "notebook_path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/2. Parsing GPTs Answers.ipynb",
-    "required_functions": [
-      "append_coverage_score",
-      "append_faithfulness_score"
-    ],
-    "function_count": 2
   }
 ]
