@@ -125,6 +125,23 @@ uv run distill-abm run \
   --score-on both
 ```
 
+Enable additional local summarizers (T5 and/or Longformer-like LED) on top of the default BART+BERT stack:
+
+```bash
+uv run distill-abm run \
+  --csv-path path/to/reduced.csv \
+  --parameters-path path/to/params.txt \
+  --documentation-path path/to/docs.txt \
+  --additional-summarizer t5 \
+  --additional-summarizer longformer_ext
+```
+
+Notes:
+
+- default summary stack is BART + BERT
+- `--additional-summarizer` is repeatable (`t5`, `longformer_ext`)
+- if one backend is unavailable at runtime, pipeline falls back to remaining summarizers without failing the run
+
 Run reference-style combination sweeps in code (`role`, `example`, `insights` matrix):
 
 ```python

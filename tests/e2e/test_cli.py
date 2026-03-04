@@ -368,6 +368,117 @@ def test_cli_run_pipeline_forwards_summarization_modes(tmp_path: Path, monkeypat
     assert captured_inputs.skip_summarization is False
 
 
+def test_cli_run_pipeline_forwards_additional_summarizers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    prompts = tmp_path / "prompts.yaml"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("d=1", encoding="utf-8")
+    prompts.write_text(
+        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
+        encoding="utf-8",
+    )
+
+    captured: dict[str, object] = {}
+
+    class _Result:
+        def __init__(self, output_dir: Path) -> None:
+            self.plot_path = output_dir / "plot.png"
+            self.report_csv = output_dir / "report.csv"
+            self.context_response = "context"
+            self.trend_response = "trend"
+            self.trend_full_response = "trend"
+            self.trend_summary_response = None
+            self.full_scores = None
+            self.summary_scores = None
+            self.stats_markdown = None
+            self.stats_image_path = None
+            self.token_f1 = 0.0
+            self.bleu = 0.0
+            self.meteor = 0.0
+            self.rouge1 = 0.0
+            self.rouge2 = 0.0
+            self.rouge_l = 0.0
+            self.flesch_reading_ease = 0.0
+
+    def fake_run_pipeline(*, inputs, prompts, adapter):  # type: ignore[no-untyped-def]
+        captured["inputs"] = inputs
+        return _Result(inputs.output_dir)
+
+    monkeypatch.setattr("distill_abm.cli.run_pipeline", fake_run_pipeline)
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--output-dir",
+            str(tmp_path / "out"),
+            "--provider",
+            "echo",
+            "--model",
+            "echo-model",
+            "--additional-summarizer",
+            "t5",
+            "--additional-summarizer",
+            "longformer_ext",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "inputs" in captured
+    captured_inputs = cast(Any, captured["inputs"])
+    assert captured_inputs.additional_summarizers == ("t5", "longformer_ext")
+
+
+def test_cli_run_pipeline_rejects_invalid_additional_summarizer(tmp_path: Path) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    prompts = tmp_path / "prompts.yaml"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("d=1", encoding="utf-8")
+    prompts.write_text(
+        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--output-dir",
+            str(tmp_path / "out"),
+            "--provider",
+            "echo",
+            "--model",
+            "echo-model",
+            "--additional-summarizer",
+            "bad-option",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "unsupported additional summarizer" in result.output
+
+
 def test_cli_run_pipeline_defaults_summarization_and_score_modes_to_both(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

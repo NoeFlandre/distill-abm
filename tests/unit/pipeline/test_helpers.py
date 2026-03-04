@@ -113,6 +113,54 @@ def test_summarize_report_text_pair_returns_raw_and_summary() -> None:
     assert summary == "bart:raw\nbert::abc"
 
 
+def test_summarize_report_text_pair_includes_additional_summarizers() -> None:
+    def fake_bart(text: str) -> str:
+        return f"bart:{text}"
+
+    def fake_bert(text: str) -> str:
+        return f"bert:{text}"
+
+    def fake_t5(text: str) -> str:
+        return f"t5:{text}"
+
+    def fake_longformer(text: str) -> str:
+        return f"longformer:{text}"
+
+    _raw, summary = helpers.summarize_report_text_pair(
+        text="raw",
+        skip_summarization=False,
+        summarize_with_bart_fn=fake_bart,
+        summarize_with_bert_fn=fake_bert,
+        additional_summarizers=[
+            ("t5", fake_t5),
+            ("longformer_ext", fake_longformer),
+        ],
+    )
+
+    assert summary == "bart:raw\nbert:raw\nt5:raw\nlongformer:raw"
+
+
+def test_summarize_report_text_pair_skips_failing_additional_summarizer() -> None:
+    def fake_bart(text: str) -> str:
+        return f"bart:{text}"
+
+    def fake_bert(text: str) -> str:
+        return f"bert:{text}"
+
+    def fake_t5(_text: str) -> str:
+        raise RuntimeError("t5 unavailable")
+
+    _raw, summary = helpers.summarize_report_text_pair(
+        text="raw",
+        skip_summarization=False,
+        summarize_with_bart_fn=fake_bart,
+        summarize_with_bert_fn=fake_bert,
+        additional_summarizers=[("t5", fake_t5)],
+    )
+
+    assert summary == "bart:raw\nbert:raw"
+
+
 def test_write_report_with_both_full_and_summary_scores(tmp_path: Path) -> None:
     def fake_scores(token_f1: float) -> SummaryScores:
         return SummaryScores(

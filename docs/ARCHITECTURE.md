@@ -19,6 +19,8 @@
 - `distill_abm.summarize`:
   - prompt-safe text cleanup
   - summarization runners for BART, BERT, T5, and Longformer-like models
+  - default summary stack: BART + BERT
+  - optional add-on stack via CLI: `--additional-summarizer t5|longformer_ext` (repeatable)
   - report post-processing utilities (`clean_markdown_symbols`, etc.)
 - `distill_abm.eval`:
   - token overlap metrics
@@ -31,6 +33,7 @@
     - `--summarization-mode` (`full`, `summary`, `both`) [default: `both`]
     - `--score-on` (`full`, `summary`, `both`) [default: `both`]
     - `--skip-summarization` maps to `summarization_mode=full`
+    - `--additional-summarizer` appends optional summarizers (`t5`, `longformer_ext`) to the default BART+BERT summary
   - evidence ablation modes via CLI `--evidence-mode`: `plot`, `stats-markdown`, `stats-image`, `plot+stats`
   - reference-style multi-feature sweep API:
     - `run_pipeline_sweep` for role/example/insights combinations

@@ -100,6 +100,7 @@ def summarize_report_text(
     skip_summarization: bool,
     summarize_with_bart_fn: Callable[[str], str] = summarize_with_bart,
     summarize_with_bert_fn: Callable[[str], str] = summarize_with_bert,
+    additional_summarizers: Sequence[tuple[str, Callable[[str], str]]] = (),
 ) -> str:
     """Apply dual summarization pass-through unless summarization is disabled."""
     _, summary = summarize_report_text_pair(
@@ -107,6 +108,7 @@ def summarize_report_text(
         skip_summarization=skip_summarization,
         summarize_with_bart_fn=summarize_with_bart_fn,
         summarize_with_bert_fn=summarize_with_bert_fn,
+        additional_summarizers=additional_summarizers,
     )
     if summary is None:
         return text
@@ -118,17 +120,21 @@ def summarize_report_text_pair(
     skip_summarization: bool,
     summarize_with_bart_fn: Callable[[str], str] = summarize_with_bart,
     summarize_with_bert_fn: Callable[[str], str] = summarize_with_bert,
+    additional_summarizers: Sequence[tuple[str, Callable[[str], str]]] = (),
 ) -> tuple[str, str | None]:
     """Return raw trend text plus optional summary for dual-path operation."""
     if skip_summarization:
         return text, None
-    try:
-        bart = summarize_with_bart_fn(text).strip()
-        bert = summarize_with_bert_fn(text).strip()
-    except Exception:
-        # Keep direct output as a robust fallback when summarization backends are unavailable.
-        return text, None
-    summary = "\n".join(part for part in (bart, bert) if part).strip()
+    summary_parts: list[str] = []
+    for _name, runner in [("bart", summarize_with_bart_fn), ("bert", summarize_with_bert_fn), *additional_summarizers]:
+        try:
+            value = runner(text).strip()
+        except Exception:
+            # Keep direct output as a robust fallback when summarization backends are unavailable.
+            continue
+        if value:
+            summary_parts.append(value)
+    summary = "\n".join(summary_parts).strip()
     if not summary:
         return text, None
     return text, summary

@@ -114,9 +114,10 @@ By default (`summarization_mode=both`, `score_on=both`), pipeline summarization 
 
 - BART summarization pass
 - BERT summarization pass on grouped plot analyses
-- Additional optional helpers are exposed via `distill_abm.summarize.models`:
-  - `summarize_with_t5`
-  - `summarize_with_longformer_ext`
+- Optional additional summarizers can be added at runtime:
+  - `--additional-summarizer t5`
+  - `--additional-summarizer longformer_ext`
+- Additional backends are additive to the default BART+BERT stack and are merged into the summary output in deterministic order.
 
 You can force full-text usage with `--summarization-mode full` (equivalent to `--skip-summarization`) or capture both text versions with `--summarization-mode both`.
 
@@ -214,6 +215,7 @@ The metadata contains:
 - resolved LLM provider/model and request hyperparameters
 - context and trend prompt signatures (SHA-256) plus prompt lengths
 - evidence/summarization mode settings (`evidence_mode`, `summarization_mode`, `score_on`)
+- selected additional summarizers (`additional_summarizers`) and backend configs
 - score summaries and output artifact locations
 
 To replay a result:
