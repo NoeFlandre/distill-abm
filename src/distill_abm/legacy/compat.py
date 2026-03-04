@@ -209,6 +209,7 @@ def plot_columns(
         output_dir=Path("results/plots"),
         title=title,
         y_label=y_label,
+        show_mean_line=False,
     )
 
 

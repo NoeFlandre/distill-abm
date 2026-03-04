@@ -17,8 +17,9 @@ from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMRequest
 from distill_abm.summarize.models import summarize_with_bart, summarize_with_bert
 from distill_abm.summarize.text import clean_markdown_symbols, strip_think_prefix
 from distill_abm.viz.plots import (
+    MetricPlotBundle,
     generate_stats_table,
-    plot_metric_bundle,
+    plot_metric_bundles,
     render_stats_table_image,
     render_stats_table_markdown,
 )
@@ -63,7 +64,17 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     """Executes the notebook-equivalent workflow through pure Python components."""
     frame = load_simulation_csv(inputs.csv_path)
     inputs.output_dir.mkdir(parents=True, exist_ok=True)
-    plot_path = plot_metric_bundle(frame, inputs.metric_pattern, inputs.output_dir, "Simulation trend", "value")
+    plot_path = plot_metric_bundles(
+        frame=frame,
+        bundles=[
+            MetricPlotBundle(
+                include_pattern=inputs.metric_pattern,
+                title="Simulation trend",
+                y_label="value",
+            )
+        ],
+        output_dir=inputs.output_dir,
+    )[0]
     stats_table = generate_stats_table(frame, include_pattern=inputs.metric_pattern)
     stats_markdown = render_stats_table_markdown(stats_table)
     stats_image_path = _write_stats_image_if_needed(
