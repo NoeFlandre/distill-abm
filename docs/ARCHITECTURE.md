@@ -26,10 +26,10 @@
   - qualitative score extraction (`extract_coverage_score`, `extract_faithfulness_score`)
   - DoE ANOVA contribution analysis
 - `distill_abm.pipeline`:
-  - end-to-end orchestration from CSV -> plot -> LLM -> (full text or summarized text) -> scoring
+  - end-to-end orchestration from CSV -> plot -> LLM -> (full text and/or summarized text) -> scoring
   - dual text handling via CLI:
-    - `--summarization-mode` (`full`, `summary`, `both`)
-    - `--score-on` (`full`, `summary`, `both`)
+    - `--summarization-mode` (`full`, `summary`, `both`) [default: `both`]
+    - `--score-on` (`full`, `summary`, `both`) [default: `both`]
     - legacy `--skip-summarization` maps to `summarization_mode=full`
   - evidence ablation modes via CLI `--evidence-mode`: `plot`, `stats-markdown`, `stats-image`, `plot+stats`
   - reference-style multi-feature sweep API:

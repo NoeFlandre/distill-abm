@@ -59,14 +59,14 @@ def run(
     summarization_mode: Annotated[
         SummarizationMode,
         typer.Option(help="full: keep raw trend text, summary: use summarized trend text, both: store/report both."),
-    ] = "summary",
+    ] = "both",
     score_on: Annotated[
         ScoreMode,
         typer.Option(
             help="Which text should be used for scoring: full, summary, or both. "
             "Both adds both score sets to report output."
         ),
-    ] = "summary",
+    ] = "both",
     abm: Annotated[str | None, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = None,
 ) -> None:
     """Runs one end-to-end pipeline execution from CSV to scored report."""

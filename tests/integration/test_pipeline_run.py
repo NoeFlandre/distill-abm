@@ -63,6 +63,49 @@ def test_run_pipeline_creates_artifacts(tmp_path: Path) -> None:
     assert adapter.calls == 2
 
 
+def test_run_pipeline_defaults_to_both_modes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bart", lambda text: f"bart::{text}")
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bert", lambda text: f"bert::{text}")
+
+    inputs = PipelineInputs(
+        csv_path=csv_path,
+        parameters_path=params,
+        documentation_path=docs,
+        output_dir=tmp_path / "out",
+        model="fake-model",
+        metric_pattern="mean-incum",
+        metric_description="weekly milk",
+    )
+    assert inputs.summarization_mode == "both"
+    assert inputs.score_on == "both"
+
+    adapter = FakeAdapter()
+    result = run_pipeline(
+        inputs=inputs,
+        prompts=PromptsConfig(
+            context_prompt="Context {parameters} {documentation}",
+            trend_prompt="Trend {description}",
+        ),
+        adapter=adapter,
+    )
+
+    assert result.full_scores is not None
+    assert result.summary_scores is not None
+    with result.report_csv.open("r", encoding="utf-8", newline="") as handle:
+        rows = list(csv.reader(handle))
+    header = rows[0]
+    assert "full_token_f1" in header
+    assert "summary_token_f1" in header
+
+
 def test_run_pipeline_skip_summarization_bypasses_model_summarizers(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

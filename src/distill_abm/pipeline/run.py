@@ -35,8 +35,8 @@ class PipelineInputs(BaseModel):
     metric_description: str
     plot_description: str | None = None
     skip_summarization: bool = False
-    summarization_mode: SummarizationMode = "summary"
-    score_on: ScoreMode = "summary"
+    summarization_mode: SummarizationMode = "both"
+    score_on: ScoreMode = "both"
     evidence_mode: EvidenceMode = "plot"
 
 
