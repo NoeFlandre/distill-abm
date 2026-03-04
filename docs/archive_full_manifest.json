@@ -1,60 +1,5 @@
 [
   {
-    "path": "archive/.DS_Store",
-    "sha256": "9bbe5104aeeed0d866c0caedb00397fa3e131d584565f17fac6d528d0391279a",
-    "size_bytes": 8196,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/.DS_Store",
-    "sha256": "0729be334be7888bc52c75e953abec0a3a4d1b0a8239e35a309c616034a82de3",
-    "size_bytes": 10244,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/.DS_Store",
-    "sha256": "7303fc42f52ab908ca1de624a598f0113d97ffc97647f8bcb21ef4c850a20d3b",
-    "size_bytes": 14340,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/.DS_Store",
-    "sha256": "79ca49654c63e51cc5868fb3ee98200ce56a657400dcdb88dbae637763a40166",
-    "size_bytes": 14340,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/DOE/.DS_Store",
-    "sha256": "48c213c773eb119702f764e2d88c65abe64a0b9c663dd65fcc479c8195c74ca0",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Code/Evaluation/DOE/Archives/1 and -1 Sorted.csv",
     "sha256": "1504eaf4be31186449599a1c255aa03cebf6674f0b16b19189ae1f7bedcd9a58",
     "size_bytes": 11909,
@@ -947,17 +892,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/.DS_Store",
-    "sha256": "909cd76f061a2d850f43c41ae558a7b7c03b95c4f7052520fd80839cd3ea4f8f",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/1. GPTFaithfulness.ipynb",
     "sha256": "1d6754f52b7e3c108a4aac830ed6106912cdedbe031cff0443691d862b914742",
     "size_bytes": 35486,
@@ -982,17 +916,6 @@
     "source_notebook_links": [
       "Evaluation/Qualitative Assessment using LLMs/2.ClaudeCoverage.ipynb"
     ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/.DS_Store",
-    "sha256": "84c2907674ab71bf94dc5aed988e13d572c69a82d1683494fe34f186acef3e0a",
-    "size_bytes": 8196,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
   },
   {
     "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/1. GPTinBulk.ipynb",
@@ -1045,17 +968,6 @@
     "source_notebook_links": [
       "Evaluation/Qualitative Assessment using LLMs/Archives/Archives Notebooks/4. Modifying the final results to compute the DoE matrix.ipynb"
     ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Examples/.DS_Store",
-    "sha256": "5a4fa1990bc4f45d8ed24227652d3c10a3238a2987c3aff46bbb8f375998d540",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
   },
   {
     "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Examples/Images/Picture Example.png",
@@ -1187,17 +1099,6 @@
     "action": "retain_record_only",
     "target_path": null,
     "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Interrater Agreement/.DS_Store",
-    "sha256": "9f7de5eb91f9277967aaecde3da52f23d2c4527efe1458de11a72ad64ab436ba",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -1819,28 +1720,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Sample to rate/.DS_Store",
-    "sha256": "bf59907f8dce949c7947a42ad6d223a2c8ceb97338645bf48f6839e6b346e27d",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Sample to rate 2/.DS_Store",
-    "sha256": "16f4e5496b9922a52adedaae8ea457f57819b19ed1674dd388ae42f7e47e34e2",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Archives/Sample to rate 2/CSV/AllResults.csv",
     "sha256": "0c043ac2f1c4718fd399a90ee02e9011ba79d96b7adc7590e6bc334278b78677",
     "size_bytes": 1300547,
@@ -2314,17 +2193,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Examples/.DS_Store",
-    "sha256": "23524d0b1ddf29f19ea4ed9347cb4b9cd8559a33d3bf25795b2a60b45d11d226",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Examples/Images/Picture Example.png",
     "sha256": "5ad532e8161cec1abb939df1d95288610d5f0b5234dcb674e898b808bd8c34c0",
     "size_bytes": 88775,
@@ -2424,17 +2292,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Sample to rate/.DS_Store",
-    "sha256": "be5e7f267d3fb8cae713858a85196123a328700e20b89e6be23760912be1e3d1",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Sample to rate/CSV/AllResults.csv",
     "sha256": "ebb1b63d857556b2c5aa1ab080ef1f7adacffb4ff9052465af6336f67af7a42f",
     "size_bytes": 1906738,
@@ -2443,17 +2300,6 @@
     "action": "retain_record_only",
     "target_path": null,
     "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Evaluation/Qualitative Assessment using LLMs/Sample to rate/Images/.DS_Store",
-    "sha256": "d154856d8e9236b6cb28df243abf9aa109413b4f8e0ad1ac34eb7959f65327b1",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -2850,28 +2696,6 @@
     "action": "archive_separately",
     "target_path": null,
     "rationale": "Visualization artifact kept only for historical visual comparison.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/.DS_Store",
-    "sha256": "2adcf1d9e10d8dc1795bcdd8451d621357d44c29119606de49a8b1358c203938",
-    "size_bytes": 10244,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Fauna/.DS_Store",
-    "sha256": "e16ed3a9a9ea95dca2f76059935f1d5037ed3d1c2ecde3bed23046bc299700c0",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -4881,17 +4705,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Paper/.DS_Store",
-    "sha256": "8ded32ffedfd8c96264d6b414e687bde95a83fe5277a612831b840e1c212f4f8",
-    "size_bytes": 10244,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Paper/Final Article from Philippe/Main.pdf",
     "sha256": "cd9aea3f822535d95bc9badcab4288039020f092dae8799f33812e65568bb973",
     "size_bytes": 1300398,
@@ -4922,17 +4735,6 @@
     "action": "retain_record_only",
     "target_path": null,
     "rationale": "Unreferenced archival artifact retained for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Paper/Journal Article/.DS_Store",
-    "sha256": "4cf1dff232bd5e139d2fde1a92b4a80e7b9d8ae7304903c3c86517177eacb704",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -5574,17 +5376,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Readings/.DS_Store",
-    "sha256": "74aeee1e91346ed4ed06796fcde51166e4772a1a2ca3f5c6bededcfb96c6901b",
-    "size_bytes": 10244,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
     "path": "archive/legacy_repo/Readings/Ce\u0301dric's/hicss.pdf",
     "sha256": "a8e35f14a0b495b841cecd59a502d82dbc1da6283fe920e9fdf46bec81c0510d",
     "size_bytes": 934172,
@@ -5923,28 +5714,6 @@
     "action": "retain_record_only",
     "target_path": null,
     "rationale": "Historical output/result artifact not required for production runtime.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/.DS_Store",
-    "sha256": "969b1d597e8b41f8f4432db93b39d2e0c653367b44d2c05d7cedcf4641b27ebc",
-    "size_bytes": 10244,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Qualitative and Quantitative Assessment/.DS_Store",
-    "sha256": "a69bc8c69062e77cd3f9ba5916ff33b32a33d5b650700b99765032d61bf238ec",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {
@@ -6473,17 +6242,6 @@
     "action": "migrate",
     "target_path": "tests/fixtures/notebook_parity/experiment_settings/archive/legacy_repo/Results/Qualitative and Quantitative Assessment/Reports/FinalResultsYesNo.csv",
     "rationale": "Canonical notebook experiment input/settings datasets.",
-    "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Results/Quantitative Assessment/.DS_Store",
-    "sha256": "7c4ec458fd629d4a5638deb134651971e97563c1aab82ab9339e324fd71c6b3a",
-    "size_bytes": 6148,
-    "extension": "",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Temporary/editor artifact retained only for historical traceability.",
     "source_notebook_links": []
   },
   {

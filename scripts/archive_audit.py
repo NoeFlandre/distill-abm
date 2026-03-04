@@ -121,7 +121,7 @@ def _source_links(path: Path) -> list[str]:
 
 
 def build_manifest() -> list[ManifestRow]:
-    files = sorted(path for path in ROOT.rglob("*") if path.is_file())
+    files = sorted(path for path in ROOT.rglob("*") if path.is_file() and path.name != ".DS_Store")
     rows: list[ManifestRow] = []
     for path in files:
         classification, action, target_path, rationale = _classify(path)
