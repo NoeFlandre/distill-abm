@@ -59,7 +59,7 @@ def test_cli_run_pipeline(tmp_path: Path) -> None:
     assert (output_dir / "report.csv").exists()
 
 
-def test_cli_run_pipeline_stats_markdown_mode(tmp_path: Path) -> None:
+def test_cli_run_pipeline_table_csv_mode(tmp_path: Path) -> None:
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
 
@@ -98,7 +98,7 @@ def test_cli_run_pipeline_stats_markdown_mode(tmp_path: Path) -> None:
             "weekly milk",
             "--skip-summarization",
             "--evidence-mode",
-            "stats-markdown",
+            "table-csv",
         ],
     )
 
@@ -318,7 +318,7 @@ def test_cli_run_pipeline_forwards_summarization_modes(tmp_path: Path, monkeypat
             self.trend_summary_response = None
             self.full_scores = None
             self.summary_scores = None
-            self.stats_markdown = None
+            self.stats_table_csv = None
             self.stats_image_path = None
             self.token_f1 = 0.0
             self.bleu = 0.0
@@ -393,7 +393,7 @@ def test_cli_run_pipeline_forwards_summary_only_mode(tmp_path: Path, monkeypatch
             self.trend_summary_response = "summary"
             self.full_scores = None
             self.summary_scores = None
-            self.stats_markdown = None
+            self.stats_table_csv = None
             self.stats_image_path = None
             self.token_f1 = 0.0
             self.bleu = 0.0
@@ -465,7 +465,7 @@ def test_cli_run_pipeline_forwards_additional_summarizers(tmp_path: Path, monkey
             self.trend_summary_response = None
             self.full_scores = None
             self.summary_scores = None
-            self.stats_markdown = None
+            self.stats_table_csv = None
             self.stats_image_path = None
             self.token_f1 = 0.0
             self.bleu = 0.0

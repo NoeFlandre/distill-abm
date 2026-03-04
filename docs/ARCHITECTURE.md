@@ -34,7 +34,8 @@
     - `--score-on` (`full`, `summary`, `both`) [default: `both`]
     - `--skip-summarization` maps to `summarization_mode=full`
     - `--additional-summarizer` appends optional summarizers (`t5`, `longformer_ext`) to the default BART+BERT summary
-  - evidence ablation modes via CLI `--evidence-mode`: `plot`, `stats-markdown`, `stats-image`, `plot+stats`
+  - evidence ablation modes via CLI `--evidence-mode`: `plot`, `table-csv`, `plot+table`
+  - `table-csv` is text-only evidence (no vision image attached)
   - reference-style multi-feature sweep API:
     - `run_pipeline_sweep` for role/example/insights combinations
     - `write_combinations_csv` for wide per-combination output schema

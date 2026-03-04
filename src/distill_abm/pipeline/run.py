@@ -24,7 +24,8 @@ from distill_abm.summarize.models import (
 )
 from distill_abm.viz.plots import MetricPlotBundle, plot_metric_bundles
 
-EvidenceMode = Literal["plot", "stats-markdown", "stats-image", "plot+stats"]
+EvidenceMode = Literal["plot", "table-csv", "plot+table", "stats-markdown", "stats-image", "plot+stats"]
+ResolvedEvidenceMode = Literal["plot", "table-csv", "plot+table"]
 SummarizationMode = Literal["full", "summary", "both"]
 ScoreMode = Literal["full", "summary", "both"]
 SweepCsvColumnStyle = Literal["trend", "plot"]
@@ -60,7 +61,7 @@ class PipelineResult(BaseModel):
     trend_summary_response: str | None = None
     full_scores: SummaryScores | None = None
     summary_scores: SummaryScores | None = None
-    stats_markdown: str | None = None
+    stats_table_csv: str | None = None
     stats_image_path: Path | None = None
     token_f1: float
     bleu: float
@@ -99,13 +100,14 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         output_dir=inputs.output_dir,
     )[0]
 
+    resolved_evidence_mode = _resolve_evidence_mode(inputs.evidence_mode)
     stats_table = helpers.build_stats_table(frame=frame, include_pattern=inputs.metric_pattern)
-    stats_markdown = helpers.build_stats_markdown(stats_table)
+    stats_table_csv = helpers.build_stats_csv(stats_table)
     stats_image_path = _write_stats_image_if_needed(
         stats_table=stats_table,
         output_dir=inputs.output_dir,
         include_pattern=inputs.metric_pattern,
-        evidence_mode=inputs.evidence_mode,
+        evidence_mode=resolved_evidence_mode,
     )
     context_prompt = _context_prompt(inputs, prompts)
     context = _invoke_adapter(adapter, model=inputs.model, prompt=context_prompt)
@@ -114,11 +116,11 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         metric_description=inputs.metric_description,
         context=context,
         plot_description=inputs.plot_description,
-        evidence_mode=inputs.evidence_mode,
-        stats_markdown=stats_markdown,
+        evidence_mode=resolved_evidence_mode,
+        stats_table_csv=stats_table_csv,
     )
     image_b64 = _encode_image_for_evidence(
-        evidence_mode=inputs.evidence_mode,
+        evidence_mode=resolved_evidence_mode,
         plot_path=plot_path,
         stats_image_path=stats_image_path,
     )
@@ -187,7 +189,8 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         selected_scores=selected_scores,
         include_extended=include_extended,
         include_pattern=inputs.metric_pattern,
-        evidence_mode=inputs.evidence_mode,
+        evidence_mode=resolved_evidence_mode,
+        requested_evidence_mode=inputs.evidence_mode,
         adapter=adapter,
     )
 
@@ -200,7 +203,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         trend_summary_response=trend_summary,
         full_scores=full_scores if include_extended else None,
         summary_scores=summary_scores if include_extended else None,
-        stats_markdown=stats_markdown,
+        stats_table_csv=stats_table_csv,
         stats_image_path=stats_image_path,
         token_f1=selected_scores.token_f1,
         bleu=selected_scores.bleu,
@@ -249,7 +252,7 @@ def run_pipeline_sweep(
             context=context_response,
             plot_description=None,
             evidence_mode="plot",
-            stats_markdown="",
+            stats_table_csv="",
             enabled_style_features=enabled_features,
         )
         prompts_for_images: list[str] = []
@@ -455,7 +458,8 @@ def _write_run_metadata(
     summary_scores: SummaryScores | None,
     include_extended: bool,
     include_pattern: str,
-    evidence_mode: EvidenceMode,
+    evidence_mode: ResolvedEvidenceMode,
+    requested_evidence_mode: EvidenceMode,
     adapter: LLMAdapter,
     selected_scores: SummaryScores,
 ) -> Path:
@@ -470,6 +474,7 @@ def _write_run_metadata(
             "metric_description": inputs.metric_description,
             "plot_description": inputs.plot_description,
             "evidence_mode": evidence_mode,
+            "evidence_mode_requested": requested_evidence_mode,
             "summarization_mode": summarization_mode,
             "score_on": score_on,
             "skip_summarization": inputs.skip_summarization,
@@ -553,8 +558,8 @@ def _build_trend_prompt(
     metric_description: str,
     context: str,
     plot_description: str | None,
-    evidence_mode: EvidenceMode,
-    stats_markdown: str,
+    evidence_mode: ResolvedEvidenceMode,
+    stats_table_csv: str,
     enabled_style_features: set[str] | None = None,
 ) -> str:
     return helpers.build_trend_prompt(
@@ -563,7 +568,7 @@ def _build_trend_prompt(
         context=context,
         plot_description=plot_description,
         evidence_mode=evidence_mode,
-        stats_markdown=stats_markdown,
+        stats_table_csv=stats_table_csv,
         enabled=enabled_style_features,
     )
 
@@ -572,7 +577,7 @@ def _write_stats_image_if_needed(
     stats_table: pd.DataFrame,
     output_dir: Path,
     include_pattern: str,
-    evidence_mode: EvidenceMode,
+    evidence_mode: ResolvedEvidenceMode,
 ) -> Path | None:
     return helpers.write_stats_image_if_needed(
         stats_table=stats_table,
@@ -583,7 +588,7 @@ def _write_stats_image_if_needed(
 
 
 def _encode_image_for_evidence(
-    evidence_mode: EvidenceMode,
+    evidence_mode: ResolvedEvidenceMode,
     plot_path: Path,
     stats_image_path: Path | None,
 ) -> str | None:
@@ -596,3 +601,7 @@ def _encode_image_for_evidence(
 
 def _append_plot_description(base_prompt: str, plot_description: str) -> str:
     return helpers.append_plot_description(base_prompt=base_prompt, plot_description=plot_description)
+
+
+def _resolve_evidence_mode(evidence_mode: EvidenceMode) -> ResolvedEvidenceMode:
+    return helpers.resolve_evidence_mode(evidence_mode)

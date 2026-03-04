@@ -345,7 +345,7 @@ def test_run_pipeline_full_only_mode_outputs_full_path(tmp_path: Path, monkeypat
     assert result.trend_response == "resp-2"
 
 
-def test_run_pipeline_stats_markdown_mode_uses_text_only_evidence(tmp_path: Path) -> None:
+def test_run_pipeline_table_csv_mode_uses_text_only_evidence(tmp_path: Path) -> None:
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
     params = tmp_path / "params.txt"
@@ -364,7 +364,7 @@ def test_run_pipeline_stats_markdown_mode_uses_text_only_evidence(tmp_path: Path
             metric_pattern="mean-incum",
             metric_description="weekly milk",
             skip_summarization=True,
-            evidence_mode="stats-markdown",
+            evidence_mode="table-csv",
         ),
         prompts=PromptsConfig(
             context_prompt="Context {parameters} {documentation}",
@@ -377,10 +377,10 @@ def test_run_pipeline_stats_markdown_mode_uses_text_only_evidence(tmp_path: Path
     assert all(request.temperature == 0.5 for request in adapter.requests)
     trend_request = adapter.requests[-1]
     assert trend_request.image_b64 is None
-    assert "| time_step | mean | std | min | max | median |" in trend_request.user_prompt()
+    assert "time_step,mean,std,min,max,median" in trend_request.user_prompt()
 
 
-def test_run_pipeline_stats_image_mode_uses_table_image(tmp_path: Path) -> None:
+def test_run_pipeline_table_csv_mode_does_not_emit_stats_image(tmp_path: Path) -> None:
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
     params = tmp_path / "params.txt"
@@ -399,7 +399,7 @@ def test_run_pipeline_stats_image_mode_uses_table_image(tmp_path: Path) -> None:
             metric_pattern="mean-incum",
             metric_description="weekly milk",
             skip_summarization=True,
-            evidence_mode="stats-image",
+            evidence_mode="table-csv",
         ),
         prompts=PromptsConfig(
             context_prompt="Context {parameters} {documentation}",
@@ -410,12 +410,11 @@ def test_run_pipeline_stats_image_mode_uses_table_image(tmp_path: Path) -> None:
 
     assert len(adapter.requests) == 2
     trend_request = adapter.requests[-1]
-    assert trend_request.image_b64 is not None
-    assert result.stats_image_path is not None
-    assert result.stats_image_path.exists()
+    assert trend_request.image_b64 is None
+    assert result.stats_image_path is None
 
 
-def test_run_pipeline_plot_plus_stats_uses_plot_image_and_markdown(tmp_path: Path) -> None:
+def test_run_pipeline_plot_plus_table_uses_plot_image_and_csv_table(tmp_path: Path) -> None:
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
     params = tmp_path / "params.txt"
@@ -434,7 +433,7 @@ def test_run_pipeline_plot_plus_stats_uses_plot_image_and_markdown(tmp_path: Pat
             metric_pattern="mean-incum",
             metric_description="weekly milk",
             skip_summarization=True,
-            evidence_mode="plot+stats",
+            evidence_mode="plot+table",
         ),
         prompts=PromptsConfig(
             context_prompt="Context {parameters} {documentation}",
@@ -445,7 +444,7 @@ def test_run_pipeline_plot_plus_stats_uses_plot_image_and_markdown(tmp_path: Pat
 
     trend_request = adapter.requests[-1]
     assert trend_request.image_b64 is not None
-    assert "| time_step | mean | std | min | max | median |" in trend_request.user_prompt()
+    assert "time_step,mean,std,min,max,median" in trend_request.user_prompt()
 
 
 def test_run_pipeline_writes_reproducibility_metadata(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

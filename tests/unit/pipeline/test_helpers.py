@@ -3,6 +3,8 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
+import pandas as pd
+
 from distill_abm.configs.models import PromptsConfig
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.pipeline import helpers
@@ -47,7 +49,7 @@ def test_build_context_prompt_includes_role_when_enabled(tmp_path: Path) -> None
     assert prompts_text.startswith("ROLE")
 
 
-def test_build_trend_prompt_includes_optional_stats_markdown_and_plot_description() -> None:
+def test_build_trend_prompt_includes_optional_stats_csv_and_plot_description() -> None:
     prompts = PromptsConfig(
         context_prompt="Context {parameters} {documentation}",
         trend_prompt="Trend {description} {context}",
@@ -58,14 +60,35 @@ def test_build_trend_prompt_includes_optional_stats_markdown_and_plot_descriptio
         metric_description="coverage",
         context="context",
         plot_description="Line A",
-        evidence_mode="stats-markdown",
-        stats_markdown="| time_step | mean | std | min | max | median |",
+        evidence_mode="table-csv",
+        stats_table_csv="time_step,mean,std,min,max,median\n0,1.0,0.1,0.8,1.2,1.0\n",
         enabled={"example"},
     )
     assert prompt.startswith("Trend coverage context")
     assert "\n\nEXAMPLE" in prompt
     assert "INSIGHTS" not in prompt
-    assert "| time_step | mean | std | min | max | median |" in prompt
+    assert "time_step,mean,std,min,max,median" in prompt
+
+
+def test_build_stats_csv_uses_expected_column_order() -> None:
+    stats_table = pd.DataFrame(
+        {
+            "time_step": [0],
+            "mean": [1.0],
+            "std": [0.1],
+            "min": [0.8],
+            "max": [1.2],
+            "median": [1.0],
+        }
+    )
+    csv_text = helpers.build_stats_csv(stats_table)
+    assert csv_text.startswith("time_step,mean,std,min,max,median\n")
+
+
+def test_resolve_evidence_mode_maps_compatibility_aliases() -> None:
+    assert helpers.resolve_evidence_mode("stats-markdown") == "table-csv"
+    assert helpers.resolve_evidence_mode("stats-image") == "table-csv"
+    assert helpers.resolve_evidence_mode("plot+stats") == "plot+table"
 
 
 def test_load_existing_rows_if_compatible_rejects_schema_mismatch() -> None:
