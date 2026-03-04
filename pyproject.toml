@@ -76,6 +76,7 @@ packages = ["distill_abm"]
 [[tool.mypy.overrides]]
 module = [
   "anthropic",
+  "yaml",
   "nltk.*",
   "nbformat",
   "ollama",
@@ -86,3 +87,9 @@ module = [
   "unidecode",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+  "yaml"
+]
+follow_imports = "skip"

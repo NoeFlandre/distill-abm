@@ -110,7 +110,7 @@ def _execute_safe_nodes(source: str, namespace: dict[str, Any]) -> None:
     except SyntaxError:
         return
     for node in tree.body:
-        if isinstance(node, (ast.Import, ast.ImportFrom)):
+        if isinstance(node, ast.Import | ast.ImportFrom):
             _safe_exec(node, namespace)
             continue
         if isinstance(node, ast.Assign) and _is_literal_like(node.value):
@@ -119,7 +119,7 @@ def _execute_safe_nodes(source: str, namespace: dict[str, Any]) -> None:
         if isinstance(node, ast.AnnAssign) and node.value is not None and _is_literal_like(node.value):
             _safe_exec(node, namespace)
             continue
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+        if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
             _safe_exec(node, namespace)
             continue
 
@@ -136,7 +136,7 @@ def _safe_exec(node: ast.stmt, namespace: dict[str, Any]) -> None:
 def _is_literal_like(node: ast.AST) -> bool:
     if isinstance(node, ast.Constant):
         return True
-    if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+    if isinstance(node, ast.List | ast.Tuple | ast.Set):
         return all(_is_literal_like(item) for item in node.elts)
     if isinstance(node, ast.Dict):
         keys_ok = all(key is None or _is_literal_like(key) for key in node.keys)

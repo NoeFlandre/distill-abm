@@ -7,11 +7,13 @@ from typing import Any
 import pandas as pd
 
 from distill_abm.ingest.netlogo_notebook_workflow import (
+    _coerce_parameter_value_for_netlogo,
     build_parameter_narrative,
     extract_code_to_text,
     extract_documentation_to_json,
     run_netlogo_experiment,
     run_notebook_ingest_workflow,
+    run_single_repetition,
     save_experiment_parameters,
     update_gui_with_experiment_parameters,
 )
@@ -34,6 +36,28 @@ class _FakeNetLogoLink:
     def report(self, reporter: str) -> int:
         # deterministic per call for test assertions
         return self.tick * 10 + len(reporter)
+
+
+def test_coerce_parameter_value_for_netlogo() -> None:
+    assert _coerce_parameter_value_for_netlogo(True) == "true"
+    assert _coerce_parameter_value_for_netlogo(False) == "false"
+    assert _coerce_parameter_value_for_netlogo(7) == 7
+    assert _coerce_parameter_value_for_netlogo("abc") == "abc"
+
+
+def test_run_single_repetition_collects_reported_ticks() -> None:
+    fake = _FakeNetLogoLink()
+    frame = run_single_repetition(
+        netlogo=fake,
+        reporters=["mean-incum", "mean-alt"],
+        max_ticks=90,
+        interval=30,
+        experiment_parameters=None,
+    )
+
+    assert frame.columns.tolist() == ["mean-incum", "mean-alt", "tick"]
+    assert frame["tick"].tolist() == [0, 30, 60]
+    assert fake.commands == ["setup", "go", "go", "go"]
 
 
 def test_run_netlogo_experiment_notebook_style_loop_and_csv(tmp_path: Path) -> None:
