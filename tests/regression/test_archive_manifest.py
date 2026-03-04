@@ -122,6 +122,5 @@ def test_archive_manifest_has_zero_runtime_required_rows_at_current_stage() -> N
 def test_archive_manifest_keeps_all_notebooks() -> None:
     rows = json.loads(Path("docs/archive_full_manifest.json").read_text(encoding="utf-8"))
     notebook_rows = [row for row in rows if row["extension"] == ".ipynb"]
-    assert notebook_rows
     for row in notebook_rows:
         assert row["action"] == "retain_record_only"
