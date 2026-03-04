@@ -10,6 +10,7 @@ from distill_abm.legacy.notebook_loader import (
     available_function_names,
     get_notebook_function,
     get_notebook_source_path,
+    missing_required_notebook_functions,
 )
 
 
@@ -64,3 +65,7 @@ def test_provenance_avoids_archive_copy_and_checkpoints_case_insensitive() -> No
 def test_missing_notebook_function_raises_key_error() -> None:
     with pytest.raises(KeyError):
         get_notebook_function("_does_not_exist_")
+
+
+def test_loader_exposes_all_required_notebook_functions_for_safe_decommission() -> None:
+    assert missing_required_notebook_functions() == []
