@@ -18,6 +18,8 @@ Provide executable parity coverage across ingestion, plotting, scoring, prompt c
 10. `distill_abm.ingest.netlogo_notebook_workflow` captures the notebook-style NetLogo preprocessing flow (parameter JSON, GUI JSON, documentation/code outputs).
 11. `configs/notebook_experiment_settings.yaml` preserves Fauna, Grazing, and Milk Consumption ingestion settings and parameter dictionaries for provenance and replay.
 12. `tests/unit/legacy` validates loader priority, notebook dispatch behavior, fallback safety, and source resolution order.
+13. `tests/fixtures/notebook_parity/model_assets/Models/` is now the canonical non-archive mirror for ABM `CSV`, `JSON`, `TXT`, `NetLogo`, and `Images` assets.
+14. `tests/regression/test_model_assets_migration.py` enforces full file coverage and byte-equivalence between legacy ABM asset folders and the canonical mirror.
 
 ## Current parity status
 
