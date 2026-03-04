@@ -110,5 +110,7 @@ class NotebookExperimentSettings(BaseModel):
     llm_defaults: NotebookLLMDefaults
     doe_defaults: NotebookDoEDefaults
     fauna_from_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
+    grazint_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
+    milk_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
     qualitative_example_text_dir: str
     human_reference_dir: str
