@@ -5,12 +5,14 @@ from pathlib import Path
 import pytest
 
 from distill_abm.legacy.notebook_loader import (
+    REQUIRED_NOTEBOOK_FUNCTIONS,
     _is_better_source,
     _path_priority,
     available_function_names,
     get_notebook_function,
     get_notebook_source_path,
     missing_required_notebook_functions,
+    required_notebook_function_sources,
 )
 
 
@@ -69,3 +71,11 @@ def test_missing_notebook_function_raises_key_error() -> None:
 
 def test_loader_exposes_all_required_notebook_functions_for_safe_decommission() -> None:
     assert missing_required_notebook_functions() == []
+
+
+def test_required_function_sources_resolve_for_notebook_deletion_planning() -> None:
+    sources = required_notebook_function_sources()
+    assert sorted(sources.keys()) == sorted(REQUIRED_NOTEBOOK_FUNCTIONS)
+    for source in sources.values():
+        assert source.exists()
+        assert source.is_relative_to(Path("archive/legacy_repo/Code"))
