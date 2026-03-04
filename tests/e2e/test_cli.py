@@ -81,6 +81,7 @@ def test_cli_run_forwards_paper_modes_and_summarizers(tmp_path: Path, monkeypatc
             "bart",
             "--summarizer",
             "t5",
+            "--allow-summary-fallback",
         ],
     )
 
@@ -89,6 +90,7 @@ def test_cli_run_forwards_paper_modes_and_summarizers(tmp_path: Path, monkeypatc
     assert inputs.evidence_mode == "table"
     assert inputs.text_source_mode == "summary_only"
     assert inputs.summarizers == ("bart", "t5")
+    assert inputs.allow_summary_fallback is True
 
 
 def test_cli_run_with_model_id_uses_registry(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -312,6 +314,7 @@ def test_cli_smoke_qwen_forwards_inputs(tmp_path: Path, monkeypatch: pytest.Monk
             "full_text_only",
             "--summarizer",
             "bert",
+            "--allow-summary-fallback",
         ],
     )
 
@@ -319,6 +322,7 @@ def test_cli_smoke_qwen_forwards_inputs(tmp_path: Path, monkeypatch: pytest.Monk
     inputs = captured["inputs"]
     assert inputs.evidence_mode == "table"
     assert inputs.text_source_mode == "full_text_only"
+    assert inputs.allow_summary_fallback is True
     assert inputs.summarizers == ("bert",)
 
 
@@ -334,3 +338,38 @@ def test_validate_model_policy_blocks_debug_model_without_flag() -> None:
             model="qwen/qwen3-vl-235b-a22b-thinking",
             allow_debug_model=False,
         )
+
+
+def test_validate_model_policy_allows_supported_benchmark_models() -> None:
+    cli_module._validate_model_policy(
+        provider="openrouter", model="moonshotai/kimi-k2.5", allow_debug_model=False
+    )
+    cli_module._validate_model_policy(
+        provider="openrouter", model="google/gemini-3.1-pro-preview", allow_debug_model=False
+    )
+    cli_module._validate_model_policy(provider="ollama", model="qwen3.5:0.8b", allow_debug_model=False)
+
+
+def test_validate_model_policy_blocks_unsupported_benchmark_model() -> None:
+    with pytest.raises(typer.BadParameter):
+        cli_module._validate_model_policy(provider="openrouter", model="unsupported-model", allow_debug_model=False)
+
+
+def test_validate_model_policy_debug_model_allowed_with_flag() -> None:
+    cli_module._validate_model_policy(
+        provider="openrouter",
+        model="qwen/qwen3-vl-235b-a22b-thinking",
+        allow_debug_model=True,
+    )
+
+
+def test_validate_model_policy_requires_local_ollama_model_available(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, str] = {}
+
+    def fake_run(cmd: list[str], check: bool, capture_output: bool, text: bool):  # type: ignore[no-untyped-def]
+        captured["cmd"] = " ".join(cmd)
+        return SimpleNamespace(stdout="NAME           ID\nqwen3.5:0.8b   0\n", returncode=0)
+
+    monkeypatch.setattr(cli_module.subprocess, "run", fake_run)
+    cli_module._validate_model_policy(provider="ollama", model="qwen3.5:0.8b", allow_debug_model=False)
+    assert captured["cmd"] == "ollama list"

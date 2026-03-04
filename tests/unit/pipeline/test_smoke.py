@@ -82,6 +82,7 @@ def test_run_qwen_smoke_suite_writes_matrix_and_reports(tmp_path: Path) -> None:
             metric_pattern="mean-incum",
             metric_description="weekly milk trend",
             plot_description="plot description text",
+            allow_summary_fallback=True,
         ),
         prompts=prompts,
         adapter=adapter,
