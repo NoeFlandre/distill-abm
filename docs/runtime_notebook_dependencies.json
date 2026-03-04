@@ -20,13 +20,5 @@
       "return_csv_2"
     ],
     "function_count": 9
-  },
-  {
-    "notebook_path": "archive/legacy_repo/Code/Evaluation/Making the Sheet Structure/Final Sheet.ipynb",
-    "required_functions": [
-      "fill_faithfulness_scores",
-      "update_structured_df"
-    ],
-    "function_count": 2
   }
 ]
