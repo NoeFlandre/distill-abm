@@ -57,7 +57,9 @@ def run(
     ] = None,
     evidence_mode: Annotated[
         EvidenceMode,
-        typer.Option(help="Evidence provided to trend analysis: plot, stats-markdown, stats-image, or plot+stats."),
+        typer.Option(
+            help="Evidence ablation mode: plot (vision only), table-csv (text table only), or plot+table (both)."
+        ),
     ] = "plot",
     skip_summarization: Annotated[
         bool,

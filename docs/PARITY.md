@@ -59,9 +59,8 @@ The following reference scripts have been replaced by production implementations
   - trend phase: optional `style_features.role`, trend template, optional `style_features.example`, optional `style_features.insights`, plus plot description
 - Evidence modes supported by pipeline:
   - `plot`
-  - `stats-markdown`
-  - `stats-image`
-  - `plot+stats`
+  - `table-csv`
+  - `plot+table`
 
 Default request temperature is `0.5` (validated in `LLMRequest`).
 

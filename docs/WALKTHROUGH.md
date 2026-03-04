@@ -16,7 +16,7 @@ The system turns NetLogo simulation outputs into text-and-metric summaries using
 
 The pipeline supports both:
 
-- **reference mode** (`--plot` / `--stats-markdown` / `--stats-image` / `plot+stats`)
+- **evidence ablation mode** (`--evidence-mode plot` / `--evidence-mode table-csv` / `--evidence-mode plot+table`)
 - **full-text mode** (`--summarization-mode full` or `--skip-summarization`)
 - **summary mode** (`--summarization-mode summary`)
 - **dual mode** (`--summarization-mode both`, stores both trend text forms)
@@ -93,14 +93,13 @@ Trend prompts include:
 - trend prompt template
 - optional style features (`role`, `example`, `insights`)
 - plot/asset context text if available
-- selected evidence mode (`plot`, `stats-markdown`, `stats-image`, `plot+stats`)
+- selected evidence mode (`plot`, `table-csv`, `plot+table`)
 
 ### Evidence modes
 
 - `plot` : sends chart image bytes + prompt instructions.
-- `stats-markdown` : sends markdown stats table inline in prompt text.
-- `stats-image` : sends generated stats table image.
-- `plot+stats` : sends both plot and markdown stats in one combined evidence request.
+- `table-csv` : sends stats table inline as CSV text only (no image attached).
+- `plot+table` : sends plot image and also embeds stats table CSV in prompt text.
 
 ### Multi-image trend phase
 

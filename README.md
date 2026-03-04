@@ -98,9 +98,8 @@ Run evidence ablations:
 
 ```bash
 uv run distill-abm run ... --evidence-mode plot
-uv run distill-abm run ... --evidence-mode stats-markdown
-uv run distill-abm run ... --evidence-mode stats-image
-uv run distill-abm run ... --evidence-mode plot+stats
+uv run distill-abm run ... --evidence-mode table-csv
+uv run distill-abm run ... --evidence-mode plot+table
 ```
 
 Run full-text baseline or summary-based runs:
@@ -110,7 +109,7 @@ uv run distill-abm run \
   --csv-path path/to/reduced.csv \
   --parameters-path path/to/params.txt \
   --documentation-path path/to/docs.txt \
-  --evidence-mode plot+stats \
+  --evidence-mode plot+table \
   --skip-summarization
 ```
 

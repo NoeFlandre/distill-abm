@@ -15,9 +15,10 @@ from distill_abm.eval.metrics import SummaryScores
 from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMRequest
 from distill_abm.summarize.models import summarize_with_bart, summarize_with_bert
 from distill_abm.summarize.text import clean_markdown_symbols, strip_think_prefix
-from distill_abm.viz.plots import generate_stats_table, render_stats_table_image, render_stats_table_markdown
+from distill_abm.viz.plots import generate_stats_table
 
-EvidenceMode = Literal["plot", "stats-markdown", "stats-image", "plot+stats"]
+EvidenceMode = Literal["plot", "table-csv", "plot+table", "stats-markdown", "stats-image", "plot+stats"]
+ResolvedEvidenceMode = Literal["plot", "table-csv", "plot+table"]
 
 
 class SweepRow(Protocol):
@@ -50,7 +51,7 @@ def build_trend_prompt(
     context: str,
     plot_description: str | None,
     evidence_mode: EvidenceMode,
-    stats_markdown: str,
+    stats_table_csv: str,
     enabled: set[str] | None = None,
 ) -> str:
     """Compose trend prompt with optional role/example/insight features and stats overlay."""
@@ -77,8 +78,9 @@ def build_trend_prompt(
         if stripped_plot:
             parts.append(stripped_plot)
 
-    if evidence_mode in {"stats-markdown", "plot+stats"}:
-        parts.append(f"Stats table:\n{stats_markdown}")
+    resolved_mode = resolve_evidence_mode(evidence_mode)
+    if resolved_mode in {"table-csv", "plot+table"}:
+        parts.append(f"Stats table (CSV):\n{stats_table_csv}")
 
     return "\n\n".join(parts)
 
@@ -152,28 +154,43 @@ def build_stats_table(frame: pd.DataFrame, include_pattern: str) -> pd.DataFrame
     return generate_stats_table(frame, include_pattern=include_pattern)
 
 
-def build_stats_markdown(stats_table: pd.DataFrame) -> str:
-    """Render stats table as Markdown."""
-    return render_stats_table_markdown(stats_table)
+def build_stats_csv(stats_table: pd.DataFrame) -> str:
+    """Render stats table as CSV text for text-only prompt evidence."""
+    columns = ["time_step", "mean", "std", "min", "max", "median"]
+    table = stats_table[columns]
+    return table.to_csv(index=False, lineterminator="\n")
 
 
 def write_stats_image_if_needed(
     stats_table: pd.DataFrame, output_dir: Path, include_pattern: str, evidence_mode: EvidenceMode
 ) -> Path | None:
-    """Render stats image only for stats-image mode and return artifact path."""
-    if evidence_mode != "stats-image":
-        return None
-    path = output_dir / f"{_slug(include_pattern)}_stats.png"
-    return render_stats_table_image(stats_table, path)
+    """Stats-table images are disabled for reviewer table-only ablations."""
+    _ = (stats_table, output_dir, include_pattern, evidence_mode)
+    return None
 
 
 def encode_evidence_image(evidence_mode: EvidenceMode, plot_path: Path, stats_image_path: Path | None) -> str | None:
     """Select an encoded image for trend-stage evidence."""
-    if evidence_mode in {"plot", "plot+stats"}:
+    _ = stats_image_path
+    resolved_mode = resolve_evidence_mode(evidence_mode)
+    if resolved_mode in {"plot", "plot+table"}:
         return encode_image(plot_path)
-    if evidence_mode == "stats-image" and stats_image_path is not None:
-        return encode_image(stats_image_path)
     return None
+
+
+def resolve_evidence_mode(evidence_mode: EvidenceMode) -> ResolvedEvidenceMode:
+    """Map compatibility aliases to canonical reviewer-facing ablation modes."""
+    if evidence_mode == "plot":
+        return "plot"
+    if evidence_mode == "table-csv":
+        return "table-csv"
+    if evidence_mode == "plot+table":
+        return "plot+table"
+    if evidence_mode in {"stats-markdown", "stats-image"}:
+        return "table-csv"
+    if evidence_mode == "plot+stats":
+        return "plot+table"
+    raise ValueError(f"unsupported evidence mode: {evidence_mode}")
 
 
 def write_report(
