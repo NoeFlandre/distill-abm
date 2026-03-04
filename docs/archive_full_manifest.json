@@ -2378,32 +2378,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb",
-    "sha256": "f06b543a21e09984e2514ec0824db2150db61b1040eb507e5ae750f0afabb556",
-    "size_bytes": 134450,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Fauna/3. (Deepseek) With combinations.ipynb"
-    ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb",
-    "sha256": "d8b8183354737741d7f6f83a15244648f8a588a872584a9bd494a497c613652f",
-    "size_bytes": 459626,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Models/Fauna/4. Generating the summary-Copy1.ipynb",
     "sha256": "30a15708d3efd54fcdb460623bbabe89bd666b8f8b8b3da61a0d9b9677a11e7b",
     "size_bytes": 14223,
@@ -3015,32 +2989,6 @@
     "source_notebook_links": []
   },
   {
-    "path": "archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb",
-    "sha256": "0f9593c6f1d7b6cbb2f1059ea69627e74e82277aa68c8bc3dbd99097b084547c",
-    "size_bytes": 57268,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Grazing/3. (Deepseek) With combinations.ipynb"
-    ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb",
-    "sha256": "c60a41698a33867b7ddd822420e5a37c753ca36ce279812573fc615c4678f254",
-    "size_bytes": 332527,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Grazing/3bis. (Claude) With combinations.ipynb"
-    ]
-  },
-  {
     "path": "archive/legacy_repo/Code/Models/Grazing/4. Generating the summary-Copy1.ipynb",
     "sha256": "12a63e48005a40071e11725e69d19df7fafb5b50946ee17e647574f8da73087f",
     "size_bytes": 13463,
@@ -3606,32 +3554,6 @@
     "target_path": "tests/fixtures/notebook_parity/experiment_settings/Models/Grazing/TXT/narrativeCombined200.txt",
     "rationale": "Model parameter/documentation inputs used in notebook runs.",
     "source_notebook_links": []
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb",
-    "sha256": "6ae646611a03d98ccf4802e9ede351049b66441e405ddb2f01c9a3a5740fb58c",
-    "size_bytes": 30037,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Milk Consumption/3. (Deepseek) With combinations.ipynb"
-    ]
-  },
-  {
-    "path": "archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb",
-    "sha256": "a18b330b9d4c915a35b2e92ba0fe1f4f70144f3924eb824afcc130c611f668fe",
-    "size_bytes": 347312,
-    "extension": ".ipynb",
-    "classification": "historical_nonruntime",
-    "action": "retain_record_only",
-    "target_path": null,
-    "rationale": "Notebook retained for full provenance, even when non-runtime.",
-    "source_notebook_links": [
-      "Models/Milk Consumption/3bis. (Claude) With combinations.ipynb"
-    ]
   },
   {
     "path": "archive/legacy_repo/Code/Models/Milk Consumption/4. Generating the summary.ipynb",

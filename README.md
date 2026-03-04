@@ -226,8 +226,14 @@ docker run --rm distill-abm
 - Regenerate parity/audit artifacts with `python scripts/refresh_parity_artifacts.py`.
 - Notebooks removed from runtime usage now include:
   - `archive/legacy_repo/Code/Models/Fauna/3. (GPT) With combinations-Copy1 copy.ipynb`
+  - `archive/legacy_repo/Code/Models/Fauna/3. (Deepseek) With combinations.ipynb`
+  - `archive/legacy_repo/Code/Models/Fauna/3bis. (Claude) With combinations-Copy1.ipynb`
   - `archive/legacy_repo/Code/Models/Grazing/3. With combinations-Copy1.ipynb`
+  - `archive/legacy_repo/Code/Models/Grazing/3. (Deepseek) With combinations.ipynb`
+  - `archive/legacy_repo/Code/Models/Grazing/3bis. (Claude) With combinations.ipynb`
   - `archive/legacy_repo/Code/Models/Milk Consumption/3. (GPT) With combinations.ipynb`
+  - `archive/legacy_repo/Code/Models/Milk Consumption/3. (Deepseek) With combinations.ipynb`
+  - `archive/legacy_repo/Code/Models/Milk Consumption/3bis. (Claude) With combinations.ipynb`
 - Notebook-discard sequence is now: remove deprecated files, run `python scripts/refresh_parity_artifacts.py`, then run full gates.
 - Deepseek-style dual-model sweep behavior (text context model + multimodal trend model) is supported directly in `run_pipeline_sweep`.
 - `distill_abm.legacy.notebook_loader` builds a callable registry from notebooks and prefers sources in this order:
