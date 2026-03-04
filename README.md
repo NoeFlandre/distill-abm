@@ -55,6 +55,25 @@ uv run mypy src tests
 uv run pytest --cov=distill_abm --cov-report=term-missing --cov-fail-under=85
 ```
 
+## Deployment
+
+1. Install dependencies:
+
+```bash
+uv sync --extra dev
+```
+
+2. Configure provider credentials in your environment (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`) for remote adapters.
+
+3. Run either local commands or containerized workflow:
+
+```bash
+docker build -t distill-abm .
+docker run --rm -v \"$(pwd):/app\" distill-abm distill-abm run ...
+```
+
+4. Keep each output directory plus `pipeline_run_metadata.json` in immutable storage for full replay.
+
 ## CLI
 
 Run the core pipeline:
@@ -224,6 +243,12 @@ Compatibility details used by parity:
 - Reference loader execution is AST-restricted and intentionally does not execute full side-effectful reference cells.
 - `return_csv` and `return_csv_2` are protected by fallback behavior if reference execution is unavailable.
 - Default request temperature is `0.5`.
+
+### Reproducibility manifest
+
+- `pipeline_run_metadata.json` is emitted for each `run` execution.
+- It captures input artifact paths, prompt signatures, provider settings (`temperature`, `max_tokens`), and score outputs.
+- The metadata file is intended to be versioned together with `report.csv` and generated plot files.
 
 ## License
 

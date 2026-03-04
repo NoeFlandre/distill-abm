@@ -1,4 +1,5 @@
 import csv
+import json
 from pathlib import Path
 
 import pytest
@@ -362,6 +363,56 @@ def test_run_pipeline_plot_plus_stats_uses_plot_image_and_markdown(tmp_path: Pat
     trend_request = adapter.requests[-1]
     assert trend_request.image_b64 is not None
     assert "| time_step | mean | std | min | max | median |" in trend_request.user_prompt()
+
+
+def test_run_pipeline_writes_reproducibility_metadata(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("doc", encoding="utf-8")
+
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bart", lambda text: f"bart::{text}")
+    monkeypatch.setattr("distill_abm.pipeline.run.summarize_with_bert", lambda text: f"bert::{text}")
+    adapter = FakeAdapter()
+
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=params,
+            documentation_path=docs,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            summarization_mode="both",
+            score_on="both",
+        ),
+        prompts=PromptsConfig(
+            context_prompt="Context {parameters} {documentation}",
+            trend_prompt="Trend {description}",
+        ),
+        adapter=adapter,
+    )
+
+    assert result.metadata_path is not None
+    metadata = json.loads(result.metadata_path.read_text(encoding="utf-8"))
+
+    assert metadata["inputs"]["metric_pattern"] == "mean-incum"
+    assert metadata["inputs"]["metric_description"] == "weekly milk"
+    assert metadata["artifacts"]["plot_path"] == str(result.plot_path)
+    assert metadata["artifacts"]["report_csv"] == str(result.report_csv)
+    assert metadata["llm"]["provider"] == "fake"
+    assert metadata["llm"]["request"]["temperature"] == 0.5
+    assert metadata["llm"]["request"]["max_tokens"] == 1000
+    assert len(metadata["reproducibility"]["context_prompt_signature"]) == 64
+    assert len(metadata["reproducibility"]["trend_prompt_signature"]) == 64
+    assert metadata["reproducibility"]["delimiter"] == ","
+    assert metadata["summarizers"]["longformer_like"]["model"] == "allenai/led-base-16384"
+    assert metadata["scores"]["selected_scores"]["token_f1"] == result.token_f1
+    assert metadata["scores"]["summary_scores"] is not None
 
 
 def test_run_pipeline_applies_notebook_style_prompt_parts_and_plot_description(tmp_path: Path) -> None:
