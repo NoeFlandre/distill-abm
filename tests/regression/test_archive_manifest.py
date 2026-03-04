@@ -27,7 +27,7 @@ def test_archive_manifest_has_no_unresolved_required_mappings() -> None:
             "historical_nonruntime",
             "legacy_visualization",
         }
-        assert action in {"migrate", "retain_record_only", "archive_separately", "discard_with_rationale"}
+        assert action in {"migrate", "retain_record_only"}
         assert isinstance(rationale, str) and rationale.strip()
         if classification in required:
             assert target_path is not None and str(target_path).strip()
