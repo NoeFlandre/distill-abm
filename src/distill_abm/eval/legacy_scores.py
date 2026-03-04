@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
+
+import pandas as pd
 
 
 @dataclass(frozen=True)
@@ -71,3 +75,70 @@ def _safe_divide(numerator: float, denominator: float) -> float:
     if denominator == 0:
         return 0.0
     return numerator / denominator
+
+
+def score_summaries_csv_batch(
+    input_csv: Path,
+    output_csv: Path,
+    ground_truth_text: str,
+    bart_column: str = "Summary (BART) Reduced",
+    bert_column: str = "Summary (BERT) Reduced",
+    score_fn: Callable[[str, str], LegacyScores] | None = None,
+) -> pd.DataFrame:
+    """Runs notebook-6 lexical scoring for BART and BERT summary columns."""
+    frame = pd.read_csv(input_csv)
+    missing = [column for column in [bart_column, bert_column] if column not in frame.columns]
+    if missing:
+        raise ValueError(f"missing summary columns: {', '.join(missing)}")
+
+    scorer = score_fn or compute_scores
+    (
+        frame["BLEU (BART)"],
+        frame["METEOR (BART)"],
+        frame["ROUGE-1 (BART)"],
+        frame["ROUGE-2 (BART)"],
+        frame["ROUGE-L (BART)"],
+        frame["Flesch Reading Ease (BART)"],
+    ) = _score_column(frame, bart_column, ground_truth_text, scorer)
+    (
+        frame["BLEU (BERT)"],
+        frame["METEOR (BERT)"],
+        frame["ROUGE-1 (BERT)"],
+        frame["ROUGE-2 (BERT)"],
+        frame["ROUGE-L (BERT)"],
+        frame["Flesch Reading Ease (BERT)"],
+    ) = _score_column(frame, bert_column, ground_truth_text, scorer)
+
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
+    frame.to_csv(output_csv, index=False)
+    return frame
+
+
+def _score_column(
+    frame: pd.DataFrame,
+    column: str,
+    ground_truth_text: str,
+    score_fn: Callable[[str, str], LegacyScores],
+) -> tuple[list[float], list[float], list[float], list[float], list[float], list[float]]:
+    bleu_scores: list[float] = []
+    meteor_scores: list[float] = []
+    rouge1_scores: list[float] = []
+    rouge2_scores: list[float] = []
+    rouge_l_scores: list[float] = []
+    flesch_scores: list[float] = []
+    for summary in frame[column]:
+        scores = score_fn(ground_truth_text, str(summary))
+        bleu_scores.append(scores.bleu)
+        meteor_scores.append(scores.meteor)
+        rouge1_scores.append(scores.rouge1)
+        rouge2_scores.append(scores.rouge2)
+        rouge_l_scores.append(scores.rouge_l)
+        flesch_scores.append(scores.flesch_reading_ease)
+    return (
+        bleu_scores,
+        meteor_scores,
+        rouge1_scores,
+        rouge2_scores,
+        rouge_l_scores,
+        flesch_scores,
+    )

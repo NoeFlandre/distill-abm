@@ -118,6 +118,14 @@ class NotebookSummaryGenerationDefaults(BaseModel):
     milk: NotebookSummaryModelDefaults
 
 
+class NotebookScoringDefaults(BaseModel):
+    """Captures notebook-6 scoring references by ABM."""
+
+    fauna_ground_truth_path: str
+    grazing_ground_truth_path: str
+    milk_ground_truth_path: str
+
+
 class NotebookExperimentSettings(BaseModel):
     """Stores canonical notebook experiment references and defaults."""
 
@@ -127,5 +135,6 @@ class NotebookExperimentSettings(BaseModel):
     grazint_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
     milk_netlogo_to_csv: NotebookFromNetLogoCsvDefaults
     summary_generation: NotebookSummaryGenerationDefaults
+    scoring: NotebookScoringDefaults
     qualitative_example_text_dir: str
     human_reference_dir: str
