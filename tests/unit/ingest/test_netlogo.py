@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from distill_abm.ingest.netlogo import (
     clean_json_content,
     extract_code,
@@ -107,3 +109,72 @@ def test_clean_json_content(tmp_path: Path) -> None:
     )
     clean_json_content(source, out)
     assert out.read_text(encoding="utf-8") == "A\nB"
+
+
+
+
+
+def test_extract_documentation_raises_for_missing_doc_section(tmp_path: Path) -> None:
+    """Test that extract_documentation raises ValueError when no doc section exists."""
+    content = "globals [a b]\nto go\nend\n"
+    path = tmp_path / "no_doc.nlogo"
+    path.write_text(content, encoding="utf-8")
+
+    with pytest.raises(ValueError, match="documentation section not found"):
+        extract_documentation(path)
+
+
+def test_extract_code_raises_for_missing_code_section(tmp_path: Path) -> None:
+    """Test that extract_code raises ValueError when no code section exists."""
+    content = "not a valid netlogo file\n"
+    path = tmp_path / "no_code.nlogo"
+    path.write_text(content, encoding="utf-8")
+
+    with pytest.raises(ValueError, match="code section not found"):
+        extract_code(path)
+
+
+def test_extract_parameters_returns_empty_dict_for_no_gui() -> None:
+    """Test that extract_parameters returns empty dict when no GUI elements."""
+    code = "globals [a b]\nto go\nend\n"
+    params = extract_parameters(code)
+    # Returns empty dict when no GUI elements
+    assert params == {}
+
+
+def test_extract_experiment_parameters_string_with_empty_experiments() -> None:
+    """Test that extract_experiment_parameters handles empty experiments section in string."""
+    code = """globals [a b]
+to go
+end
+"""
+    # String with no experiments section - returns empty dict
+    values = extract_experiment_parameters(code)
+    assert isinstance(values, dict)
+
+
+def test_extract_experiment_parameters_accepts_code_string() -> None:
+    """Test that extract_experiment_parameters accepts string content."""
+    code_str = Path("data/fauna_abm/fauna.nlogo").read_text(encoding="utf-8")
+    # Should work with string content
+    values = extract_experiment_parameters(code_str, preferred_experiment="2023-20-6-0.33-0.8")
+    assert isinstance(values, dict)
+    assert "Output-csv-file" not in values
+
+
+def test_extract_experiment_parameters_falls_back_for_missing_experiment() -> None:
+    """Test that extract_experiment_parameters falls back when preferred experiment not found."""
+    code = """globals [a b]
+to go
+end
+@#$#@#$#@
+<experiments>
+<experiment name="Experiment1">
+<setup>setup</setup>
+</experiment>
+</experiments>
+"""
+    # Pass string directly (not Path)
+    values = extract_experiment_parameters(code, preferred_experiment="NonExistentExperiment")
+    # Falls back to first experiment
+    assert isinstance(values, dict)
