@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+import pytest
 
 from distill_abm.ingest.netlogo_workflow import (
     _coerce_parameter_value_for_netlogo,
@@ -208,3 +209,28 @@ def test_run_ingest_workflow_uses_reference_narrative_when_available(tmp_path: P
     )
 
     assert result["narrative_txt"].read_text(encoding="utf-8") == "Reference narrative"
+
+
+def test_default_link_factory_raises_when_pynetlogo_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that _default_link_factory raises RuntimeError when pynetlogo cannot be imported."""
+    import sys
+    
+    # Temporarily hide pynetlogo by removing it from sys.modules if present
+    original_modules = dict(sys.modules)
+    if 'pynetlogo' in sys.modules:
+        del sys.modules['pynetlogo']
+    
+    # Mock the import to fail
+    def mock_import(name: str, *args: object, **kwargs: object) -> object:
+        if name == 'pynetlogo' or name.startswith('pynetlogo'):
+            raise ImportError("simulated pynetlogo not available")
+        return original_modules.get(name)
+    
+    monkeypatch.setattr("builtins.__import__", mock_import)
+    
+    from distill_abm.ingest.netlogo_workflow import _default_link_factory
+    
+    with pytest.raises(RuntimeError) as exc_info:
+        _default_link_factory(netlogo_home="/fake/path")
+    
+    assert "pynetlogo" in str(exc_info.value).lower()
