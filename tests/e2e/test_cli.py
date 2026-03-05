@@ -47,6 +47,25 @@ def _write_min_nlogo_model(tmp_path: Path) -> tuple[Path, Path]:
     return model_path, experiment_parameters_path
 
 
+def _write_min_nlogo_model_dir(root: Path, abm_name: str, doc_text: str) -> tuple[Path, Path, Path]:
+    model_dir = root / f"{abm_name}_abm"
+    model_dir.mkdir(parents=True, exist_ok=True)
+    model_path = model_dir / f"{abm_name}.nlogo"
+    model_path.write_text(
+        "globals [a b]\n"
+        "to go\nend\n"
+        "@#$#@#$#@\n"
+        f"## WHAT IS IT?\n\n{doc_text}\n"
+        "@#$#@#$#@\n"
+        "SLIDER 0 0 10 10 slider-a slider-a 0 10 1 5\n"
+        "SWITCH 0 0 10 10 switch-b switch-b 1 0 0\n",
+        encoding="utf-8",
+    )
+    experiment_parameters_path = model_dir / "experiment_parameters.json"
+    experiment_parameters_path.write_text('{"slider-a": 3, "switch-b": true}', encoding="utf-8")
+    return model_path, experiment_parameters_path, model_dir
+
+
 def test_cli_run_forwards_paper_modes_and_summarizers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
     captured: dict[str, Any] = {}
@@ -278,10 +297,44 @@ def test_cli_ingest_netlogo_generates_visible_artifacts(tmp_path: Path) -> None:
 
     assert result.exit_code == 0
     assert (output_dir / "JSON" / "documentation100.json").exists()
+    assert (output_dir / "JSON" / "cleaned_documentation100.json").exists()
+    assert (output_dir / "JSON" / "documentation_without_default100.json").exists()
+    assert (output_dir / "TXT" / "final_documentation100.txt").exists()
+    assert (output_dir / "TXT" / "narrative_combined100.txt").exists()
+    # backward-compatible legacy filenames
     assert (output_dir / "JSON" / "cleaneddocumentation100.json").exists()
     assert (output_dir / "JSON" / "documentationWithoutDefault100.json").exists()
     assert (output_dir / "TXT" / "finalDocumentation100.txt").exists()
     assert (output_dir / "TXT" / "narrativeCombined100.txt").exists()
+
+
+def test_cli_ingest_netlogo_suite_generates_all_configured_abms(tmp_path: Path) -> None:
+    model_root = tmp_path / "data"
+    for abm, doc in [
+        ("fauna", "Fauna documentation"),
+        ("grazing", "Grazing documentation"),
+        ("milk_consumption", "Milk documentation"),
+    ]:
+        _write_min_nlogo_model_dir(model_root, abm, doc)
+    result = runner.invoke(
+        app,
+        [
+            "ingest-netlogo-suite",
+            "--models-root",
+            str(model_root),
+            "--output-root",
+            str(tmp_path / "ingest"),
+            "--suffix",
+            "100",
+        ],
+    )
+
+    assert result.exit_code == 0
+    for abm in ["fauna", "grazing", "milk_consumption"]:
+        assert (tmp_path / "ingest" / abm / "JSON" / "documentation100.json").exists()
+        assert (tmp_path / "ingest" / abm / "JSON" / "cleaned_documentation100.json").exists()
+        assert (tmp_path / "ingest" / abm / "TXT" / "final_documentation100.txt").exists()
+        assert (tmp_path / "ingest" / abm / "TXT" / "narrative_combined100.txt").exists()
 
 
 def test_cli_evaluate_qualitative_outputs_json(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -177,9 +177,15 @@ def test_run_ingest_workflow_end_to_end(tmp_path: Path) -> None:
     assert result["updated_gui_parameters_json"].exists()
     assert result["updated_experiment_parameters_json"].exists()
     assert result["narrative_txt"].exists()
+    # canonical artifact names
     assert result["documentation_json"].exists()
     assert result["cleaned_documentation_json"].exists()
     assert result["documentation_without_default_json"].exists()
     assert result["final_documentation_txt"].exists()
     assert result["extracted_code_txt"].exists()
+    # legacy filenames remain for compatibility
+    assert (output_dir / "JSON" / "cleaneddocumentation100.json").exists()
+    assert (output_dir / "JSON" / "documentationWithoutDefault100.json").exists()
+    assert (output_dir / "TXT" / "finalDocumentation100.txt").exists()
+    assert (output_dir / "TXT" / "narrativeCombined100.txt").exists()
     assert "We have 2 parameters:" in result["narrative_txt"].read_text(encoding="utf-8")
