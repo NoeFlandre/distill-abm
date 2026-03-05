@@ -504,3 +504,27 @@ def test_validate_model_policy_requires_local_ollama_model_available(monkeypatch
     monkeypatch.setattr(cli_module.subprocess, "run", fake_run)
     cli_module._validate_model_policy(provider="ollama", model="qwen3.5:0.8b", allow_debug_model=False)
     assert captured["cmd"] == "ollama list"
+
+
+def test_cli_analyze_doe_exits_on_analysis_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that analyze-doe exits with code 1 when analysis returns None."""
+    input_csv = tmp_path / "input.csv"
+    input_csv.write_text("a,b,score\n1,1,10\n2,2,20\n", encoding="utf-8")
+
+    def fake_analyze(*args: object, **kwargs: object) -> None:
+        return None
+
+    monkeypatch.setattr(cli_module, "analyze_factorial_anova", fake_analyze)
+
+    result = runner.invoke(
+        app,
+        [
+            "analyze-doe",
+            "--input-csv",
+            str(input_csv),
+            "--output-csv",
+            str(tmp_path / "output.csv"),
+        ],
+    )
+
+    assert result.exit_code == 1
