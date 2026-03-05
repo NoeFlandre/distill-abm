@@ -1,8 +1,57 @@
 from distill_abm.eval.metrics import score_summary
 
 
-def test_score_summary_ranges() -> None:
+def test_score_summary_basic_overlap() -> None:
+    """Test that basic token overlap is calculated correctly."""
     scores = score_summary(reference="the cat sat on the mat", candidate="cat sat on mat")
     assert 0.0 <= scores.token_f1 <= 1.0
     assert scores.reference_length == 6
     assert scores.candidate_length == 4
+    # "cat", "sat", "on", "mat" overlap. "the" (x2) doesn't.
+    # overlap = 4
+    # precision = 4/4 = 1.0
+    # recall = 4/6 = 0.666
+    # f1 = 2 * 1 * 0.66 / (1 + 0.66) = 1.33 / 1.66 = 0.8
+    assert round(scores.precision, 2) == 1.0
+    assert round(scores.recall, 2) == 0.67
+    assert round(scores.token_f1, 2) == 0.80
+
+
+def test_score_summary_identical() -> None:
+    """Test that identical strings give perfect scores."""
+    scores = score_summary("test string", "test string")
+    assert scores.precision == 1.0
+    assert scores.recall == 1.0
+    assert scores.token_f1 == 1.0
+
+
+def test_score_summary_no_overlap() -> None:
+    """Test that strings with no overlap give zero scores."""
+    scores = score_summary("abc", "def")
+    assert scores.precision == 0.0
+    assert scores.recall == 0.0
+    assert scores.token_f1 == 0.0
+
+
+def test_score_summary_empty_candidate() -> None:
+    """Test that an empty candidate string gives zero scores."""
+    scores = score_summary("abc", "")
+    assert scores.precision == 0.0
+    assert scores.recall == 0.0
+    assert scores.token_f1 == 0.0
+    assert scores.candidate_length == 0
+
+
+def test_score_summary_empty_reference() -> None:
+    """Test that an empty reference string gives zero scores."""
+    scores = score_summary("", "abc")
+    assert scores.precision == 0.0
+    assert scores.recall == 0.0
+    assert scores.token_f1 == 0.0
+    assert scores.reference_length == 0
+
+
+def test_score_summary_case_insensitive() -> None:
+    """Test that scoring is case-insensitive."""
+    scores = score_summary("THE CAT", "the cat")
+    assert scores.token_f1 == 1.0
