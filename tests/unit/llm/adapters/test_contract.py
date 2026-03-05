@@ -306,3 +306,44 @@ def test_janus_adapter_passes_image_and_sampling_fields() -> None:
 def test_external_errors_are_wrapped(adapter_cls: type[LLMAdapter], client: object) -> None:
     with pytest.raises(LLMProviderError):
         adapter_cls(model="x", client=client).complete(make_request())  # type: ignore[call-arg]
+
+
+def test_openrouter_adapter_raises_on_missing_api_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that OpenRouterAdapter raises LLMProviderError when API key is missing."""
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    
+    adapter = OpenRouterAdapter(model="test-model")
+    request = LLMRequest(
+        model="test-model",
+        messages=[LLMMessage(role="user", content="hello")],
+        temperature=0.1,
+        max_tokens=100,
+    )
+    
+    with pytest.raises(LLMProviderError) as exc_info:
+        adapter.complete(request)
+    
+    assert "api key missing" in str(exc_info.value).lower()
+
+
+def test_openrouter_adapter_raises_on_completion_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that OpenRouterAdapter raises LLMProviderError when completion fails."""
+    class FakeClient:
+        class Completions:
+            def create(self, **kwargs: object) -> None:
+                raise RuntimeError("network error")
+        
+        chat = Completions()
+    
+    adapter = OpenRouterAdapter(model="test-model", client=FakeClient())
+    request = LLMRequest(
+        model="test-model",
+        messages=[LLMMessage(role="user", content="hello")],
+        temperature=0.1,
+        max_tokens=100,
+    )
+    
+    with pytest.raises(LLMProviderError) as exc_info:
+        adapter.complete(request)
+    
+    assert "completion failed" in str(exc_info.value).lower()
