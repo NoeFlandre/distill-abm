@@ -565,3 +565,214 @@ def test_cli_run_fails_on_missing_csv_file(tmp_path: Path) -> None:
 
     assert result.exit_code != 0
     assert result.exit_code != 0  # Typer validates file existence
+
+
+def test_cli_ingest_netlogo_suite_continues_on_missing_with_flag(tmp_path: Path) -> None:
+    """Test that ingest-netlogo-suite continues processing when ABM is missing and --continue-on-missing is set."""
+    model_root = tmp_path / "data"
+    # Only create one ABM folder
+    _write_min_nlogo_model_dir(model_root, "fauna", "Fauna documentation")
+
+    result = runner.invoke(
+        app,
+        [
+            "ingest-netlogo-suite",
+            "--models-root",
+            str(model_root),
+            "--output-root",
+            str(tmp_path / "ingest"),
+            "--abm",
+            "fauna",
+            "--abm",
+            "grazing",  # This one doesn't exist
+            "--continue-on-missing",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "skipped ABMs" in result.stdout
+    assert "grazing" in result.stdout
+
+
+def test_cli_ingest_netlogo_suite_fails_on_missing_without_flag(tmp_path: Path) -> None:
+    """Test that ingest-netlogo-suite fails when ABM is missing and --continue-on-missing is not set."""
+    model_root = tmp_path / "data"
+    # Only create one ABM folder
+    _write_min_nlogo_model_dir(model_root, "fauna", "Fauna documentation")
+
+    result = runner.invoke(
+        app,
+        [
+            "ingest-netlogo-suite",
+            "--models-root",
+            str(model_root),
+            "--output-root",
+            str(tmp_path / "ingest"),
+            "--abm",
+            "fauna",
+            "--abm",
+            "grazing",  # This one doesn't exist
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "grazing" in result.output
+
+
+def test_cli_smoke_qwen_exits_on_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that smoke-qwen exits with code 1 when the smoke suite reports failure."""
+    csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
+
+    def fake_run_smoke(*, inputs, prompts, adapter, run_qualitative, doe_input_csv, run_sweep, cases, resume_existing):  # type: ignore[no-untyped-def]
+        _ = prompts, adapter, run_qualitative, doe_input_csv, run_sweep, cases, resume_existing
+        return SimpleNamespace(
+            report_markdown_path=Path("smoke.md"),
+            report_json_path=Path("smoke.json"),
+            doe_output_csv=None,
+            sweep_output_csv=None,
+            success=False,
+            failed_cases=["case-1", "case-2"],
+        )
+
+    monkeypatch.setattr(cli_module, "_validate_model_policy", lambda **_: None)
+    monkeypatch.setattr(cli_module, "create_adapter", lambda provider, model: object())
+    monkeypatch.setattr(cli_module, "run_qwen_smoke_suite", fake_run_smoke)
+
+    result = runner.invoke(
+        app,
+        [
+            "smoke-qwen",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--provider",
+            "echo",
+            "--model",
+            "echo-model",
+        ],
+    )
+
+    assert result.exit_code == 1
+    assert "smoke suite failed" in result.stdout
+
+
+def test_cli_smoke_qwen_rejects_unknown_case_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that smoke-qwen rejects unknown --case-id values."""
+    csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
+
+    monkeypatch.setattr(cli_module, "_validate_model_policy", lambda **_: None)
+
+    result = runner.invoke(
+        app,
+        [
+            "smoke-qwen",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--provider",
+            "echo",
+            "--model",
+            "echo-model",
+            "--case-id",
+            "nonexistent-case-id",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "unknown --case-id" in result.output
+
+
+def test_cli_run_fails_on_unknown_model_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that run command fails when model_id is not found in registry."""
+    csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
+    models = tmp_path / "models.yaml"
+    models.write_text(
+        """
+models:
+  kimi:
+    provider: openrouter
+    model: moonshotai/kimi-k2.5
+""",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(cli_module, "_validate_model_policy", lambda **_: None)
+
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--models-path",
+            str(models),
+            "--model-id",
+            "nonexistent-model",  # Not in registry
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "unknown model_id" in result.output
+
+
+def test_cli_ingest_fails_on_missing_experiment_parameters_file(tmp_path: Path) -> None:
+    """Test that ingest-netlogo fails when experiment parameters file is specified but doesn't exist."""
+    model_path, _ = _write_min_nlogo_model(tmp_path)
+    output_dir = tmp_path / "ingest_output"
+    missing_params = tmp_path / "nonexistent_params.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "ingest-netlogo",
+            "--model-path",
+            str(model_path),
+            "--experiment-parameters-path",
+            str(missing_params),
+            "--output-dir",
+            str(output_dir),
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "not found" in result.output
+
+
+def test_cli_ingest_fails_on_invalid_experiment_parameters_json(tmp_path: Path) -> None:
+    """Test that ingest-netlogo fails when experiment parameters file contains invalid JSON."""
+    model_path, _ = _write_min_nlogo_model(tmp_path)
+    output_dir = tmp_path / "ingest_output"
+    invalid_params = tmp_path / "invalid_params.json"
+    invalid_params.write_text("not valid json", encoding="utf-8")
+
+    result = runner.invoke(
+        app,
+        [
+            "ingest-netlogo",
+            "--model-path",
+            str(model_path),
+            "--experiment-parameters-path",
+            str(invalid_params),
+            "--output-dir",
+            str(output_dir),
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "JSON" in result.output
