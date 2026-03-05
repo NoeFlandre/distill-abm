@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import shutil
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any, cast
@@ -61,25 +60,6 @@ def _artifact_name_map(suffix: str) -> dict[str, str]:
         "final_documentation_txt": f"final_documentation{suffix}.txt",
         "extracted_code_txt": f"extracted_code{suffix}.txt",
     }
-
-
-def _artifact_legacy_names(suffix: str) -> dict[str, str]:
-    """Legacy filenames kept for backward-compatible consumers."""
-    return {
-        "cleaned_documentation_json": f"cleaneddocumentation{suffix}.json",
-        "documentation_without_default_json": f"documentationWithoutDefault{suffix}.json",
-        "final_documentation_txt": f"finalDocumentation{suffix}.txt",
-        "narrative_txt": f"narrativeCombined{suffix}.txt",
-    }
-
-
-def _write_legacy_artifact_aliases(artifact_paths: dict[str, Path], suffix: str) -> None:
-    """Write compatibility copies for legacy artifact filenames."""
-    for key, legacy_name in _artifact_legacy_names(suffix).items():
-        source = artifact_paths[key]
-        destination = source.parent / legacy_name
-        if source.exists():
-            shutil.copy2(source, destination)
 
 
 def _default_link_factory(*, netlogo_home: str) -> NetLogoLinkProtocol:
@@ -207,7 +187,7 @@ def run_ingest_workflow(
     model_path: Path,
     experiment_parameters: Mapping[str, ParameterScalar],
     output_dir: Path,
-    suffix: str = "100",
+    suffix: str = "",
 ) -> dict[str, Path]:
     """Run ingestion preprocessing workflow and return artifact paths."""
     json_dir = output_dir / "JSON"
@@ -254,5 +234,4 @@ def run_ingest_workflow(
         "final_documentation_txt": final_documentation_txt,
         "extracted_code_txt": extracted_code_txt,
     }
-    _write_legacy_artifact_aliases(artifact_paths, suffix)
     return artifact_paths

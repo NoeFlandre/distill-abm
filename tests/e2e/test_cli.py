@@ -66,6 +66,25 @@ def _write_min_nlogo_model_dir(root: Path, abm_name: str, doc_text: str) -> tupl
     return model_path, experiment_parameters_path, model_dir
 
 
+def _write_min_nlogo_model_file(
+    root: Path,
+    filename: str,
+    doc_text: str,
+) -> Path:
+    model_path = root / filename
+    model_path.write_text(
+        "globals [a b]\n"
+        "to go\nend\n"
+        "@#$#@#$#@\n"
+        f"## WHAT IS IT?\n\n{doc_text}\n"
+        "@#$#@#$#@\n"
+        "SLIDER 0 0 10 10 slider-a slider-a 0 10 1 5\n"
+        "SWITCH 0 0 10 10 switch-b switch-b 1 0 0\n",
+        encoding="utf-8",
+    )
+    return model_path
+
+
 def test_cli_run_forwards_paper_modes_and_summarizers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
     captured: dict[str, Any] = {}
@@ -301,11 +320,6 @@ def test_cli_ingest_netlogo_generates_visible_artifacts(tmp_path: Path) -> None:
     assert (output_dir / "JSON" / "documentation_without_default100.json").exists()
     assert (output_dir / "TXT" / "final_documentation100.txt").exists()
     assert (output_dir / "TXT" / "narrative_combined100.txt").exists()
-    # backward-compatible legacy filenames
-    assert (output_dir / "JSON" / "cleaneddocumentation100.json").exists()
-    assert (output_dir / "JSON" / "documentationWithoutDefault100.json").exists()
-    assert (output_dir / "TXT" / "finalDocumentation100.txt").exists()
-    assert (output_dir / "TXT" / "narrativeCombined100.txt").exists()
 
 
 def test_cli_ingest_netlogo_suite_generates_all_configured_abms(tmp_path: Path) -> None:
@@ -316,6 +330,33 @@ def test_cli_ingest_netlogo_suite_generates_all_configured_abms(tmp_path: Path) 
         ("milk_consumption", "Milk documentation"),
     ]:
         _write_min_nlogo_model_dir(model_root, abm, doc)
+    result = runner.invoke(
+        app,
+        [
+            "ingest-netlogo-suite",
+            "--models-root",
+            str(model_root),
+            "--output-root",
+            str(tmp_path / "ingest"),
+            "--suffix",
+            "100",
+        ],
+    )
+
+    assert result.exit_code == 0
+    for abm in ["fauna", "grazing", "milk_consumption"]:
+        assert (tmp_path / "ingest" / abm / "JSON" / "documentation100.json").exists()
+        assert (tmp_path / "ingest" / abm / "JSON" / "cleaned_documentation100.json").exists()
+        assert (tmp_path / "ingest" / abm / "TXT" / "final_documentation100.txt").exists()
+        assert (tmp_path / "ingest" / abm / "TXT" / "narrative_combined100.txt").exists()
+
+
+def test_cli_ingest_netlogo_suite_supports_root_level_model_files(tmp_path: Path) -> None:
+    model_root = tmp_path / "data"
+    model_root.mkdir()
+    _write_min_nlogo_model_file(model_root, "fauna.nlogo", "Root fauna documentation")
+    _write_min_nlogo_model_file(model_root, "grazing.nlogo", "Root grazing documentation")
+    _write_min_nlogo_model_file(model_root, "model.nlogo", "Root milk consumption documentation")
     result = runner.invoke(
         app,
         [

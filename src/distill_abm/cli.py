@@ -174,7 +174,7 @@ def ingest_netlogo(
         Path | None,
         typer.Option(help="Directory for artifacts. Defaults to results/ingest/<model-stem>."),
     ] = None,
-    suffix: Annotated[str, typer.Option(help="Suffix used in workflow artifact names.")] = "100",
+    suffix: Annotated[str, typer.Option(help="Suffix used in workflow artifact names.")] = "",
 ) -> None:
     """Run NetLogo preprocessing workflow and persist extracted artifacts."""
     resolved_output_dir = output_dir if output_dir is not None else Path("results") / "ingest" / model_path.stem
@@ -201,13 +201,15 @@ def ingest_netlogo_suite(
     ] = None,
     models_root: Annotated[
         Path,
-        typer.Option(help="Root directory containing per-ABM NetLogo folders."),
+        typer.Option(
+            help="Root directory containing ABM models. Supports per-ABM folders and root-level model files.",
+        ),
     ] = Path("data"),
     output_root: Annotated[
         Path,
         typer.Option(help="Root directory for generated artifacts."),
     ] = Path("results/ingest"),
-    suffix: Annotated[str, typer.Option(help="Suffix used in workflow artifact names.")] = "100",
+    suffix: Annotated[str, typer.Option(help="Suffix used in workflow artifact names.")] = "",
     continue_on_missing: Annotated[
         bool,
         typer.Option(help="Continue processing remaining ABMs if one ABM cannot be ingested."),
@@ -482,22 +484,36 @@ def _discover_configured_abms() -> tuple[str, ...]:
     return tuple(sorted(p.stem for p in Path("configs/abms").glob("*.yaml")))
 
 
+def _resolve_model_filenames(abm: str) -> tuple[str, ...]:
+    """Return preferred NetLogo model filenames for an ABM."""
+    candidates = [f"{abm}.nlogo", f"{abm}_model.nlogo"]
+    if abm == "milk_consumption":
+        candidates.append("model.nlogo")
+    return tuple(dict.fromkeys(candidates))
+
+
 def _resolve_abm_model_path(*, abm: str, models_root: Path) -> Path:
     """Find a single NetLogo model for an ABM and fail with a clear message if absent/ambiguous."""
-    candidate_dirs = [models_root / f"{abm}_abm", models_root / abm]
-    existing_dirs = [path for path in candidate_dirs if path.exists()]
-    if not existing_dirs:
-        raise typer.BadParameter(
-            f"ABM '{abm}' is not available in data root '{models_root}'. "
-            "Expected directory data/<abm>_abm."
-        )
-
+    candidate_roots = [models_root, models_root / f"{abm}_abm", models_root / abm]
+    model_filenames = _resolve_model_filenames(abm)
     matches: list[Path] = []
-    for directory in existing_dirs:
-        matches.extend(sorted(directory.rglob("*.nlogo")))
+    for directory in candidate_roots:
+        if not directory.exists():
+            continue
+        if directory.is_file():
+            if directory.name in model_filenames:
+                matches.append(directory)
+            continue
+        for model_name in model_filenames:
+            candidate = directory / model_name
+            if candidate.exists():
+                matches.append(candidate)
+
     if not matches:
+        candidates_desc = ", ".join(str(directory / name) for directory in candidate_roots for name in model_filenames)
         raise typer.BadParameter(
-            f"no .nlogo file found for ABM '{abm}' in {', '.join(str(d) for d in existing_dirs)}."
+            f"no .nlogo file found for ABM '{abm}' in {models_root}. "
+            f"Searched: {candidates_desc}"
         )
     if len(matches) > 1:
         names = ", ".join(str(match.relative_to(models_root)) for match in matches)
