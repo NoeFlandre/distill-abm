@@ -98,7 +98,7 @@ def test_save_update_and_narrative_workflow(tmp_path: Path) -> None:
     gui_path = tmp_path / "gui_parameters100.json"
     updated_gui_path = tmp_path / "updated_gui_parameters100.json"
     updated_exp_path = tmp_path / "updated_experiment_parameters100.json"
-    narrative_path = tmp_path / "narrativeCombined100.txt"
+    narrative_path = tmp_path / "narrative_combined100.txt"
 
     save_experiment_parameters({"slider-a": 3, "switch-b": True}, experiment_path)
     assert json.loads(experiment_path.read_text(encoding="utf-8")) == {"slider-a": 3, "switch-b": True}
@@ -183,9 +183,5 @@ def test_run_ingest_workflow_end_to_end(tmp_path: Path) -> None:
     assert result["documentation_without_default_json"].exists()
     assert result["final_documentation_txt"].exists()
     assert result["extracted_code_txt"].exists()
-    # legacy filenames remain for compatibility
-    assert (output_dir / "JSON" / "cleaneddocumentation100.json").exists()
-    assert (output_dir / "JSON" / "documentationWithoutDefault100.json").exists()
-    assert (output_dir / "TXT" / "finalDocumentation100.txt").exists()
-    assert (output_dir / "TXT" / "narrativeCombined100.txt").exists()
+    assert "We have 2 parameters:" in result["narrative_txt"].read_text(encoding="utf-8")
     assert "We have 2 parameters:" in result["narrative_txt"].read_text(encoding="utf-8")

@@ -36,6 +36,21 @@ def test_extract_documentation_and_code(tmp_path: Path) -> None:
     assert "globals [a b]" in extract_code(path)
 
 
+def test_extract_documentation_falls_back_to_header_comments(tmp_path: Path) -> None:
+    content = (
+        "; This is the fauna model.\n"
+        "; It models forager bands and prey dynamics.\n"
+        "extensions [csv]\n"
+        "globals [a b]\n"
+    )
+    path = tmp_path / "no_doc_model.nlogo"
+    path.write_text(content, encoding="utf-8")
+
+    doc = extract_documentation(path)
+    assert "## WHAT IS IT?" in doc
+    assert "This is the fauna model." in doc
+
+
 def test_remove_urls_and_defaults() -> None:
     text = "See https://example.com and www.test.org"
     assert "http" not in remove_urls(text)

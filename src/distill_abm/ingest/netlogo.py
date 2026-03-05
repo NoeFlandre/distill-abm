@@ -127,11 +127,37 @@ def extract_documentation(file_path: Path) -> str:
     end_pattern = re.compile(r"@#\$#@#\$#@")
     start_match = start_pattern.search(content)
     if not start_match:
+        fallback = _extract_model_header_comments(content)
+        if fallback:
+            return f"## WHAT IS IT?\n\n{fallback}"
         raise ValueError("start of documentation section not found")
     end_match = end_pattern.search(content, start_match.end())
     if not end_match:
-        raise ValueError("end of documentation section not found")
+        return f"## WHAT IS IT?\n\n{content[start_match.end():].strip()}"
     return content[start_match.start() : end_match.start()].strip()
+
+
+def _extract_model_header_comments(content: str) -> str:
+    """Extract contiguous comment prose from the top of the NetLogo source file."""
+    lines = content.splitlines()
+    capture = False
+    documented_lines: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            if capture:
+                documented_lines.append("")
+            continue
+        if stripped.startswith(";"):
+            capture = True
+            normalized = stripped.lstrip(";").strip()
+            documented_lines.append(normalized)
+            continue
+        if capture:
+            break
+
+    cleaned = "\n".join(documented_lines).strip()
+    return re.sub(r"\n{3,}", "\n\n", cleaned)
 
 
 def extract_code(file_path: Path) -> str:
