@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any, cast
@@ -44,6 +45,41 @@ from distill_abm.ingest.netlogo_steps import (
 )
 
 ParameterScalar = bool | int | float | str
+
+
+def _artifact_name_map(suffix: str) -> dict[str, str]:
+    """Return canonical artifact filenames for a given suffix."""
+    return {
+        "experiment_parameters_json": f"experiment_parameters{suffix}.json",
+        "gui_parameters_json": f"gui_parameters{suffix}.json",
+        "updated_gui_parameters_json": f"updated_gui_parameters{suffix}.json",
+        "updated_experiment_parameters_json": f"updated_experiment_parameters{suffix}.json",
+        "narrative_txt": f"narrative_combined{suffix}.txt",
+        "documentation_json": f"documentation{suffix}.json",
+        "cleaned_documentation_json": f"cleaned_documentation{suffix}.json",
+        "documentation_without_default_json": f"documentation_without_default{suffix}.json",
+        "final_documentation_txt": f"final_documentation{suffix}.txt",
+        "extracted_code_txt": f"extracted_code{suffix}.txt",
+    }
+
+
+def _artifact_legacy_names(suffix: str) -> dict[str, str]:
+    """Legacy filenames kept for backward-compatible consumers."""
+    return {
+        "cleaned_documentation_json": f"cleaneddocumentation{suffix}.json",
+        "documentation_without_default_json": f"documentationWithoutDefault{suffix}.json",
+        "final_documentation_txt": f"finalDocumentation{suffix}.txt",
+        "narrative_txt": f"narrativeCombined{suffix}.txt",
+    }
+
+
+def _write_legacy_artifact_aliases(artifact_paths: dict[str, Path], suffix: str) -> None:
+    """Write compatibility copies for legacy artifact filenames."""
+    for key, legacy_name in _artifact_legacy_names(suffix).items():
+        source = artifact_paths[key]
+        destination = source.parent / legacy_name
+        if source.exists():
+            shutil.copy2(source, destination)
 
 
 def _default_link_factory(*, netlogo_home: str) -> NetLogoLinkProtocol:
@@ -176,16 +212,17 @@ def run_ingest_workflow(
     """Run ingestion preprocessing workflow and return artifact paths."""
     json_dir = output_dir / "JSON"
     txt_dir = output_dir / "TXT"
-    experiment_parameters_json = json_dir / f"experiment_parameters{suffix}.json"
-    gui_parameters_json = json_dir / f"gui_parameters{suffix}.json"
-    updated_gui_parameters_json = json_dir / f"updated_gui_parameters{suffix}.json"
-    updated_experiment_parameters_json = json_dir / f"updated_experiment_parameters{suffix}.json"
-    narrative_txt = txt_dir / f"narrativeCombined{suffix}.txt"
-    documentation_json = json_dir / f"documentation{suffix}.json"
-    cleaned_documentation_json = json_dir / f"cleaneddocumentation{suffix}.json"
-    documentation_without_default_json = json_dir / f"documentationWithoutDefault{suffix}.json"
-    final_documentation_txt = txt_dir / f"finalDocumentation{suffix}.txt"
-    extracted_code_txt = txt_dir / f"extracted_code{suffix}.txt"
+    artifact_names = _artifact_name_map(suffix)
+    experiment_parameters_json = json_dir / artifact_names["experiment_parameters_json"]
+    gui_parameters_json = json_dir / artifact_names["gui_parameters_json"]
+    updated_gui_parameters_json = json_dir / artifact_names["updated_gui_parameters_json"]
+    updated_experiment_parameters_json = json_dir / artifact_names["updated_experiment_parameters_json"]
+    narrative_txt = txt_dir / artifact_names["narrative_txt"]
+    documentation_json = json_dir / artifact_names["documentation_json"]
+    cleaned_documentation_json = json_dir / artifact_names["cleaned_documentation_json"]
+    documentation_without_default_json = json_dir / artifact_names["documentation_without_default_json"]
+    final_documentation_txt = txt_dir / artifact_names["final_documentation_txt"]
+    extracted_code_txt = txt_dir / artifact_names["extracted_code_txt"]
 
     save_experiment_parameters(dict(experiment_parameters), experiment_parameters_json)
     extract_gui_parameters_to_json(model_path, gui_parameters_json)
@@ -205,8 +242,7 @@ def run_ingest_workflow(
     _remove_documentation_defaults(cleaned_documentation_json, documentation_without_default_json)
     _clean_documentation_artifacts(documentation_without_default_json, final_documentation_txt)
     _extract_code_to_text(model_path, extracted_code_txt)
-
-    return {
+    artifact_paths = {
         "experiment_parameters_json": experiment_parameters_json,
         "gui_parameters_json": gui_parameters_json,
         "updated_gui_parameters_json": updated_gui_parameters_json,
@@ -218,3 +254,5 @@ def run_ingest_workflow(
         "final_documentation_txt": final_documentation_txt,
         "extracted_code_txt": extracted_code_txt,
     }
+    _write_legacy_artifact_aliases(artifact_paths, suffix)
+    return artifact_paths

@@ -48,6 +48,7 @@ __all__ = [
     "app",
     "evaluate_qualitative",
     "ingest_netlogo",
+    "ingest_netlogo_suite",
     "main",
     "run",
     "smoke_qwen",
@@ -187,6 +188,73 @@ def ingest_netlogo(
     typer.echo(f"NetLogo ingestion artifacts written to: {resolved_output_dir.resolve()}")
     for key, path in sorted(artifacts.items()):
         typer.echo(f"{key}: {path}")
+
+
+@app.command("ingest-netlogo-suite")
+def ingest_netlogo_suite(
+    abms: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--abm",
+            help="ABM names to process. Repeat for multiple. Defaults to all configured ABMs.",
+        ),
+    ] = None,
+    models_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing per-ABM NetLogo folders."),
+    ] = Path("data"),
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Root directory for generated artifacts."),
+    ] = Path("results/ingest"),
+    suffix: Annotated[str, typer.Option(help="Suffix used in workflow artifact names.")] = "100",
+    continue_on_missing: Annotated[
+        bool,
+        typer.Option(help="Continue processing remaining ABMs if one ABM cannot be ingested."),
+    ] = False,
+    default_experiment_parameters_path: Annotated[
+        Path | None,
+        typer.Option(help="Optional shared experiment-parameters JSON path for all ABMs."),
+    ] = None,
+) -> None:
+    """Run NetLogo ingestion for multiple ABMs into dedicated output folders."""
+    requested = sorted(set(abms)) if abms else _discover_configured_abms()
+    missing: list[str] = []
+    shared_params = _load_experiment_parameters(default_experiment_parameters_path)
+
+    for abm in requested:
+        try:
+            model_path = _resolve_abm_model_path(abm=abm, models_root=models_root)
+            parameter_path = _resolve_abm_experiment_parameters_path(
+                model_dir=model_path.parent,
+                abm=abm,
+                explicit=default_experiment_parameters_path,
+            )
+            if default_experiment_parameters_path is not None:
+                experiment_parameters = shared_params
+            else:
+                experiment_parameters = _load_experiment_parameters(parameter_path)
+            output_dir = output_root / abm
+            artifacts = run_ingest_workflow(
+                model_path=model_path,
+                experiment_parameters=experiment_parameters,
+                output_dir=output_dir,
+                suffix=suffix,
+            )
+            typer.echo(f"[{abm}] NetLogo ingestion artifacts written to: {output_dir.resolve()}")
+            for key, path in sorted(artifacts.items()):
+                typer.echo(f"{abm}::{key}: {path}")
+        except typer.BadParameter as exc:
+            message = f"failed for {abm}: {exc}"
+            if continue_on_missing:
+                missing.append(message)
+                continue
+            raise typer.BadParameter(message) from exc
+
+    if missing:
+        typer.echo("ingest completed with skipped ABMs:")
+        for issue in missing:
+            typer.echo(f" - {issue}")
 
 
 @app.command("analyze-doe")
@@ -407,6 +475,54 @@ def _load_experiment_parameters(path: Path | None) -> dict[str, bool | int | flo
         sanitized[key] = value
 
     return sanitized
+
+
+def _discover_configured_abms() -> tuple[str, ...]:
+    """Return ABM identifiers configured in configs/abms."""
+    return tuple(sorted(p.stem for p in Path("configs/abms").glob("*.yaml")))
+
+
+def _resolve_abm_model_path(*, abm: str, models_root: Path) -> Path:
+    """Find a single NetLogo model for an ABM and fail with a clear message if absent/ambiguous."""
+    candidate_dirs = [models_root / f"{abm}_abm", models_root / abm]
+    existing_dirs = [path for path in candidate_dirs if path.exists()]
+    if not existing_dirs:
+        raise typer.BadParameter(
+            f"ABM '{abm}' is not available in data root '{models_root}'. "
+            "Expected directory data/<abm>_abm."
+        )
+
+    matches: list[Path] = []
+    for directory in existing_dirs:
+        matches.extend(sorted(directory.rglob("*.nlogo")))
+    if not matches:
+        raise typer.BadParameter(
+            f"no .nlogo file found for ABM '{abm}' in {', '.join(str(d) for d in existing_dirs)}."
+        )
+    if len(matches) > 1:
+        names = ", ".join(str(match.relative_to(models_root)) for match in matches)
+        raise typer.BadParameter(f"multiple .nlogo files found for ABM '{abm}': {names}.")
+    return matches[0]
+
+
+def _resolve_abm_experiment_parameters_path(*, model_dir: Path, abm: str, explicit: Path | None) -> Path | None:
+    """Resolve per-ABM experiment-parameters file if available."""
+    if explicit is not None:
+        if explicit.exists():
+            return explicit
+        return None
+
+    candidates = [
+        model_dir / "experiment_parameters.json",
+        model_dir / "experiment-parameters.json",
+        model_dir / f"{abm}_experiment_parameters.json",
+        model_dir / f"{abm}-experiment_parameters.json",
+        model_dir / f"{abm}-experiment-parameters.json",
+    ]
+    for path in candidates:
+        if path.exists():
+            return path
+    return None
 
 
 def _parse_summarizers(values: list[str] | None, fallback: tuple[SummarizerId, ...]) -> tuple[SummarizerId, ...]:
