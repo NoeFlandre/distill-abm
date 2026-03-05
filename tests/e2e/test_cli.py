@@ -528,3 +528,40 @@ def test_cli_analyze_doe_exits_on_analysis_failure(tmp_path: Path, monkeypatch: 
     )
 
     assert result.exit_code == 1
+
+
+def test_cli_run_fails_on_missing_csv_file(tmp_path: Path) -> None:
+    """Test that run command fails when CSV file doesn't exist."""
+    csv_path = tmp_path / "nonexistent.csv"
+    params = tmp_path / "params.txt"
+    docs = tmp_path / "docs.txt"
+    prompts = tmp_path / "prompts.yaml"
+
+    params.write_text("p=1", encoding="utf-8")
+    docs.write_text("d=1", encoding="utf-8")
+    prompts.write_text(
+        'context_prompt: "Context {parameters} {documentation}"\ntrend_prompt: "Trend {description}"\n',
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "--csv-path",
+            str(csv_path),
+            "--parameters-path",
+            str(params),
+            "--documentation-path",
+            str(docs),
+            "--prompts-path",
+            str(prompts),
+            "--provider",
+            "echo",
+            "--model",
+            "echo-model",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert result.exit_code != 0  # Typer validates file existence
