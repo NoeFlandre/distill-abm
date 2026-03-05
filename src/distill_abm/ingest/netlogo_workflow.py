@@ -8,6 +8,12 @@ from typing import Any, cast
 
 import pandas as pd
 
+from distill_abm.ingest.netlogo import (
+    extract_experiment_parameters as _extract_experiment_parameters,
+)
+from distill_abm.ingest.netlogo import (
+    find_reference_narrative_path,
+)
 from distill_abm.ingest.netlogo_artifacts import (
     build_parameter_narrative as _build_parameter_narrative,
 )
@@ -43,11 +49,30 @@ from distill_abm.ingest.netlogo_steps import (
     run_single_repetition as _run_single_repetition,
 )
 
+ABM_PREFERRED_EXPERIMENTS: dict[str, str] = {
+    "fauna": "2023-20-6-0.33-0.8",
+    "grazing": "experiment",
+    "milk_consumption": "Milk Consumption Trends",
+}
+
 ParameterScalar = bool | int | float | str
 
 
 def _artifact_name_map(suffix: str) -> dict[str, str]:
     """Return canonical artifact filenames for a given suffix."""
+    if not suffix:
+        return {
+            "experiment_parameters_json": "experiment_parameters.json",
+            "gui_parameters_json": "gui_parameters.json",
+            "updated_gui_parameters_json": "updated_gui_parameters.json",
+            "updated_experiment_parameters_json": "updated_experiment_parameters.json",
+            "narrative_txt": "narrative_combined.txt",
+            "documentation_json": "documentation.json",
+            "cleaned_documentation_json": "cleaned_documentation.json",
+            "documentation_without_default_json": "documentation_without_default.json",
+            "final_documentation_txt": "final_documentation.txt",
+            "extracted_code_txt": "extracted_code.txt",
+        }
     return {
         "experiment_parameters_json": f"experiment_parameters{suffix}.json",
         "gui_parameters_json": f"gui_parameters{suffix}.json",
@@ -60,6 +85,76 @@ def _artifact_name_map(suffix: str) -> dict[str, str]:
         "final_documentation_txt": f"final_documentation{suffix}.txt",
         "extracted_code_txt": f"extracted_code{suffix}.txt",
     }
+
+
+def _infer_abm_id(model_path: Path) -> str | None:
+    """Infer ABM identifier from model path for narrative/experiment selection."""
+    candidates = {
+        _normalise_name(component)
+        for component in [model_path.stem, model_path.parent.name]
+        if component
+    }
+    for candidate in candidates:
+        if "fauna" in candidate:
+            return "fauna"
+        if "grazing" in candidate:
+            return "grazing"
+        if "milk" in candidate and "consumption" in candidate:
+            return "milk_consumption"
+    return None
+
+
+def _normalise_name(value: str) -> str:
+    """Normalize filesystem names for stable ABM inference."""
+    return value.lower().replace("-", "_").replace(" ", "_")
+
+
+def _resolve_preferred_experiment(model_path: Path) -> str | None:
+    abm_id = _infer_abm_id(model_path)
+    if abm_id is None:
+        return None
+    return ABM_PREFERRED_EXPERIMENTS.get(abm_id)
+
+
+def _resolve_experiment_parameters(
+    model_path: Path,
+    experiment_parameters: Mapping[str, ParameterScalar],
+) -> dict[str, ParameterScalar]:
+    """Merge explicit CLI inputs with deterministic BehaviorSpace defaults."""
+    preferred_experiment = _resolve_preferred_experiment(model_path)
+    defaults: dict[str, Any] = _extract_experiment_parameters(
+        model_path.read_text(encoding="utf-8"),
+        preferred_experiment=preferred_experiment,
+    )
+    merged: dict[str, ParameterScalar] = {
+        key: value for key, value in defaults.items() if isinstance(value, (bool, int, float, str))
+    }
+    for key, value in experiment_parameters.items():
+        merged[key] = value
+    return merged
+
+
+def _write_reference_narrative_or_build(
+    *,
+    model_path: Path,
+    gui_parameters_path: Path,
+    experiment_parameters_path: Path,
+    narrative_txt: Path,
+) -> str:
+    reference_path = find_reference_narrative_path(model_path.parent)
+    if reference_path is not None:
+        narrative = reference_path.read_text(encoding="utf-8")
+    else:
+        narrative = _build_parameter_narrative(
+            gui_parameters_path=gui_parameters_path,
+            experiment_parameters_path=experiment_parameters_path,
+            output_text_path=narrative_txt,
+        )
+        return narrative
+
+    narrative_txt.parent.mkdir(parents=True, exist_ok=True)
+    narrative_txt.write_text(narrative, encoding="utf-8")
+    return narrative
 
 
 def _default_link_factory(*, netlogo_home: str) -> NetLogoLinkProtocol:
@@ -204,7 +299,8 @@ def run_ingest_workflow(
     final_documentation_txt = txt_dir / artifact_names["final_documentation_txt"]
     extracted_code_txt = txt_dir / artifact_names["extracted_code_txt"]
 
-    save_experiment_parameters(dict(experiment_parameters), experiment_parameters_json)
+    resolved_experiment_parameters = _resolve_experiment_parameters(model_path, experiment_parameters)
+    save_experiment_parameters(dict(resolved_experiment_parameters), experiment_parameters_json)
     extract_gui_parameters_to_json(model_path, gui_parameters_json)
     update_gui_with_experiment_parameters(
         gui_parameters_path=gui_parameters_json,
@@ -212,10 +308,11 @@ def run_ingest_workflow(
         updated_gui_parameters_path=updated_gui_parameters_json,
         updated_experiment_parameters_path=updated_experiment_parameters_json,
     )
-    build_parameter_narrative(
+    _write_reference_narrative_or_build(
+        model_path=model_path,
         gui_parameters_path=updated_gui_parameters_json,
         experiment_parameters_path=updated_experiment_parameters_json,
-        output_text_path=narrative_txt,
+        narrative_txt=narrative_txt,
     )
     _extract_documentation_to_json(model_path, documentation_json)
     _remove_documentation_urls(documentation_json, cleaned_documentation_json)
