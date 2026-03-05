@@ -30,6 +30,23 @@ def _write_min_inputs(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
     return csv_path, params, docs, prompts
 
 
+def _write_min_nlogo_model(tmp_path: Path) -> tuple[Path, Path]:
+    model_path = tmp_path / "model.nlogo"
+    model_path.write_text(
+        "globals [a b]\n"
+        "to go\nend\n"
+        "@#$#@#$#@\n"
+        "## WHAT IS IT?\n\nDemo doc text for testing ingestion.\n"
+        "@#$#@#$#@\n"
+        "SLIDER 0 0 10 10 slider-a slider-a 0 10 1 5\n"
+        "SWITCH 0 0 10 10 switch-b switch-b 1 0 0\n",
+        encoding="utf-8",
+    )
+    experiment_parameters_path = tmp_path / "experiment-parameters.json"
+    experiment_parameters_path.write_text('{"slider-a": 3, "switch-b": true}', encoding="utf-8")
+    return model_path, experiment_parameters_path
+
+
 def test_cli_run_forwards_paper_modes_and_summarizers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
     captured: dict[str, Any] = {}
@@ -239,6 +256,32 @@ def test_cli_run_rejects_invalid_summarizer(tmp_path: Path, monkeypatch: pytest.
     )
     assert result.exit_code != 0
     assert result.exception is not None
+
+
+def test_cli_ingest_netlogo_generates_visible_artifacts(tmp_path: Path) -> None:
+    model_path, experiment_parameters_path = _write_min_nlogo_model(tmp_path)
+    output_dir = tmp_path / "ingest_output"
+    result = runner.invoke(
+        app,
+        [
+            "ingest-netlogo",
+            "--model-path",
+            str(model_path),
+            "--experiment-parameters-path",
+            str(experiment_parameters_path),
+            "--output-dir",
+            str(output_dir),
+            "--suffix",
+            "100",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert (output_dir / "JSON" / "documentation100.json").exists()
+    assert (output_dir / "JSON" / "cleaneddocumentation100.json").exists()
+    assert (output_dir / "JSON" / "documentationWithoutDefault100.json").exists()
+    assert (output_dir / "TXT" / "finalDocumentation100.txt").exists()
+    assert (output_dir / "TXT" / "narrativeCombined100.txt").exists()
 
 
 def test_cli_evaluate_qualitative_outputs_json(monkeypatch: pytest.MonkeyPatch) -> None:

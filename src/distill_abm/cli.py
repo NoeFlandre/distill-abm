@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import subprocess
 from pathlib import Path
 from typing import Annotated, Literal, cast
@@ -18,6 +19,7 @@ from distill_abm.configs.models import ModelEntry, SummarizerId
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
+from distill_abm.ingest.netlogo_workflow import run_ingest_workflow
 from distill_abm.llm.factory import create_adapter
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
@@ -45,6 +47,7 @@ __all__ = [
     "analyze_doe",
     "app",
     "evaluate_qualitative",
+    "ingest_netlogo",
     "main",
     "run",
     "smoke_qwen",
@@ -154,6 +157,36 @@ def run(
     )
     typer.echo(f"plot: {result.plot_path}")
     typer.echo(f"report: {result.report_csv}")
+
+
+@app.command("ingest-netlogo")
+def ingest_netlogo(
+    model_path: Annotated[
+        Path,
+        typer.Option(..., exists=True, file_okay=True, dir_okay=False),
+    ],
+    experiment_parameters_path: Annotated[
+        Path | None,
+        typer.Option(help="Optional JSON file with experiment parameters."),
+    ] = None,
+    output_dir: Annotated[
+        Path | None,
+        typer.Option(help="Directory for artifacts. Defaults to results/ingest/<model-stem>."),
+    ] = None,
+    suffix: Annotated[str, typer.Option(help="Suffix used in workflow artifact names.")] = "100",
+) -> None:
+    """Run NetLogo preprocessing workflow and persist extracted artifacts."""
+    resolved_output_dir = output_dir if output_dir is not None else Path("results") / "ingest" / model_path.stem
+    experiment_parameters = _load_experiment_parameters(experiment_parameters_path)
+    artifacts = run_ingest_workflow(
+        model_path=model_path,
+        experiment_parameters=experiment_parameters,
+        output_dir=resolved_output_dir,
+        suffix=suffix,
+    )
+    typer.echo(f"NetLogo ingestion artifacts written to: {resolved_output_dir.resolve()}")
+    for key, path in sorted(artifacts.items()):
+        typer.echo(f"{key}: {path}")
 
 
 @app.command("analyze-doe")
@@ -341,6 +374,39 @@ def smoke_qwen(
 def main() -> None:
     """Entrypoint callable used by setuptools/uv script wiring."""
     app()
+
+
+def _load_experiment_parameters(path: Path | None) -> dict[str, bool | int | float | str]:
+    """Load experiment parameter overrides from an optional JSON file."""
+    if path is None:
+        return {}
+
+    if not path.exists():
+        raise typer.BadParameter(f"experiment parameters file not found: {path}")
+    payload = path.read_text(encoding="utf-8")
+    if not payload.strip():
+        return {}
+
+    try:
+        parsed = json.loads(payload)
+    except json.JSONDecodeError as exc:
+        raise typer.BadParameter(f"experiment parameters file must contain JSON object: {path}") from exc
+
+    if not isinstance(parsed, dict):
+        raise typer.BadParameter("experiment parameters file must contain a JSON object at top level.")
+
+    sanitized: dict[str, bool | int | float | str] = {}
+    for key, value in parsed.items():
+        if not isinstance(key, str):
+            raise typer.BadParameter("experiment parameters keys must be strings.")
+        if not isinstance(value, (bool, int, float, str)):
+            raise typer.BadParameter(
+                f"unsupported value type for experiment parameter '{key}': {type(value).__name__}. "
+                "Allowed types are bool, int, float, and str."
+            )
+        sanitized[key] = value
+
+    return sanitized
 
 
 def _parse_summarizers(values: list[str] | None, fallback: tuple[SummarizerId, ...]) -> tuple[SummarizerId, ...]:
