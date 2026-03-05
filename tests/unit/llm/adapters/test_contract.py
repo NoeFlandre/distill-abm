@@ -347,3 +347,33 @@ def test_openrouter_adapter_raises_on_completion_failure(monkeypatch: pytest.Mon
         adapter.complete(request)
     
     assert "completion failed" in str(exc_info.value).lower()
+
+
+def test_janus_adapter_raises_on_http_error() -> None:
+    """Test that JanusAdapter raises LLMProviderError when HTTP error occurs."""
+
+    class FakeJanusClient:
+        def generate(
+            self,
+            prompt: str,
+            image_b64: str | None,
+            model: str,
+            max_tokens: int | None,
+            temperature: float | None,
+        ) -> str:
+            raise RuntimeError("HTTP 500: Internal Server Error")
+
+    with pytest.raises(LLMProviderError):
+        JanusAdapter(model="janus-pro", client=FakeJanusClient()).complete(make_request())
+
+
+def test_ollama_adapter_raises_on_connection_error() -> None:
+    """Test that OllamaAdapter raises LLMProviderError on connection errors."""
+    import urllib.error
+
+    class FakeClient:
+        def chat(self, **_: object) -> None:
+            raise urllib.error.URLError("connection refused")
+
+    with pytest.raises(LLMProviderError):
+        OllamaAdapter(model="qwen3.5:0.8b", client=FakeClient()).complete(make_request())
