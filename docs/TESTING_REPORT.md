@@ -22,6 +22,16 @@
 5. DOE/metric utilities and smoke orchestration.
 
 ## Execution Status (Current)
-- Full test suite passes.
+- Full test suite passes (~199 tests).
 - Lint and type checks pass.
 - Build succeeds.
+
+## Recent Coverage Expansions
+
+### Error Path Coverage
+- CLI: continue-on-missing behavior, unknown case-id rejection, model registry errors, missing/invalid experiment parameters
+- Smoke helpers: missing metadata file handling
+- Run-state resumability: signature mismatch, missing artifacts, malformed metadata
+- DOE: unreadable CSV, invalid content, empty data, missing factors/metrics, zero variance
+- NetLogo parser: missing doc/code sections, empty GUI/experiments
+- Adapters: API key errors, completion failures, HTTP errors, connection errors

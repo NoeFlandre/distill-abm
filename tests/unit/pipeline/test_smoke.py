@@ -303,3 +303,32 @@ def test_build_case_response_rows_returns_fallback_row_for_invalid_metadata(tmp_
     assert len(rows) == 1
     assert rows[0]["case_status"] == "failed"
     assert rows[0]["error"] == "boom"
+
+
+def test_build_case_response_rows_handles_missing_metadata_file(tmp_path: Path) -> None:
+    """Test that _build_case_response_rows handles missing metadata file gracefully."""
+    case = SmokeCase(case_id="plot-summary", evidence_mode="plot", text_source_mode="summary_only")
+    # No metadata file at all
+    case_result = SmokeCaseResult(
+        case=case,
+        status="ok",
+        output_dir=tmp_path,
+        metadata_path=None,  # No metadata file
+    )
+
+    rows = smoke_module._build_case_response_rows(
+        case_result=case_result,
+        smoke_inputs=SmokeSuiteInputs(
+            csv_path=Path("sim.csv"),
+            parameters_path=Path("params.txt"),
+            documentation_path=Path("docs.txt"),
+            output_dir=Path("out"),
+            model="model",
+            metric_pattern="mean",
+            metric_description="desc",
+        ),
+    )
+
+    # Should still produce rows with default values
+    assert len(rows) >= 1
+    assert rows[0]["case_id"] == "plot-summary"
