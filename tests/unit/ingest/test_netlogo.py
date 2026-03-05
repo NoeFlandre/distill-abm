@@ -7,7 +7,9 @@ from distill_abm.ingest.netlogo import (
     clean_json_content,
     extract_code,
     extract_documentation,
+    extract_experiment_parameters,
     extract_parameters,
+    find_reference_narrative_path,
     process_documentation_remove_defaults,
     process_documentation_remove_urls,
     remove_default_elements,
@@ -72,6 +74,28 @@ def test_process_documentation_stages(tmp_path: Path) -> None:
     process_documentation_remove_defaults(no_urls, no_defaults)
     cleaned = json.loads(no_defaults.read_text(encoding="utf-8"))
     assert "documentation" in cleaned
+
+
+def test_extract_experiment_parameters_prefers_named_experiment() -> None:
+    code = Path("data/milk_consumption_abm/milk_consumption.nlogo").read_text(encoding="utf-8")
+    values = extract_experiment_parameters(code, preferred_experiment="Milk Consumption Trends")
+    assert values["number-of-agents"] == 1000
+    assert values["habit-on?"] is True
+    assert values["network-type"] == "watts-strogatz"
+    assert len(values) == 16
+
+
+def test_extract_experiment_parameters_filters_output_csv_file_value() -> None:
+    code = Path("data/fauna_abm/fauna.nlogo").read_text(encoding="utf-8")
+    values = extract_experiment_parameters(code, preferred_experiment="2023-20-6-0.33-0.8")
+    assert "Output-csv-file" not in values
+    assert len(values) == 29
+
+
+def test_find_reference_narrative_path_for_abm() -> None:
+    reference_path = find_reference_narrative_path(Path("data/grazing_abm"))
+    assert reference_path is not None
+    assert reference_path.name == "reference_narrative.txt"
 
 
 def test_clean_json_content(tmp_path: Path) -> None:

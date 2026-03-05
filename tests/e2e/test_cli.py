@@ -309,17 +309,15 @@ def test_cli_ingest_netlogo_generates_visible_artifacts(tmp_path: Path) -> None:
             str(experiment_parameters_path),
             "--output-dir",
             str(output_dir),
-            "--suffix",
-            "100",
         ],
     )
 
     assert result.exit_code == 0
-    assert (output_dir / "JSON" / "documentation100.json").exists()
-    assert (output_dir / "JSON" / "cleaned_documentation100.json").exists()
-    assert (output_dir / "JSON" / "documentation_without_default100.json").exists()
-    assert (output_dir / "TXT" / "final_documentation100.txt").exists()
-    assert (output_dir / "TXT" / "narrative_combined100.txt").exists()
+    assert (output_dir / "JSON" / "documentation.json").exists()
+    assert (output_dir / "JSON" / "cleaned_documentation.json").exists()
+    assert (output_dir / "JSON" / "documentation_without_default.json").exists()
+    assert (output_dir / "TXT" / "final_documentation.txt").exists()
+    assert (output_dir / "TXT" / "narrative_combined.txt").exists()
 
 
 def test_cli_ingest_netlogo_suite_generates_all_configured_abms(tmp_path: Path) -> None:
@@ -338,17 +336,15 @@ def test_cli_ingest_netlogo_suite_generates_all_configured_abms(tmp_path: Path) 
             str(model_root),
             "--output-root",
             str(tmp_path / "ingest"),
-            "--suffix",
-            "100",
         ],
     )
 
     assert result.exit_code == 0
     for abm in ["fauna", "grazing", "milk_consumption"]:
-        assert (tmp_path / "ingest" / abm / "JSON" / "documentation100.json").exists()
-        assert (tmp_path / "ingest" / abm / "JSON" / "cleaned_documentation100.json").exists()
-        assert (tmp_path / "ingest" / abm / "TXT" / "final_documentation100.txt").exists()
-        assert (tmp_path / "ingest" / abm / "TXT" / "narrative_combined100.txt").exists()
+        assert (tmp_path / "ingest" / abm / "JSON" / "documentation.json").exists()
+        assert (tmp_path / "ingest" / abm / "JSON" / "cleaned_documentation.json").exists()
+        assert (tmp_path / "ingest" / abm / "TXT" / "final_documentation.txt").exists()
+        assert (tmp_path / "ingest" / abm / "TXT" / "narrative_combined.txt").exists()
 
 
 def test_cli_ingest_netlogo_suite_supports_root_level_model_files(tmp_path: Path) -> None:
@@ -365,17 +361,15 @@ def test_cli_ingest_netlogo_suite_supports_root_level_model_files(tmp_path: Path
             str(model_root),
             "--output-root",
             str(tmp_path / "ingest"),
-            "--suffix",
-            "100",
         ],
     )
 
     assert result.exit_code == 0
     for abm in ["fauna", "grazing", "milk_consumption"]:
-        assert (tmp_path / "ingest" / abm / "JSON" / "documentation100.json").exists()
-        assert (tmp_path / "ingest" / abm / "JSON" / "cleaned_documentation100.json").exists()
-        assert (tmp_path / "ingest" / abm / "TXT" / "final_documentation100.txt").exists()
-        assert (tmp_path / "ingest" / abm / "TXT" / "narrative_combined100.txt").exists()
+        assert (tmp_path / "ingest" / abm / "JSON" / "documentation.json").exists()
+        assert (tmp_path / "ingest" / abm / "JSON" / "cleaned_documentation.json").exists()
+        assert (tmp_path / "ingest" / abm / "TXT" / "final_documentation.txt").exists()
+        assert (tmp_path / "ingest" / abm / "TXT" / "narrative_combined.txt").exists()
 
 
 def test_cli_evaluate_qualitative_outputs_json(monkeypatch: pytest.MonkeyPatch) -> None:

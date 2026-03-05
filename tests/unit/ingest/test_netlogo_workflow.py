@@ -94,11 +94,11 @@ def test_run_netlogo_experiment_loop_and_csv(tmp_path: Path) -> None:
 
 
 def test_save_update_and_narrative_workflow(tmp_path: Path) -> None:
-    experiment_path = tmp_path / "experiment_parameters100.json"
-    gui_path = tmp_path / "gui_parameters100.json"
-    updated_gui_path = tmp_path / "updated_gui_parameters100.json"
-    updated_exp_path = tmp_path / "updated_experiment_parameters100.json"
-    narrative_path = tmp_path / "narrative_combined100.txt"
+    experiment_path = tmp_path / "experiment_parameters.json"
+    gui_path = tmp_path / "gui_parameters.json"
+    updated_gui_path = tmp_path / "updated_gui_parameters.json"
+    updated_exp_path = tmp_path / "updated_experiment_parameters.json"
+    narrative_path = tmp_path / "narrative_combined.txt"
 
     save_experiment_parameters({"slider-a": 3, "switch-b": True}, experiment_path)
     assert json.loads(experiment_path.read_text(encoding="utf-8")) == {"slider-a": 3, "switch-b": True}
@@ -135,8 +135,8 @@ def test_save_update_and_narrative_workflow(tmp_path: Path) -> None:
 
 def test_extract_documentation_and_code_to_files(tmp_path: Path) -> None:
     model_path = tmp_path / "model.nlogo"
-    documentation_json_path = tmp_path / "documentation100.json"
-    code_txt_path = tmp_path / "extracted_code100.txt"
+    documentation_json_path = tmp_path / "documentation.json"
+    code_txt_path = tmp_path / "extracted_code.txt"
     model_path.write_text(
         "globals [a b]\n" "to go\n" "end\n" "@#$#@#$#@\n" "## WHAT IS IT?\n\nDoc text\n" "@#$#@#$#@\n",
         encoding="utf-8",
@@ -169,7 +169,6 @@ def test_run_ingest_workflow_end_to_end(tmp_path: Path) -> None:
         model_path=model_path,
         experiment_parameters={"slider-a": 3, "switch-b": True},
         output_dir=output_dir,
-        suffix="100",
     )
 
     assert result["experiment_parameters_json"].exists()
@@ -185,3 +184,27 @@ def test_run_ingest_workflow_end_to_end(tmp_path: Path) -> None:
     assert result["extracted_code_txt"].exists()
     assert "We have 2 parameters:" in result["narrative_txt"].read_text(encoding="utf-8")
     assert "We have 2 parameters:" in result["narrative_txt"].read_text(encoding="utf-8")
+
+
+def test_run_ingest_workflow_uses_reference_narrative_when_available(tmp_path: Path) -> None:
+    model_path = tmp_path / "model.nlogo"
+    model_path.write_text(
+        "globals [a b]\n"
+        "to go\n"
+        "end\n"
+        "@#$#@#$#@\n"
+        "## WHAT IS IT?\n\nDoc text\n"
+        "@#$#@#$#@\n",
+        encoding="utf-8",
+    )
+    reference = tmp_path / "reference_narrative.txt"
+    reference.write_text("Reference narrative", encoding="utf-8")
+
+    output_dir = tmp_path / "output"
+    result = run_ingest_workflow(
+        model_path=model_path,
+        experiment_parameters={},
+        output_dir=output_dir,
+    )
+
+    assert result["narrative_txt"].read_text(encoding="utf-8") == "Reference narrative"

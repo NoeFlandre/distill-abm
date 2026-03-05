@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import html
 import json
 import re
+import xml.etree.ElementTree as ET
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -19,6 +21,122 @@ DEFAULT_DOCUMENTATION_ELEMENTS: dict[str, str] = {
     "## RELATED MODELS": "(models in the NetLogo Models Library",
     "## CREDITS AND REFERENCES": "(what works, ideas, or models this one extends",
 }
+
+REFERENCE_NARRATIVE_FILENAMES: tuple[str, ...] = (
+    "reference_narrative.txt",
+    "reference-narrative.txt",
+    "narrative_reference.txt",
+)
+
+
+def _coerce_experiment_value(value: str) -> Any:
+    """Coerce a BehaviorSpace value string to Python scalar types."""
+    normalized = html.unescape(value).strip()
+    if (
+        len(normalized) >= 2
+        and ((normalized[0] == normalized[-1] == '"') or (normalized[0] == normalized[-1] == "'"))
+    ):
+        normalized = normalized[1:-1]
+    lowered = normalized.lower()
+    if lowered == "true":
+        return True
+    if lowered == "false":
+        return False
+    if re.fullmatch(r"-?\d+", normalized):
+        try:
+            return int(normalized)
+        except ValueError:
+            pass
+    if re.fullmatch(r"-?\d*\.\d+(?:[eE][-+]?\d+)?", normalized):
+        try:
+            return float(normalized)
+        except ValueError:
+            pass
+    return normalized
+
+
+def _extract_experiments_root(netlogo_code: str) -> ET.Element | None:
+    start = netlogo_code.find("<experiments>")
+    if start < 0:
+        return None
+    end = netlogo_code.find("</experiments>", start)
+    if end < 0:
+        return None
+    xml_text = netlogo_code[start : end + len("</experiments>")]
+    try:
+        return ET.fromstring(xml_text)
+    except ET.ParseError:
+        return None
+
+
+def _select_experiment(
+    experiments: list[ET.Element],
+    preferred_experiment: str | None,
+    fallback_names: tuple[str, ...] = ("experiment",),
+) -> ET.Element | None:
+    if not experiments:
+        return None
+    if preferred_experiment:
+        for experiment in experiments:
+            if experiment.attrib.get("name") == preferred_experiment:
+                return experiment
+    for fallback_name in fallback_names:
+        for experiment in experiments:
+            if experiment.attrib.get("name") == fallback_name:
+                return experiment
+    for experiment in experiments:
+        if experiment.findall("enumeratedValueSet"):
+            return experiment
+    return experiments[0] if experiments else None
+
+
+def _should_drop_experiment_value(variable: str, value: Any) -> bool:
+    if variable.lower().endswith("csv-file") and value == "":
+        return True
+    return False
+
+
+def extract_experiment_parameters(
+    netlogo_code: str,
+    *,
+    preferred_experiment: str | None = None,
+    fallback_experiments: tuple[str, ...] = ("experiment",),
+) -> dict[str, Any]:
+    """Extract BehaviorSpace parameters while preserving declaration order."""
+    parameters_root = _extract_experiments_root(netlogo_code)
+    if parameters_root is None:
+        return {}
+
+    experiments: list[ET.Element] = list(parameters_root.findall("experiment"))
+    selected = _select_experiment(experiments, preferred_experiment, fallback_experiments)
+    if selected is None:
+        return {}
+
+    parameters: dict[str, Any] = {}
+    for value_set in selected.findall("enumeratedValueSet"):
+        variable = value_set.attrib.get("variable")
+        if not variable:
+            continue
+        value_element = value_set.find("value")
+        if value_element is None:
+            continue
+        raw_value = value_element.attrib.get("value")
+        if raw_value is None:
+            continue
+        parsed_value = _coerce_experiment_value(raw_value)
+        if _should_drop_experiment_value(variable, parsed_value):
+            continue
+        parameters[variable] = parsed_value
+    return parameters
+
+
+def find_reference_narrative_path(model_dir: Path) -> Path | None:
+    """Find model-specific reference narratives used to override generated narrative text."""
+    for filename in REFERENCE_NARRATIVE_FILENAMES:
+        candidate = model_dir / filename
+        if candidate.exists():
+            return candidate
+    return None
 
 
 def extract_parameters(netlogo_code: str) -> dict[str, list[dict[str, Any]]]:
