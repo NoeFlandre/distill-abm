@@ -112,6 +112,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
             return resumed
 
     frame = load_simulation_csv(inputs.csv_path)
+    matched_metric_columns = [str(column) for column in frame.columns if inputs.metric_pattern in str(column)]
 
     plot_path = plot_metric_bundles(
         frame=frame,
@@ -137,7 +138,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     )
     enabled_style_features = _enabled_style_features(inputs.enabled_style_features)
     context_prompt = _context_prompt(inputs, prompts, enabled_style_features=enabled_style_features)
-    context = _invoke_adapter(adapter, model=inputs.model, prompt=context_prompt)
+    context, context_trace = _invoke_adapter_with_trace(adapter, model=inputs.model, prompt=context_prompt)
     trend_prompt = _build_trend_prompt(
         prompts=prompts,
         metric_description=inputs.metric_description,
@@ -152,7 +153,12 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         plot_path=plot_path,
         stats_image_path=stats_image_path,
     )
-    trend_raw = _invoke_adapter(adapter, model=inputs.model, prompt=trend_prompt, image_b64=image_b64)
+    trend_raw, trend_trace = _invoke_adapter_with_trace(
+        adapter,
+        model=inputs.model,
+        prompt=trend_prompt,
+        image_b64=image_b64,
+    )
     scoring_reference_text, scoring_reference_source, scoring_reference_path = _resolve_scoring_reference(
         inputs=inputs,
         context=context,
@@ -165,6 +171,18 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     )
     selected_text_source: TextSourceMode = "summary_only" if trend_summary is not None else "full_text_only"
     report_trend = trend_summary if trend_summary is not None else trend_full
+    summarization_trace: dict[str, object] = {
+        "text_source_mode": inputs.text_source_mode,
+        "selected_text_source": selected_text_source,
+        "allow_summary_fallback": inputs.allow_summary_fallback,
+        "requested_summarizers": list(inputs.summarizers),
+        "trend_raw_text": trend_raw,
+        "trend_raw_length": len(trend_raw),
+        "trend_full_text": trend_full,
+        "trend_full_length": len(trend_full),
+        "trend_summary_text": trend_summary,
+        "trend_summary_length": len(trend_summary) if trend_summary is not None else None,
+    }
 
     selected_scores = score_summary(reference=scoring_reference_text, candidate=report_trend)
     full_scores = score_summary(reference=scoring_reference_text, candidate=trend_full)
@@ -212,6 +230,15 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         adapter=adapter,
         trend_image_attached=image_b64 is not None,
         run_signature=run_signature,
+        context_trace=context_trace,
+        trend_trace=trend_trace,
+        summarization_trace=summarization_trace,
+        frame_summary={
+            "row_count": len(frame),
+            "column_count": len(frame.columns),
+            "columns": [str(column) for column in frame.columns],
+            "matched_metric_columns": matched_metric_columns,
+        },
     )
 
     return PipelineResult(
@@ -244,6 +271,15 @@ def _write_stats_table_csv(output_dir: Path, stats_table_csv: str) -> Path:
 
 def _invoke_adapter(adapter: LLMAdapter, model: str, prompt: str, image_b64: str | None = None) -> str:
     return helpers.invoke_adapter(adapter=adapter, model=model, prompt=prompt, image_b64=image_b64)
+
+
+def _invoke_adapter_with_trace(
+    adapter: LLMAdapter,
+    model: str,
+    prompt: str,
+    image_b64: str | None = None,
+) -> tuple[str, dict[str, object]]:
+    return helpers.invoke_adapter_with_trace(adapter=adapter, model=model, prompt=prompt, image_b64=image_b64)
 
 
 def _enabled_style_features(values: tuple[str, ...] | None) -> set[str] | None:

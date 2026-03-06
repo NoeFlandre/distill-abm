@@ -116,6 +116,14 @@ Each run writes `pipeline_run_metadata.json` with:
 5. Run signature for resumable execution
 6. Score source provenance (`context_response` or human ground truth file)
 
+Each run also writes `debug_trace/` with:
+
+1. Snapshotted input files used for the run
+2. Request/response JSON for context and trend LLM calls
+3. Summarization trace showing the selected text source and outputs
+4. Artifact manifests with hashes, sizes, and previews
+5. Validation warnings for placeholder-like inputs and missing metric columns
+
 ## Verification Commands
 
 ```bash

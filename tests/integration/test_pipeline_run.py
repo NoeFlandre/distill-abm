@@ -460,3 +460,67 @@ def test_run_pipeline_resume_handles_malformed_metadata(tmp_path: Path) -> None:
 
     # Should succeed by re-running
     assert result.report_csv.exists()
+
+
+def test_run_pipeline_writes_detailed_debug_trace_artifacts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+    parameters_path = tmp_path / "params.txt"
+    parameters_path.write_text("TODO replace me with real parameters\n", encoding="utf-8")
+    documentation_path = tmp_path / "docs.txt"
+    documentation_path.write_text("Placeholder documentation block\n", encoding="utf-8")
+    output_dir = tmp_path / "out"
+    monkeypatch.setattr(run_module.helpers, "summarize_with_bart", lambda text: f"bart::{text}")
+
+    adapter = FakeAdapter()
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=parameters_path,
+            documentation_path=documentation_path,
+            output_dir=output_dir,
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            text_source_mode="summary_only",
+            evidence_mode="plot+table",
+            summarizers=("bart",),
+            allow_summary_fallback=True,
+        ),
+        prompts=_prompts(),
+        adapter=adapter,
+    )
+
+    assert result.metadata_path is not None
+    metadata = json.loads(result.metadata_path.read_text(encoding="utf-8"))
+    debug_trace = metadata["debug_trace"]
+    assert debug_trace["warnings"]
+    assert any("placeholder" in warning.lower() for warning in debug_trace["warnings"])
+    assert debug_trace["dataframe"]["row_count"] == 2
+    assert debug_trace["dataframe"]["matched_metric_columns"] == ["mean-incum-1", "mean-incum-2"]
+
+    input_snapshots = debug_trace["input_snapshots"]
+    assert Path(input_snapshots["csv_path"]).exists()
+    assert Path(input_snapshots["parameters_path"]).exists()
+    assert Path(input_snapshots["documentation_path"]).exists()
+
+    assert Path(debug_trace["context_request_path"]).exists()
+    assert Path(debug_trace["trend_request_path"]).exists()
+    assert Path(debug_trace["summarization_trace_path"]).exists()
+    assert Path(debug_trace["artifact_manifest_path"]).exists()
+
+    context_request = json.loads(Path(debug_trace["context_request_path"]).read_text(encoding="utf-8"))
+    trend_request = json.loads(Path(debug_trace["trend_request_path"]).read_text(encoding="utf-8"))
+    summarization_trace = json.loads(Path(debug_trace["summarization_trace_path"]).read_text(encoding="utf-8"))
+    artifact_manifest = json.loads(Path(debug_trace["artifact_manifest_path"]).read_text(encoding="utf-8"))
+
+    assert context_request["request"]["prompt_text"].startswith("ROLE\n\nContext")
+    assert context_request["response"]["clean_text"] == "resp-1"
+    assert trend_request["request"]["image_attached"] is True
+    assert trend_request["response"]["clean_text"] == "resp-2"
+    assert summarization_trace["selected_text_source"] == "summary_only"
+    assert summarization_trace["allow_summary_fallback"] is True
+    assert artifact_manifest["report_csv"]["exists"] is True
+    assert artifact_manifest["plot_path"]["exists"] is True
