@@ -166,7 +166,7 @@ to setup
   load-value-data                    ;loads 'Human value data' from UK response of ESS 2018
   assign-value-data                  ;agents are assigned values based on distribution from the ESS 2018 survey data
   file-close-all
-  file-open "/Users/noeflandre/Documents/[03] School/École d'ingénieur/2A/Stage Miami University/Projet/Simulations/Comses/Historic British Milk Consumption ABM/data/netlogodata_downsampled.csv"             ;downsampled annual data on UK public concerns of economy, health, and environment - aggregated from Ipsos Mori Issues Index and YouGov.
+  file-open "netlogodata_downsampled.csv"             ;downsampled annual data on UK public concerns of economy, health, and environment - aggregated from Ipsos Mori Issues Index and YouGov.
   if justification < cognitive-dissonance-threshold
     [ifelse (justification + cognitive-dissonance-threshold) >= 1 [set justification 1] [set justification justification + cognitive-dissonance-threshold]]    ;makes sure that justification parameter is larger than cognitive-dissonance-threshold parameter during the optimisation exercise
   set network-parameter round network-parameter
@@ -225,9 +225,9 @@ end
 
 to load-value-data
   ;this creates a distribution of values among the agents according to the ESS 2018 survey for the UK.
-  ifelse (file-exists? "/Users/noeflandre/Documents/[03] School/École d'ingénieur/2A/Stage Miami University/Projet/Simulations/Comses/Historic British Milk Consumption ABM/data/netlogovaluedata.csv")
+  ifelse (file-exists? "netlogovaluedata.csv")
     [set value-data []
-    set value-data (csv:from-file "/Users/noeflandre/Documents/[03] School/École d'ingénieur/2A/Stage Miami University/Projet/Simulations/Comses/Historic British Milk Consumption ABM/data/netlogovaluedata.csv")
+    set value-data (csv:from-file "netlogovaluedata.csv")
     user-message "File loading complete!"
     file-close]
     [user-message "There is no netlogovaluedata.csv file in current directory!"]

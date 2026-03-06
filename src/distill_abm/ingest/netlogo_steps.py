@@ -24,6 +24,9 @@ def coerce_parameter_value_for_netlogo(value: ParameterScalar) -> ParameterScala
     """Normalize booleans to NetLogo literals while keeping other values unchanged."""
     if isinstance(value, bool):
         return "true" if value else "false"
+    if isinstance(value, str):
+        escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+        return f'"{escaped}"'
     return value
 
 

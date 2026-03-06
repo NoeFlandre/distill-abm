@@ -25,7 +25,7 @@ from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
 from distill_abm.ingest.ingest_smoke import run_ingest_smoke_suite
-from distill_abm.ingest.netlogo_workflow import run_ingest_workflow
+from distill_abm.ingest.netlogo_workflow import resolve_experiment_parameters, run_ingest_workflow
 from distill_abm.llm.factory import create_adapter
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
@@ -35,7 +35,8 @@ from distill_abm.pipeline.smoke import (
     default_smoke_cases,
     run_qwen_smoke_suite,
 )
-from distill_abm.viz.viz_smoke import run_viz_smoke_suite
+from distill_abm.viz.plots import MetricPlotBundle
+from distill_abm.viz.viz_smoke import VizSmokeSpec, run_viz_smoke_suite
 
 app = typer.Typer(help="Run ABM distillation workflows.")
 RUNTIME_DEFAULTS = get_runtime_defaults()
@@ -696,16 +697,22 @@ def smoke_viz(
         list[str] | None,
         typer.Option(
             "--abm",
-            help="ABM names to process. Repeat for multiple. Defaults to all configured ABMs with resolvable CSVs.",
+            help="ABM names to process. Repeat for multiple. Defaults to all configured ABMs.",
         ),
     ] = None,
-    csv_map: Annotated[
-        list[str] | None,
+    models_root: Annotated[
+        Path,
         typer.Option(
-            "--csv-map",
-            help="Explicit ABM CSV mapping in the form abm=/path/to/file.csv. Repeatable.",
+            help="Root directory containing ABM models. Supports per-ABM folders and root-level model files.",
         ),
-    ] = None,
+    ] = Path("data"),
+    netlogo_home: Annotated[
+        str,
+        typer.Option(
+            envvar="DISTILL_ABM_NETLOGO_HOME",
+            help="NetLogo installation directory used by pynetlogo. Can also be provided via DISTILL_ABM_NETLOGO_HOME.",
+        ),
+    ] = "",
     stage: Annotated[
         list[str] | None,
         typer.Option("--stage", help="Optional viz smoke stage filter. Repeat to focus the smoke report."),
@@ -717,14 +724,23 @@ def smoke_viz(
     output_root: Annotated[
         Path,
         typer.Option(help="Root directory for visualization smoke artifacts."),
-    ] = Path("results/viz_smoke"),
+    ] = Path("results/viz_smoke_latest"),
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
-    """Run artifact-focused smoke checks for plot and stats-table generation."""
+    """Run NetLogo simulations and generate the ordered plot PNGs used before LLM inference."""
     requested = sorted(set(abms)) if abms else list(_discover_configured_abms())
     try:
-        abm_inputs = _resolve_viz_smoke_inputs(requested_abms=requested, csv_map_entries=csv_map)
-        result = run_viz_smoke_suite(abm_inputs=abm_inputs, output_root=output_root, stage_ids=stage)
+        if not netlogo_home.strip():
+            raise ValueError(
+                "missing NetLogo installation directory. Provide --netlogo-home or set DISTILL_ABM_NETLOGO_HOME."
+            )
+        specs = _resolve_viz_smoke_specs(requested_abms=requested, models_root=models_root)
+        result = run_viz_smoke_suite(
+            specs=specs,
+            netlogo_home=netlogo_home,
+            output_root=output_root,
+            stage_ids=stage,
+        )
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
     if require_stage:
@@ -1101,48 +1117,53 @@ def _resolve_abm_experiment_parameters_path(*, model_dir: Path, abm: str, explic
     return None
 
 
-def _resolve_viz_smoke_inputs(
-    *, requested_abms: list[str], csv_map_entries: list[str] | None
-) -> dict[str, tuple[Path, str]]:
-    """Resolve ABM CSV inputs and metric patterns for visualization smoke runs."""
-    explicit_map = _parse_csv_map_entries(csv_map_entries)
-    abm_inputs: dict[str, tuple[Path, str]] = {}
-    missing: list[str] = []
+def _resolve_viz_smoke_specs(*, requested_abms: list[str], models_root: Path) -> dict[str, VizSmokeSpec]:
+    """Resolve ABM NetLogo simulation-and-plot specs for visualization smoke runs."""
+    specs: dict[str, VizSmokeSpec] = {}
+    missing_viz_config: list[str] = []
     for abm in requested_abms:
         abm_config = load_abm_config(Path("configs/abms") / f"{abm}.yaml")
-        csv_path = explicit_map.get(abm)
-        if csv_path is None and abm_config.default_input_csv is not None:
-            candidate = Path(abm_config.default_input_csv)
-            if candidate.exists():
-                csv_path = candidate
-        if csv_path is None:
-            missing.append(abm)
+        model_path = _resolve_abm_model_path(abm=abm, models_root=models_root)
+        if abm_config.netlogo_viz is None:
+            missing_viz_config.append(abm)
             continue
-        abm_inputs[abm] = (csv_path, abm_config.metric_pattern)
-    if missing:
-        joined = ", ".join(missing)
-        raise ValueError(
-            f"missing CSV input(s) for viz smoke ABMs: {joined}. "
-            "Provide them with --csv-map abm=/path/to/file.csv or add default_input_csv in the ABM config."
+        viz_config = abm_config.netlogo_viz
+        experiment_parameters = resolve_experiment_parameters(
+            model_path=model_path,
+            experiment_parameters=viz_config.experiment_parameters,
+            preferred_experiment=viz_config.experiment_name,
         )
-    return abm_inputs
-
-
-def _parse_csv_map_entries(entries: list[str] | None) -> dict[str, Path]:
-    """Parse repeatable ABM-to-CSV mappings from the CLI."""
-    resolved: dict[str, Path] = {}
-    for entry in entries or []:
-        if "=" not in entry:
-            raise ValueError(f"invalid --csv-map entry '{entry}'. Expected format: abm=/path/to/file.csv")
-        abm, raw_path = entry.split("=", 1)
-        abm_key = abm.strip()
-        csv_path = Path(raw_path.strip())
-        if not abm_key:
-            raise ValueError(f"invalid --csv-map entry '{entry}'. ABM key cannot be empty.")
-        if not csv_path.exists():
-            raise ValueError(f"CSV path not found for --csv-map entry '{entry}': {csv_path}")
-        resolved[abm_key] = csv_path
-    return resolved
+        specs[abm] = VizSmokeSpec(
+            abm=abm,
+            model_path=model_path,
+            experiment_name=viz_config.experiment_name,
+            experiment_parameters=experiment_parameters,
+            num_runs=viz_config.smoke_num_runs or viz_config.num_runs,
+            max_ticks=viz_config.smoke_max_ticks or viz_config.max_ticks,
+            interval=viz_config.smoke_interval or viz_config.interval,
+            fallback_mode=viz_config.fallback_mode,
+            fallback_csv=Path(viz_config.fallback_csv) if viz_config.fallback_csv else None,
+            fallback_plot_dir=Path(viz_config.fallback_plot_dir) if viz_config.fallback_plot_dir else None,
+            reporters=list(viz_config.reporters),
+            plots=[
+                MetricPlotBundle(
+                    include_pattern=plot.reporter_pattern,
+                    title=plot.title,
+                    y_label=plot.y_label,
+                    x_label=plot.x_label,
+                    exclude_pattern=plot.exclude_pattern,
+                    show_mean_line=plot.show_mean_line,
+                )
+                for plot in viz_config.plots
+            ],
+        )
+    if missing_viz_config:
+        joined = ", ".join(missing_viz_config)
+        raise ValueError(
+            f"missing netlogo_viz config for ABM(s): {joined}. "
+            "Add the simulation-and-plot spec under netlogo_viz in the ABM config."
+        )
+    return specs
 
 
 def _parse_summarizers(values: list[str] | None, fallback: tuple[SummarizerId, ...]) -> tuple[SummarizerId, ...]:

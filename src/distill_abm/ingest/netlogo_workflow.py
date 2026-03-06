@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import re
+import subprocess
+import sys
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any, cast
@@ -119,12 +122,14 @@ def _resolve_preferred_experiment(model_path: Path) -> str | None:
 def _resolve_experiment_parameters(
     model_path: Path,
     experiment_parameters: Mapping[str, ParameterScalar],
+    *,
+    preferred_experiment: str | None = None,
 ) -> dict[str, ParameterScalar]:
     """Merge explicit CLI inputs with deterministic BehaviorSpace defaults."""
-    preferred_experiment = _resolve_preferred_experiment(model_path)
+    selected_experiment = preferred_experiment or _resolve_preferred_experiment(model_path)
     defaults: dict[str, Any] = _extract_experiment_parameters(
         model_path.read_text(encoding="utf-8"),
-        preferred_experiment=preferred_experiment,
+        preferred_experiment=selected_experiment,
     )
     merged: dict[str, ParameterScalar] = {
         key: value for key, value in defaults.items() if isinstance(value, (bool, int, float, str))
@@ -132,6 +137,20 @@ def _resolve_experiment_parameters(
     for key, value in experiment_parameters.items():
         merged[key] = value
     return merged
+
+
+def resolve_experiment_parameters(
+    *,
+    model_path: Path,
+    experiment_parameters: Mapping[str, ParameterScalar],
+    preferred_experiment: str | None = None,
+) -> dict[str, ParameterScalar]:
+    """Public wrapper for deterministic BehaviorSpace parameter resolution."""
+    return _resolve_experiment_parameters(
+        model_path=model_path,
+        experiment_parameters=experiment_parameters,
+        preferred_experiment=preferred_experiment,
+    )
 
 
 def _write_reference_narrative_or_build(
@@ -162,7 +181,69 @@ def _default_link_factory(*, netlogo_home: str) -> NetLogoLinkProtocol:
         import pynetlogo
     except Exception as exc:  # pragma: no cover - exercised via injected factory in tests
         raise RuntimeError("pynetlogo is required to run NetLogo experiments") from exc
-    return cast(NetLogoLinkProtocol, pynetlogo.NetLogoLink(netlogo_home=netlogo_home))
+    jvm_path = _resolve_jvm_path()
+    return cast(
+        NetLogoLinkProtocol,
+        pynetlogo.NetLogoLink(netlogo_home=netlogo_home, jvm_path=jvm_path),
+    )
+
+
+def _resolve_jvm_path() -> str | None:
+    """Prefer a modern macOS JVM for pynetlogo when one is installed."""
+    if sys.platform != "darwin":
+        return None
+
+    return _find_modern_macos_jvm()
+
+
+def _find_modern_macos_jvm() -> str | None:
+    """Return a Java 17+ libjvm path when available on macOS."""
+    for version in ("21", "17", "11"):
+        try:
+            result = subprocess.run(
+                ["/usr/libexec/java_home", "-v", version],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            continue
+        java_home = result.stdout.strip()
+        if not java_home:
+            continue
+        libjvm = Path(java_home) / "lib" / "server" / "libjvm.dylib"
+        if libjvm.exists():
+            return str(libjvm)
+    return None
+
+
+def _read_java_major_version() -> int | None:
+    """Read the default `java` major version from the current shell environment."""
+    try:
+        result = subprocess.run(
+            ["java", "-version"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return None
+    return _parse_java_major_version(result.stderr or result.stdout)
+
+
+def _parse_java_major_version(version_output: str) -> int | None:
+    """Parse a major Java version from `java -version` style output."""
+    match = re.search(r'version "(?P<raw>[0-9]+(?:\.[0-9]+)*)', version_output)
+    if match is None:
+        return None
+    raw = match.group("raw")
+    if raw.startswith("1."):
+        parts = raw.split(".")
+        if len(parts) > 1 and parts[1].isdigit():
+            return int(parts[1])
+        return None
+    head = raw.split(".", maxsplit=1)[0]
+    return int(head) if head.isdigit() else None
 
 
 def run_netlogo_experiment(
@@ -197,7 +278,7 @@ def run_netlogo_experiment(
             all_results = pd.concat([all_results, run_df], axis=1)
 
     output_csv_path.parent.mkdir(parents=True, exist_ok=True)
-    all_results.to_csv(output_csv_path, index=False)
+    all_results.to_csv(output_csv_path, index=False, sep=";")
     return all_results
 
 

@@ -9,6 +9,8 @@ import pytest
 
 from distill_abm.ingest.netlogo_workflow import (
     _coerce_parameter_value_for_netlogo,
+    _parse_java_major_version,
+    _resolve_jvm_path,
     build_parameter_narrative,
     extract_code_to_text,
     extract_documentation_to_json,
@@ -43,7 +45,8 @@ def test_coerce_parameter_value_for_netlogo() -> None:
     assert _coerce_parameter_value_for_netlogo(True) == "true"
     assert _coerce_parameter_value_for_netlogo(False) == "false"
     assert _coerce_parameter_value_for_netlogo(7) == 7
-    assert _coerce_parameter_value_for_netlogo("abc") == "abc"
+    assert _coerce_parameter_value_for_netlogo("abc") == '"abc"'
+    assert _coerce_parameter_value_for_netlogo('a"b') == '"a\\"b"'
 
 
 def test_run_single_repetition_collects_reported_ticks() -> None:
@@ -83,7 +86,7 @@ def test_run_netlogo_experiment_loop_and_csv(tmp_path: Path) -> None:
 
     assert factory_calls == [{"netlogo_home": "/fake/netlogo"}]
     assert output_csv.exists()
-    written = pd.read_csv(output_csv)
+    written = pd.read_csv(output_csv, sep=";")
     assert written.shape == frame.shape
     assert written.values.tolist() == frame.values.tolist()
     assert frame.shape[0] == 2
@@ -234,3 +237,49 @@ def test_default_link_factory_raises_when_pynetlogo_unavailable(monkeypatch: pyt
         _default_link_factory(netlogo_home="/fake/path")
     
     assert "pynetlogo" in str(exc_info.value).lower()
+
+
+def test_parse_java_major_version_supports_legacy_and_modern_strings() -> None:
+    assert _parse_java_major_version('java version "1.8.0_451"') == 8
+    assert _parse_java_major_version('openjdk version "17.0.13" 2024-10-15') == 17
+    assert _parse_java_major_version('openjdk version "21.0.5" 2024-10-15') == 21
+    assert _parse_java_major_version("not a version string") is None
+
+
+def test_resolve_jvm_path_prefers_modern_macos_jvm_when_default_is_legacy(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("distill_abm.ingest.netlogo_workflow.sys.platform", "darwin")
+    monkeypatch.setattr(
+        "distill_abm.ingest.netlogo_workflow._find_modern_macos_jvm",
+        lambda: "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server/libjvm.dylib",
+    )
+    monkeypatch.setattr(
+        "distill_abm.ingest.netlogo_workflow._read_java_major_version",
+        lambda: 8,
+    )
+
+    assert (
+        _resolve_jvm_path()
+        == "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server/libjvm.dylib"
+    )
+
+
+def test_resolve_jvm_path_still_prefers_explicit_modern_jvm_when_available(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("distill_abm.ingest.netlogo_workflow.sys.platform", "darwin")
+    monkeypatch.setattr(
+        "distill_abm.ingest.netlogo_workflow._find_modern_macos_jvm",
+        lambda: "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server/libjvm.dylib",
+    )
+
+    assert (
+        _resolve_jvm_path()
+        == "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server/libjvm.dylib"
+    )
+
+
+def test_resolve_jvm_path_returns_none_outside_macos(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("distill_abm.ingest.netlogo_workflow.sys.platform", "linux")
+    assert _resolve_jvm_path() is None

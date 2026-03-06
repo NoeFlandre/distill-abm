@@ -13,7 +13,9 @@
 - Exposes `validate-workspace` as the canonical non-LLM verification contract for coding agents.
 - Exposes read-only `describe-*` commands so agents can inspect ABMs, ingest outputs, and run artifacts without rerunning workflows.
 - Exposes `--json` output on the main verification and inspection surfaces.
-- Exposes `smoke-viz` for artifact-focused verification of plot and stats-table generation from simulation CSVs.
+- Exposes `smoke-viz` for artifact-focused verification of the NetLogo-to-CSV-to-plot workflow that runs before any LLM inference.
+  - `smoke-viz` is production fallback-first: it preserves repo-local reference CSVs and plot images under `data/*/legacy/` and records whether each ABM artifact bundle was produced from a live simulation or from fallback reference artifacts.
+  - Milk model input CSVs and grazing `.nls` include files are now stored inside the repository so the NetLogo launch path no longer depends on the temporary notebook workspace.
 - Benchmark/debug model gating.
 - Model registry resolution via `configs/models.yaml`.
 
@@ -53,8 +55,20 @@
 - It is not a universal parser for every possible `.nlogo` variant; models with materially different info blocks, interface declarations, or experiment layouts may require extractor updates.
 
 ### `src/distill_abm/viz/*`
-- Plot generation and stats table construction.
-- Visualization smoke checks for plot PNGs, stats CSVs, markdown tables, and stats-table images.
+- Plot generation utilities for repeated simulation runs.
+- Visualization smoke checks for the pre-LLM NetLogo plotting workflow:
+  - resolve ABM-specific simulation settings from config
+  - run the NetLogo model
+  - write the generated simulation CSV
+  - emit the ordered plot PNGs later consumed by trend-description prompts
+
+### `configs/abms/*.yaml`
+- ABM presets.
+- `netlogo_viz` is the source of truth for the pre-LLM plotting workflow:
+  - BehaviorSpace experiment name
+  - generated reporter list
+  - run-count / tick / interval settings
+  - ordered plot definitions and labels
 
 ## Configuration
 - `configs/models.yaml`: canonical model aliases and provider routing.

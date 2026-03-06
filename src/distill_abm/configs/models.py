@@ -51,6 +51,35 @@ class PromptsConfig(BaseModel):
     style_features: dict[str, str] = Field(default_factory=dict)
 
 
+class ABMNetLogoVizPlotConfig(BaseModel):
+    """Defines one ordered plot emitted by the NetLogo visualization smoke workflow."""
+
+    reporter_pattern: str
+    title: str
+    y_label: str
+    x_label: str = "Steps"
+    exclude_pattern: str | None = None
+    show_mean_line: bool = False
+
+
+class ABMNetLogoVizConfig(BaseModel):
+    """Defines how one ABM is simulated and plotted before any LLM inference."""
+
+    experiment_name: str
+    num_runs: int
+    max_ticks: int
+    interval: int
+    experiment_parameters: dict[str, bool | int | float | str] = Field(default_factory=dict)
+    smoke_num_runs: int | None = None
+    smoke_max_ticks: int | None = None
+    smoke_interval: int | None = None
+    fallback_mode: Literal["on_error", "always"] = "on_error"
+    fallback_csv: str | None = None
+    fallback_plot_dir: str | None = None
+    reporters: list[str]
+    plots: list[ABMNetLogoVizPlotConfig]
+
+
 class ABMConfig(BaseModel):
     """Defines case-study-specific defaults."""
 
@@ -61,6 +90,7 @@ class ABMConfig(BaseModel):
     default_input_csv: str | None = None
     default_parameters_txt: str | None = None
     default_documentation_txt: str | None = None
+    netlogo_viz: ABMNetLogoVizConfig | None = None
 
 
 class EvaluationConfig(BaseModel):

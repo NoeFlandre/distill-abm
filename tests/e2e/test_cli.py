@@ -565,19 +565,19 @@ def test_cli_describe_run_returns_metadata_summary(tmp_path: Path) -> None:
 
 
 def test_cli_smoke_viz_supports_json_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    csv_path = tmp_path / "sim.csv"
-    csv_path.write_text("tick;mean-incum-run-1;mean-incum-run-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+    fake_specs = {"milk_consumption": object()}
 
-    def fake_run_viz_smoke_suite(*, abm_inputs, output_root, stage_ids):  # type: ignore[no-untyped-def]
-        _ = abm_inputs, output_root, stage_ids
+    def fake_run_viz_smoke_suite(*, specs, netlogo_home, output_root, stage_ids):  # type: ignore[no-untyped-def]
+        _ = specs, netlogo_home, output_root, stage_ids
         return SimpleNamespace(
             success=True,
             failed_abms=[],
-            selected_stage_ids=["plot"],
+            selected_stage_ids=["plot-1"],
             report_markdown_path=Path("viz_smoke.md"),
             report_json_path=Path("viz_smoke.json"),
         )
 
+    monkeypatch.setattr(cli_module, "_resolve_viz_smoke_specs", lambda **_: fake_specs)
     monkeypatch.setattr(cli_module, "run_viz_smoke_suite", fake_run_viz_smoke_suite)
 
     result = runner.invoke(
@@ -586,12 +586,14 @@ def test_cli_smoke_viz_supports_json_output(tmp_path: Path, monkeypatch: pytest.
             "smoke-viz",
             "--abm",
             "milk_consumption",
-            "--csv-map",
-            f"milk_consumption={csv_path}",
+            "--models-root",
+            str(tmp_path),
+            "--netlogo-home",
+            "/fake/netlogo",
             "--stage",
-            "plot",
+            "plot-1",
             "--require-stage",
-            "plot",
+            "plot-1",
             "--json",
         ],
     )

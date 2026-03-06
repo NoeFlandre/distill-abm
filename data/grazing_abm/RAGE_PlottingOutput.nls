@@ -1,0 +1,287 @@
+;; RAGE RAngeland Grazing ModEl ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Plotting and Output functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; PLOT FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;NH update color of patches
+to update-color-of-patches
+  ask patches 
+  [ 
+    set pcolor scale-color green reserve-biomass ( 1.1 * Rmax ) 0
+  ]
+  ask households
+  [
+    set size max list 0.25 (livestock / 120)
+  ]
+end
+
+to plot-livestock-per-household 
+  if count households > 0
+  [
+    set-current-plot "current (EXT: healthy) livestock [each household]" ;;#EXT renamed for clarity in extension model
+    
+    clear-plot
+    set-plot-x-range 0 number-households
+    set-plot-y-range 0 precision max ( list max [ livestock ] of households 1 ) 0
+    set-current-plot-pen "livestock-current"
+    
+    let x 0 
+    foreach sort-on [ livestock ] households 
+    [
+      [ hh ] -> plotxy x [ livestock ] of hh
+      set x x + 1
+    ]
+  ]
+end
+
+;;; #EXT for extension model only 
+to plot-total-livestock-placed-per-household 
+  if count households > 0
+  [
+    set-current-plot "current livestock-placed [each household]"
+    
+    clear-plot
+    set-plot-x-range 0 number-households
+    set-plot-y-range 0 livestock-init
+    set-current-plot-pen "total-livestock-placed-current"
+    
+    let x 0 
+    foreach sort-on [ livestock + destock ] households 
+    [
+      [ hh ] -> plotxy x [ livestock + destock ] of hh
+      set x x + 1
+    ]
+  ]
+end
+      
+
+to plot-lorenz
+  if count households > 0
+  [
+    set-current-plot "Lorenz Curve"
+    
+    clear-plot
+    set-plot-x-range 0 number-households ;count households
+    set-plot-y-range 0 1
+    
+    set-current-plot-pen "lorenz"
+    plotxy 0 0
+    let x 1
+    let sum-livestock sum [ livestock ] of households
+    let part-sum-livestock 0
+    let dead-households number-households - count households
+    
+    repeat dead-households
+    [
+      plotxy x 0
+      set x x + 1
+    ]
+    
+    foreach sort-on [ livestock ] households
+    [
+      [ hh ] -> plotxy x ( ( part-sum-livestock + [ livestock ] of hh ) / sum-livestock )
+      set x x + 1
+      set part-sum-livestock part-sum-livestock + [ livestock ] of hh
+    ]
+  ]
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; HELPER FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+to-report gini-coef
+  ifelse ( count households > 0 )
+  [
+    let x-part 1 / number-households;count households
+    let distribution-area 0
+    let sum-livestock sum [ livestock ] of households
+    let part-area-livestock 0
+    
+    foreach sort-on [ livestock ] households
+    [
+      [ hh ] -> set part-area-livestock part-area-livestock + ( [ livestock ] of hh / sum-livestock )
+      let part-area ( part-area-livestock - ( [ livestock ] of hh / ( 2 * sum-livestock )  ) ) * x-part
+      set distribution-area distribution-area + part-area
+    ]
+    
+    let gini 1 - 2 * distribution-area
+    
+    report gini  
+  ]
+  [
+    report 0
+  ]
+end
+
+to-report gini-coef-surviving ;#EXT also from original model, shown in reporter screen in interface, in #EXT this represents gini based on livestock-healthy at the end of each time step
+  ifelse ( count households > 0 )
+  [
+    let x-part 1 / count households
+    let distribution-area 0
+    let sum-livestock sum [ livestock ] of households
+    let part-area-livestock 0
+    
+    foreach sort-on [ livestock ] households
+    [
+      [ hh ] -> set part-area-livestock part-area-livestock + ( [ livestock ] of hh / sum-livestock )
+      let part-area ( part-area-livestock - ( [ livestock ] of hh / ( 2 * sum-livestock )  ) ) * x-part
+      set distribution-area distribution-area + part-area
+    ]
+    
+    let gini 1 - 2 * distribution-area
+    
+    report gini  
+  ]
+  [
+    report 0
+  ]
+end
+
+
+to-report gini-coef-total-livestock-healthy ;; #EXT: in extension version of the model this measures Gini Coef relatively to TOTAL livestock-healthy at the end of the simulation
+    ifelse ( count households > 0 )
+  [
+    let x-part 1 / count households
+    let distribution-area 0
+    let sum-livestock sum [ livestock-healthy-total ] of households
+    let part-area-livestock 0
+    
+    foreach sort-on [ livestock-healthy-total ] households
+    [
+      [ hh ] -> set part-area-livestock part-area-livestock + ( [ livestock-healthy-total ] of hh / sum-livestock )
+      let part-area ( part-area-livestock - ( [livestock-healthy-total] of hh / ( 2 * sum-livestock )  ) ) * x-part
+      set distribution-area distribution-area + part-area
+    ]
+    
+    let gini 1 - 2 * distribution-area
+    
+    report gini  
+  ]
+  [
+    report 0
+  ]
+end
+  
+
+to-report upside-sd [ vector ]
+  ;; calculate upside standard deviation 
+  let mean-vector mean vector
+  let up-vector ( list )
+  
+  foreach vector
+  [
+    [ x ] -> if ( x >= mean-vector )
+    [
+      set up-vector lput (( x - mean-vector) ^ 2) up-vector
+    ]
+  ]
+  ;show up-vector
+  let up-sd 0
+  if length up-vector > 0
+  [
+    set up-sd sqrt ( mean up-vector ) 
+  ]
+  report up-sd
+end
+
+to-report downside-sd [ vector ]
+  ;; calculate downside standard deviation
+  let mean-vector mean vector
+  let down-vector ( list )
+  
+  foreach vector
+  [
+    [ x ] -> if ( x <= mean-vector )
+    [
+      set down-vector lput (( x - mean-vector ) ^ 2) down-vector
+    ]
+  ]
+  ;show down-vector
+  let down-sd 0
+  if length down-vector > 0
+  [
+    set down-sd sqrt ( mean down-vector ) 
+  ]
+  report down-sd
+end
+
+to-report moore-neighborhood [ n ]
+  let result [ list pxcor pycor ] of patches with [ abs pxcor <= n and abs pycor <= n ]
+  report result
+end
+
+to-report surviving-households
+  report count households with [ livestock > 0 ]
+end
+
+to-report surviving-households-trad
+  report count households with [ livestock > 0 and household-behavioral-type = "TRAD"]
+end
+
+to-report surviving-households-sat
+  report count households with [ livestock > 0 and household-behavioral-type = "SAT"]
+end
+
+to-report surviving-households-max
+  report count households with [ livestock > 0 and household-behavioral-type = "MAX"]
+end
+
+to-report mean-reserve-biomass
+  report mean [ reserve-biomass ] of patches 
+end
+
+to-report mean-green-biomass
+  report mean [ green-biomass-init ] of patches 
+end
+
+to-report mean-green-biomass-over
+  report mean [ green-biomass ] of patches 
+end
+
+to-report mean-livestock
+  ifelse ( count households > 0 )
+  [
+    report mean [ livestock ] of households
+  ]
+  [
+    report 0
+  ]
+end
+
+to-report mean-total-livestock
+  ifelse ( count households > 0 )
+  [
+    report mean [ livestock-healthy-total ] of households / ticks
+  ]
+  [
+    report 0
+  ]
+end
+
+to-report sum-livestock-end
+  report sum [ livestock ] of households
+end
+
+to-report mean-knowledge-radius
+  report mean [ knowledge-radius ] of households
+end
+
+to-report seed-used
+  report model-seed
+end
+
+to-report dn-hoec
+  report count households with [ household-behavioral-type = "MAX" ]
+end
+
+to-report dn-trad-a
+  report count households with [ household-behavioral-type = "TRAD" ]
+end
+
+to-report dn-trad-b
+  report count households with [ household-behavioral-type = "TRAD" ]
+end
