@@ -10,6 +10,7 @@ from typing import Annotated, Literal, cast
 
 import typer
 
+from distill_abm.agent_validation import run_validation_suite
 from distill_abm.configs.loader import (
     load_abm_config,
     load_experiment_settings,
@@ -56,6 +57,7 @@ __all__ = [
     "smoke_ingest_netlogo",
     "smoke_qwen",
     "subprocess",
+    "validate_workspace",
 ]
 
 
@@ -479,6 +481,67 @@ def smoke_ingest_netlogo(
     typer.echo(f"ingest smoke report (json): {result.report_json_path}")
     if not result.success:
         typer.echo(f"ingest smoke failed: {', '.join(result.failed_abms)}")
+        raise typer.Exit(code=1)
+
+
+@app.command("validate-workspace")
+def validate_workspace(
+    checks: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--check",
+            help="Optional validation check filter. Repeatable: pytest, ruff, mypy, build, smoke-ingest-netlogo.",
+        ),
+    ] = None,
+    abms: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--abm",
+            help="ABM names to process for the smoke-ingest-netlogo validation step. Defaults to all configured ABMs.",
+        ),
+    ] = None,
+    models_root: Annotated[
+        Path,
+        typer.Option(
+            help="Root directory containing ABM models for the smoke-ingest-netlogo validation step.",
+        ),
+    ] = Path("data"),
+    ingest_stage: Annotated[
+        list[str] | None,
+        typer.Option("--ingest-stage", help="Optional ingest stage filter for the smoke-ingest-netlogo check."),
+    ] = None,
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for structured validation reports and nested artifacts."),
+    ] = Path("results/agent_validation/latest"),
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Print the full validation report JSON to stdout."),
+    ] = False,
+) -> None:
+    """Run the canonical non-LLM validation suite for coding-agent verification."""
+    requested = sorted(set(abms)) if abms else list(_discover_configured_abms())
+    abm_models = {abm: _resolve_abm_model_path(abm=abm, models_root=models_root) for abm in requested}
+    try:
+        result = run_validation_suite(
+            output_root=output_root,
+            abm_models=abm_models,
+            checks=checks,
+            ingest_stage_ids=ingest_stage,
+        )
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    if json_output:
+        typer.echo(result.model_dump_json(indent=2))
+    else:
+        typer.echo(f"validation report (markdown): {result.report_markdown_path}")
+        typer.echo(f"validation report (json): {result.report_json_path}")
+        if result.ingest_smoke_report_json_path is not None:
+            typer.echo(f"ingest smoke report (json): {result.ingest_smoke_report_json_path}")
+        if result.ingest_smoke_report_markdown_path is not None:
+            typer.echo(f"ingest smoke report (markdown): {result.ingest_smoke_report_markdown_path}")
+    if not result.success:
+        typer.echo(f"validation failed: {', '.join(result.failed_checks)}")
         raise typer.Exit(code=1)
 
 
