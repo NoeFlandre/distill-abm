@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
+from shutil import copy2
 from typing import TYPE_CHECKING
 
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
@@ -158,8 +160,25 @@ def write_run_metadata(
     selected_scores: SummaryScores,
     trend_image_attached: bool,
     run_signature: str,
+    context_trace: dict[str, object],
+    trend_trace: dict[str, object],
+    summarization_trace: dict[str, object],
+    frame_summary: dict[str, object],
 ) -> Path:
     """Persist deterministic metadata for a completed pipeline run."""
+    debug_trace = _write_debug_trace_bundle(
+        output_dir=output_dir,
+        inputs=inputs,
+        plot_path=plot_path,
+        report_csv=report_csv,
+        stats_table_csv_path=stats_table_csv_path,
+        stats_image_path=stats_image_path,
+        scoring_reference_path=scoring_reference_path,
+        context_trace=context_trace,
+        trend_trace=trend_trace,
+        summarization_trace=summarization_trace,
+        frame_summary=frame_summary,
+    )
     metadata = _build_metadata_payload(
         output_dir=output_dir,
         inputs=inputs,
@@ -187,6 +206,7 @@ def write_run_metadata(
         selected_scores=selected_scores,
         trend_image_attached=trend_image_attached,
         run_signature=run_signature,
+        debug_trace=debug_trace,
     )
     metadata_path = output_dir / "pipeline_run_metadata.json"
     metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
@@ -220,6 +240,10 @@ def _write_run_metadata(
     selected_scores: SummaryScores,
     trend_image_attached: bool,
     run_signature: str,
+    context_trace: dict[str, object],
+    trend_trace: dict[str, object],
+    summarization_trace: dict[str, object],
+    frame_summary: dict[str, object],
 ) -> Path:
     """Backward-compatible private helper for older internal callers."""
     return write_run_metadata(
@@ -249,6 +273,10 @@ def _write_run_metadata(
         selected_scores=selected_scores,
         trend_image_attached=trend_image_attached,
         run_signature=run_signature,
+        context_trace=context_trace,
+        trend_trace=trend_trace,
+        summarization_trace=summarization_trace,
+        frame_summary=frame_summary,
     )
 
 
@@ -315,6 +343,7 @@ def _build_metadata_payload(
     selected_scores: SummaryScores,
     trend_image_attached: bool,
     run_signature: str,
+    debug_trace: dict[str, object],
 ) -> dict[str, object]:
     runtime_defaults = get_runtime_defaults()
     default_temperature = runtime_defaults.llm_request.temperature
@@ -438,6 +467,7 @@ def _build_metadata_payload(
             "reference": {
                 "source": scoring_reference_source,
                 "path": str(scoring_reference_path) if scoring_reference_path is not None else None,
+                "text": scoring_reference_text,
                 "length": len(scoring_reference_text),
                 "signature": hashlib.sha256(scoring_reference_text.encode("utf-8")).hexdigest(),
             },
@@ -450,4 +480,151 @@ def _build_metadata_payload(
             ),
             "stats_table_csv_written": stats_table_csv_path.exists(),
         },
+        "debug_trace": debug_trace,
     }
+
+
+def _write_debug_trace_bundle(
+    *,
+    output_dir: Path,
+    inputs: PipelineInputs,
+    plot_path: Path,
+    report_csv: Path,
+    stats_table_csv_path: Path,
+    stats_image_path: Path | None,
+    scoring_reference_path: Path | None,
+    context_trace: dict[str, object],
+    trend_trace: dict[str, object],
+    summarization_trace: dict[str, object],
+    frame_summary: dict[str, object],
+) -> dict[str, object]:
+    debug_dir = output_dir / "debug_trace"
+    inputs_dir = debug_dir / "inputs"
+    llm_dir = debug_dir / "llm"
+    summarization_dir = debug_dir / "summarization"
+    manifests_dir = debug_dir / "manifests"
+    for path in (inputs_dir, llm_dir, summarization_dir, manifests_dir):
+        path.mkdir(parents=True, exist_ok=True)
+
+    csv_snapshot = _snapshot_file(inputs.csv_path, inputs_dir / "simulation.csv")
+    parameters_snapshot = _snapshot_file(inputs.parameters_path, inputs_dir / "parameters.txt")
+    documentation_snapshot = _snapshot_file(inputs.documentation_path, inputs_dir / "documentation.txt")
+    scoring_snapshot = (
+        _snapshot_file(scoring_reference_path, inputs_dir / "scoring_reference.txt")
+        if scoring_reference_path is not None
+        else None
+    )
+
+    context_request_path = llm_dir / "context_request.json"
+    context_request_path.write_text(json.dumps(context_trace, indent=2, sort_keys=True), encoding="utf-8")
+    trend_request_path = llm_dir / "trend_request.json"
+    trend_request_path.write_text(json.dumps(trend_trace, indent=2, sort_keys=True), encoding="utf-8")
+    summarization_trace_path = summarization_dir / "summarization_trace.json"
+    summarization_trace_path.write_text(json.dumps(summarization_trace, indent=2, sort_keys=True), encoding="utf-8")
+
+    input_validations = {
+        "csv": _build_file_debug_record(inputs.csv_path),
+        "parameters": _build_file_debug_record(inputs.parameters_path),
+        "documentation": _build_file_debug_record(inputs.documentation_path),
+        "scoring_reference": _build_file_debug_record(scoring_reference_path) if scoring_reference_path else None,
+    }
+    warnings = _collect_debug_warnings(input_validations=input_validations, frame_summary=frame_summary)
+
+    artifact_manifest = {
+        "plot_path": _build_file_debug_record(plot_path),
+        "report_csv": _build_file_debug_record(report_csv),
+        "stats_table_csv": _build_file_debug_record(stats_table_csv_path),
+        "stats_image_path": _build_file_debug_record(stats_image_path) if stats_image_path is not None else None,
+    }
+    artifact_manifest_path = manifests_dir / "artifact_manifest.json"
+    artifact_manifest_path.write_text(json.dumps(artifact_manifest, indent=2, sort_keys=True), encoding="utf-8")
+
+    validations_path = manifests_dir / "input_validations.json"
+    validations_path.write_text(
+        json.dumps(
+            {
+                "input_validations": input_validations,
+                "dataframe": frame_summary,
+                "warnings": warnings,
+            },
+            indent=2,
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+    return {
+        "input_snapshots": {
+            "csv_path": str(csv_snapshot),
+            "parameters_path": str(parameters_snapshot),
+            "documentation_path": str(documentation_snapshot),
+            "scoring_reference_path": str(scoring_snapshot) if scoring_snapshot is not None else None,
+        },
+        "context_request_path": str(context_request_path),
+        "trend_request_path": str(trend_request_path),
+        "summarization_trace_path": str(summarization_trace_path),
+        "artifact_manifest_path": str(artifact_manifest_path),
+        "input_validations_path": str(validations_path),
+        "dataframe": frame_summary,
+        "warnings": warnings,
+    }
+
+
+def _snapshot_file(source: Path, destination: Path) -> Path:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    copy2(source, destination)
+    return destination
+
+
+def _build_file_debug_record(path: Path | None) -> dict[str, object]:
+    if path is None:
+        return {"exists": False}
+    exists = path.exists()
+    record: dict[str, object] = {
+        "path": str(path),
+        "exists": exists,
+    }
+    if not exists:
+        return record
+    text = path.read_text(encoding="utf-8", errors="replace")
+    preview = text[:200]
+    lowered = text.lower()
+    placeholder_signals = [
+        token
+        for token in ("placeholder", "todo", "tbd", "dummy", "lorem ipsum")
+        if token in lowered
+    ]
+    record.update(
+        {
+            "size_bytes": path.stat().st_size,
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            "line_count": len(text.splitlines()),
+            "preview": preview,
+            "placeholder_signals": placeholder_signals,
+        }
+    )
+    return record
+
+
+def _collect_debug_warnings(
+    *,
+    input_validations: Mapping[str, dict[str, object] | None],
+    frame_summary: Mapping[str, object],
+) -> list[str]:
+    warnings: list[str] = []
+    for label, payload in input_validations.items():
+        if not isinstance(payload, dict):
+            continue
+        if not payload.get("exists", False):
+            warnings.append(f"{label} input is missing from the debug trace")
+            continue
+        size_bytes = payload.get("size_bytes", 0)
+        if isinstance(size_bytes, int) and size_bytes == 0:
+            warnings.append(f"{label} input is empty")
+        placeholder_signals = payload.get("placeholder_signals", [])
+        if isinstance(placeholder_signals, list):
+            for signal in placeholder_signals:
+                warnings.append(f"{label} input contains placeholder-like token '{signal}'")
+    matched_columns = frame_summary.get("matched_metric_columns")
+    if isinstance(matched_columns, list) and not matched_columns:
+        warnings.append("simulation CSV did not contain any columns matching the configured metric pattern")
+    return warnings
