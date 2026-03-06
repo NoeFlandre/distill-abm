@@ -67,6 +67,42 @@ def test_cli_smoke_ingest_netlogo_forwards_stage_selection(tmp_path: Path, monke
     assert sorted(captured["abm_models"]) == ["fauna", "grazing", "milk_consumption"]
 
 
+def test_cli_smoke_ingest_netlogo_supports_json_and_require_stage(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    model_root = tmp_path / "data"
+    _write_model(model_root, "fauna")
+    _write_model(model_root, "grazing")
+    _write_model(model_root, "milk_consumption")
+
+    def fake_run_ingest_smoke_suite(*, abm_models, output_root, stage_ids):  # type: ignore[no-untyped-def]
+        _ = abm_models, output_root, stage_ids
+        return SimpleNamespace(
+            success=True,
+            failed_abms=[],
+            selected_stage_ids=["documentation"],
+            report_markdown_path=Path("ingest_smoke.md"),
+            report_json_path=Path("ingest_smoke.json"),
+        )
+
+    monkeypatch.setattr(cli_module, "run_ingest_smoke_suite", fake_run_ingest_smoke_suite)
+
+    result = runner.invoke(
+        app,
+        [
+            "smoke-ingest-netlogo",
+            "--models-root",
+            str(model_root),
+            "--stage",
+            "documentation",
+            "--require-stage",
+            "documentation",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert '"command": "smoke-ingest-netlogo"' in result.output
+
+
 def test_cli_smoke_ingest_netlogo_rejects_unknown_stage(tmp_path: Path) -> None:
     model_root = tmp_path / "data"
     _write_model(model_root, "fauna")

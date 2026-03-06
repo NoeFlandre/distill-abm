@@ -124,6 +124,20 @@ uv run distill-abm validate-workspace --json
 
 This command is intended to be the default "verify my work" entrypoint for coding agents. It runs the repository's standard local checks, emits a structured JSON report, and nests the NetLogo ingest-smoke report under `results/agent_validation/latest/` so agents can validate outcomes without ad hoc artifact hunting.
 
+Agent-oriented CLI additions:
+
+- Most verification-oriented commands now support `--json` so agents can consume structured output instead of parsing human text.
+- `validate-workspace` supports profiles:
+  - `quick`: fast static + ingest verification
+  - `default`: full local verification
+  - `full`: currently equivalent to `default`, reserved as the strictest profile
+- `smoke-ingest-netlogo` supports `--require-stage` so callers can assert that specific stage checks are present.
+- `ingest-netlogo` and `ingest-netlogo-suite` now write stable artifact manifests.
+- Read-only inspection commands are available for agent loops:
+  - `uv run distill-abm describe-abm --abm grazing --json`
+  - `uv run distill-abm describe-ingest-artifacts --root results/ingest/grazing --json`
+  - `uv run distill-abm describe-run --output-dir results/pipeline --json`
+
 Run DOE analysis:
 
 ```bash

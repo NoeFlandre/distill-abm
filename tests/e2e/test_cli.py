@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -217,11 +218,12 @@ def test_cli_validate_workspace_prints_json_report(tmp_path: Path, monkeypatch: 
 
     captured: dict[str, Any] = {}
 
-    def fake_run_validation_suite(*, output_root, abm_models, checks, ingest_stage_ids):  # type: ignore[no-untyped-def]
+    def fake_run_validation_suite(*, output_root, abm_models, checks, ingest_stage_ids, profile):  # type: ignore[no-untyped-def]
         captured["output_root"] = output_root
         captured["abm_models"] = abm_models
         captured["checks"] = checks
         captured["ingest_stage_ids"] = ingest_stage_ids
+        captured["profile"] = profile
         return SimpleNamespace(
             success=True,
             failed_checks=[],
@@ -252,6 +254,7 @@ def test_cli_validate_workspace_prints_json_report(tmp_path: Path, monkeypatch: 
     assert '"success": true' in result.output
     assert captured["checks"] == ["pytest"]
     assert captured["ingest_stage_ids"] == ["documentation"]
+    assert captured["profile"] == "default"
     assert sorted(captured["abm_models"]) == ["fauna", "grazing", "milk_consumption"]
 
 
@@ -261,8 +264,8 @@ def test_cli_validate_workspace_fails_on_unknown_check(tmp_path: Path, monkeypat
     _write_min_nlogo_model_dir(model_root, "grazing", "Grazing doc")
     _write_min_nlogo_model_dir(model_root, "milk_consumption", "Milk doc")
 
-    def fake_run_validation_suite(*, output_root, abm_models, checks, ingest_stage_ids):  # type: ignore[no-untyped-def]
-        _ = output_root, abm_models, ingest_stage_ids
+    def fake_run_validation_suite(*, output_root, abm_models, checks, ingest_stage_ids, profile):  # type: ignore[no-untyped-def]
+        _ = output_root, abm_models, ingest_stage_ids, profile
         raise ValueError(f"unknown validation check(s): {', '.join(checks or [])}. Known checks: pytest")
 
     monkeypatch.setattr(cli_module, "run_validation_suite", fake_run_validation_suite)
@@ -280,6 +283,43 @@ def test_cli_validate_workspace_fails_on_unknown_check(tmp_path: Path, monkeypat
 
     assert result.exit_code != 0
     assert "unknown validation check" in result.output
+
+
+def test_cli_validate_workspace_accepts_profile(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    model_root = tmp_path / "data"
+    _write_min_nlogo_model_dir(model_root, "fauna", "Fauna doc")
+    _write_min_nlogo_model_dir(model_root, "grazing", "Grazing doc")
+    _write_min_nlogo_model_dir(model_root, "milk_consumption", "Milk doc")
+
+    captured: dict[str, Any] = {}
+
+    def fake_run_validation_suite(*, output_root, abm_models, checks, ingest_stage_ids, profile):  # type: ignore[no-untyped-def]
+        captured["profile"] = profile
+        return SimpleNamespace(
+            success=True,
+            failed_checks=[],
+            ingest_smoke_report_json_path=None,
+            ingest_smoke_report_markdown_path=None,
+            report_json_path=Path("validation_report.json"),
+            report_markdown_path=Path("validation_report.md"),
+            model_dump_json=lambda indent=2: "{}",
+        )
+
+    monkeypatch.setattr(cli_module, "run_validation_suite", fake_run_validation_suite)
+
+    result = runner.invoke(
+        app,
+        [
+            "validate-workspace",
+            "--models-root",
+            str(model_root),
+            "--profile",
+            "quick",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["profile"] == "quick"
 
 
 def test_cli_run_with_abm_uses_scoring_reference(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -393,6 +433,28 @@ def test_cli_ingest_netlogo_generates_visible_artifacts(tmp_path: Path) -> None:
     assert (output_dir / "TXT" / "narrative_combined.txt").exists()
 
 
+def test_cli_ingest_netlogo_supports_json_output(tmp_path: Path) -> None:
+    model_path, experiment_parameters_path = _write_min_nlogo_model(tmp_path)
+    output_dir = tmp_path / "ingest_output"
+    result = runner.invoke(
+        app,
+        [
+            "ingest-netlogo",
+            "--model-path",
+            str(model_path),
+            "--experiment-parameters-path",
+            str(experiment_parameters_path),
+            "--output-dir",
+            str(output_dir),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert '"command": "ingest-netlogo"' in result.output
+    assert '"artifact_manifest_path"' in result.output
+
+
 def test_cli_ingest_netlogo_suite_generates_all_configured_abms(tmp_path: Path) -> None:
     model_root = tmp_path / "data"
     for abm, doc in [
@@ -418,6 +480,88 @@ def test_cli_ingest_netlogo_suite_generates_all_configured_abms(tmp_path: Path) 
         assert (tmp_path / "ingest" / abm / "JSON" / "cleaned_documentation.json").exists()
         assert (tmp_path / "ingest" / abm / "TXT" / "final_documentation.txt").exists()
         assert (tmp_path / "ingest" / abm / "TXT" / "narrative_combined.txt").exists()
+
+
+def test_cli_describe_abm_returns_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    model_root = tmp_path / "data"
+    _write_min_nlogo_model_dir(model_root, "grazing", "Grazing doc")
+
+    monkeypatch.setattr(cli_module, "_resolve_scoring_reference_path", lambda _abm: Path("ground_truth.txt"))
+
+    result = runner.invoke(
+        app,
+        [
+            "describe-abm",
+            "--abm",
+            "grazing",
+            "--models-root",
+            str(model_root),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert '"abm": "grazing"' in result.output
+    assert '"model_path"' in result.output
+
+
+def test_cli_describe_ingest_artifacts_reads_manifest(tmp_path: Path) -> None:
+    ingest_root = tmp_path / "ingest"
+    ingest_root.mkdir(parents=True, exist_ok=True)
+    artifact = ingest_root / "artifact.txt"
+    artifact.write_text("hello", encoding="utf-8")
+    manifest = ingest_root / "ingest_manifest.json"
+    manifest.write_text(
+        json.dumps(
+            {
+                "command": "ingest-netlogo",
+                "output_dir": str(ingest_root),
+                "artifact_manifest_path": str(manifest),
+                "artifacts": {
+                    "artifact": {
+                        "path": str(artifact),
+                        "exists": True,
+                        "size_bytes": 5,
+                        "sha256": "abc",
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["describe-ingest-artifacts", "--root", str(ingest_root), "--json"])
+
+    assert result.exit_code == 0
+    assert '"manifest_path"' in result.output
+    assert '"artifact"' in result.output
+
+
+def test_cli_describe_run_returns_metadata_summary(tmp_path: Path) -> None:
+    output_dir = tmp_path / "run"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    metadata_path = output_dir / "pipeline_run_metadata.json"
+    metadata_path.write_text(
+        json.dumps(
+            {
+                "artifacts": {"plot_path": str(output_dir / "plot.png")},
+                "reproducibility": {"run_signature": "sig-123"},
+                "execution": {
+                    "selected_text_source": "summary_only",
+                    "evidence_mode": "plot+table",
+                    "requested_evidence_mode": "plot+table",
+                },
+                "debug_trace": {"frame_summary": {"matched_metric_columns": ["metric-a"]}},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["describe-run", "--output-dir", str(output_dir), "--json"])
+
+    assert result.exit_code == 0
+    assert '"run_signature": "sig-123"' in result.output
+    assert '"matched_metric_columns"' in result.output
 
 
 def test_cli_ingest_netlogo_suite_supports_root_level_model_files(tmp_path: Path) -> None:
