@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document serves as a structured testing checklist for `distill-abm`. Its role is not to claim formal verification, nor to argue that every possible failure mode has been eliminated. Rather, it records the concrete checks used to build confidence that the implementation is behaviorally consistent with the intended workflow, robust to common failure conditions, and reproducible under the documented execution environment.
+This document serves as a structured testing checklist. Its role is not to claim formal verification, nor to argue that every possible failure mode has been eliminated. Rather, it records the concrete checks used to build confidence that the implementation is behaviorally consistent with the intended workflow, robust to common failure conditions, and reproducible under the documented execution environment.
 
 The testing strategy follows a simple principle: confidence should be accumulated in layers. At the lowest level, unit tests isolate local transformations, parsing routines, metric calculations, and helper logic. At the middle level, integration tests verify that the main pipeline composes these components correctly. At the highest level, end-to-end tests exercise the command-line interface, model-policy enforcement, smoke workflows, and user-facing control paths. Static analysis and packaging checks complement executable tests by reducing the risk of type drift, interface inconsistency, and release-time regressions.
 
