@@ -9,7 +9,6 @@ import pytest
 
 from distill_abm.ingest.netlogo_workflow import (
     _coerce_parameter_value_for_netlogo,
-    _parse_java_major_version,
     _resolve_jvm_path,
     build_parameter_narrative,
     extract_code_to_text,
@@ -238,34 +237,7 @@ def test_default_link_factory_raises_when_pynetlogo_unavailable(monkeypatch: pyt
     
     assert "pynetlogo" in str(exc_info.value).lower()
 
-
-def test_parse_java_major_version_supports_legacy_and_modern_strings() -> None:
-    assert _parse_java_major_version('java version "1.8.0_451"') == 8
-    assert _parse_java_major_version('openjdk version "17.0.13" 2024-10-15') == 17
-    assert _parse_java_major_version('openjdk version "21.0.5" 2024-10-15') == 21
-    assert _parse_java_major_version("not a version string") is None
-
-
-def test_resolve_jvm_path_prefers_modern_macos_jvm_when_default_is_legacy(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    monkeypatch.setattr("distill_abm.ingest.netlogo_workflow.sys.platform", "darwin")
-    monkeypatch.setattr(
-        "distill_abm.ingest.netlogo_workflow._find_modern_macos_jvm",
-        lambda: "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server/libjvm.dylib",
-    )
-    monkeypatch.setattr(
-        "distill_abm.ingest.netlogo_workflow._read_java_major_version",
-        lambda: 8,
-    )
-
-    assert (
-        _resolve_jvm_path()
-        == "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server/libjvm.dylib"
-    )
-
-
-def test_resolve_jvm_path_still_prefers_explicit_modern_jvm_when_available(
+def test_resolve_jvm_path_prefers_modern_macos_jvm_when_available(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr("distill_abm.ingest.netlogo_workflow.sys.platform", "darwin")
