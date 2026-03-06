@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.metrics import SummaryScores
+from distill_abm.utils import detect_placeholder_signals
 
 if TYPE_CHECKING:
     from distill_abm.configs.models import PromptsConfig
@@ -587,12 +588,7 @@ def _build_file_debug_record(path: Path | None) -> dict[str, object]:
         return record
     text = path.read_text(encoding="utf-8", errors="replace")
     preview = text[:200]
-    lowered = text.lower()
-    placeholder_signals = [
-        token
-        for token in ("placeholder", "todo", "tbd", "dummy", "lorem ipsum")
-        if token in lowered
-    ]
+    placeholder_signals = detect_placeholder_signals(text)
     record.update(
         {
             "size_bytes": path.stat().st_size,
