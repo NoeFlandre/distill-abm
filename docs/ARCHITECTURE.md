@@ -38,6 +38,9 @@
 
 ### `src/distill_abm/ingest/*`
 - CSV ingestion and NetLogo preprocessing artifacts.
+- NetLogo ingestion is dynamic: documentation, parameters, narratives, and code are extracted from the supplied `.nlogo` files at runtime.
+- The implementation targets the NetLogo structures used by the benchmark ABMs in this repository and similar models.
+- It is not a universal parser for every possible `.nlogo` variant; models with materially different info blocks, interface declarations, or experiment layouts may require extractor updates.
 
 ### `src/distill_abm/viz/*`
 - Plot generation and stats table construction.
