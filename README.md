@@ -120,6 +120,22 @@ uv run distill-abm smoke-viz \
   --json
 ```
 
+Run pre-LLM DOE smoke checks:
+
+```bash
+uv run distill-abm smoke-doe \
+  --ingest-root results/ingest_smoke_latest \
+  --viz-root results/viz_smoke_latest \
+  --json
+```
+
+DOE smoke notes:
+
+- `smoke-doe` does not call any LLM.
+- It materializes the exact first-call context prompt, the trend-call prompt template with an explicit unresolved context placeholder, the request plans, and the exact evidence image path that the current pipeline would attach for each selected smoke case.
+- It uses the latest ingest and visualization smoke outputs as the default pre-LLM inputs, so the report makes it easy to catch wrong documentation, wrong parameter narrative, wrong simulation CSV, wrong evidence image, wrong prompt composition, wrong model choice, or placeholder leakage before any model execution.
+- It writes a design matrix CSV plus per-case bundles under `results/doe_smoke_latest/`.
+
 Visualization smoke caveat:
 
 - Unlike the older CSV-driven debug path, `smoke-viz` now resolves ABM-specific NetLogo settings from `configs/abms/<name>.yaml`.
@@ -154,6 +170,7 @@ Agent-oriented CLI additions:
   - `full`: currently equivalent to `default`, reserved as the strictest profile
 - `smoke-ingest-netlogo` supports `--require-stage` so callers can assert that specific stage checks are present.
 - `smoke-viz` provides stage-filtering and `--require-stage` for the generated simulation CSV and each ordered plot image.
+- `smoke-doe` provides a structured pre-LLM view of the smoke matrix and writes the exact case-level prompt and request artifacts that would be used by `smoke-qwen`.
 - `ingest-netlogo` and `ingest-netlogo-suite` now write stable artifact manifests.
 - Read-only inspection commands are available for agent loops:
   - `uv run distill-abm describe-abm --abm grazing --json`
