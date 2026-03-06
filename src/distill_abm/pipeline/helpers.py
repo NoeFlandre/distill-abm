@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import csv
+import hashlib
 import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
@@ -102,16 +103,66 @@ def invoke_adapter(
     retry_backoff_seconds: float | None = None,
 ) -> str:
     """Execute one LLM call with bounded retries and normalize response text."""
+    text, _trace = invoke_adapter_with_trace(
+        adapter=adapter,
+        model=model,
+        prompt=prompt,
+        image_b64=image_b64,
+        max_retries=max_retries,
+        retry_backoff_seconds=retry_backoff_seconds,
+    )
+    return text
+
+
+def invoke_adapter_with_trace(
+    adapter: LLMAdapter,
+    model: str,
+    prompt: str,
+    image_b64: str | None = None,
+    max_retries: int | None = None,
+    retry_backoff_seconds: float | None = None,
+) -> tuple[str, dict[str, object]]:
+    """Execute one LLM call and return normalized text plus a debug trace payload."""
     request = LLMRequest(model=model, messages=[LLMMessage(role="user", content=prompt)], image_b64=image_b64)
     defaults = get_runtime_defaults().llm_request
     retries = max(defaults.max_retries if max_retries is None else max_retries, 0)
     backoff = max(defaults.retry_backoff_seconds if retry_backoff_seconds is None else retry_backoff_seconds, 0.0)
+    request_block = {
+        "provider": adapter.provider,
+        "model": model,
+        "temperature": request.temperature,
+        "max_tokens": request.max_tokens,
+        "max_retries": retries,
+        "retry_backoff_seconds": backoff,
+        "image_attached": image_b64 is not None,
+        "prompt_text": prompt,
+        "prompt_length": len(prompt),
+        "prompt_signature": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+        "message_count": len(request.messages),
+        "messages": [message.model_dump() for message in request.messages],
+    }
 
     errors: list[str] = []
     for attempt in range(retries + 1):
         try:
             response = adapter.complete(request)
-            return clean_markdown_symbols(strip_think_prefix(response.text))
+            clean_text = clean_markdown_symbols(strip_think_prefix(response.text))
+            return clean_text, {
+                "request": request_block,
+                "response": {
+                    "provider": response.provider,
+                    "model": response.model,
+                    "raw_text": response.text,
+                    "raw_text_length": len(response.text),
+                    "raw_text_signature": hashlib.sha256(response.text.encode("utf-8")).hexdigest(),
+                    "clean_text": clean_text,
+                    "clean_text_length": len(clean_text),
+                    "clean_text_signature": hashlib.sha256(clean_text.encode("utf-8")).hexdigest(),
+                    "raw": response.raw,
+                },
+                "attempts_made": attempt + 1,
+                "errors": list(errors),
+            }
         except Exception as exc:
             wrapped = exc if isinstance(exc, LLMProviderError) else LLMProviderError(str(exc))
             errors.append(str(wrapped))
