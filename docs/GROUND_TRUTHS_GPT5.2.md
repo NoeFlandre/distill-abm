@@ -441,6 +441,8 @@ The following plot-level descriptions were generated with GPT-5.2 Thinking using
 
 Across the repeated runs, mean weekly whole milk consumption per agent declines steadily and almost monotonically from about 2,650 at step 0 to roughly 2,400 by step 3, about 2,050 by step 5, around 1,550–1,650 by step 6, and close to 1,200–1,300 by step 8, indicating the sharpest reduction occurs early in the simulation as agents rapidly move away from initially dominant dairy consumption. The decline then continues but slows, reaching about 950–1,050 at step 10, around 900 by steps 12–13, and roughly 820–860 by steps 15–16, after which the trajectories flatten further, with values near 750–780 around steps 18–21 and about 690–720 by steps 23–24. A smaller secondary drop appears late in the run: consumption is still near 600–650 at steps 26–27, then falls more abruptly to around 400–450 at step 28 and to roughly 300–370 by steps 29–30, before ending near 240–300 at steps 31–32. The runs remain tightly clustered throughout, with only modest spread between simulations, which suggests a consistent transition in the model from entrenched habitual whole-milk consumption toward substantially lower dairy use over time under the combined effects of cognition, habit, memory, and social influence.
 
+> **Suggestion:** Forgot to mention the small rebound around step 27 but overall great description.
+
 **PLOT 2:**   
 ![plot 26](./images/milk_plots/2.png)
 
@@ -466,10 +468,14 @@ Across all simulation runs, the total number of milk choices made increases in a
 
 Across the repeated runs, mean whole milk consumption declines steadily and substantially over the full 32 steps, indicating a persistent shift away from whole milk in the model’s milk-choice dynamics. It begins at about 2,650 units at step 0, falls only slightly by steps 1–3 to around 2,450–2,550, then drops rapidly between roughly steps 4 and 10, reaching about 950–1,050 by step 10; this marks the main transition period in which agents’ choices move strongly away from the incumbent dairy option. After that, the decline becomes more gradual: values move from around 900 at steps 12–13 to about 820–850 by steps 15–16, then hover near 750–780 through steps 18–22 with only small fluctuations. A further reduction occurs late in the run, with consumption falling from around 680–720 at steps 23–25 to about 580–650 at step 27, then dropping sharply again around steps 28–29 to roughly 300–450, and ending near 240–300 by steps 31–32. The close clustering of runs throughout suggests a common trajectory in which habit, memory, and social influence consistently reduce average whole milk consumption over time as agents increasingly shift toward alternative milk choices.
 
+> **Suggestion:** Forgot to mention the small rebound around step 27 but overall great description.
+
 **PLOT 7:**   
 ![plot 31](./images/milk_plots/7.png)
 
 Across the repeated runs, the mean quantity of skimmed and semi-skimmed milk consumed rises very rapidly from near 0 at step 0 to roughly 230-300 by step 3, about 500-700 by step 5, around 850-1050 by step 7, and approximately 1180-1230 by step 9\. Growth then slows, reaching an early plateau near 1230-1270 around steps 10-11. From about step 12 through step 17, the mean quantity remains broadly stable with a slight easing, mostly around 1210-1245, followed by a modest dip to roughly 1185-1200 at step 18\. After this, consumption recovers gradually to around 1220-1260 by steps 21-27, before a sharper late increase begins around step 28, lifting the mean to about 1340-1370 at step 29, 1395-1420 at step 30, and roughly 1450-1470 by steps 31-32. In the context of the model, this trajectory indicates that skimmed and semi-skimmed milk becomes increasingly embedded in agents’ consumption over time, with early rapid uptake likely shaped by the interaction of cognition, social influence, and habit formation, a middle period of stabilization, and a later renewed shift toward higher consumption as these social and behavioural processes continue to accumulate across the simulated population.
+
+> **Suggestion:** By step 5 the quantity is included between 400 and 600, by step 7, between 700 and 900, by step 9 between 1000 and 1200. 
 
 **PLOT 8:**   
 ![plot 32](./images/milk_plots/8.png)
@@ -481,6 +487,8 @@ Across the 33 steps, the mean habit factor applied to whole milk choice rises gr
 
 Across runs, the mean habit factor applied to the skimmed/semi-skimmed milk choice function starts essentially at baseline, at about 1.00 at step 0, rises quickly to roughly 1.02 by step 1, and then remains nearly flat with a slight dip/plateau around 1.01–1.02 through about steps 2–6. From roughly step 7 onward it increases steadily, reaching about 1.03–1.04 by steps 8–9 and around 1.08–1.09 at step 10, after which the growth accelerates through the mid-horizon (approximately 1.23–1.24 by step 15 and about 1.36–1.38 by step 20). The factor continues to climb but with gradually slowing increments later on, reaching roughly 1.46–1.48 by step 25, about 1.55–1.56 by step 30, and ending near 1.58–1.60 by steps 32–33. In the model context, this indicates that once repeated choices pass the habit-threshold (set to 2\) and are reinforced within the agents’ limited memory window (memory-lifetime set to 5), habit increasingly amplifies the propensity to select skimmed/semi-skimmed milk, producing a progressively stronger multiplicative bias in the cognitive choice process over time.
 
+> **Suggestion:** By step 15, the mean habit factor is around 1.2, at 1.32 at step 20, 
+
 **PLOT 10:**   
 ![plot 34](./images/milk_plots/10.png)
 
@@ -491,10 +499,14 @@ Across the 32 steps, the mean percentage difference between the maximum and mini
 
 Across the 33 steps, the mean deviation between agents’ held health values and the health implications of their milk choices rises steadily in every run, starting at 0 at step 0 and increasing sharply to about 0.12–0.13 by step 1, around 0.19–0.20 by step 2, and roughly 0.24–0.25 by step 3\. The increase continues through the early and middle stages, reaching about 0.36–0.41 by step 7, around 0.47–0.49 by step 9, and approximately 0.51–0.53 by step 10, before approaching a flatter phase near 0.55–0.57 between steps 15 and 18\. From there, the metric grows only gradually to around 0.58–0.60 by steps 23–25, then shows a renewed rise after about step 27, reaching roughly 0.67–0.69 by step 30 and ending near 0.70–0.75 by step 32\. In the context of the model, this pattern indicates that agents increasingly choose milk options whose implied health characteristics diverge from the health values they hold, with early rapid growth suggesting a quick emergence of mismatch under habit, memory, and social influence, followed by a mid-run stabilization and then a later widening of the discrepancy as consumption trajectories continue to evolve.
 
+> **Suggestion:** By step 3 the metric rather reaches 0.22. By step 10 the metric is around 0.49.
+
 **PLOT 12:**   
 ![plot 36](./images/milk_plots/12.png)
 
 Across the repeated runs, the mean deviation between agents’ environmental values and the environmental implications of their milk choices rises very rapidly from 0 at step 0 to about 7 by step 1, around 10 by step 2, and roughly 11.5–11.9 by step 3, before continuing to increase more gradually to about 12.5–12.8 at step 4 and around 13.0–13.2 by steps 5–6. After this early adjustment, the measure approaches a clear plateau: it reaches about 13.3 by steps 7–8, around 13.4–13.45 by roughly steps 10–13, and then remains essentially flat through the rest of the simulation, with only negligible fluctuations and a slight softening to about 13.35–13.4 near the final steps. In the context of the model, this indicates that agents quickly move into a persistent state where the environmental values they hold are substantially misaligned with the environmental meaning of their milk consumption choices, after which habit, limited memory, and modest social interaction and conformity maintain that discrepancy at a stable high level rather than reducing it over time.
+
+> **Suggestion:** By step 1 the metric is closer to 3, 5 at step 2 and 9 by step 3. For step 4 the mean value environmental deviation is around 11 and 12.5 by step 5.
 
 ### Long Ground Truth
 
