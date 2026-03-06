@@ -145,6 +145,28 @@ def test_clean_json_content_removes_netlogo_delimiter_heading_prefix(tmp_path: P
     assert out.read_text(encoding="utf-8") == "Doc text\nMore text"
 
 
+def test_clean_json_content_flattens_remaining_markdown_headings(tmp_path: Path) -> None:
+    source = tmp_path / "source.json"
+    out = tmp_path / "doc.txt"
+    source.write_text(
+        json.dumps(
+            {
+                "documentation": (
+                    "### A detailed description of the model\n\n"
+                    "#The model consists of two parts\n\n"
+                    "## HOW IT WORKS\n\n"
+                    "Body text"
+                )
+            }
+        ),
+        encoding="utf-8",
+    )
+    clean_json_content(source, out)
+    assert out.read_text(encoding="utf-8") == (
+        "A detailed description of the model\n\nThe model consists of two parts\n\nBody text"
+    )
+
+
 
 
 

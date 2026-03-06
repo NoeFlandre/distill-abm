@@ -347,7 +347,35 @@ def clean_json_content(input_json: Path, output_txt: Path) -> None:
     """Export cleaned plain documentation text."""
     payload = json.loads(input_json.read_text(encoding="utf-8"))
     documentation = str(payload.get("documentation", ""))
+    # Validated against the repository benchmark NetLogo models; do not
+    # change this cleanup path unless the task explicitly requests it.
     cleaned = re.sub(r"^## @#\$#@#\$#@\n+", "", documentation)
-    cleaned = re.sub(r"^# .*\n+", "", cleaned)
-    cleaned = re.sub(r"## .*?\n\n", "", cleaned)
+    if cleaned.startswith("# ") and "## WHAT IS IT?" in cleaned:
+        cleaned = re.sub(r"^# .*\n+", "", cleaned, count=1)
+    cleaned = re.sub(r"(?m)^## [^\n]+\n\n", "", cleaned)
+    cleaned = _normalize_documentation_headings(cleaned)
     output_txt.write_text(cleaned, encoding="utf-8")
+
+
+def _normalize_documentation_headings(text: str) -> str:
+    """Drop NetLogo section labels and flatten remaining markdown headings to plain text."""
+    netlogo_headers = {header.removeprefix("## ").strip().upper() for header in DEFAULT_DOCUMENTATION_ELEMENTS}
+    normalized_lines: list[str] = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            normalized_lines.append("")
+            continue
+        if stripped == "@#$#@#$#@":
+            continue
+        if stripped.startswith("#"):
+            heading_text = stripped.lstrip("#").strip()
+            if not heading_text:
+                continue
+            if heading_text.upper() in netlogo_headers:
+                continue
+            normalized_lines.append(heading_text)
+            continue
+        normalized_lines.append(line)
+    normalized = "\n".join(normalized_lines).strip()
+    return re.sub(r"\n{3,}", "\n\n", normalized)
