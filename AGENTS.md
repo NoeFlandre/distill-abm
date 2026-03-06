@@ -218,6 +218,15 @@ Unless explicitly requested, do **not**:
 - skip tests when tests are available
 - claim success without verification
 
+### Protected Documentation Files
+
+The following files should **not be modified** unless explicitly asked to do so:
+
+- `docs/TESTING_REPORT.md`
+- `docs/GROUND_TRUTHS_GPT5.2.md`
+
+If a task requires modifying these files, you **must ask for confirmation** from the human operator before proceeding.
+
 ---
 
 ## Preferred Change Style
