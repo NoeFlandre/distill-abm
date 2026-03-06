@@ -116,6 +116,14 @@ NetLogo ingestion caveat:
 - It is expected to work for these benchmark models and similar NetLogo files, but it is not guaranteed to work unchanged for every arbitrary `.nlogo` file.
 - In particular, documentation extraction assumes a recognizable NetLogo info section or usable top-of-file comments, and parameter extraction assumes interface/experiment sections in formats the parser already supports.
 
+Run the canonical non-LLM validation suite for coding-agent verification:
+
+```bash
+uv run distill-abm validate-workspace --json
+```
+
+This command is intended to be the default "verify my work" entrypoint for coding agents. It runs the repository's standard local checks, emits a structured JSON report, and nests the NetLogo ingest-smoke report under `results/agent_validation/latest/` so agents can validate outcomes without ad hoc artifact hunting.
+
 Run DOE analysis:
 
 ```bash

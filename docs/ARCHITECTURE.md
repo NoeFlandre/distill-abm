@@ -10,8 +10,14 @@
 
 ### `src/distill_abm/cli.py`
 - Command entrypoint for run, smoke, qualitative scoring, DOE analysis.
+- Exposes `validate-workspace` as the canonical non-LLM verification contract for coding agents.
 - Benchmark/debug model gating.
 - Model registry resolution via `configs/models.yaml`.
+
+### `src/distill_abm/agent_validation.py`
+- Canonical local validation orchestration for agents.
+- Runs pytest, Ruff, mypy, build, and NetLogo ingest smoke checks behind one structured report.
+- Writes stable machine-readable and markdown reports for post-run inspection.
 
 ### `src/distill_abm/pipeline/run.py`
 - End-to-end run orchestration.

@@ -209,6 +209,79 @@ models:
     assert captured["model"] == "moonshotai/kimi-k2.5"
 
 
+def test_cli_validate_workspace_prints_json_report(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    model_root = tmp_path / "data"
+    _write_min_nlogo_model_dir(model_root, "fauna", "Fauna doc")
+    _write_min_nlogo_model_dir(model_root, "grazing", "Grazing doc")
+    _write_min_nlogo_model_dir(model_root, "milk_consumption", "Milk doc")
+
+    captured: dict[str, Any] = {}
+
+    def fake_run_validation_suite(*, output_root, abm_models, checks, ingest_stage_ids):  # type: ignore[no-untyped-def]
+        captured["output_root"] = output_root
+        captured["abm_models"] = abm_models
+        captured["checks"] = checks
+        captured["ingest_stage_ids"] = ingest_stage_ids
+        return SimpleNamespace(
+            success=True,
+            failed_checks=[],
+            ingest_smoke_report_json_path=Path("ingest_smoke.json"),
+            ingest_smoke_report_markdown_path=Path("ingest_smoke.md"),
+            report_json_path=Path("validation_report.json"),
+            report_markdown_path=Path("validation_report.md"),
+            model_dump_json=lambda indent=2: '{"success": true, "selected_checks": ["pytest"]}',
+        )
+
+    monkeypatch.setattr(cli_module, "run_validation_suite", fake_run_validation_suite)
+
+    result = runner.invoke(
+        app,
+        [
+            "validate-workspace",
+            "--models-root",
+            str(model_root),
+            "--check",
+            "pytest",
+            "--ingest-stage",
+            "documentation",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert '"success": true' in result.output
+    assert captured["checks"] == ["pytest"]
+    assert captured["ingest_stage_ids"] == ["documentation"]
+    assert sorted(captured["abm_models"]) == ["fauna", "grazing", "milk_consumption"]
+
+
+def test_cli_validate_workspace_fails_on_unknown_check(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    model_root = tmp_path / "data"
+    _write_min_nlogo_model_dir(model_root, "fauna", "Fauna doc")
+    _write_min_nlogo_model_dir(model_root, "grazing", "Grazing doc")
+    _write_min_nlogo_model_dir(model_root, "milk_consumption", "Milk doc")
+
+    def fake_run_validation_suite(*, output_root, abm_models, checks, ingest_stage_ids):  # type: ignore[no-untyped-def]
+        _ = output_root, abm_models, ingest_stage_ids
+        raise ValueError(f"unknown validation check(s): {', '.join(checks or [])}. Known checks: pytest")
+
+    monkeypatch.setattr(cli_module, "run_validation_suite", fake_run_validation_suite)
+
+    result = runner.invoke(
+        app,
+        [
+            "validate-workspace",
+            "--models-root",
+            str(model_root),
+            "--check",
+            "unknown-check",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "unknown validation check" in result.output
+
+
 def test_cli_run_with_abm_uses_scoring_reference(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
     captured: dict[str, Any] = {}
