@@ -602,6 +602,54 @@ def test_cli_smoke_viz_supports_json_output(tmp_path: Path, monkeypatch: pytest.
     assert '"command": "smoke-viz"' in result.output
 
 
+def test_cli_smoke_doe_supports_json_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    model_root = tmp_path / "data"
+    _write_min_nlogo_model_dir(model_root, "fauna", "Fauna doc")
+    _write_min_nlogo_model_dir(model_root, "grazing", "Grazing doc")
+    _write_min_nlogo_model_dir(model_root, "milk_consumption", "Milk doc")
+
+    ingest_root = tmp_path / "ingest"
+    viz_root = tmp_path / "viz"
+    for abm in ["fauna", "grazing", "milk_consumption"]:
+        txt_dir = ingest_root / abm / "TXT"
+        txt_dir.mkdir(parents=True, exist_ok=True)
+        (txt_dir / "narrative_combined.txt").write_text("parameters", encoding="utf-8")
+        (txt_dir / "final_documentation.txt").write_text("documentation", encoding="utf-8")
+        abm_viz = viz_root / abm
+        (abm_viz / "plots").mkdir(parents=True, exist_ok=True)
+        (abm_viz / "simulation.csv").write_text("[step],mean\n0,1\n", encoding="utf-8")
+        (abm_viz / "artifact_source.txt").write_text("fallback\n", encoding="utf-8")
+
+    def fake_run_doe_smoke_suite(*, abm_inputs, prompts, provider, model, output_root, cases, selected_case_ids):  # type: ignore[no-untyped-def]
+        _ = abm_inputs, prompts, provider, model, output_root, cases, selected_case_ids
+        return SimpleNamespace(
+            success=True,
+            failed_case_ids=[],
+            report_markdown_path=Path("doe_smoke.md"),
+            report_json_path=Path("doe_smoke.json"),
+            design_matrix_csv_path=Path("design_matrix.csv"),
+        )
+
+    monkeypatch.setattr(cli_module, "run_doe_smoke_suite", fake_run_doe_smoke_suite)
+
+    result = runner.invoke(
+        app,
+        [
+            "smoke-doe",
+            "--models-root",
+            str(model_root),
+            "--ingest-root",
+            str(ingest_root),
+            "--viz-root",
+            str(viz_root),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert '"command": "smoke-doe"' in result.output
+
+
 def test_cli_ingest_netlogo_suite_supports_root_level_model_files(tmp_path: Path) -> None:
     model_root = tmp_path / "data"
     model_root.mkdir()
