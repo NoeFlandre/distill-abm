@@ -17,7 +17,9 @@
   - `smoke-viz` is production fallback-first: it preserves repo-local reference CSVs and plot images under `data/*/legacy/` and records whether each ABM artifact bundle was produced from a live simulation or from fallback reference artifacts.
   - Milk model input CSVs and grazing `.nls` include files are now stored inside the repository so the NetLogo launch path no longer depends on the temporary notebook workspace.
 - Exposes `smoke-doe` for pre-LLM inspection of the smoke matrix.
-  - `smoke-doe` resolves the selected smoke cases, loads the current ingest/viz artifacts, generates the single pipeline evidence plot and stats table, writes the exact context prompt, writes the trend prompt template with an explicit unresolved context placeholder, and records the request settings that would be sent to the LLMs.
+  - `smoke-doe` resolves the full benchmark DOE matrix over ABMs, candidate models, evidence modes, summarization settings, prompt variants, and repetitions.
+  - It groups shared ABM artifacts under `results/doe_smoke_latest/shared/<abm>/` and writes case-specific manifests under `results/doe_smoke_latest/cases/...`.
+  - It writes the exact context prompt, the exact trend prompt for each plot, per-request hyperparameters, image/table evidence paths, and unresolved context placeholders that define the pre-LLM boundary.
   - The command is intended to debug wrong input artifacts, wrong prompts, wrong model settings, and placeholder leakage before any model call is made.
 - Benchmark/debug model gating.
 - Model registry resolution via `configs/models.yaml`.

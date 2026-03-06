@@ -49,11 +49,20 @@ from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qual
 from distill_abm.ingest.ingest_smoke import run_ingest_smoke_suite
 from distill_abm.ingest.netlogo_workflow import run_ingest_workflow
 from distill_abm.llm.factory import create_adapter
-from distill_abm.pipeline.doe_smoke import DoESmokeAbmInput, run_doe_smoke_suite
+from distill_abm.pipeline.doe_smoke import (
+    CANONICAL_DOE_MODEL_IDS,
+    CANONICAL_EVIDENCE_MODES,
+    CANONICAL_REPETITIONS,
+    DoESmokeAbmInput,
+    DoESmokeModelSpec,
+    DoESmokePlotInput,
+    canonical_prompt_variants,
+    canonical_summarization_specs,
+    run_doe_smoke_suite,
+)
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
     SmokeSuiteInputs,
-    default_smoke_cases,
     run_qwen_smoke_suite,
 )
 from distill_abm.viz.viz_smoke import run_viz_smoke_suite
@@ -585,27 +594,15 @@ def smoke_doe(
         Path,
         typer.Option(exists=True, help="Model registry YAML path."),
     ] = Path("configs/models.yaml"),
-    provider: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.provider,
-    model: Annotated[str, typer.Option()] = RUNTIME_DEFAULTS.smoke.model,
-    model_id: Annotated[
-        str | None,
-        typer.Option(help="Optional model alias from configs/models.yaml."),
-    ] = None,
-    allow_debug_model: Annotated[
-        bool,
-        typer.Option(help="Allow debug model in this pre-LLM smoke inspection."),
-    ] = True,
-    profile: Annotated[
-        Literal["matrix", "three-branches"],
-        typer.Option(help="DOE profile: full matrix or compact three-branch profile."),
-    ] = "matrix",
-    case_id: Annotated[
+    model_ids: Annotated[
         list[str] | None,
-        typer.Option("--case-id", help="Optional case id filter. Repeat to select specific cases."),
-    ] = None,
-    max_cases: Annotated[
-        int | None,
-        typer.Option(min=1, help="Optional cap on number of selected cases."),
+        typer.Option(
+            "--model-id",
+            help=(
+                "Candidate model aliases from configs/models.yaml. "
+                "Repeat to filter. Defaults to the canonical DOE trio."
+            ),
+        ),
     ] = None,
     output_root: Annotated[
         Path,
@@ -615,13 +612,24 @@ def smoke_doe(
 ) -> None:
     """Inspect the full pre-LLM smoke design and materialize exact case payload artifacts."""
     prompts = load_prompts_config(prompts_path)
-    if model_id is not None:
-        provider, model = resolve_model_from_registry(models_path=models_path, model_id=model_id)
-    _validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
     requested = sorted(set(abms)) if abms else list(discover_configured_abms())
-    selected_cases = _select_smoke_cases(case_ids=case_id, max_cases=max_cases, profile=profile)
-    if selected_cases is None:
-        selected_cases = default_smoke_cases()
+    selected_model_ids = tuple(dict.fromkeys(model_ids or list(CANONICAL_DOE_MODEL_IDS)))
+    model_specs: list[DoESmokeModelSpec] = []
+    for candidate_model_id in selected_model_ids:
+        provider, model = resolve_model_from_registry(models_path=models_path, model_id=candidate_model_id)
+        preflight_error: str | None = None
+        try:
+            _validate_model_policy(provider=provider, model=model, allow_debug_model=False)
+        except typer.BadParameter as exc:
+            preflight_error = str(exc)
+        model_specs.append(
+            DoESmokeModelSpec(
+                model_id=candidate_model_id,
+                provider=provider,
+                model=model,
+                preflight_error=preflight_error,
+            )
+        )
 
     abm_inputs: dict[str, DoESmokeAbmInput] = {}
     for abm in requested:
@@ -636,6 +644,31 @@ def smoke_doe(
             loaded_source = artifact_source_path.read_text(encoding="utf-8").strip()
             if loaded_source in {"simulated", "fallback"}:
                 artifact_source = cast(Literal["simulated", "fallback"], loaded_source)
+        if abm_config.netlogo_viz is None:
+            raise typer.BadParameter(f"missing netlogo_viz config for ABM '{abm}'")
+        plot_specs: list[DoESmokePlotInput] = []
+        plot_config_count = len(abm_config.netlogo_viz.plots)
+        plot_description_count = len(abm_config.plot_descriptions)
+        max_plot_count = max(plot_config_count, plot_description_count)
+        for plot_index in range(1, max_plot_count + 1):
+            reporter_pattern = (
+                abm_config.netlogo_viz.plots[plot_index - 1].reporter_pattern
+                if plot_index <= plot_config_count
+                else "missing-reporter-pattern"
+            )
+            plot_description = (
+                abm_config.plot_descriptions[plot_index - 1]
+                if plot_index <= plot_description_count
+                else "TODO missing plot description"
+            )
+            plot_specs.append(
+                DoESmokePlotInput(
+                    plot_index=plot_index,
+                    reporter_pattern=reporter_pattern,
+                    plot_description=plot_description,
+                    plot_path=viz_root / abm / "plots" / f"{plot_index}.png",
+                )
+            )
         abm_inputs[abm] = DoESmokeAbmInput(
             abm=abm,
             csv_path=input_csv_path,
@@ -643,19 +676,19 @@ def smoke_doe(
             documentation_path=documentation_path,
             metric_pattern=abm_config.metric_pattern,
             metric_description=abm_config.metric_description,
-            plot_description=(abm_config.plot_descriptions[0] if abm_config.plot_descriptions else None),
-            source_viz_plot_dir=viz_root / abm / "plots",
+            plots=plot_specs,
             source_viz_artifact_source=artifact_source,
         )
 
     result = run_doe_smoke_suite(
         abm_inputs=abm_inputs,
         prompts=prompts,
-        provider=provider,
-        model=model,
+        model_specs=model_specs,
         output_root=output_root,
-        cases=selected_cases,
-        selected_case_ids=[case.case_id for case in selected_cases],
+        evidence_modes=CANONICAL_EVIDENCE_MODES,
+        summarization_specs=canonical_summarization_specs(),
+        prompt_variants=canonical_prompt_variants(),
+        repetitions=CANONICAL_REPETITIONS,
     )
     command_result = SmokeCommandResult(
         command="smoke-doe",
@@ -663,7 +696,10 @@ def smoke_doe(
         report_json_path=result.report_json_path,
         report_markdown_path=result.report_markdown_path,
         failed_items=result.failed_case_ids,
-        nested_artifacts={"design_matrix_csv": result.design_matrix_csv_path},
+        nested_artifacts={
+            "design_matrix_csv": result.design_matrix_csv_path,
+            "request_matrix_csv": result.request_matrix_csv_path,
+        },
     )
     if json_output:
         typer.echo(command_result.model_dump_json(indent=2))
