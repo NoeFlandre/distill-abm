@@ -2,18 +2,28 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import subprocess
-from collections.abc import Mapping
 from pathlib import Path
 from shutil import copy2
 from typing import Annotated, Literal, cast
 
 import typer
-from pydantic import BaseModel, Field
 
 from distill_abm.agent_validation import ValidationProfile, run_validation_suite
+from distill_abm.cli_models import (
+    ArtifactDescriptor,
+    DescribeAbmResult,
+    DescribeArtifactsResult,
+    DescribeRunResult,
+    DoeCommandResult,
+    IngestCommandResult,
+    IngestSuiteCommandResult,
+    RunCommandResult,
+    SmokeCommandResult,
+    build_artifact_descriptors,
+    describe_artifact,
+)
 from distill_abm.configs.loader import (
     load_abm_config,
     load_experiment_settings,
@@ -50,100 +60,6 @@ BENCHMARK_MODELS: set[tuple[str, str]] = {
     ("ollama", "qwen3.5:0.8b"),
 }
 DEBUG_MODEL: tuple[str, str] = ("openrouter", "qwen/qwen3-vl-235b-a22b-thinking")
-
-
-class ArtifactDescriptor(BaseModel):
-    """Stable artifact description for agent-readable manifests."""
-
-    path: Path
-    exists: bool
-    size_bytes: int = 0
-    sha256: str | None = None
-
-
-class IngestCommandResult(BaseModel):
-    """Structured result for single-model ingest CLI runs."""
-
-    command: str = "ingest-netlogo"
-    output_dir: Path
-    artifact_manifest_path: Path
-    artifacts: dict[str, ArtifactDescriptor]
-
-
-class IngestSuiteCommandResult(BaseModel):
-    """Structured result for multi-model ingest CLI runs."""
-
-    command: str = "ingest-netlogo-suite"
-    output_root: Path
-    artifact_manifest_path: Path
-    abms: dict[str, dict[str, ArtifactDescriptor]]
-    skipped_abms: list[str] = Field(default_factory=list)
-
-
-class RunCommandResult(BaseModel):
-    """Structured result for one pipeline run."""
-
-    command: str = "run"
-    output_dir: Path
-    plot_path: Path
-    report_csv_path: Path
-    metadata_path: Path | None = None
-    artifact_manifest_path: Path
-    artifacts: dict[str, ArtifactDescriptor]
-
-
-class SmokeCommandResult(BaseModel):
-    """Structured result for smoke-style CLI runs."""
-
-    command: str
-    success: bool
-    report_json_path: Path
-    report_markdown_path: Path
-    failed_items: list[str] = Field(default_factory=list)
-    nested_artifacts: dict[str, Path] = Field(default_factory=dict)
-
-
-class DoeCommandResult(BaseModel):
-    """Structured result for DOE analysis."""
-
-    command: str = "analyze-doe"
-    success: bool
-    output_csv: Path
-
-
-class DescribeAbmResult(BaseModel):
-    """Read-only summary of one configured ABM."""
-
-    abm: str
-    config_path: Path
-    model_path: Path
-    experiment_parameters_path: Path | None = None
-    scoring_reference_path: Path | None = None
-    metric_pattern: str
-    metric_description: str
-    plot_descriptions: list[str] = Field(default_factory=list)
-
-
-class DescribeRunResult(BaseModel):
-    """Read-only summary of one existing run output directory."""
-
-    output_dir: Path
-    metadata_path: Path
-    available_artifacts: dict[str, Path] = Field(default_factory=dict)
-    run_signature: str | None = None
-    selected_text_source: str | None = None
-    evidence_mode: str | None = None
-    requested_evidence_mode: str | None = None
-    matched_metric_columns: list[str] = Field(default_factory=list)
-
-
-class DescribeArtifactsResult(BaseModel):
-    """Read-only summary of an existing ingest artifact directory."""
-
-    root: Path
-    manifest_path: Path | None = None
-    artifact_index_path: Path | None = None
-    artifacts: dict[str, ArtifactDescriptor] = Field(default_factory=dict)
 
 __all__ = [
     "analyze_doe",
@@ -269,7 +185,7 @@ def run(
         report_csv_path=result.report_csv,
         metadata_path=getattr(result, "metadata_path", None),
         artifact_manifest_path=artifact_manifest_path,
-        artifacts=_build_artifact_descriptors(
+        artifacts=build_artifact_descriptors(
             {
                 "plot": result.plot_path,
                 "report_csv": result.report_csv,
@@ -317,7 +233,7 @@ def ingest_netlogo(
     command_result = IngestCommandResult(
         output_dir=resolved_output_dir,
         artifact_manifest_path=artifact_manifest_path,
-        artifacts=_build_artifact_descriptors(artifacts),
+        artifacts=build_artifact_descriptors(artifacts),
     )
     artifact_manifest_path.write_text(command_result.model_dump_json(indent=2), encoding="utf-8")
     if json_output:
@@ -388,7 +304,7 @@ def ingest_netlogo_suite(
             command_result = IngestCommandResult(
                 output_dir=output_dir,
                 artifact_manifest_path=manifest_path,
-                artifacts=_build_artifact_descriptors(artifacts),
+                artifacts=build_artifact_descriptors(artifacts),
             )
             manifest_path.write_text(command_result.model_dump_json(indent=2), encoding="utf-8")
             suite_artifacts[abm] = command_result.artifacts
@@ -893,12 +809,12 @@ def describe_ingest_artifacts(
         source_path = manifest_path
     elif artifact_index_path.exists():
         payload = json.loads(artifact_index_path.read_text(encoding="utf-8"))
-        artifacts = _build_artifact_descriptors({key: Path(value) for key, value in payload.items()})
+        artifacts = build_artifact_descriptors({key: Path(value) for key, value in payload.items()})
         source_path = artifact_index_path
     else:
         for path in sorted(root.rglob("*")):
             if path.is_file():
-                artifacts[str(path.relative_to(root))] = _describe_artifact(path)
+                artifacts[str(path.relative_to(root))] = describe_artifact(path)
     result = DescribeArtifactsResult(
         root=root,
         manifest_path=manifest_path if manifest_path.exists() else None,
@@ -1003,27 +919,6 @@ def _load_experiment_parameters(path: Path | None) -> dict[str, bool | int | flo
         sanitized[key] = value
 
     return sanitized
-
-
-def _build_artifact_descriptors(paths: Mapping[str, Path | None]) -> dict[str, ArtifactDescriptor]:
-    """Describe a set of artifact paths with stable metadata."""
-    return {
-        key: _describe_artifact(path)
-        for key, path in paths.items()
-        if path is not None
-    }
-
-
-def _describe_artifact(path: Path) -> ArtifactDescriptor:
-    """Return a stable artifact descriptor with existence, size, and digest."""
-    if not path.exists():
-        return ArtifactDescriptor(path=path, exists=False)
-    return ArtifactDescriptor(
-        path=path,
-        exists=True,
-        size_bytes=path.stat().st_size,
-        sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
-    )
 
 
 def _as_dict(value: object) -> dict[str, object]:
