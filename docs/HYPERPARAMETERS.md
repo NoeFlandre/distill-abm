@@ -4,7 +4,7 @@
 
 | Parameter | Default |
 |---|---|
-| `temperature` | `0.5` |
+| `temperature` | `1.0` |
 | `max_tokens` | `1000` |
 | `max_retries` | `2` |
 | `retry_backoff_seconds` | `2.0` |

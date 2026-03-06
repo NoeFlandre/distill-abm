@@ -34,9 +34,9 @@ def make_request() -> LLMRequest:
     )
 
 
-def test_llm_request_default_temperature_is_point_five() -> None:
+def test_llm_request_default_temperature_is_one() -> None:
     req = LLMRequest(model="test-model", messages=[LLMMessage(role="user", content="hello")])
-    assert req.temperature == 0.5
+    assert req.temperature == 1.0
 
 
 def test_adapter_contract_returns_response() -> None:
