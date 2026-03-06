@@ -6,69 +6,95 @@ from pathlib import Path
 import pandas as pd
 
 from distill_abm.configs.models import PromptsConfig
-from distill_abm.pipeline.doe_smoke import DoESmokeAbmInput, run_doe_smoke_suite
-from distill_abm.pipeline.smoke import SmokeCase
+from distill_abm.pipeline.doe_smoke import (
+    DoESmokeAbmInput,
+    DoESmokeModelSpec,
+    DoESmokePlotInput,
+    DoESmokePromptVariant,
+    DoESmokeSummarizationSpec,
+    canonical_prompt_variants,
+    canonical_summarization_specs,
+    run_doe_smoke_suite,
+)
 
 
 def _write_case_inputs(tmp_path: Path) -> DoESmokeAbmInput:
     csv_path = tmp_path / "simulation.csv"
     pd.DataFrame(
         {
-            "[run number]": [1, 1, 1],
-            "mean-incum": [10.0, 12.0, 11.5],
             "[step]": [0, 1, 2],
+            "metric-a": [10.0, 12.0, 11.5],
+            "metric-b": [7.0, 7.5, 8.0],
         }
     ).to_csv(csv_path, index=False)
     parameters_path = tmp_path / "parameters.txt"
     parameters_path.write_text("number-of-agents: 1000\nhabit-on?: true\n", encoding="utf-8")
     documentation_path = tmp_path / "documentation.txt"
     documentation_path.write_text("Milk model context.\n", encoding="utf-8")
+    plots_dir = tmp_path / "plots"
+    plots_dir.mkdir()
+    for index in range(1, 3):
+        (plots_dir / f"{index}.png").write_bytes(b"png")
 
     return DoESmokeAbmInput(
         abm="milk_consumption",
         csv_path=csv_path,
         parameters_path=parameters_path,
         documentation_path=documentation_path,
-        metric_pattern="mean-incum",
+        metric_pattern="metric-a",
         metric_description="average weekly whole milk consumption per agent",
-        plot_description="The attachment is the whole milk consumption plot.",
-        source_viz_plot_dir=None,
+        plots=[
+            DoESmokePlotInput(
+                plot_index=1,
+                reporter_pattern="metric-a",
+                plot_description="Plot one description.",
+                plot_path=plots_dir / "1.png",
+            ),
+            DoESmokePlotInput(
+                plot_index=2,
+                reporter_pattern="metric-b",
+                plot_description="Plot two description.",
+                plot_path=plots_dir / "2.png",
+            ),
+        ],
         source_viz_artifact_source="fallback",
     )
 
 
-def test_run_doe_smoke_suite_writes_pre_llm_case_bundles(tmp_path: Path) -> None:
+def test_run_doe_smoke_suite_writes_grouped_shared_and_case_artifacts(tmp_path: Path) -> None:
     prompts = PromptsConfig(
         context_prompt="Context prompt\n{parameters}\n{documentation}",
         trend_prompt="Trend prompt\nMetric description: {description}\nContext: {context}",
-        style_features={"role": "You are a scientist.", "insights": "Keep it concise."},
+        style_features={"role": "You are a scientist.", "insights": "Keep it concise.", "example": "Give examples."},
     )
-    inputs = {"milk_consumption": _write_case_inputs(tmp_path)}
-    cases = [SmokeCase(case_id="plot-summary", evidence_mode="plot", text_source_mode="summary_only")]
-
     result = run_doe_smoke_suite(
-        abm_inputs=inputs,
+        abm_inputs={"milk_consumption": _write_case_inputs(tmp_path)},
         prompts=prompts,
-        provider="openrouter",
-        model="moonshotai/kimi-k2.5",
+        model_specs=[DoESmokeModelSpec(model_id="kimi_k2_5", provider="openrouter", model="moonshotai/kimi-k2.5")],
         output_root=tmp_path / "doe-smoke",
-        cases=cases,
+        evidence_modes=("plot",),
+        summarization_specs=(
+            DoESmokeSummarizationSpec(
+                summarization_mode="none",
+                text_source_mode="full_text_only",
+                summarizers=(),
+            ),
+        ),
+        prompt_variants=(DoESmokePromptVariant(variant_id="none", enabled_style_features=()),),
+        repetitions=(1,),
     )
 
     assert result.success is True
+    assert result.total_cases == 1
+    assert result.total_planned_requests == 3
     assert result.design_matrix_csv_path.exists()
-    assert result.report_json_path.exists()
-    assert result.report_markdown_path.exists()
-    assert len(result.cases) == 1
+    assert result.request_matrix_csv_path.exists()
+    assert result.abm_shared["milk_consumption"].shared_dir.exists()
     case = result.cases[0]
-    assert case.status == "ok"
-    assert case.context_prompt_path is not None and case.context_prompt_path.exists()
-    assert case.trend_prompt_template_path is not None and case.trend_prompt_template_path.exists()
-    assert case.pipeline_plot_path is not None and case.pipeline_plot_path.exists()
-    assert case.stats_table_csv_path is not None and case.stats_table_csv_path.exists()
-    assert case.evidence_image_path == case.pipeline_plot_path
-    request_payload = json.loads(case.context_request_plan_path.read_text(encoding="utf-8"))
-    assert request_payload["image_attached"] is False
+    manifest = json.loads(case.case_manifest_path.read_text(encoding="utf-8"))
+    assert manifest["context_request"]["image_attached"] is False
+    assert len(manifest["trend_requests"]) == 2
+    assert Path(manifest["trend_requests"][0]["prompt_path"]).exists()
 
 
 def test_run_doe_smoke_suite_flags_placeholder_inputs(tmp_path: Path) -> None:
@@ -82,37 +108,110 @@ def test_run_doe_smoke_suite_flags_placeholder_inputs(tmp_path: Path) -> None:
     result = run_doe_smoke_suite(
         abm_inputs={"milk_consumption": input_bundle},
         prompts=prompts,
-        provider="openrouter",
-        model="moonshotai/kimi-k2.5",
+        model_specs=[DoESmokeModelSpec(model_id="kimi_k2_5", provider="openrouter", model="moonshotai/kimi-k2.5")],
         output_root=tmp_path / "doe-smoke",
-        cases=[SmokeCase(case_id="plot-summary", evidence_mode="plot", text_source_mode="summary_only")],
+        evidence_modes=("plot",),
+        summarization_specs=(
+            DoESmokeSummarizationSpec(
+                summarization_mode="none",
+                text_source_mode="full_text_only",
+                summarizers=(),
+            ),
+        ),
+        prompt_variants=(DoESmokePromptVariant(variant_id="none", enabled_style_features=()),),
+        repetitions=(1,),
     )
 
     assert result.success is False
-    assert result.failed_case_ids == ["milk_consumption::plot-summary"]
-    doc_stage = next(stage for stage in result.cases[0].stage_results if stage.stage.stage_id == "documentation")
-    assert doc_stage.status == "failed"
-    assert doc_stage.error_code == "placeholder_detected"
+    assert result.failed_case_ids == ["milk_consumption::kimi_k2_5::plot::none::none::rep1"]
 
 
-def test_run_doe_smoke_suite_records_unmatched_metric_pattern_without_crashing(tmp_path: Path) -> None:
+def test_run_doe_smoke_suite_records_unmatched_plot_reporter_without_crashing(tmp_path: Path) -> None:
     prompts = PromptsConfig(
         context_prompt="Context prompt\n{parameters}\n{documentation}",
         trend_prompt="Trend prompt\nMetric description: {description}\nContext: {context}",
     )
     input_bundle = _write_case_inputs(tmp_path)
-    input_bundle.metric_pattern = "missing-pattern"
+    input_bundle.plots[1].reporter_pattern = "missing-pattern"
 
     result = run_doe_smoke_suite(
         abm_inputs={"milk_consumption": input_bundle},
         prompts=prompts,
-        provider="openrouter",
-        model="moonshotai/kimi-k2.5",
+        model_specs=[DoESmokeModelSpec(model_id="kimi_k2_5", provider="openrouter", model="moonshotai/kimi-k2.5")],
         output_root=tmp_path / "doe-smoke",
-        cases=[SmokeCase(case_id="plot-summary", evidence_mode="plot", text_source_mode="summary_only")],
+        evidence_modes=("plot+table",),
+        summarization_specs=(
+            DoESmokeSummarizationSpec(
+                summarization_mode="bart",
+                text_source_mode="summary_only",
+                summarizers=("bart",),
+            ),
+        ),
+        prompt_variants=(DoESmokePromptVariant(variant_id="role", enabled_style_features=("role",)),),
+        repetitions=(1,),
     )
 
     assert result.success is False
-    plot_stage = next(stage for stage in result.cases[0].stage_results if stage.stage.stage_id == "pipeline-plot")
-    assert plot_stage.status == "failed"
-    assert plot_stage.error_code == "unmatched_metric_pattern"
+    manifest = json.loads(result.cases[0].case_manifest_path.read_text(encoding="utf-8"))
+    failed_request = manifest["trend_requests"][1]
+    assert failed_request["status"] == "failed"
+    assert failed_request["error_code"] == "unmatched_metric_pattern"
+
+
+def test_canonical_doe_dimensions_match_benchmark_contract() -> None:
+    prompt_variants = canonical_prompt_variants()
+    summarization_specs = canonical_summarization_specs()
+
+    assert [variant.variant_id for variant in prompt_variants] == [
+        "none",
+        "role",
+        "insights",
+        "example",
+        "role+example",
+        "role+insights",
+        "insights+example",
+        "all_three",
+    ]
+    assert [spec.summarization_mode for spec in summarization_specs] == [
+        "none",
+        "bart",
+        "bert",
+        "t5",
+        "longformer_ext",
+    ]
+
+
+def test_run_doe_smoke_suite_records_model_preflight_failures_without_aborting(tmp_path: Path) -> None:
+    prompts = PromptsConfig(
+        context_prompt="Context prompt\n{parameters}\n{documentation}",
+        trend_prompt="Trend prompt\nMetric description: {description}\nContext: {context}",
+    )
+    result = run_doe_smoke_suite(
+        abm_inputs={"milk_consumption": _write_case_inputs(tmp_path)},
+        prompts=prompts,
+        model_specs=[
+            DoESmokeModelSpec(
+                model_id="qwen3_5_local",
+                provider="ollama",
+                model="qwen3.5:0.8b",
+                preflight_error="ollama list crashed",
+            )
+        ],
+        output_root=tmp_path / "doe-smoke",
+        evidence_modes=("plot",),
+        summarization_specs=(
+            DoESmokeSummarizationSpec(
+                summarization_mode="none",
+                text_source_mode="full_text_only",
+                summarizers=(),
+            ),
+        ),
+        prompt_variants=(DoESmokePromptVariant(variant_id="none", enabled_style_features=()),),
+        repetitions=(1,),
+    )
+
+    assert result.success is False
+    manifest = json.loads(result.cases[0].case_manifest_path.read_text(encoding="utf-8"))
+    assert manifest["model_preflight_error"] == "ollama list crashed"
+    assert manifest["context_request"]["error_code"] == "model_preflight_failed"
+    assert manifest["trend_requests"][0]["error_code"] == "model_preflight_failed"

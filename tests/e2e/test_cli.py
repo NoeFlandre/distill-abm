@@ -12,6 +12,7 @@ from typer.testing import CliRunner
 import distill_abm.cli as cli_module
 from distill_abm.cli import app
 from distill_abm.configs.models import ABMConfig
+from distill_abm.pipeline.doe_smoke import DoESmokeModelSpec
 
 runner = CliRunner()
 
@@ -618,16 +619,37 @@ def test_cli_smoke_doe_supports_json_output(tmp_path: Path, monkeypatch: pytest.
         abm_viz = viz_root / abm
         (abm_viz / "plots").mkdir(parents=True, exist_ok=True)
         (abm_viz / "simulation.csv").write_text("[step],mean\n0,1\n", encoding="utf-8")
+        (abm_viz / "plots" / "1.png").write_bytes(b"png")
         (abm_viz / "artifact_source.txt").write_text("fallback\n", encoding="utf-8")
 
-    def fake_run_doe_smoke_suite(*, abm_inputs, prompts, provider, model, output_root, cases, selected_case_ids):  # type: ignore[no-untyped-def]
-        _ = abm_inputs, prompts, provider, model, output_root, cases, selected_case_ids
+    def fake_run_doe_smoke_suite(  # type: ignore[no-untyped-def]
+        *,
+        abm_inputs,
+        prompts,
+        model_specs,
+        output_root,
+        evidence_modes,
+        summarization_specs,
+        prompt_variants,
+        repetitions,
+    ):
+        _ = (
+            abm_inputs,
+            prompts,
+            model_specs,
+            output_root,
+            evidence_modes,
+            summarization_specs,
+            prompt_variants,
+            repetitions,
+        )
         return SimpleNamespace(
             success=True,
             failed_case_ids=[],
             report_markdown_path=Path("doe_smoke.md"),
             report_json_path=Path("doe_smoke.json"),
             design_matrix_csv_path=Path("design_matrix.csv"),
+            request_matrix_csv_path=Path("request_matrix.csv"),
         )
 
     monkeypatch.setattr(cli_module, "run_doe_smoke_suite", fake_run_doe_smoke_suite)
@@ -642,12 +664,95 @@ def test_cli_smoke_doe_supports_json_output(tmp_path: Path, monkeypatch: pytest.
             str(ingest_root),
             "--viz-root",
             str(viz_root),
+            "--model-id",
+            "kimi_k2_5",
             "--json",
         ],
     )
 
     assert result.exit_code == 0
     assert '"command": "smoke-doe"' in result.output
+
+
+def test_cli_smoke_doe_records_model_preflight_errors_without_failing_fast(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    model_root = tmp_path / "data"
+    _write_min_nlogo_model_dir(model_root, "fauna", "Fauna doc")
+    _write_min_nlogo_model_dir(model_root, "grazing", "Grazing doc")
+    _write_min_nlogo_model_dir(model_root, "milk_consumption", "Milk doc")
+
+    ingest_root = tmp_path / "ingest"
+    viz_root = tmp_path / "viz"
+    for abm in ["fauna", "grazing", "milk_consumption"]:
+        txt_dir = ingest_root / abm / "TXT"
+        txt_dir.mkdir(parents=True, exist_ok=True)
+        (txt_dir / "narrative_combined.txt").write_text("parameters", encoding="utf-8")
+        (txt_dir / "final_documentation.txt").write_text("documentation", encoding="utf-8")
+        abm_viz = viz_root / abm
+        (abm_viz / "plots").mkdir(parents=True, exist_ok=True)
+        (abm_viz / "simulation.csv").write_text("[step],mean\n0,1\n", encoding="utf-8")
+        (abm_viz / "plots" / "1.png").write_bytes(b"png")
+        (abm_viz / "artifact_source.txt").write_text("fallback\n", encoding="utf-8")
+
+    captured_model_specs: list[DoESmokeModelSpec] = []
+
+    def fake_validate_model_policy(*, provider, model, allow_debug_model):  # type: ignore[no-untyped-def]
+        _ = allow_debug_model
+        if provider == "ollama" and model == "qwen3.5:0.8b":
+            raise typer.BadParameter("ollama list crashed")
+
+    def fake_run_doe_smoke_suite(  # type: ignore[no-untyped-def]
+        *,
+        abm_inputs,
+        prompts,
+        model_specs,
+        output_root,
+        evidence_modes,
+        summarization_specs,
+        prompt_variants,
+        repetitions,
+    ):
+        _ = (
+            abm_inputs,
+            prompts,
+            output_root,
+            evidence_modes,
+            summarization_specs,
+            prompt_variants,
+            repetitions,
+        )
+        captured_model_specs.extend(model_specs)
+        return SimpleNamespace(
+            success=False,
+            failed_case_ids=["fauna::qwen3_5_local::plot::none::none::rep1"],
+            report_markdown_path=Path("doe_smoke.md"),
+            report_json_path=Path("doe_smoke.json"),
+            design_matrix_csv_path=Path("design_matrix.csv"),
+            request_matrix_csv_path=Path("request_matrix.csv"),
+        )
+
+    monkeypatch.setattr(cli_module, "_validate_model_policy", fake_validate_model_policy)
+    monkeypatch.setattr(cli_module, "run_doe_smoke_suite", fake_run_doe_smoke_suite)
+
+    result = runner.invoke(
+        app,
+        [
+            "smoke-doe",
+            "--models-root",
+            str(model_root),
+            "--ingest-root",
+            str(ingest_root),
+            "--viz-root",
+            str(viz_root),
+            "--model-id",
+            "qwen3_5_local",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 1
+    assert captured_model_specs[0].preflight_error == "ollama list crashed"
 
 
 def test_cli_ingest_netlogo_suite_supports_root_level_model_files(tmp_path: Path) -> None:
