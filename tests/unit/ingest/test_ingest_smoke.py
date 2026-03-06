@@ -73,3 +73,29 @@ def test_run_ingest_smoke_suite_writes_stage_level_report(tmp_path: Path) -> Non
     assert documentation_stage["status"] == "ok"
     assert documentation_stage["artifact"]["exists"] is True
     assert documentation_stage["artifact"]["preview"]
+
+
+def test_code_stage_allows_todo_comments_in_real_code(tmp_path: Path) -> None:
+    model_dir = tmp_path / "data" / "grazing_abm"
+    model_dir.mkdir(parents=True, exist_ok=True)
+    model_path = model_dir / "grazing.nlogo"
+    model_path.write_text(
+        "globals [\n"
+        "  value ; todo keep this comment\n"
+        "]\n"
+        "to go\nend\n"
+        "@#$#@#$#@\n"
+        "## WHAT IS IT?\n\n"
+        "Documentation\n"
+        "@#$#@#$#@\n",
+        encoding="utf-8",
+    )
+
+    result = run_ingest_smoke_suite(
+        abm_models={"grazing": model_path},
+        output_root=tmp_path / "ingest-smoke",
+        stage_ids=["code"],
+    )
+
+    assert result.success is True
+    assert result.abms[0].stage_results[0].status == "ok"
