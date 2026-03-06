@@ -109,6 +109,23 @@ uv run distill-abm smoke-ingest-netlogo \
   --stage final-documentation
 ```
 
+Run granular visualization smoke checks:
+
+```bash
+uv run distill-abm smoke-viz \
+  --abm milk_consumption \
+  --csv-map milk_consumption=/path/to/simulation.csv \
+  --stage plot \
+  --stage stats-csv \
+  --json
+```
+
+Visualization smoke caveat:
+
+- Unlike NetLogo ingestion smoke, plot generation requires simulation CSV inputs.
+- The repository does not currently ship benchmark CSVs for every ABM, so this command is explicit about CSV sources rather than inferring them silently.
+- If an ABM has no configured default CSV and no `--csv-map` entry is provided, the command fails with a clear error instead of fabricating a smoke run.
+
 NetLogo ingestion caveat:
 
 - These artifacts are extracted dynamically from the provided `.nlogo` files; they are not static repository fixtures.
@@ -132,6 +149,7 @@ Agent-oriented CLI additions:
   - `default`: full local verification
   - `full`: currently equivalent to `default`, reserved as the strictest profile
 - `smoke-ingest-netlogo` supports `--require-stage` so callers can assert that specific stage checks are present.
+- `smoke-viz` provides the same stage-filtering and `--require-stage` pattern for plot/stats generation.
 - `ingest-netlogo` and `ingest-netlogo-suite` now write stable artifact manifests.
 - Read-only inspection commands are available for agent loops:
   - `uv run distill-abm describe-abm --abm grazing --json`
