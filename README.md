@@ -163,6 +163,11 @@ uv run distill-abm validate-workspace --json
 
 This command is intended to be the default "verify my work" entrypoint for coding agents. It runs the repository's standard local checks, emits a structured JSON report, and nests the NetLogo ingest-smoke report under `results/agent_validation/latest/` so agents can validate outcomes without ad hoc artifact hunting.
 
+Repo workflow notes:
+
+- See `docs/AGENT_WORKFLOW.md` for the repository-specific agent workflow, verification order, and evidence expectations.
+- See `docs/MANUAL_VALIDATION.md` for the current evidence-style manual verification record covering the pre-LLM workflow surfaces.
+
 Agent-oriented CLI additions:
 
 - Most verification-oriented commands now support `--json` so agents can consume structured output instead of parsing human text.
