@@ -12,6 +12,13 @@ from pydantic import BaseModel, Field
 from distill_abm.ingest.ingest_smoke import run_ingest_smoke_suite
 
 ValidationStatus = Literal["ok", "failed", "skipped"]
+ValidationExecutionMode = Literal["fresh", "skipped"]
+ValidationProfile = Literal["quick", "default", "full"]
+ValidationErrorCode = Literal[
+    "command_failed",
+    "ingest_smoke_failed",
+    "unknown_check",
+]
 
 
 class ValidationCheck(BaseModel):
@@ -28,11 +35,13 @@ class ValidationCheckResult(BaseModel):
     check_id: str
     description: str
     status: ValidationStatus
+    execution_mode: ValidationExecutionMode = "fresh"
     command: list[str] = Field(default_factory=list)
     exit_code: int | None = None
     stdout_preview: str = ""
     stderr_preview: str = ""
     artifact_paths: list[Path] = Field(default_factory=list)
+    error_code: ValidationErrorCode | None = None
     error: str | None = None
 
 
@@ -43,6 +52,7 @@ class ValidationSuiteResult(BaseModel):
     finished_at_utc: str
     output_root: Path
     success: bool
+    profile: ValidationProfile
     selected_checks: list[str]
     failed_checks: list[str] = Field(default_factory=list)
     check_results: list[ValidationCheckResult] = Field(default_factory=list)
@@ -82,17 +92,27 @@ def default_validation_checks() -> list[ValidationCheck]:
     ]
 
 
+def validation_checks_for_profile(profile: ValidationProfile) -> list[str]:
+    """Return the default check roster for a named validation profile."""
+    if profile == "quick":
+        return ["ruff", "mypy", "smoke-ingest-netlogo"]
+    return ["pytest", "ruff", "mypy", "build", "smoke-ingest-netlogo"]
+
+
 def run_validation_suite(
     *,
     output_root: Path,
     abm_models: dict[str, Path],
     checks: list[str] | None = None,
     ingest_stage_ids: list[str] | None = None,
+    profile: ValidationProfile = "default",
 ) -> ValidationSuiteResult:
     """Run the canonical local validation suite and persist structured reports."""
     started_at = datetime.now(UTC)
     output_root.mkdir(parents=True, exist_ok=True)
-    selected_checks = _select_checks(checks)
+    selected_checks = _select_checks(checks, profile=profile)
+    selected_ids = {item.check_id for item in selected_checks}
+    all_checks = default_validation_checks()
 
     check_results: list[ValidationCheckResult] = []
     failed_checks: list[str] = []
@@ -118,6 +138,7 @@ def run_validation_suite(
                     description=check.description,
                     status=status,
                     artifact_paths=[smoke_result.report_json_path, smoke_result.report_markdown_path],
+                    error_code=None if smoke_result.success else "ingest_smoke_failed",
                     error=None if smoke_result.success else f"failed_abms: {', '.join(smoke_result.failed_abms)}",
                 )
             )
@@ -136,6 +157,20 @@ def run_validation_suite(
                 exit_code=completed.returncode,
                 stdout_preview=completed.stdout[:2000],
                 stderr_preview=completed.stderr[:2000],
+                error_code=None if completed.returncode == 0 else "command_failed",
+            )
+        )
+
+    for check in all_checks:
+        if check.check_id in selected_ids:
+            continue
+        check_results.append(
+            ValidationCheckResult(
+                check_id=check.check_id,
+                description=check.description,
+                status="skipped",
+                execution_mode="skipped",
+                command=check.command,
             )
         )
 
@@ -147,6 +182,7 @@ def run_validation_suite(
         finished_at_utc=finished_at.isoformat(),
         output_root=output_root,
         success=not failed_checks,
+        profile=profile,
         selected_checks=[item.check_id for item in selected_checks],
         failed_checks=failed_checks,
         check_results=check_results,
@@ -158,17 +194,16 @@ def run_validation_suite(
     report_json_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
     report_markdown_path.write_text(_render_markdown_report(result), encoding="utf-8")
     return result
-
-
-def _select_checks(checks: list[str] | None) -> list[ValidationCheck]:
+def _select_checks(checks: list[str] | None, profile: ValidationProfile) -> list[ValidationCheck]:
     available = {item.check_id: item for item in default_validation_checks()}
-    if not checks:
-        return list(available.values())
-    unknown = [item for item in checks if item not in available]
+    requested = checks if checks is not None else validation_checks_for_profile(profile)
+    if not requested:
+        return []
+    unknown = [item for item in requested if item not in available]
     if unknown:
         known = ", ".join(sorted(available))
         raise ValueError(f"unknown validation check(s): {', '.join(unknown)}. Known checks: {known}")
-    return [available[item] for item in checks]
+    return [available[item] for item in requested]
 
 
 def _render_markdown_report(result: ValidationSuiteResult) -> str:
@@ -176,6 +211,7 @@ def _render_markdown_report(result: ValidationSuiteResult) -> str:
         "# Validation Report",
         "",
         f"- success: `{result.success}`",
+        f"- profile: `{result.profile}`",
         f"- selected_checks: `{', '.join(result.selected_checks)}`",
         f"- failed_checks: `{', '.join(result.failed_checks) if result.failed_checks else 'none'}`",
         "",
@@ -183,12 +219,15 @@ def _render_markdown_report(result: ValidationSuiteResult) -> str:
     for check in result.check_results:
         lines.append(f"## {check.check_id}")
         lines.append(f"- status: `{check.status}`")
+        lines.append(f"- execution_mode: `{check.execution_mode}`")
         if check.command:
             lines.append(f"- command: `{' '.join(check.command)}`")
         if check.exit_code is not None:
             lines.append(f"- exit_code: `{check.exit_code}`")
         if check.artifact_paths:
             lines.append(f"- artifacts: `{', '.join(str(path) for path in check.artifact_paths)}`")
+        if check.error_code:
+            lines.append(f"- error_code: `{check.error_code}`")
         if check.error:
             lines.append(f"- error: `{check.error}`")
         lines.append("")

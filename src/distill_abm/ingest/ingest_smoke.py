@@ -14,6 +14,11 @@ from distill_abm.ingest.netlogo_workflow import run_ingest_workflow
 from distill_abm.utils import detect_placeholder_signals
 
 IngestSmokeStatus = Literal["ok", "failed"]
+IngestSmokeErrorCode = Literal[
+    "missing_or_empty_artifact",
+    "placeholder_like_content",
+    "workflow_exception",
+]
 
 
 class IngestSmokeStage(BaseModel):
@@ -42,6 +47,7 @@ class IngestSmokeStageResult(BaseModel):
     stage: IngestSmokeStage
     status: IngestSmokeStatus
     artifact: IngestSmokeArtifact
+    error_code: IngestSmokeErrorCode | None = None
     error: str | None = None
 
 
@@ -54,6 +60,7 @@ class IngestSmokeAbmResult(BaseModel):
     status: IngestSmokeStatus
     artifact_index_path: Path | None = None
     stage_results: list[IngestSmokeStageResult] = Field(default_factory=list)
+    error_code: IngestSmokeErrorCode | None = None
     error: str | None = None
 
 
@@ -165,6 +172,7 @@ def run_ingest_smoke_suite(
                     model_path=model_path,
                     output_dir=output_dir,
                     status="failed",
+                    error_code="workflow_exception",
                     error=str(exc),
                 )
             )
@@ -206,12 +214,15 @@ def _build_stage_result(*, stage: IngestSmokeStage, artifact_path: Path) -> Inge
         "ok" if artifact.exists and artifact.size_bytes > 0 and not artifact.placeholder_signals else "failed"
     )
     error = None
+    error_code: IngestSmokeErrorCode | None = None
     if not artifact.exists or artifact.size_bytes <= 0:
         error = f"artifact missing or empty: {artifact_path}"
+        error_code = "missing_or_empty_artifact"
     elif artifact.placeholder_signals:
         signals = ", ".join(artifact.placeholder_signals)
         error = f"artifact contains placeholder-like content: {signals}"
-    return IngestSmokeStageResult(stage=stage, status=status, artifact=artifact, error=error)
+        error_code = "placeholder_like_content"
+    return IngestSmokeStageResult(stage=stage, status=status, artifact=artifact, error_code=error_code, error=error)
 
 
 def _inspect_artifact(path: Path, *, inspect_placeholder_signals: bool) -> IngestSmokeArtifact:
@@ -240,11 +251,17 @@ def _render_markdown_report(result: IngestSmokeSuiteResult) -> str:
     for abm in result.abms:
         lines.append(f"## {abm.abm}")
         lines.append(f"- status: `{abm.status}`")
+        if abm.error_code:
+            lines.append(f"- error_code: `{abm.error_code}`")
         if abm.error:
             lines.append(f"- error: `{abm.error}`")
         for stage_result in abm.stage_results:
             lines.append(
                 f"- {stage_result.stage.stage_id}: `{stage_result.status}` -> `{stage_result.artifact.path}`"
             )
+            if stage_result.error_code:
+                lines.append(f"  error_code: `{stage_result.error_code}`")
+            if stage_result.error:
+                lines.append(f"  error: `{stage_result.error}`")
         lines.append("")
     return "\n".join(lines)

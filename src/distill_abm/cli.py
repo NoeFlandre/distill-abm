@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
+from collections.abc import Mapping
 from pathlib import Path
 from shutil import copy2
 from typing import Annotated, Literal, cast
 
 import typer
+from pydantic import BaseModel, Field
 
-from distill_abm.agent_validation import run_validation_suite
+from distill_abm.agent_validation import ValidationProfile, run_validation_suite
 from distill_abm.configs.loader import (
     load_abm_config,
     load_experiment_settings,
@@ -45,6 +48,100 @@ BENCHMARK_MODELS: set[tuple[str, str]] = {
     ("ollama", "qwen3.5:0.8b"),
 }
 DEBUG_MODEL: tuple[str, str] = ("openrouter", "qwen/qwen3-vl-235b-a22b-thinking")
+
+
+class ArtifactDescriptor(BaseModel):
+    """Stable artifact description for agent-readable manifests."""
+
+    path: Path
+    exists: bool
+    size_bytes: int = 0
+    sha256: str | None = None
+
+
+class IngestCommandResult(BaseModel):
+    """Structured result for single-model ingest CLI runs."""
+
+    command: str = "ingest-netlogo"
+    output_dir: Path
+    artifact_manifest_path: Path
+    artifacts: dict[str, ArtifactDescriptor]
+
+
+class IngestSuiteCommandResult(BaseModel):
+    """Structured result for multi-model ingest CLI runs."""
+
+    command: str = "ingest-netlogo-suite"
+    output_root: Path
+    artifact_manifest_path: Path
+    abms: dict[str, dict[str, ArtifactDescriptor]]
+    skipped_abms: list[str] = Field(default_factory=list)
+
+
+class RunCommandResult(BaseModel):
+    """Structured result for one pipeline run."""
+
+    command: str = "run"
+    output_dir: Path
+    plot_path: Path
+    report_csv_path: Path
+    metadata_path: Path | None = None
+    artifact_manifest_path: Path
+    artifacts: dict[str, ArtifactDescriptor]
+
+
+class SmokeCommandResult(BaseModel):
+    """Structured result for smoke-style CLI runs."""
+
+    command: str
+    success: bool
+    report_json_path: Path
+    report_markdown_path: Path
+    failed_items: list[str] = Field(default_factory=list)
+    nested_artifacts: dict[str, Path] = Field(default_factory=dict)
+
+
+class DoeCommandResult(BaseModel):
+    """Structured result for DOE analysis."""
+
+    command: str = "analyze-doe"
+    success: bool
+    output_csv: Path
+
+
+class DescribeAbmResult(BaseModel):
+    """Read-only summary of one configured ABM."""
+
+    abm: str
+    config_path: Path
+    model_path: Path
+    experiment_parameters_path: Path | None = None
+    scoring_reference_path: Path | None = None
+    metric_pattern: str
+    metric_description: str
+    plot_descriptions: list[str] = Field(default_factory=list)
+
+
+class DescribeRunResult(BaseModel):
+    """Read-only summary of one existing run output directory."""
+
+    output_dir: Path
+    metadata_path: Path
+    available_artifacts: dict[str, Path] = Field(default_factory=dict)
+    run_signature: str | None = None
+    selected_text_source: str | None = None
+    evidence_mode: str | None = None
+    requested_evidence_mode: str | None = None
+    matched_metric_columns: list[str] = Field(default_factory=list)
+
+
+class DescribeArtifactsResult(BaseModel):
+    """Read-only summary of an existing ingest artifact directory."""
+
+    root: Path
+    manifest_path: Path | None = None
+    artifact_index_path: Path | None = None
+    artifacts: dict[str, ArtifactDescriptor] = Field(default_factory=dict)
 
 __all__ = [
     "analyze_doe",
@@ -125,6 +222,7 @@ def run(
         typer.Option(help="Allow summary-only mode to fall back to full-text when summarizers fail."),
     ] = False,
     abm: Annotated[str | None, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = None,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run one end-to-end pipeline execution from CSV to scored report."""
     prompts = load_prompts_config(prompts_path)
@@ -161,8 +259,29 @@ def run(
         prompts=prompts,
         adapter=adapter,
     )
+    artifact_manifest_path = output_dir / "run_artifact_manifest.json"
+    command_result = RunCommandResult(
+        output_dir=output_dir,
+        plot_path=result.plot_path,
+        report_csv_path=result.report_csv,
+        metadata_path=getattr(result, "metadata_path", None),
+        artifact_manifest_path=artifact_manifest_path,
+        artifacts=_build_artifact_descriptors(
+            {
+                "plot": result.plot_path,
+                "report_csv": result.report_csv,
+                "metadata": getattr(result, "metadata_path", None),
+                "stats_image": getattr(result, "stats_image_path", None),
+            }
+        ),
+    )
+    artifact_manifest_path.write_text(command_result.model_dump_json(indent=2), encoding="utf-8")
+    if json_output:
+        typer.echo(command_result.model_dump_json(indent=2))
+        return
     typer.echo(f"plot: {result.plot_path}")
     typer.echo(f"report: {result.report_csv}")
+    typer.echo(f"artifact manifest: {artifact_manifest_path}")
 
 
 @app.command("ingest-netlogo")
@@ -180,6 +299,7 @@ def ingest_netlogo(
         typer.Option(help="Directory for artifacts. Defaults to results/ingest/<model-stem>."),
     ] = None,
     suffix: Annotated[str, typer.Option(help="Suffix used in workflow artifact names.")] = "",
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run NetLogo preprocessing workflow and persist extracted artifacts."""
     resolved_output_dir = output_dir if output_dir is not None else Path("results") / "ingest" / model_path.stem
@@ -190,7 +310,18 @@ def ingest_netlogo(
         output_dir=resolved_output_dir,
         suffix=suffix,
     )
+    artifact_manifest_path = resolved_output_dir / "ingest_manifest.json"
+    command_result = IngestCommandResult(
+        output_dir=resolved_output_dir,
+        artifact_manifest_path=artifact_manifest_path,
+        artifacts=_build_artifact_descriptors(artifacts),
+    )
+    artifact_manifest_path.write_text(command_result.model_dump_json(indent=2), encoding="utf-8")
+    if json_output:
+        typer.echo(command_result.model_dump_json(indent=2))
+        return
     typer.echo(f"NetLogo ingestion artifacts written to: {resolved_output_dir.resolve()}")
+    typer.echo(f"artifact manifest: {artifact_manifest_path}")
     for key, path in sorted(artifacts.items()):
         typer.echo(f"{key}: {path}")
 
@@ -223,11 +354,13 @@ def ingest_netlogo_suite(
         Path | None,
         typer.Option(help="Optional shared experiment-parameters JSON path for all ABMs."),
     ] = None,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run NetLogo ingestion for multiple ABMs into dedicated output folders."""
     requested = sorted(set(abms)) if abms else _discover_configured_abms()
     missing: list[str] = []
     shared_params = _load_experiment_parameters(default_experiment_parameters_path)
+    suite_artifacts: dict[str, dict[str, ArtifactDescriptor]] = {}
 
     for abm in requested:
         try:
@@ -248,6 +381,14 @@ def ingest_netlogo_suite(
                 output_dir=output_dir,
                 suffix=suffix,
             )
+            manifest_path = output_dir / "ingest_manifest.json"
+            command_result = IngestCommandResult(
+                output_dir=output_dir,
+                artifact_manifest_path=manifest_path,
+                artifacts=_build_artifact_descriptors(artifacts),
+            )
+            manifest_path.write_text(command_result.model_dump_json(indent=2), encoding="utf-8")
+            suite_artifacts[abm] = command_result.artifacts
             typer.echo(f"[{abm}] NetLogo ingestion artifacts written to: {output_dir.resolve()}")
             for key, path in sorted(artifacts.items()):
                 typer.echo(f"{abm}::{key}: {path}")
@@ -258,6 +399,18 @@ def ingest_netlogo_suite(
                 continue
             raise typer.BadParameter(message) from exc
 
+    suite_manifest_path = output_root / "ingest_suite_manifest.json"
+    suite_result = IngestSuiteCommandResult(
+        output_root=output_root,
+        artifact_manifest_path=suite_manifest_path,
+        abms=suite_artifacts,
+        skipped_abms=missing,
+    )
+    suite_manifest_path.write_text(suite_result.model_dump_json(indent=2), encoding="utf-8")
+    if json_output:
+        typer.echo(suite_result.model_dump_json(indent=2))
+        return
+    typer.echo(f"suite artifact manifest: {suite_manifest_path}")
     if missing:
         typer.echo("ingest completed with skipped ABMs:")
         for issue in missing:
@@ -269,12 +422,17 @@ def analyze_doe(
     input_csv: Annotated[Path, typer.Option(..., exists=True, file_okay=True, dir_okay=False)],
     output_csv: Annotated[Path, typer.Option()] = Path(RUNTIME_DEFAULTS.doe.output_csv),
     max_interaction_order: Annotated[int, typer.Option()] = RUNTIME_DEFAULTS.doe.max_interaction_order,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run full factorial ANOVA contribution analysis."""
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     result = analyze_factorial_anova(input_csv, output_csv, max_interaction_order=max_interaction_order)
     if result is None:
         raise typer.Exit(code=1)
+    command_result = DoeCommandResult(success=True, output_csv=output_csv)
+    if json_output:
+        typer.echo(command_result.model_dump_json(indent=2))
+        return
     typer.echo(f"wrote: {output_csv}")
 
 
@@ -392,6 +550,7 @@ def smoke_qwen(
         bool,
         typer.Option("--resume/--no-resume", help="Reuse existing smoke artifacts and skip already completed work."),
     ] = True,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run full debug smoke validation across evidence/text modes plus DoE and sweep artifacts."""
     _validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
@@ -434,6 +593,28 @@ def smoke_qwen(
         cases=selected_cases,
         resume_existing=resume,
     )
+    command_result = SmokeCommandResult(
+        command="smoke-qwen",
+        success=result.success,
+        report_json_path=result.report_json_path,
+        report_markdown_path=result.report_markdown_path,
+        failed_items=result.failed_cases,
+        nested_artifacts={
+            key: value
+            for key, value in {
+                "doe_output_csv": result.doe_output_csv,
+                "sweep_output_csv": result.sweep_output_csv,
+                "run_master_csv": getattr(result, "run_master_csv_path", None),
+                "global_master_csv": getattr(result, "global_master_csv_path", None),
+            }.items()
+            if value is not None
+        },
+    )
+    if json_output:
+        typer.echo(command_result.model_dump_json(indent=2))
+        if not result.success:
+            raise typer.Exit(code=1)
+        return
     typer.echo(f"smoke report (markdown): {result.report_markdown_path}")
     typer.echo(f"smoke report (json): {result.report_json_path}")
     if result.doe_output_csv is not None:
@@ -469,6 +650,11 @@ def smoke_ingest_netlogo(
         list[str] | None,
         typer.Option("--stage", help="Optional ingest stage filter. Repeat to focus the smoke report."),
     ] = None,
+    require_stage: Annotated[
+        list[str] | None,
+        typer.Option("--require-stage", help="Assert that these stages were selected in the report."),
+    ] = None,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run artifact-focused smoke checks for NetLogo ingestion across configured ABMs."""
     requested = sorted(set(abms)) if abms else list(_discover_configured_abms())
@@ -477,6 +663,24 @@ def smoke_ingest_netlogo(
         result = run_ingest_smoke_suite(abm_models=abm_models, output_root=output_root, stage_ids=stage)
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
+    if require_stage:
+        missing_required = [item for item in require_stage if item not in result.selected_stage_ids]
+        if missing_required:
+            raise typer.BadParameter(
+                f"required stage(s) missing from ingest smoke selection: {', '.join(missing_required)}"
+            )
+    command_result = SmokeCommandResult(
+        command="smoke-ingest-netlogo",
+        success=result.success,
+        report_json_path=result.report_json_path,
+        report_markdown_path=result.report_markdown_path,
+        failed_items=result.failed_abms,
+    )
+    if json_output:
+        typer.echo(command_result.model_dump_json(indent=2))
+        if not result.success:
+            raise typer.Exit(code=1)
+        return
     typer.echo(f"ingest smoke report (markdown): {result.report_markdown_path}")
     typer.echo(f"ingest smoke report (json): {result.report_json_path}")
     if not result.success:
@@ -510,6 +714,10 @@ def validate_workspace(
         list[str] | None,
         typer.Option("--ingest-stage", help="Optional ingest stage filter for the smoke-ingest-netlogo check."),
     ] = None,
+    profile: Annotated[
+        ValidationProfile,
+        typer.Option(help="Validation profile: quick, default, or full."),
+    ] = "default",
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for structured validation reports and nested artifacts."),
@@ -528,6 +736,7 @@ def validate_workspace(
             abm_models=abm_models,
             checks=checks,
             ingest_stage_ids=ingest_stage,
+            profile=profile,
         )
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
@@ -543,6 +752,139 @@ def validate_workspace(
     if not result.success:
         typer.echo(f"validation failed: {', '.join(result.failed_checks)}")
         raise typer.Exit(code=1)
+
+
+@app.command("describe-abm")
+def describe_abm(
+    abm: Annotated[str, typer.Option(help="ABM config name in configs/abms/<name>.yaml")],
+    models_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ABM models."),
+    ] = Path("data"),
+    json_output: Annotated[bool, typer.Option("--json", help="Print structured JSON to stdout.")] = False,
+) -> None:
+    """Describe the resolved configuration and local assets for one ABM without running the pipeline."""
+    config_path = Path("configs/abms") / f"{abm}.yaml"
+    abm_config = load_abm_config(config_path)
+    model_path = _resolve_abm_model_path(abm=abm, models_root=models_root)
+    experiment_parameters_path = _resolve_abm_experiment_parameters_path(
+        model_dir=model_path.parent,
+        abm=abm,
+        explicit=None,
+    )
+    result = DescribeAbmResult(
+        abm=abm,
+        config_path=config_path,
+        model_path=model_path,
+        experiment_parameters_path=experiment_parameters_path,
+        scoring_reference_path=(
+            _resolve_scoring_reference_path(abm) if abm in {"fauna", "grazing", "milk_consumption"} else None
+        ),
+        metric_pattern=abm_config.metric_pattern,
+        metric_description=abm_config.metric_description,
+        plot_descriptions=list(abm_config.plot_descriptions),
+    )
+    if json_output:
+        typer.echo(result.model_dump_json(indent=2))
+        return
+    typer.echo(f"abm: {result.abm}")
+    typer.echo(f"config: {result.config_path}")
+    typer.echo(f"model: {result.model_path}")
+    if result.experiment_parameters_path is not None:
+        typer.echo(f"experiment parameters: {result.experiment_parameters_path}")
+    if result.scoring_reference_path is not None:
+        typer.echo(f"scoring reference: {result.scoring_reference_path}")
+
+
+@app.command("describe-ingest-artifacts")
+def describe_ingest_artifacts(
+    root: Annotated[Path, typer.Option(..., exists=True, file_okay=False, dir_okay=True)],
+    json_output: Annotated[bool, typer.Option("--json", help="Print structured JSON to stdout.")] = False,
+) -> None:
+    """Describe an existing ingest artifact directory without rerunning ingestion."""
+    manifest_path = root / "ingest_manifest.json"
+    artifact_index_path = root / "ingest_artifact_index.json"
+    artifacts: dict[str, ArtifactDescriptor] = {}
+    source_path: Path | None = None
+    if manifest_path.exists():
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        for key, value in payload.get("artifacts", {}).items():
+            artifacts[key] = ArtifactDescriptor.model_validate(value)
+        source_path = manifest_path
+    elif artifact_index_path.exists():
+        payload = json.loads(artifact_index_path.read_text(encoding="utf-8"))
+        artifacts = _build_artifact_descriptors({key: Path(value) for key, value in payload.items()})
+        source_path = artifact_index_path
+    else:
+        for path in sorted(root.rglob("*")):
+            if path.is_file():
+                artifacts[str(path.relative_to(root))] = _describe_artifact(path)
+    result = DescribeArtifactsResult(
+        root=root,
+        manifest_path=manifest_path if manifest_path.exists() else None,
+        artifact_index_path=artifact_index_path if artifact_index_path.exists() else None,
+        artifacts=artifacts,
+    )
+    if json_output:
+        typer.echo(result.model_dump_json(indent=2))
+        return
+    typer.echo(f"root: {root}")
+    if source_path is not None:
+        typer.echo(f"source: {source_path}")
+    for key, artifact in sorted(result.artifacts.items()):
+        typer.echo(f"{key}: {artifact.path}")
+
+
+@app.command("describe-run")
+def describe_run(
+    output_dir: Annotated[Path, typer.Option(..., exists=True, file_okay=False, dir_okay=True)],
+    json_output: Annotated[bool, typer.Option("--json", help="Print structured JSON to stdout.")] = False,
+) -> None:
+    """Describe an existing run output directory from its metadata without rerunning the pipeline."""
+    metadata_path = output_dir / "pipeline_run_metadata.json"
+    if not metadata_path.exists():
+        raise typer.BadParameter(f"missing pipeline metadata file: {metadata_path}")
+    payload = json.loads(metadata_path.read_text(encoding="utf-8"))
+    artifacts_payload = _as_dict(payload.get("artifacts"))
+    reproducibility = _as_dict(payload.get("reproducibility"))
+    execution = _as_dict(payload.get("execution"))
+    debug_trace = _as_dict(payload.get("debug_trace"))
+    frame_summary = _as_dict(debug_trace.get("frame_summary"))
+    matched_metric_columns_raw = frame_summary.get("matched_metric_columns", [])
+    available_artifacts = {
+        key: Path(value)
+        for key, value in artifacts_payload.items()
+        if isinstance(value, str) and value
+    }
+    result = DescribeRunResult(
+        output_dir=output_dir,
+        metadata_path=metadata_path,
+        available_artifacts=available_artifacts,
+        run_signature=str(reproducibility.get("run_signature")) if reproducibility.get("run_signature") else None,
+        selected_text_source=(
+            str(execution.get("selected_text_source")) if execution.get("selected_text_source") else None
+        ),
+        evidence_mode=str(execution.get("evidence_mode")) if execution.get("evidence_mode") else None,
+        requested_evidence_mode=(
+            str(execution.get("requested_evidence_mode")) if execution.get("requested_evidence_mode") else None
+        ),
+        matched_metric_columns=(
+            [str(item) for item in matched_metric_columns_raw if isinstance(item, str)]
+            if isinstance(matched_metric_columns_raw, list)
+            else []
+        ),
+    )
+    if json_output:
+        typer.echo(result.model_dump_json(indent=2))
+        return
+    typer.echo(f"output_dir: {result.output_dir}")
+    typer.echo(f"metadata: {result.metadata_path}")
+    if result.run_signature:
+        typer.echo(f"run_signature: {result.run_signature}")
+    if result.selected_text_source:
+        typer.echo(f"selected_text_source: {result.selected_text_source}")
+    if result.evidence_mode:
+        typer.echo(f"evidence_mode: {result.evidence_mode}")
 
 
 def main() -> None:
@@ -581,6 +923,32 @@ def _load_experiment_parameters(path: Path | None) -> dict[str, bool | int | flo
         sanitized[key] = value
 
     return sanitized
+
+
+def _build_artifact_descriptors(paths: Mapping[str, Path | None]) -> dict[str, ArtifactDescriptor]:
+    """Describe a set of artifact paths with stable metadata."""
+    return {
+        key: _describe_artifact(path)
+        for key, path in paths.items()
+        if path is not None
+    }
+
+
+def _describe_artifact(path: Path) -> ArtifactDescriptor:
+    """Return a stable artifact descriptor with existence, size, and digest."""
+    if not path.exists():
+        return ArtifactDescriptor(path=path, exists=False)
+    return ArtifactDescriptor(
+        path=path,
+        exists=True,
+        size_bytes=path.stat().st_size,
+        sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+    )
+
+
+def _as_dict(value: object) -> dict[str, object]:
+    """Normalize optional JSON payload fragments to dictionaries."""
+    return value if isinstance(value, dict) else {}
 
 
 def _discover_configured_abms() -> tuple[str, ...]:

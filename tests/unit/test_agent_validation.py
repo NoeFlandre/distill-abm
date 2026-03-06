@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from distill_abm.agent_validation import default_validation_checks, run_validation_suite
+from distill_abm.agent_validation import default_validation_checks, run_validation_suite, validation_checks_for_profile
 
 
 def test_default_validation_checks_expose_canonical_agent_workflow() -> None:
@@ -16,6 +16,11 @@ def test_default_validation_checks_expose_canonical_agent_workflow() -> None:
         "build",
         "smoke-ingest-netlogo",
     ]
+
+
+def test_validation_profiles_expose_expected_check_sets() -> None:
+    assert validation_checks_for_profile("quick") == ["ruff", "mypy", "smoke-ingest-netlogo"]
+    assert validation_checks_for_profile("default") == ["pytest", "ruff", "mypy", "build", "smoke-ingest-netlogo"]
 
 
 def test_run_validation_suite_writes_structured_reports(
@@ -60,3 +65,27 @@ def test_run_validation_suite_writes_structured_reports(
         "build",
         "smoke-ingest-netlogo",
     ]
+    assert result.profile == "default"
+    assert all(item.execution_mode == "fresh" for item in result.check_results)
+
+
+def test_run_validation_suite_marks_non_selected_checks_as_skipped(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_run(command: list[str], capture_output: bool, text: bool) -> SimpleNamespace:
+        _ = capture_output, text
+        return SimpleNamespace(returncode=0, stdout=f"ok {' '.join(command)}", stderr="")
+
+    monkeypatch.setattr("distill_abm.agent_validation.subprocess.run", fake_run)
+
+    result = run_validation_suite(
+        output_root=tmp_path / "validation",
+        abm_models={"fauna": Path("data/fauna_abm/fauna.nlogo")},
+        checks=["ruff"],
+    )
+
+    by_id = {item.check_id: item for item in result.check_results}
+    assert by_id["ruff"].status == "ok"
+    assert by_id["pytest"].status == "skipped"
+    assert by_id["pytest"].execution_mode == "skipped"
