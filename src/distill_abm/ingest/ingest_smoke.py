@@ -11,6 +11,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from distill_abm.ingest.netlogo_workflow import run_ingest_workflow
+from distill_abm.utils import detect_placeholder_signals
 
 IngestSmokeStatus = Literal["ok", "failed"]
 
@@ -215,16 +216,13 @@ def _inspect_artifact(path: Path) -> IngestSmokeArtifact:
     if not path.exists():
         return IngestSmokeArtifact(path=path, exists=False)
     text = path.read_text(encoding="utf-8", errors="replace")
-    lowered = text.lower()
     return IngestSmokeArtifact(
         path=path,
         exists=True,
         size_bytes=path.stat().st_size,
         sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
         preview=text[:200],
-        placeholder_signals=[
-            token for token in ("placeholder", "todo", "tbd", "dummy", "lorem ipsum") if token in lowered
-        ],
+        placeholder_signals=detect_placeholder_signals(text),
     )
 
 
