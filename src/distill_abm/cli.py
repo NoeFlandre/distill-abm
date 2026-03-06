@@ -20,6 +20,7 @@ from distill_abm.configs.models import ModelEntry, SummarizerId
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
+from distill_abm.ingest.ingest_smoke import run_ingest_smoke_suite
 from distill_abm.ingest.netlogo_workflow import run_ingest_workflow
 from distill_abm.llm.factory import create_adapter
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode, run_pipeline
@@ -52,6 +53,7 @@ __all__ = [
     "ingest_netlogo_suite",
     "main",
     "run",
+    "smoke_ingest_netlogo",
     "smoke_qwen",
     "subprocess",
 ]
@@ -439,6 +441,44 @@ def smoke_qwen(
     if not result.success:
         failed = ", ".join(result.failed_cases) if result.failed_cases else "doe/sweep"
         typer.echo(f"smoke suite failed: {failed}")
+        raise typer.Exit(code=1)
+
+
+@app.command("smoke-ingest-netlogo")
+def smoke_ingest_netlogo(
+    abms: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--abm",
+            help="ABM names to process. Repeat for multiple. Defaults to all configured ABMs.",
+        ),
+    ] = None,
+    models_root: Annotated[
+        Path,
+        typer.Option(
+            help="Root directory containing ABM models. Supports per-ABM folders and root-level model files.",
+        ),
+    ] = Path("data"),
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Root directory for ingestion smoke artifacts."),
+    ] = Path("results/ingest_smoke"),
+    stage: Annotated[
+        list[str] | None,
+        typer.Option("--stage", help="Optional ingest stage filter. Repeat to focus the smoke report."),
+    ] = None,
+) -> None:
+    """Run artifact-focused smoke checks for NetLogo ingestion across configured ABMs."""
+    requested = sorted(set(abms)) if abms else list(_discover_configured_abms())
+    abm_models = {abm: _resolve_abm_model_path(abm=abm, models_root=models_root) for abm in requested}
+    try:
+        result = run_ingest_smoke_suite(abm_models=abm_models, output_root=output_root, stage_ids=stage)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    typer.echo(f"ingest smoke report (markdown): {result.report_markdown_path}")
+    typer.echo(f"ingest smoke report (json): {result.report_json_path}")
+    if not result.success:
+        typer.echo(f"ingest smoke failed: {', '.join(result.failed_abms)}")
         raise typer.Exit(code=1)
 
 
