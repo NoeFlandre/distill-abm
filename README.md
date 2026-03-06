@@ -100,6 +100,15 @@ uv run distill-abm smoke-qwen \
   --allow-debug-model
 ```
 
+Run granular NetLogo ingestion smoke checks:
+
+```bash
+uv run distill-abm smoke-ingest-netlogo \
+  --models-root data \
+  --stage documentation \
+  --stage final-documentation
+```
+
 Run DOE analysis:
 
 ```bash
