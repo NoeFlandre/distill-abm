@@ -5,8 +5,7 @@ from __future__ import annotations
 import json
 import subprocess
 from pathlib import Path
-from shutil import copy2
-from typing import Annotated, Literal, cast
+from typing import Annotated, Literal
 
 import typer
 
@@ -24,29 +23,38 @@ from distill_abm.cli_models import (
     build_artifact_descriptors,
     describe_artifact,
 )
+from distill_abm.cli_output import emit_smoke_command_result, ensure_required_stage_ids
+from distill_abm.cli_support import (
+    BENCHMARK_MODELS,
+    DEBUG_MODEL,
+    as_dict,
+    discover_configured_abms,
+    load_experiment_parameters,
+    parse_summarizers,
+    resolve_abm_experiment_parameters_path,
+    resolve_abm_model_path,
+    resolve_model_from_registry,
+    resolve_scoring_reference_path,
+    resolve_viz_smoke_specs,
+    select_smoke_cases,
+)
 from distill_abm.configs.loader import (
     load_abm_config,
-    load_experiment_settings,
-    load_models_config,
     load_prompts_config,
 )
-from distill_abm.configs.models import ModelEntry, SummarizerId
+from distill_abm.configs.models import SummarizerId
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
 from distill_abm.ingest.ingest_smoke import run_ingest_smoke_suite
-from distill_abm.ingest.netlogo_workflow import resolve_experiment_parameters, run_ingest_workflow
+from distill_abm.ingest.netlogo_workflow import run_ingest_workflow
 from distill_abm.llm.factory import create_adapter
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
-    SmokeCase,
     SmokeSuiteInputs,
-    default_branch_smoke_cases,
-    default_smoke_cases,
     run_qwen_smoke_suite,
 )
-from distill_abm.viz.plots import MetricPlotBundle
-from distill_abm.viz.viz_smoke import VizSmokeSpec, run_viz_smoke_suite
+from distill_abm.viz.viz_smoke import run_viz_smoke_suite
 
 app = typer.Typer(help="Run ABM distillation workflows.")
 RUNTIME_DEFAULTS = get_runtime_defaults()
@@ -54,12 +62,11 @@ DEFAULT_EVIDENCE_MODE: EvidenceMode = RUNTIME_DEFAULTS.run.evidence_mode
 DEFAULT_TEXT_SOURCE_MODE: TextSourceMode = RUNTIME_DEFAULTS.run.text_source_mode
 DEFAULT_SUMMARIZERS: tuple[SummarizerId, ...] = RUNTIME_DEFAULTS.run.summarizers
 
-BENCHMARK_MODELS: set[tuple[str, str]] = {
-    ("openrouter", "moonshotai/kimi-k2.5"),
-    ("openrouter", "google/gemini-3.1-pro-preview"),
-    ("ollama", "qwen3.5:0.8b"),
-}
-DEBUG_MODEL: tuple[str, str] = ("openrouter", "qwen/qwen3-vl-235b-a22b-thinking")
+# Backward-compatible helper aliases kept for tests and local call sites.
+_resolve_scoring_reference_path = resolve_scoring_reference_path
+_resolve_viz_smoke_specs = resolve_viz_smoke_specs
+_select_smoke_cases = select_smoke_cases
+_parse_summarizers = parse_summarizers
 
 __all__ = [
     "analyze_doe",
@@ -146,7 +153,7 @@ def run(
     """Run one end-to-end pipeline execution from CSV to scored report."""
     prompts = load_prompts_config(prompts_path)
     if model_id is not None:
-        provider, model = _resolve_model_from_registry(models_path=models_path, model_id=model_id)
+        provider, model = resolve_model_from_registry(models_path=models_path, model_id=model_id)
     _validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
 
     scoring_reference_path: Path | None = None
@@ -222,7 +229,7 @@ def ingest_netlogo(
 ) -> None:
     """Run NetLogo preprocessing workflow and persist extracted artifacts."""
     resolved_output_dir = output_dir if output_dir is not None else Path("results") / "ingest" / model_path.stem
-    experiment_parameters = _load_experiment_parameters(experiment_parameters_path)
+    experiment_parameters = load_experiment_parameters(experiment_parameters_path)
     artifacts = run_ingest_workflow(
         model_path=model_path,
         experiment_parameters=experiment_parameters,
@@ -276,15 +283,15 @@ def ingest_netlogo_suite(
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run NetLogo ingestion for multiple ABMs into dedicated output folders."""
-    requested = sorted(set(abms)) if abms else _discover_configured_abms()
+    requested = sorted(set(abms)) if abms else discover_configured_abms()
     missing: list[str] = []
-    shared_params = _load_experiment_parameters(default_experiment_parameters_path)
+    shared_params = load_experiment_parameters(default_experiment_parameters_path)
     suite_artifacts: dict[str, dict[str, ArtifactDescriptor]] = {}
 
     for abm in requested:
         try:
-            model_path = _resolve_abm_model_path(abm=abm, models_root=models_root)
-            parameter_path = _resolve_abm_experiment_parameters_path(
+            model_path = resolve_abm_model_path(abm=abm, models_root=models_root)
+            parameter_path = resolve_abm_experiment_parameters_path(
                 model_dir=model_path.parent,
                 abm=abm,
                 explicit=default_experiment_parameters_path,
@@ -292,7 +299,7 @@ def ingest_netlogo_suite(
             if default_experiment_parameters_path is not None:
                 experiment_parameters = shared_params
             else:
-                experiment_parameters = _load_experiment_parameters(parameter_path)
+                experiment_parameters = load_experiment_parameters(parameter_path)
             output_dir = output_root / abm
             artifacts = run_ingest_workflow(
                 model_path=model_path,
@@ -576,18 +583,18 @@ def smoke_ingest_netlogo(
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run artifact-focused smoke checks for NetLogo ingestion across configured ABMs."""
-    requested = sorted(set(abms)) if abms else list(_discover_configured_abms())
-    abm_models = {abm: _resolve_abm_model_path(abm=abm, models_root=models_root) for abm in requested}
+    requested = sorted(set(abms)) if abms else list(discover_configured_abms())
+    abm_models = {abm: resolve_abm_model_path(abm=abm, models_root=models_root) for abm in requested}
     try:
         result = run_ingest_smoke_suite(abm_models=abm_models, output_root=output_root, stage_ids=stage)
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
     if require_stage:
-        missing_required = [item for item in require_stage if item not in result.selected_stage_ids]
-        if missing_required:
-            raise typer.BadParameter(
-                f"required stage(s) missing from ingest smoke selection: {', '.join(missing_required)}"
-            )
+        ensure_required_stage_ids(
+            selected_stage_ids=result.selected_stage_ids,
+            required_stage_ids=require_stage,
+            label="ingest smoke",
+        )
     command_result = SmokeCommandResult(
         command="smoke-ingest-netlogo",
         success=result.success,
@@ -595,16 +602,13 @@ def smoke_ingest_netlogo(
         report_markdown_path=result.report_markdown_path,
         failed_items=result.failed_abms,
     )
-    if json_output:
-        typer.echo(command_result.model_dump_json(indent=2))
-        if not result.success:
-            raise typer.Exit(code=1)
-        return
-    typer.echo(f"ingest smoke report (markdown): {result.report_markdown_path}")
-    typer.echo(f"ingest smoke report (json): {result.report_json_path}")
-    if not result.success:
-        typer.echo(f"ingest smoke failed: {', '.join(result.failed_abms)}")
-        raise typer.Exit(code=1)
+    emit_smoke_command_result(
+        command_result=command_result,
+        json_output=json_output,
+        markdown_label="ingest smoke report (markdown)",
+        json_label="ingest smoke report (json)",
+        failure_label="ingest smoke failed",
+    )
 
 
 @app.command("smoke-viz")
@@ -644,7 +648,7 @@ def smoke_viz(
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run NetLogo simulations and generate the ordered plot PNGs used before LLM inference."""
-    requested = sorted(set(abms)) if abms else list(_discover_configured_abms())
+    requested = sorted(set(abms)) if abms else list(discover_configured_abms())
     try:
         if not netlogo_home.strip():
             raise ValueError(
@@ -660,11 +664,11 @@ def smoke_viz(
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
     if require_stage:
-        missing_required = [item for item in require_stage if item not in result.selected_stage_ids]
-        if missing_required:
-            raise typer.BadParameter(
-                f"required stage(s) missing from viz smoke selection: {', '.join(missing_required)}"
-            )
+        ensure_required_stage_ids(
+            selected_stage_ids=result.selected_stage_ids,
+            required_stage_ids=require_stage,
+            label="viz smoke",
+        )
     command_result = SmokeCommandResult(
         command="smoke-viz",
         success=result.success,
@@ -672,16 +676,13 @@ def smoke_viz(
         report_markdown_path=result.report_markdown_path,
         failed_items=result.failed_abms,
     )
-    if json_output:
-        typer.echo(command_result.model_dump_json(indent=2))
-        if not result.success:
-            raise typer.Exit(code=1)
-        return
-    typer.echo(f"viz smoke report (markdown): {result.report_markdown_path}")
-    typer.echo(f"viz smoke report (json): {result.report_json_path}")
-    if not result.success:
-        typer.echo(f"viz smoke failed: {', '.join(result.failed_abms)}")
-        raise typer.Exit(code=1)
+    emit_smoke_command_result(
+        command_result=command_result,
+        json_output=json_output,
+        markdown_label="viz smoke report (markdown)",
+        json_label="viz smoke report (json)",
+        failure_label="viz smoke failed",
+    )
 
 
 @app.command("validate-workspace")
@@ -724,8 +725,8 @@ def validate_workspace(
     ] = False,
 ) -> None:
     """Run the canonical non-LLM validation suite for coding-agent verification."""
-    requested = sorted(set(abms)) if abms else list(_discover_configured_abms())
-    abm_models = {abm: _resolve_abm_model_path(abm=abm, models_root=models_root) for abm in requested}
+    requested = sorted(set(abms)) if abms else list(discover_configured_abms())
+    abm_models = {abm: resolve_abm_model_path(abm=abm, models_root=models_root) for abm in requested}
     try:
         result = run_validation_suite(
             output_root=output_root,
@@ -762,8 +763,8 @@ def describe_abm(
     """Describe the resolved configuration and local assets for one ABM without running the pipeline."""
     config_path = Path("configs/abms") / f"{abm}.yaml"
     abm_config = load_abm_config(config_path)
-    model_path = _resolve_abm_model_path(abm=abm, models_root=models_root)
-    experiment_parameters_path = _resolve_abm_experiment_parameters_path(
+    model_path = resolve_abm_model_path(abm=abm, models_root=models_root)
+    experiment_parameters_path = resolve_abm_experiment_parameters_path(
         model_dir=model_path.parent,
         abm=abm,
         explicit=None,
@@ -841,11 +842,11 @@ def describe_run(
     if not metadata_path.exists():
         raise typer.BadParameter(f"missing pipeline metadata file: {metadata_path}")
     payload = json.loads(metadata_path.read_text(encoding="utf-8"))
-    artifacts_payload = _as_dict(payload.get("artifacts"))
-    reproducibility = _as_dict(payload.get("reproducibility"))
-    execution = _as_dict(payload.get("execution"))
-    debug_trace = _as_dict(payload.get("debug_trace"))
-    frame_summary = _as_dict(debug_trace.get("frame_summary"))
+    artifacts_payload = as_dict(payload.get("artifacts"))
+    reproducibility = as_dict(payload.get("reproducibility"))
+    execution = as_dict(payload.get("execution"))
+    debug_trace = as_dict(payload.get("debug_trace"))
+    frame_summary = as_dict(debug_trace.get("frame_summary"))
     matched_metric_columns_raw = frame_summary.get("matched_metric_columns", [])
     available_artifacts = {
         key: Path(value)
@@ -888,215 +889,6 @@ def main() -> None:
     app()
 
 
-def _load_experiment_parameters(path: Path | None) -> dict[str, bool | int | float | str]:
-    """Load experiment parameter overrides from an optional JSON file."""
-    if path is None:
-        return {}
-
-    if not path.exists():
-        raise typer.BadParameter(f"experiment parameters file not found: {path}")
-    payload = path.read_text(encoding="utf-8")
-    if not payload.strip():
-        return {}
-
-    try:
-        parsed = json.loads(payload)
-    except json.JSONDecodeError as exc:
-        raise typer.BadParameter(f"experiment parameters file must contain JSON object: {path}") from exc
-
-    if not isinstance(parsed, dict):
-        raise typer.BadParameter("experiment parameters file must contain a JSON object at top level.")
-
-    sanitized: dict[str, bool | int | float | str] = {}
-    for key, value in parsed.items():
-        if not isinstance(key, str):
-            raise typer.BadParameter("experiment parameters keys must be strings.")
-        if not isinstance(value, (bool, int, float, str)):
-            raise typer.BadParameter(
-                f"unsupported value type for experiment parameter '{key}': {type(value).__name__}. "
-                "Allowed types are bool, int, float, and str."
-            )
-        sanitized[key] = value
-
-    return sanitized
-
-
-def _as_dict(value: object) -> dict[str, object]:
-    """Normalize optional JSON payload fragments to dictionaries."""
-    return value if isinstance(value, dict) else {}
-
-
-def _discover_configured_abms() -> tuple[str, ...]:
-    """Return ABM identifiers configured in configs/abms."""
-    return tuple(sorted(p.stem for p in Path("configs/abms").glob("*.yaml")))
-
-
-def _resolve_model_filenames(abm: str) -> tuple[str, ...]:
-    """Return preferred NetLogo model filenames for an ABM."""
-    candidates = [f"{abm}.nlogo", f"{abm}_model.nlogo"]
-    if abm == "milk_consumption":
-        candidates.append("model.nlogo")
-    return tuple(dict.fromkeys(candidates))
-
-
-def _resolve_abm_model_path(*, abm: str, models_root: Path) -> Path:
-    """Find a single NetLogo model for an ABM and fail with a clear message if absent/ambiguous."""
-    candidate_roots = [models_root, models_root / f"{abm}_abm", models_root / abm]
-    model_filenames = _resolve_model_filenames(abm)
-    matches: list[Path] = []
-    for directory in candidate_roots:
-        if not directory.exists():
-            continue
-        if directory.is_file():
-            if directory.name in model_filenames:
-                matches.append(directory)
-            continue
-        for model_name in model_filenames:
-            candidate = directory / model_name
-            if candidate.exists():
-                matches.append(candidate)
-
-    if not matches:
-        candidates_desc = ", ".join(str(directory / name) for directory in candidate_roots for name in model_filenames)
-        raise typer.BadParameter(
-            f"no .nlogo file found for ABM '{abm}' in {models_root}. "
-            f"Searched: {candidates_desc}"
-        )
-    matches = list(
-        dict.fromkeys(
-            _promote_root_model(models_root=models_root, abm=abm, model_path=match)
-            for match in matches
-        )
-    )
-
-    if len(matches) > 1:
-        names = ", ".join(str(match.relative_to(models_root)) for match in matches)
-        raise typer.BadParameter(f"multiple .nlogo files found for ABM '{abm}': {names}.")
-    return matches[0]
-
-
-def _promote_root_model(*, models_root: Path, abm: str, model_path: Path) -> Path:
-    """Copy root-level models into the ABM folder to keep canonical artifacts in one location."""
-    if model_path.parent != models_root:
-        return model_path
-
-    target_dir = models_root / f"{abm}_abm"
-    target_dir.mkdir(parents=True, exist_ok=True)
-    target_path = target_dir / model_path.name
-    if target_path.exists():
-        return target_path
-    try:
-        copy2(model_path, target_path)
-    except OSError:
-        return model_path
-    return target_path
-
-
-def _resolve_abm_experiment_parameters_path(*, model_dir: Path, abm: str, explicit: Path | None) -> Path | None:
-    """Resolve per-ABM experiment-parameters file if available."""
-    if explicit is not None:
-        if explicit.exists():
-            return explicit
-        return None
-
-    candidates = [
-        model_dir / "experiment_parameters.json",
-        model_dir / "experiment-parameters.json",
-        model_dir / f"{abm}_experiment_parameters.json",
-        model_dir / f"{abm}-experiment_parameters.json",
-        model_dir / f"{abm}-experiment-parameters.json",
-    ]
-    for path in candidates:
-        if path.exists():
-            return path
-    return None
-
-
-def _resolve_viz_smoke_specs(*, requested_abms: list[str], models_root: Path) -> dict[str, VizSmokeSpec]:
-    """Resolve ABM NetLogo simulation-and-plot specs for visualization smoke runs."""
-    specs: dict[str, VizSmokeSpec] = {}
-    missing_viz_config: list[str] = []
-    for abm in requested_abms:
-        abm_config = load_abm_config(Path("configs/abms") / f"{abm}.yaml")
-        model_path = _resolve_abm_model_path(abm=abm, models_root=models_root)
-        if abm_config.netlogo_viz is None:
-            missing_viz_config.append(abm)
-            continue
-        viz_config = abm_config.netlogo_viz
-        experiment_parameters = resolve_experiment_parameters(
-            model_path=model_path,
-            experiment_parameters=viz_config.experiment_parameters,
-            preferred_experiment=viz_config.experiment_name,
-        )
-        specs[abm] = VizSmokeSpec(
-            abm=abm,
-            model_path=model_path,
-            experiment_name=viz_config.experiment_name,
-            experiment_parameters=experiment_parameters,
-            num_runs=viz_config.smoke_num_runs or viz_config.num_runs,
-            max_ticks=viz_config.smoke_max_ticks or viz_config.max_ticks,
-            interval=viz_config.smoke_interval or viz_config.interval,
-            fallback_mode=viz_config.fallback_mode,
-            fallback_csv=Path(viz_config.fallback_csv) if viz_config.fallback_csv else None,
-            fallback_plot_dir=Path(viz_config.fallback_plot_dir) if viz_config.fallback_plot_dir else None,
-            reporters=list(viz_config.reporters),
-            plots=[
-                MetricPlotBundle(
-                    include_pattern=plot.reporter_pattern,
-                    title=plot.title,
-                    y_label=plot.y_label,
-                    x_label=plot.x_label,
-                    exclude_pattern=plot.exclude_pattern,
-                    show_mean_line=plot.show_mean_line,
-                )
-                for plot in viz_config.plots
-            ],
-        )
-    if missing_viz_config:
-        joined = ", ".join(missing_viz_config)
-        raise ValueError(
-            f"missing netlogo_viz config for ABM(s): {joined}. "
-            "Add the simulation-and-plot spec under netlogo_viz in the ABM config."
-        )
-    return specs
-
-
-def _parse_summarizers(values: list[str] | None, fallback: tuple[SummarizerId, ...]) -> tuple[SummarizerId, ...]:
-    allowed = {"bart", "bert", "t5", "longformer_ext"}
-    normalized = tuple(dict.fromkeys(values or list(fallback)))
-    invalid = [value for value in normalized if value not in allowed]
-    if invalid:
-        raise typer.BadParameter(
-            "unsupported summarizer(s): "
-            f"{', '.join(invalid)}. Allowed: bart, bert, t5, longformer_ext."
-        )
-    return cast(tuple[SummarizerId, ...], normalized)
-
-
-def _resolve_model_from_registry(models_path: Path, model_id: str) -> tuple[str, str]:
-    config = load_models_config(models_path)
-    try:
-        entry: ModelEntry = config.models[model_id]
-    except KeyError as exc:
-        available = ", ".join(sorted(config.models))
-        raise typer.BadParameter(f"unknown model_id '{model_id}'. Available: {available}") from exc
-    return entry.provider, entry.model
-
-
-def _resolve_scoring_reference_path(abm: str) -> Path:
-    settings = load_experiment_settings(Path("configs/experiment_settings.yaml"))
-    mapping = {
-        "fauna": settings.ground_truth.fauna,
-        "grazing": settings.ground_truth.grazing,
-        "milk_consumption": settings.ground_truth.milk_consumption,
-    }
-    if abm not in mapping:
-        raise typer.BadParameter(
-            f"unsupported ABM for scoring reference: {abm}. Allowed: fauna, grazing, milk_consumption."
-        )
-    return Path(mapping[abm])
-
-
 def _assert_ollama_model_available(model: str) -> None:
     try:
         completed = subprocess.run(
@@ -1132,36 +924,6 @@ def _validate_model_policy(provider: str, model: str, allow_debug_model: bool) -
 
     if key == ("ollama", "qwen3.5:0.8b"):
         _assert_ollama_model_available(model)
-
-
-def _select_smoke_cases(
-    case_ids: list[str] | None, max_cases: int | None, profile: Literal["matrix", "three-branches"]
-) -> list[SmokeCase] | None:
-    all_cases = default_smoke_cases() if profile == "matrix" else default_branch_smoke_cases()
-    if not case_ids:
-        if max_cases is None and profile == "matrix":
-            return None
-        if max_cases is None:
-            return all_cases
-        return all_cases[:max_cases]
-
-    by_id = {case.case_id: case for case in all_cases}
-    unknown = [value for value in case_ids if value not in by_id]
-    if unknown:
-        known = ", ".join(sorted(by_id))
-        raise typer.BadParameter(f"unknown --case-id value(s): {', '.join(unknown)}. Known cases: {known}")
-    seen: set[str] = set()
-    selected: list[SmokeCase] = []
-    for value in case_ids:
-        if value in seen:
-            continue
-        seen.add(value)
-        selected.append(by_id[value])
-    if max_cases is not None:
-        selected = selected[:max_cases]
-    if not selected:
-        raise typer.BadParameter("at least one smoke case must be selected")
-    return selected
 
 
 if __name__ == "__main__":
