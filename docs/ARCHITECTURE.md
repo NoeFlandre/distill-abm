@@ -13,6 +13,7 @@
 - Exposes `validate-workspace` as the canonical non-LLM verification contract for coding agents.
 - Exposes read-only `describe-*` commands so agents can inspect ABMs, ingest outputs, and run artifacts without rerunning workflows.
 - Exposes `--json` output on the main verification and inspection surfaces.
+- Exposes `smoke-viz` for artifact-focused verification of plot and stats-table generation from simulation CSVs.
 - Benchmark/debug model gating.
 - Model registry resolution via `configs/models.yaml`.
 
@@ -53,6 +54,7 @@
 
 ### `src/distill_abm/viz/*`
 - Plot generation and stats table construction.
+- Visualization smoke checks for plot PNGs, stats CSVs, markdown tables, and stats-table images.
 
 ## Configuration
 - `configs/models.yaml`: canonical model aliases and provider routing.

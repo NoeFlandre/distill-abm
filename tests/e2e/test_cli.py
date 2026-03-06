@@ -564,6 +564,42 @@ def test_cli_describe_run_returns_metadata_summary(tmp_path: Path) -> None:
     assert '"matched_metric_columns"' in result.output
 
 
+def test_cli_smoke_viz_supports_json_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    csv_path = tmp_path / "sim.csv"
+    csv_path.write_text("tick;mean-incum-run-1;mean-incum-run-2\n0;1;2\n1;2;3\n", encoding="utf-8")
+
+    def fake_run_viz_smoke_suite(*, abm_inputs, output_root, stage_ids):  # type: ignore[no-untyped-def]
+        _ = abm_inputs, output_root, stage_ids
+        return SimpleNamespace(
+            success=True,
+            failed_abms=[],
+            selected_stage_ids=["plot"],
+            report_markdown_path=Path("viz_smoke.md"),
+            report_json_path=Path("viz_smoke.json"),
+        )
+
+    monkeypatch.setattr(cli_module, "run_viz_smoke_suite", fake_run_viz_smoke_suite)
+
+    result = runner.invoke(
+        app,
+        [
+            "smoke-viz",
+            "--abm",
+            "milk_consumption",
+            "--csv-map",
+            f"milk_consumption={csv_path}",
+            "--stage",
+            "plot",
+            "--require-stage",
+            "plot",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert '"command": "smoke-viz"' in result.output
+
+
 def test_cli_ingest_netlogo_suite_supports_root_level_model_files(tmp_path: Path) -> None:
     model_root = tmp_path / "data"
     model_root.mkdir()

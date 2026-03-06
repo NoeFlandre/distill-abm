@@ -35,6 +35,7 @@ from distill_abm.pipeline.smoke import (
     default_smoke_cases,
     run_qwen_smoke_suite,
 )
+from distill_abm.viz.viz_smoke import run_viz_smoke_suite
 
 app = typer.Typer(help="Run ABM distillation workflows.")
 RUNTIME_DEFAULTS = get_runtime_defaults()
@@ -153,6 +154,7 @@ __all__ = [
     "run",
     "smoke_ingest_netlogo",
     "smoke_qwen",
+    "smoke_viz",
     "subprocess",
     "validate_workspace",
 ]
@@ -688,6 +690,68 @@ def smoke_ingest_netlogo(
         raise typer.Exit(code=1)
 
 
+@app.command("smoke-viz")
+def smoke_viz(
+    abms: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--abm",
+            help="ABM names to process. Repeat for multiple. Defaults to all configured ABMs with resolvable CSVs.",
+        ),
+    ] = None,
+    csv_map: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--csv-map",
+            help="Explicit ABM CSV mapping in the form abm=/path/to/file.csv. Repeatable.",
+        ),
+    ] = None,
+    stage: Annotated[
+        list[str] | None,
+        typer.Option("--stage", help="Optional viz smoke stage filter. Repeat to focus the smoke report."),
+    ] = None,
+    require_stage: Annotated[
+        list[str] | None,
+        typer.Option("--require-stage", help="Assert that these stages were selected in the report."),
+    ] = None,
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Root directory for visualization smoke artifacts."),
+    ] = Path("results/viz_smoke"),
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Run artifact-focused smoke checks for plot and stats-table generation."""
+    requested = sorted(set(abms)) if abms else list(_discover_configured_abms())
+    try:
+        abm_inputs = _resolve_viz_smoke_inputs(requested_abms=requested, csv_map_entries=csv_map)
+        result = run_viz_smoke_suite(abm_inputs=abm_inputs, output_root=output_root, stage_ids=stage)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    if require_stage:
+        missing_required = [item for item in require_stage if item not in result.selected_stage_ids]
+        if missing_required:
+            raise typer.BadParameter(
+                f"required stage(s) missing from viz smoke selection: {', '.join(missing_required)}"
+            )
+    command_result = SmokeCommandResult(
+        command="smoke-viz",
+        success=result.success,
+        report_json_path=result.report_json_path,
+        report_markdown_path=result.report_markdown_path,
+        failed_items=result.failed_abms,
+    )
+    if json_output:
+        typer.echo(command_result.model_dump_json(indent=2))
+        if not result.success:
+            raise typer.Exit(code=1)
+        return
+    typer.echo(f"viz smoke report (markdown): {result.report_markdown_path}")
+    typer.echo(f"viz smoke report (json): {result.report_json_path}")
+    if not result.success:
+        typer.echo(f"viz smoke failed: {', '.join(result.failed_abms)}")
+        raise typer.Exit(code=1)
+
+
 @app.command("validate-workspace")
 def validate_workspace(
     checks: Annotated[
@@ -1035,6 +1099,50 @@ def _resolve_abm_experiment_parameters_path(*, model_dir: Path, abm: str, explic
         if path.exists():
             return path
     return None
+
+
+def _resolve_viz_smoke_inputs(
+    *, requested_abms: list[str], csv_map_entries: list[str] | None
+) -> dict[str, tuple[Path, str]]:
+    """Resolve ABM CSV inputs and metric patterns for visualization smoke runs."""
+    explicit_map = _parse_csv_map_entries(csv_map_entries)
+    abm_inputs: dict[str, tuple[Path, str]] = {}
+    missing: list[str] = []
+    for abm in requested_abms:
+        abm_config = load_abm_config(Path("configs/abms") / f"{abm}.yaml")
+        csv_path = explicit_map.get(abm)
+        if csv_path is None and abm_config.default_input_csv is not None:
+            candidate = Path(abm_config.default_input_csv)
+            if candidate.exists():
+                csv_path = candidate
+        if csv_path is None:
+            missing.append(abm)
+            continue
+        abm_inputs[abm] = (csv_path, abm_config.metric_pattern)
+    if missing:
+        joined = ", ".join(missing)
+        raise ValueError(
+            f"missing CSV input(s) for viz smoke ABMs: {joined}. "
+            "Provide them with --csv-map abm=/path/to/file.csv or add default_input_csv in the ABM config."
+        )
+    return abm_inputs
+
+
+def _parse_csv_map_entries(entries: list[str] | None) -> dict[str, Path]:
+    """Parse repeatable ABM-to-CSV mappings from the CLI."""
+    resolved: dict[str, Path] = {}
+    for entry in entries or []:
+        if "=" not in entry:
+            raise ValueError(f"invalid --csv-map entry '{entry}'. Expected format: abm=/path/to/file.csv")
+        abm, raw_path = entry.split("=", 1)
+        abm_key = abm.strip()
+        csv_path = Path(raw_path.strip())
+        if not abm_key:
+            raise ValueError(f"invalid --csv-map entry '{entry}'. ABM key cannot be empty.")
+        if not csv_path.exists():
+            raise ValueError(f"CSV path not found for --csv-map entry '{entry}': {csv_path}")
+        resolved[abm_key] = csv_path
+    return resolved
 
 
 def _parse_summarizers(values: list[str] | None, fallback: tuple[SummarizerId, ...]) -> tuple[SummarizerId, ...]:
