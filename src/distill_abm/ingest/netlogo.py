@@ -241,18 +241,16 @@ def format_json_oneline(data: dict[str, list[dict[str, Any]]]) -> str:
 def extract_documentation(file_path: Path) -> str:
     """Slices model documentation block between NetLogo section delimiters."""
     content = file_path.read_text(encoding="utf-8")
-    start_pattern = re.compile(r"@#\$#@#\$#@\s*## WHAT IS IT\?")
-    end_pattern = re.compile(r"@#\$#@#\$#@")
-    start_match = start_pattern.search(content)
-    if not start_match:
-        fallback = _extract_model_header_comments(content)
-        if fallback:
-            return f"## WHAT IS IT?\n\n{fallback}"
-        raise ValueError("start of documentation section not found")
-    end_match = end_pattern.search(content, start_match.end())
-    if not end_match:
-        return f"## WHAT IS IT?\n\n{content[start_match.end():].strip()}"
-    return content[start_match.start() : end_match.start()].strip()
+    delimiter = "@#$#@#$#@"
+    parts = content.split(delimiter)
+    for part in parts:
+        if "## WHAT IS IT?" in part:
+            return f"{delimiter}\n{part.strip()}".strip()
+
+    fallback = _extract_model_header_comments(content)
+    if fallback:
+        return f"## WHAT IS IT?\n\n{fallback}"
+    raise ValueError("documentation section not found")
 
 
 def _extract_model_header_comments(content: str) -> str:
@@ -349,6 +347,7 @@ def clean_json_content(input_json: Path, output_txt: Path) -> None:
     """Export cleaned plain documentation text."""
     payload = json.loads(input_json.read_text(encoding="utf-8"))
     documentation = str(payload.get("documentation", ""))
-    cleaned = re.sub(r"## @#\$#@#\$#@\n\n\n", "", documentation)
+    cleaned = re.sub(r"^## @#\$#@#\$#@\n+", "", documentation)
+    cleaned = re.sub(r"^# .*\n+", "", cleaned)
     cleaned = re.sub(r"## .*?\n\n", "", cleaned)
     output_txt.write_text(cleaned, encoding="utf-8")

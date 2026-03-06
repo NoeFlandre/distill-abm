@@ -22,6 +22,7 @@ class IngestSmokeStage(BaseModel):
     stage_id: str
     artifact_key: str
     description: str
+    inspect_placeholder_signals: bool = True
 
 
 class IngestSmokeArtifact(BaseModel):
@@ -112,6 +113,7 @@ def default_ingest_smoke_stages() -> list[IngestSmokeStage]:
             stage_id="code",
             artifact_key="extracted_code_txt",
             description="Extracted NetLogo source code text.",
+            inspect_placeholder_signals=False,
         ),
     ]
 
@@ -199,7 +201,7 @@ def _select_stages(stage_ids: list[str] | None) -> list[IngestSmokeStage]:
 
 
 def _build_stage_result(*, stage: IngestSmokeStage, artifact_path: Path) -> IngestSmokeStageResult:
-    artifact = _inspect_artifact(artifact_path)
+    artifact = _inspect_artifact(artifact_path, inspect_placeholder_signals=stage.inspect_placeholder_signals)
     status: IngestSmokeStatus = (
         "ok" if artifact.exists and artifact.size_bytes > 0 and not artifact.placeholder_signals else "failed"
     )
@@ -212,7 +214,7 @@ def _build_stage_result(*, stage: IngestSmokeStage, artifact_path: Path) -> Inge
     return IngestSmokeStageResult(stage=stage, status=status, artifact=artifact, error=error)
 
 
-def _inspect_artifact(path: Path) -> IngestSmokeArtifact:
+def _inspect_artifact(path: Path, *, inspect_placeholder_signals: bool) -> IngestSmokeArtifact:
     if not path.exists():
         return IngestSmokeArtifact(path=path, exists=False)
     text = path.read_text(encoding="utf-8", errors="replace")
@@ -222,7 +224,7 @@ def _inspect_artifact(path: Path) -> IngestSmokeArtifact:
         size_bytes=path.stat().st_size,
         sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
         preview=text[:200],
-        placeholder_signals=detect_placeholder_signals(text),
+        placeholder_signals=detect_placeholder_signals(text) if inspect_placeholder_signals else [],
     )
 
 

@@ -40,6 +40,24 @@ def test_extract_documentation_and_code(tmp_path: Path) -> None:
     assert "globals [a b]" in extract_code(path)
 
 
+def test_extract_documentation_accepts_title_between_delimiter_and_what_is_it(tmp_path: Path) -> None:
+    content = (
+        "globals [a b]\n"
+        "to go\nend\n"
+        "@#$#@#$#@\n"
+        "# Model Title\n\n"
+        "## WHAT IS IT?\n\n"
+        "Doc text\n"
+        "@#$#@#$#@\n"
+    )
+    path = tmp_path / "model.nlogo"
+    path.write_text(content, encoding="utf-8")
+
+    doc = extract_documentation(path)
+    assert "# Model Title" in doc
+    assert "Doc text" in doc
+
+
 def test_extract_documentation_falls_back_to_header_comments(tmp_path: Path) -> None:
     content = (
         "; This is the fauna model.\n"
@@ -109,6 +127,22 @@ def test_clean_json_content(tmp_path: Path) -> None:
     )
     clean_json_content(source, out)
     assert out.read_text(encoding="utf-8") == "A\nB"
+
+
+def test_clean_json_content_removes_netlogo_delimiter_heading_prefix(tmp_path: Path) -> None:
+    source = tmp_path / "source.json"
+    out = tmp_path / "doc.txt"
+    source.write_text(
+        json.dumps(
+            {
+                "documentation": "## @#$#@#$#@\n\n# RAGE RAngeland Grazing ModEl - EXTENSION\n\n"
+                "## WHAT IS IT?\n\nDoc text\n## HOW IT WORKS\n\nMore text"
+            }
+        ),
+        encoding="utf-8",
+    )
+    clean_json_content(source, out)
+    assert out.read_text(encoding="utf-8") == "Doc text\nMore text"
 
 
 
