@@ -46,7 +46,7 @@ def test_evaluate_coverage_returns_structured_result() -> None:
     assert result.reasoning == "Coverage score: 4. Reasoning: strong topical overlap."
     assert result.model == "fake-model"
     assert adapter.last_request is not None
-    assert adapter.last_request.temperature == 0.5
+    assert adapter.last_request.temperature == 1.0
 
 
 def test_evaluate_faithfulness_passes_image_to_adapter(tmp_path: Path) -> None:

@@ -99,7 +99,7 @@ class ExperimentSettings(BaseModel):
 class RuntimeLLMRequestDefaults(BaseModel):
     """Defines default request sampling parameters across providers."""
 
-    temperature: float = 0.5
+    temperature: float = 1.0
     max_tokens: int = 1000
     max_retries: int = 2
     retry_backoff_seconds: float = 2.0
