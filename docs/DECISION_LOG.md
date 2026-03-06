@@ -22,5 +22,5 @@
 
 ## DL-005
 - Date: 2026-03-06
-- Decision: Freeze the validated NetLogo documentation-cleanup path unless a task explicitly requests changes.
-- Rationale: the current extraction and cleanup behavior for benchmark-model documentation has been manually validated end-to-end and should not be modified casually or reworked speculatively.
+- Decision: Freeze the validated NetLogo ingestion pipeline unless a task explicitly requests changes.
+- Rationale: the current benchmark-model ingestion flow, including experiment-parameter extraction, GUI-parameter extraction, updated-parameter generation, narrative generation, documentation extraction and cleanup, final-documentation export, code extraction, and stage-level smoke validation, has been manually validated end-to-end and should not be modified casually or reworked speculatively.
