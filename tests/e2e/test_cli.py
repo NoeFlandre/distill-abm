@@ -879,7 +879,12 @@ def test_validate_model_policy_blocks_debug_model_without_flag() -> None:
         )
 
 
-def test_validate_model_policy_allows_supported_benchmark_models() -> None:
+def test_validate_model_policy_allows_supported_benchmark_models(monkeypatch: pytest.MonkeyPatch) -> None:
+    def fake_run(cmd: list[str], check: bool, capture_output: bool, text: bool):  # type: ignore[no-untyped-def]
+        _ = (cmd, check, capture_output, text)
+        return SimpleNamespace(stdout="NAME           ID\nqwen3.5:0.8b   0\n", returncode=0)
+
+    monkeypatch.setattr(cli_module.subprocess, "run", fake_run)
     cli_module._validate_model_policy(
         provider="openrouter", model="moonshotai/kimi-k2.5", allow_debug_model=False
     )

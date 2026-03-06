@@ -6,7 +6,25 @@
 uv sync --frozen --extra dev
 ```
 
-## 2. Run a Benchmark-Policy Pipeline
+## 2. Establish a Baseline
+
+```bash
+uv run pytest
+uv run ruff check src tests
+uv run mypy src tests
+```
+
+## 3. Run Pre-LLM Verification First
+
+```bash
+uv run distill-abm smoke-ingest-netlogo --models-root data --output-root results/ingest_smoke_latest
+uv run distill-abm smoke-viz --models-root data --netlogo-home /path/to/NetLogo --output-root results/viz_smoke_latest
+uv run distill-abm smoke-doe --ingest-root results/ingest_smoke_latest --viz-root results/viz_smoke_latest --output-root results/doe_smoke_latest
+```
+
+These commands do not execute any benchmark LLM request. They exist to validate the ingest, visualization, and exact pre-LLM DOE payloads before a full run.
+
+## 4. Run a Benchmark-Policy Pipeline
 
 ```bash
 uv run distill-abm run \
@@ -24,7 +42,7 @@ uv run distill-abm run \
 
 See [Failure Semantics](FAILURE_SEMANTICS.md) for the full policy.
 
-## 3. Run Full-Text Only Ablation
+## 5. Run Full-Text Only Ablation
 
 ```bash
 uv run distill-abm run \
@@ -36,7 +54,7 @@ uv run distill-abm run \
   --text-source-mode full_text_only
 ```
 
-## 4. Debug Smoke Matrix
+## 6. Debug Smoke Matrix
 
 ```bash
 uv run distill-abm smoke-qwen \
@@ -46,13 +64,13 @@ uv run distill-abm smoke-qwen \
   --allow-debug-model
 ```
 
-## 5. DOE / ANOVA
+## 7. DOE / ANOVA
 
 ```bash
 uv run distill-abm analyze-doe --input-csv results/sweep/combinations_report.csv
 ```
 
-## 6. Reproducibility Checklist
+## 8. Reproducibility Checklist
 1. Preserve generated `pipeline_run_metadata.json` files.
 2. Preserve command-line invocation and config snapshots.
 3. Keep model registry and runtime defaults version-controlled.
