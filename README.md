@@ -113,18 +113,22 @@ Run granular visualization smoke checks:
 
 ```bash
 uv run distill-abm smoke-viz \
-  --abm milk_consumption \
-  --csv-map milk_consumption=/path/to/simulation.csv \
-  --stage plot \
-  --stage stats-csv \
+  --models-root data \
+  --netlogo-home /path/to/NetLogo \
+  --stage simulation-csv \
+  --stage plot-1 \
   --json
 ```
 
 Visualization smoke caveat:
 
-- Unlike NetLogo ingestion smoke, plot generation requires simulation CSV inputs.
-- The repository does not currently ship benchmark CSVs for every ABM, so this command is explicit about CSV sources rather than inferring them silently.
-- If an ABM has no configured default CSV and no `--csv-map` entry is provided, the command fails with a clear error instead of fabricating a smoke run.
+- Unlike the older CSV-driven debug path, `smoke-viz` now resolves ABM-specific NetLogo settings from `configs/abms/<name>.yaml`.
+- Each ABM must define a `netlogo_viz` section in `configs/abms/<name>.yaml` with the experiment name, reporter list, and ordered plot list.
+- The command writes one simulation CSV plus ordered plot PNGs under `results/viz_smoke_latest/<abm>/`.
+- The repository now preserves validated reference CSVs and plot images under `data/<abm>_abm/legacy/` so production smoke runs can emit deterministic debug artifacts without depending on the temporary notebook folder.
+- The report records the artifact source per ABM as either `simulated` or `fallback`.
+- The workflow depends on `pynetlogo` and a working NetLogo installation directory passed via `--netlogo-home` or `DISTILL_ABM_NETLOGO_HOME`.
+- The NetLogo execution path remains available and repo-local for all benchmark models; milk-specific input CSVs and grazing include files are now stored in the project data directories instead of external notebook paths.
 
 NetLogo ingestion caveat:
 
@@ -149,7 +153,7 @@ Agent-oriented CLI additions:
   - `default`: full local verification
   - `full`: currently equivalent to `default`, reserved as the strictest profile
 - `smoke-ingest-netlogo` supports `--require-stage` so callers can assert that specific stage checks are present.
-- `smoke-viz` provides the same stage-filtering and `--require-stage` pattern for plot/stats generation.
+- `smoke-viz` provides stage-filtering and `--require-stage` for the generated simulation CSV and each ordered plot image.
 - `ingest-netlogo` and `ingest-netlogo-suite` now write stable artifact manifests.
 - Read-only inspection commands are available for agent loops:
   - `uv run distill-abm describe-abm --abm grazing --json`

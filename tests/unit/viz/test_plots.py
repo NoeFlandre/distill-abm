@@ -37,8 +37,15 @@ def test_plot_metric_bundle_respects_show_mean_line_flag(tmp_path: Path, monkeyp
     )
     seen: list[bool] = []
 
-    def fake_draw(data: pd.DataFrame, output_path: Path, title: str, y_label: str, show_mean_line: bool) -> None:
-        _ = data, title, y_label
+    def fake_draw(
+        data: pd.DataFrame,
+        output_path: Path,
+        title: str,
+        y_label: str,
+        x_label: str,
+        show_mean_line: bool,
+    ) -> None:
+        _ = data, title, y_label, x_label
         seen.append(show_mean_line)
         output_path.write_bytes(b"png")
 

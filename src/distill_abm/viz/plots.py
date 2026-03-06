@@ -27,6 +27,7 @@ class MetricPlotBundle:
     include_pattern: str
     title: str
     y_label: str
+    x_label: str = "time step"
     exclude_pattern: str | None = None
     show_mean_line: bool = True
 
@@ -37,6 +38,7 @@ def plot_metric_bundle(
     output_dir: Path,
     title: str,
     y_label: str,
+    x_label: str = "time step",
     exclude_pattern: str | None = None,
     show_mean_line: bool = True,
 ) -> Path:
@@ -47,7 +49,41 @@ def plot_metric_bundle(
     numeric = _numeric_frame(frame, columns)
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / f"{_slug(include_pattern)}.png"
-    _draw_plot(numeric, output_path, title=title, y_label=y_label, show_mean_line=show_mean_line)
+    _draw_plot(
+        numeric,
+        output_path,
+        title=title,
+        y_label=y_label,
+        x_label=x_label,
+        show_mean_line=show_mean_line,
+    )
+    return output_path
+
+
+def plot_metric_bundle_to_path(
+    frame: pd.DataFrame,
+    include_pattern: str,
+    output_path: Path,
+    title: str,
+    y_label: str,
+    x_label: str = "time step",
+    exclude_pattern: str | None = None,
+    show_mean_line: bool = True,
+) -> Path:
+    """Create one metric plot and write it to an explicit output path."""
+    columns = matching_columns(list(frame.columns), include_pattern, exclude_pattern)
+    if not columns:
+        raise PlotError(f"no columns found for pattern '{include_pattern}'")
+    numeric = _numeric_frame(frame, columns)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    _draw_plot(
+        numeric,
+        output_path,
+        title=title,
+        y_label=y_label,
+        x_label=x_label,
+        show_mean_line=show_mean_line,
+    )
     return output_path
 
 
@@ -68,6 +104,7 @@ def plot_metric_bundles(
                 output_dir=output_dir,
                 title=bundle.title,
                 y_label=bundle.y_label,
+                x_label=bundle.x_label,
                 exclude_pattern=bundle.exclude_pattern,
                 show_mean_line=bundle.show_mean_line,
             )
@@ -182,14 +219,21 @@ def _numeric_frame(frame: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     return cast(pd.DataFrame, converted.ffill().fillna(0.0))
 
 
-def _draw_plot(data: pd.DataFrame, output_path: Path, title: str, y_label: str, show_mean_line: bool) -> None:
+def _draw_plot(
+    data: pd.DataFrame,
+    output_path: Path,
+    title: str,
+    y_label: str,
+    x_label: str,
+    show_mean_line: bool,
+) -> None:
     figure, axis = plt.subplots(figsize=(10, 6))
     for column in data.columns:
         axis.plot(data.index, data[column], alpha=0.25, linewidth=1.0, label=str(column))
     if show_mean_line:
         axis.plot(data.index, data.mean(axis=1), color="black", linewidth=2.0, label="mean")
     axis.set_title(title)
-    axis.set_xlabel("time step")
+    axis.set_xlabel(x_label)
     axis.set_ylabel(y_label)
     axis.legend(loc="best")
     figure.tight_layout()

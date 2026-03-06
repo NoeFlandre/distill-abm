@@ -1,0 +1,82 @@
+ ;; RAGE RAngeland Grazing ModEl ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Vegetation and Livestock Model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; VEGETATION AND RAINFALL FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; based on vegetation model used in Martin et al 2013, Mueller et al 2007 and some others                                                          ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to-report rainfall
+  ;; Draw a random rainfall value out of LogNorm(rain-mean, rain-std)
+  ;; 1. Calculate sigma2 and mu out of rain-mean and rain-std
+  let sigma2 sqrt ( ln ( ( rain-std ^ 2 ) / ( rain-mean ^ 2 ) + 1 ) )
+  let mu ln rain-mean - 0.5 * ( sigma2 ^ 2 )
+  
+  ;; 2. Draw a random number x ~ N(mu, sigma2)
+  let x random-normal mu sigma2
+  ;; 3. Transform to LogNorm random value by calculating exp(x) 
+  let current-rainfall exp x
+
+  
+  report current-rainfall
+end
+
+to generate-rain-list [ years ]
+  if (file-exists? "rainfall_list.txt") 
+  [ file-delete "rainfall_list.txt" ] 
+  file-open "rainfall_list.txt" 
+  
+  let rain-list []
+  let i 0
+  while [ i < years ]
+  [
+    set rain-list lput rainfall rain-list
+    set i i + 1
+  ]
+  
+  file-write rain-list 
+  file-close
+end
+
+to-report green-biomass-growth [ green-biomass-t-1 rain-t reserve-biomass-t-1 ]
+  ;; calculate the new green-biomass value
+  let green-biomass-t 0
+  ifelse green-biomass-carry-over?
+  [
+    set green-biomass-t green-biomass-t-1 + rain-t * rue * reserve-biomass-t-1
+  ]
+  [
+    set green-biomass-t rain-t * rue * reserve-biomass-t-1
+  ]
+  ;; check if growth limit lambda is reached and adjust green-biomass value if necessary
+  if green-biomass-t > lambda * reserve-biomass-t-1
+  [
+    set green-biomass-t lambda * reserve-biomass-t-1
+  ]
+  report green-biomass-t
+end
+
+to-report reserve-biomass-growth [ green-biomass-init-t green-biomass-t reserve-biomass-t reserve-biomass-edible-t ]
+  ;; calculate new reserve-biomass value
+  let reserve-biomass-t+1 reserve-biomass-t + w * ( gr1 * ( green-biomass-init-t - green-biomass-t ) + 
+    green-biomass-t ) * ( 1 - d * reserve-biomass-t ) - 
+    ( mr * reserve-biomass-t + (gr2 * reserve-biomass-t - reserve-biomass-edible-t ) ) 
+  report reserve-biomass-t+1
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LIVESTOCK GROWTH ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to-report livestock-growth [ livestock-t-1 ]
+  ;; calculate new livestock herd size based on fixed growth rate b
+  let livestock-new floor ( ( 1 + b ) * livestock-t-1 )
+  ; let livestock-new ( 1 + b ) * livestock-t-1 #EXT the one with floor was commented in original model and this one active
+  ; print (word "livestock new after birth: " livestock-new " based-on livestock t-1: " livestock-t-1)
+  ;; in case an agent has less than one sheep, his herd size is set to zero, so he will drop out of the system
+;  if livestock-new <= 1
+;  [
+;    set livestock-new 0
+;  ]
+  report livestock-new   
+end

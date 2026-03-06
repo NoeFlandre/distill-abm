@@ -24,3 +24,18 @@
 - Date: 2026-03-06
 - Decision: Freeze the validated NetLogo ingestion pipeline unless a task explicitly requests changes.
 - Rationale: the current benchmark-model ingestion flow, including experiment-parameter extraction, GUI-parameter extraction, updated-parameter generation, narrative generation, documentation extraction and cleanup, final-documentation export, code extraction, and stage-level smoke validation, has been manually validated end-to-end and should not be modified casually or reworked speculatively.
+
+## DL-006
+- Date: 2026-03-06
+- Decision: Freeze the validated visualization smoke pipeline unless a task explicitly requests changes.
+- Rationale: the current pre-LLM visualization workflow, including ABM-specific NetLogo visualization configuration, repo-local model inputs, preserved legacy reference CSV/plot artifacts, fallback-first smoke generation, artifact-source reporting, and ordered plot emission for all three benchmark ABMs, has been validated as the desired debugging path and should not be reworked casually.
+
+## DL-007
+- Date: 2026-03-06
+- Decision: Freeze `docs/TESTING_REPORT.md` unless a task explicitly requests changes.
+- Rationale: the testing supplementary material has been manually edited into the publication-ready checklist style requested for this project and should not be rewritten or reformatted casually.
+
+## DL-008
+- Date: 2026-03-06
+- Decision: Freeze `docs/GROUND_TRUTHS_GPT5.2.md` unless a task explicitly requests changes.
+- Rationale: the GPT-5.2 ground-truth supplementary material has been manually curated into the validated structure and wording expected for the paper supplement, while preserving prompt and model-output content, and should not be modified casually.

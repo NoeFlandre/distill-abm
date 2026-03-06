@@ -12,3 +12,88 @@ plot_descriptions:
   - "This plot represents the number of households that have engaged in social learning, indicated by the variable household-SL being true."
   - "This plot represents the average cumulative number of livestock that have been destocked across all households."
   - "This plot represents the number of households that follow the E-RO strategy, indicating households with non learning agents."
+netlogo_viz:
+  experiment_name: experiment
+  num_runs: 15
+  max_ticks: 100
+  interval: 1
+  experiment_parameters:
+    behavioral-type: E-RO
+    number-SAT: 0
+    number-E-RO: 20
+    number-TRAD: 0
+    resting?: false
+    b: 0
+    number-MAX: 0
+    rain-mean: 200
+    homog-behav-types?: true
+    risk-att-init: 0.5
+    resting-threshold: 0.1
+    gr1: 0.5
+    number-E-LBD: 20
+    satisficing-threshold: 0
+    gr2: 0.1
+    number-E-RO-SL1: 20
+    timesteps: 100
+    w: 0.8
+    start-on-homepatch?: true
+    intrinsic-preference: 0
+    SL2-strategy-switch?: false
+    number-random: 0
+    number-households: 60
+    extension-model?: true
+    livestock-init: 90
+    risk-mode?: true
+    satisficing-trials: 21
+    rain-std: 100
+    global-rain?: true
+    social-susceptibility: 0
+    knowledge-radius: 1
+  smoke_num_runs: 30
+  smoke_max_ticks: 101
+  smoke_interval: 1
+  fallback_mode: always
+  fallback_csv: data/grazing_abm/legacy/reduced3.csv
+  fallback_plot_dir: data/grazing_abm/legacy/plots
+  reporters:
+    - mean [household-risk-att-init] of households
+    - mean [household-risk-att] of households
+    - mean-reserve-biomass
+    - mean-green-biomass
+    - mean [livestock + destock] of households
+    - mean [destock] of households
+    - gini-coef-total-livestock-healthy
+    - count households with [household-SL? = true]
+    - mean [destock-total] of households
+    - count households with [household-behavioral-type = "E-RO"]
+  plots:
+    - reporter_pattern: mean [household-risk-att-init] of households
+      title: Mean Household Initial Risk Attitude
+      y_label: Mean Household Initial Risk Attitude
+    - reporter_pattern: mean [household-risk-att] of households
+      title: Mean Household Risk Attitude
+      y_label: Mean Household Risk Attitude
+    - reporter_pattern: mean-reserve-biomass
+      title: Mean Reserve Biomass
+      y_label: Mean Reserve Biomass
+    - reporter_pattern: mean-green-biomass
+      title: Mean Green Biomass
+      y_label: Mean Green Biomass
+    - reporter_pattern: mean [livestock + destock] of households
+      title: Mean Livestock + Destock of Households
+      y_label: Mean Livestock + Destock of Households
+    - reporter_pattern: mean [destock] of households
+      title: Mean Destock of Households
+      y_label: Mean Destock of Households
+    - reporter_pattern: gini-coef-total-livestock-healthy
+      title: Gini Coefficient Total Livestock Healthy
+      y_label: Gini Coefficient Total Livestock Healthy
+    - reporter_pattern: count households with [household-SL? = true]
+      title: Count of Households with Social Learning
+      y_label: Count of Households with Social Learning
+    - reporter_pattern: mean [destock-total] of households
+      title: Mean Destock Total of Households
+      y_label: Mean Destock Total of Households
+    - reporter_pattern: count households with [household-behavioral-type = "E-RO"]
+      title: Count of Non Learning Households
+      y_label: Count of Non Learning Households
