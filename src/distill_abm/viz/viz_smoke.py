@@ -103,6 +103,16 @@ class VizSmokeSuiteResult(BaseModel):
     report_json_path: Path
 
 
+class VizSmokeOutputPaths(BaseModel):
+    """Canonical output paths for one ABM visualization smoke run."""
+
+    output_dir: Path
+    plot_dir: Path
+    parameters_path: Path
+    generated_csv_path: Path
+    artifact_index_path: Path
+
+
 def default_viz_smoke_stages(specs: dict[str, VizSmokeSpec]) -> list[VizSmokeStage]:
     """Return the canonical visualization checks for agent debugging."""
     stages: list[VizSmokeStage] = [
@@ -140,22 +150,18 @@ def run_viz_smoke_suite(
     abm_results: list[VizSmokeAbmResult] = []
     failed_abms: list[str] = []
     for abm, spec in sorted(specs.items()):
-        output_dir = output_root / abm
-        plot_dir = output_dir / "plots"
-        parameters_path = output_dir / "resolved_parameters.json"
-        generated_csv_path = output_dir / "simulation.csv"
+        paths = _abm_output_paths(output_root=output_root, abm=abm)
         try:
             artifact_paths = _generate_viz_artifacts(
                 spec=spec,
                 netlogo_home=netlogo_home,
-                output_dir=output_dir,
-                plot_dir=plot_dir,
-                parameters_path=parameters_path,
-                generated_csv_path=generated_csv_path,
+                output_dir=paths.output_dir,
+                plot_dir=paths.plot_dir,
+                parameters_path=paths.parameters_path,
+                generated_csv_path=paths.generated_csv_path,
                 netlogo_link_factory=netlogo_link_factory,
             )
-            artifact_index_path = output_dir / "viz_artifact_index.json"
-            artifact_index_path.write_text(
+            paths.artifact_index_path.write_text(
                 json.dumps({key: str(path) for key, path in artifact_paths.items()}, indent=2, sort_keys=True),
                 encoding="utf-8",
             )
@@ -176,13 +182,13 @@ def run_viz_smoke_suite(
                     abm=abm,
                     model_path=spec.model_path,
                     experiment_name=spec.experiment_name,
-                    parameters_path=parameters_path,
-                    generated_csv_path=generated_csv_path,
-                    output_dir=output_dir,
-                    plot_dir=plot_dir,
+                    parameters_path=paths.parameters_path,
+                    generated_csv_path=paths.generated_csv_path,
+                    output_dir=paths.output_dir,
+                    plot_dir=paths.plot_dir,
                     artifact_source=_read_artifact_source(artifact_paths),
                     status=status,
-                    artifact_index_path=artifact_index_path,
+                    artifact_index_path=paths.artifact_index_path,
                     stage_results=stage_results,
                 )
             )
@@ -193,10 +199,10 @@ def run_viz_smoke_suite(
                     abm=abm,
                     model_path=spec.model_path,
                     experiment_name=spec.experiment_name,
-                    parameters_path=parameters_path,
-                    generated_csv_path=generated_csv_path,
-                    output_dir=output_dir,
-                    plot_dir=plot_dir,
+                    parameters_path=paths.parameters_path,
+                    generated_csv_path=paths.generated_csv_path,
+                    output_dir=paths.output_dir,
+                    plot_dir=paths.plot_dir,
                     artifact_source="simulated",
                     status="failed",
                     error_code="simulation_failed",
@@ -232,6 +238,18 @@ def _select_stages(stages: list[VizSmokeStage], stage_ids: list[str] | None) -> 
         known = ", ".join(sorted(by_id))
         raise ValueError(f"unknown viz smoke stage(s): {', '.join(unknown)}. Known stages: {known}")
     return [by_id[stage_id] for stage_id in stage_ids]
+
+
+def _abm_output_paths(*, output_root: Path, abm: str) -> VizSmokeOutputPaths:
+    """Return the canonical output paths for one ABM smoke bundle."""
+    output_dir = output_root / abm
+    return VizSmokeOutputPaths(
+        output_dir=output_dir,
+        plot_dir=output_dir / "plots",
+        parameters_path=output_dir / "resolved_parameters.json",
+        generated_csv_path=output_dir / "simulation.csv",
+        artifact_index_path=output_dir / "viz_artifact_index.json",
+    )
 
 
 def _generate_viz_artifacts(
@@ -283,9 +301,7 @@ def _generate_viz_artifacts(
                 show_mean_line=bundle.show_mean_line,
             )
             artifact_paths[f"plot_{index}"] = output_path
-        source_path = output_dir / "artifact_source.txt"
-        source_path.write_text("simulated\n", encoding="utf-8")
-        artifact_paths["artifact_source"] = source_path
+        artifact_paths["artifact_source"] = _write_artifact_source(output_dir=output_dir, source="simulated")
         return artifact_paths
     except Exception:
         if spec.fallback_csv is None or spec.fallback_plot_dir is None:
@@ -326,10 +342,15 @@ def _materialize_fallback_artifacts(
         output_path = plot_dir / f"{index}.png"
         output_path.write_bytes(source_plot.read_bytes())
         artifact_paths[f"plot_{index}"] = output_path
-    source_path = output_dir / "artifact_source.txt"
-    source_path.write_text("fallback\n", encoding="utf-8")
-    artifact_paths["artifact_source"] = source_path
+    artifact_paths["artifact_source"] = _write_artifact_source(output_dir=output_dir, source="fallback")
     return artifact_paths
+
+
+def _write_artifact_source(*, output_dir: Path, source: Literal["simulated", "fallback"]) -> Path:
+    """Persist the artifact source marker for one ABM bundle."""
+    source_path = output_dir / "artifact_source.txt"
+    source_path.write_text(f"{source}\n", encoding="utf-8")
+    return source_path
 
 
 def _build_stage_result(

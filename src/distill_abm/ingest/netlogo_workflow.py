@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 import subprocess
 import sys
 from collections.abc import Callable, Mapping, Sequence
@@ -215,35 +214,6 @@ def _find_modern_macos_jvm() -> str | None:
         if libjvm.exists():
             return str(libjvm)
     return None
-
-
-def _read_java_major_version() -> int | None:
-    """Read the default `java` major version from the current shell environment."""
-    try:
-        result = subprocess.run(
-            ["java", "-version"],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        return None
-    return _parse_java_major_version(result.stderr or result.stdout)
-
-
-def _parse_java_major_version(version_output: str) -> int | None:
-    """Parse a major Java version from `java -version` style output."""
-    match = re.search(r'version "(?P<raw>[0-9]+(?:\.[0-9]+)*)', version_output)
-    if match is None:
-        return None
-    raw = match.group("raw")
-    if raw.startswith("1."):
-        parts = raw.split(".")
-        if len(parts) > 1 and parts[1].isdigit():
-            return int(parts[1])
-        return None
-    head = raw.split(".", maxsplit=1)[0]
-    return int(head) if head.isdigit() else None
 
 
 def run_netlogo_experiment(

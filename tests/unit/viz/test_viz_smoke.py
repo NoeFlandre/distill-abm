@@ -5,7 +5,13 @@ from pathlib import Path
 import pandas as pd
 
 from distill_abm.viz.plots import MetricPlotBundle
-from distill_abm.viz.viz_smoke import VizSmokeSpec, default_viz_smoke_stages, run_viz_smoke_suite
+from distill_abm.viz.viz_smoke import (
+    VizSmokeSpec,
+    _abm_output_paths,
+    _write_artifact_source,
+    default_viz_smoke_stages,
+    run_viz_smoke_suite,
+)
 
 
 class _FakeNetLogoLink:
@@ -22,6 +28,23 @@ class _FakeNetLogoLink:
 
     def report(self, reporter: str) -> float:
         return float(self.tick * 10 + len(reporter))
+
+
+def test_abm_output_paths_are_stable() -> None:
+    paths = _abm_output_paths(output_root=Path("results/viz"), abm="milk_consumption")
+
+    assert paths.output_dir == Path("results/viz/milk_consumption")
+    assert paths.plot_dir == Path("results/viz/milk_consumption/plots")
+    assert paths.parameters_path == Path("results/viz/milk_consumption/resolved_parameters.json")
+    assert paths.generated_csv_path == Path("results/viz/milk_consumption/simulation.csv")
+    assert paths.artifact_index_path == Path("results/viz/milk_consumption/viz_artifact_index.json")
+
+
+def test_write_artifact_source_creates_marker_file(tmp_path: Path) -> None:
+    source_path = _write_artifact_source(output_dir=tmp_path, source="fallback")
+
+    assert source_path == tmp_path / "artifact_source.txt"
+    assert source_path.read_text(encoding="utf-8") == "fallback\n"
 
 
 def test_default_viz_smoke_stages_are_granular() -> None:
