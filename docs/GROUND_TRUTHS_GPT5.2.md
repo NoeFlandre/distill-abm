@@ -141,6 +141,8 @@ The number of male prey animals declines monotonically across runs, starting at 
 
 The female prey population starts at roughly 125 individuals and declines steeply across all runs, with most simulations falling below about 100 by roughly 100–180 steps and below about 60 by around 250–350 steps. By approximately 400–500 steps, many runs are down to about 10–30 females, and by 600–800 steps most have reached single digits or zero, although a few trajectories retain small remnant populations of around 5–20 females slightly longer. After about 900–1200 steps, nearly all runs are at or near zero, with only rare survivors persisting at 1–3 individuals until roughly 1500–2300 steps before disappearing entirely. In the context of the MHPM, this pattern indicates a rapid collapse of the breeding female segment of the ungulate population under the combined effects of background mortality, resource constraints in a seasonal grassland, and sustained human predation pressure, with limited persistence of small residual groups before local extinction.
 
+> **Suggestion:** Most simulations rather fall at about 100 individuals around 200 to 380 steps. They fall below 60 around 250-400 steps. These are minors observations, the description is overall very accurate. 
+
 **PLOT 10**  
 ![plot 10](./images/fauna_plots/10.png)
 
@@ -150,6 +152,8 @@ The total prey population begins at about 250 individuals and declines rapidly i
 ![plot 11](./images/fauna_plots/11.png)
 
 The combined male prey energy begins at roughly 12,300–12,500 units and declines quickly across all runs, falling to about 9,000–11,000 by around 150–250 steps. A sharper collapse then occurs near 300–400 steps, when total male energy typically drops to roughly 3,000–5,000, indicating a major contraction in the energetic contribution of males under the combined effects of mortality, movement costs, feeding limits, and hunting pressure in the model. After this break, the decline continues more gradually: by about 500–800 steps most runs are below 2,000, and many are already under 500–1,000. Near 900–1,200 steps the total male energy is close to zero in most simulations, with only a few runs retaining small residual values that persist longer, sometimes to about 1,500–2,300 steps. In context, this pattern shows that male prey energy is depleted early and persistently as the ungulate population contracts, consistent with strong interaction between resource dynamics and sustained human predation in driving downward population energy over time.
+
+> **Suggestion:** It failed to spot the rebounce in energy around 450 steps before the gradual decline.
 
 **PLOT 12**  
 ![plot 12](./images/fauna_plots/12.png)
@@ -161,10 +165,14 @@ Across repeated runs, the combined energy held by female prey begins at roughly 
 
 Across runs, the combined prey-energy pool starts near 25,000 at step 0 and declines rapidly throughout the early simulation, usually falling to about 18,000–22,000 by roughly 100 steps and to around 12,000–16,000 by about 200 steps. A sharper collapse typically occurs between about 250 and 400 steps, when total prey energy drops from roughly 10,000–15,000 to about 5,000–8,000, and then continues downward to around 2,000–5,000 by about 500–700 steps. After this point, most runs enter a low-energy phase with only small temporary plateaus or modest rebounds, generally below 4,000, before declining further toward near-zero values by roughly 900–1,300 steps in many cases; a smaller number of runs persist longer at very low energy levels until about 1,500–2,300 steps. In the MHPM context, this pattern indicates that the total energetic resources embodied in the prey population are progressively depleted as ungulate numbers and condition are reduced through the combined effects of environmental constraints, movement and survival costs, and continued human hunting pressure, with little evidence of sustained recovery once the mid-simulation collapse begins.
 
+> **Suggestion:** The total energy rather reaches 12000 to 16000 around 300 steps. Fails to capture the rebouns most simulations have around 450 steps. 
+
 **PLOT 14**  
 ![plot 14](./images/fauna_plots/14.png)
 
 The proportion of vegetated patches remains high and tightly bounded for most of the run, generally close to the initial grass proportion of about 33%, indicating that fodder availability is usually maintained near carrying levels despite prey grazing. After a brief early adjustment from roughly 32.8% to about 32.0–32.1% at the start, the system gradually recovers to around 32.6–32.9% by about steps 500–650. The main deviation occurs near step 350, when green cover drops sharply across runs to about 23.0–25.6%, consistent with a short-lived but severe episode of grass depletion under seasonal pressure and herbivore consumption; this is followed by a rapid return to about 32.8–33.0% immediately afterward, reflecting fast regrowth under the model’s short regrowth time. Smaller synchronized declines recur later, especially around steps 700, 1080–1100, 1450, 1820, and 2180, with minima of roughly 28.9–31.9%, but each is brief and followed by recovery to near 33.0%. Overall, the landscape remains predominantly green, suggesting that vegetation dynamics are strongly resilient and that prey usually experience only intermittent, short-duration reductions in forage availability rather than prolonged resource scarcity.
+
+> **Suggestion:** The first sharp decline occurs around 400 steps to a percentage of 23%-27.5%.
 
 ### Long Ground Truth
 
