@@ -1,4 +1,4 @@
-"""Live monitoring helpers for the sampled local-Qwen smoke."""
+"""Live monitoring helpers for local-Qwen smoke and tuning workflows."""
 
 from __future__ import annotations
 
@@ -11,10 +11,11 @@ from typing import Any
 
 @dataclass(frozen=True)
 class LocalQwenCaseSnapshot:
-    """One case status snapshot for the live monitor."""
+    """One item status snapshot for the live monitor."""
 
     case_id: str
     status: str
+    label: str | None
     num_ctx: int | None
     max_tokens: int | None
     context_prompt_length: int | None
@@ -26,10 +27,11 @@ class LocalQwenCaseSnapshot:
 
 @dataclass(frozen=True)
 class LocalQwenMonitorSnapshot:
-    """Top-level local-Qwen smoke monitor snapshot."""
+    """Top-level local-Qwen monitor snapshot."""
 
     output_root: Path
     exists: bool
+    mode: str
     total_cases: int
     completed_cases: int
     failed_cases: int
@@ -42,12 +44,17 @@ class LocalQwenMonitorSnapshot:
 
 
 def collect_local_qwen_monitor_snapshot(output_root: Path) -> LocalQwenMonitorSnapshot:
-    """Collect the current smoke progress from the output directory."""
+    """Collect the current smoke or tuning progress from the output directory."""
+    trials_root = output_root / "trials"
+    if trials_root.exists():
+        return _collect_tuning_snapshot(output_root, trials_root)
+
     cases_root = output_root / "cases"
     if not cases_root.exists():
         return LocalQwenMonitorSnapshot(
             output_root=output_root,
             exists=False,
+            mode="smoke",
             total_cases=0,
             completed_cases=0,
             failed_cases=0,
@@ -65,6 +72,7 @@ def collect_local_qwen_monitor_snapshot(output_root: Path) -> LocalQwenMonitorSn
     return LocalQwenMonitorSnapshot(
         output_root=output_root,
         exists=True,
+        mode="smoke",
         total_cases=len(case_snapshots),
         completed_cases=completed_cases,
         failed_cases=failed_cases,
@@ -74,18 +82,18 @@ def collect_local_qwen_monitor_snapshot(output_root: Path) -> LocalQwenMonitorSn
 
 
 def render_local_qwen_monitor(snapshot: LocalQwenMonitorSnapshot) -> str:
-    """Render a compact text dashboard for the smoke status."""
+    """Render a compact text dashboard for the smoke or tuning status."""
     lines = [
-        f"Local Qwen smoke: {snapshot.output_root}",
+        f"Local Qwen {snapshot.mode}: {snapshot.output_root}",
         (
-            "Cases: "
+            f"{'Trials' if snapshot.mode == 'tuning' else 'Cases'}: "
             f"{snapshot.completed_cases} completed / "
             f"{snapshot.failed_cases} failed / "
             f"{snapshot.total_cases} discovered"
         ),
         f"Running: {snapshot.running_case_id or '-'}",
         "",
-        "Status  Case                                   num_ctx  max_tok  ctx_tok  tr_tok  ctx_len  tr_len",
+        "Status  Item                                   num_ctx  max_tok  ctx_tok  tr_tok  ctx_len  tr_len",
         "------  -------------------------------------  -------  -------  -------  ------  -------  ------",
     ]
     for case in snapshot.cases:
@@ -93,7 +101,7 @@ def render_local_qwen_monitor(snapshot: LocalQwenMonitorSnapshot) -> str:
             "  ".join(
                 [
                     f"{case.status:<6}",
-                    f"{case.case_id:<37}",
+                    f"{(case.label or case.case_id):<37}",
                     _fmt(case.num_ctx, 7),
                     _fmt(case.max_tokens, 7),
                     _fmt(case.context_total_tokens, 7),
@@ -152,6 +160,7 @@ def _collect_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
     return LocalQwenCaseSnapshot(
         case_id=case_dir.name,
         status=status,
+        label=case_dir.name,
         num_ctx=num_ctx,
         max_tokens=max_tokens,
         context_prompt_length=_extract_prompt_length(context_request),
@@ -159,6 +168,77 @@ def _collect_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
         context_total_tokens=_extract_total_tokens(context_trace),
         trend_total_tokens=_extract_total_tokens(trend_trace),
         error=error_text,
+    )
+
+
+def _collect_tuning_snapshot(output_root: Path, trials_root: Path) -> LocalQwenMonitorSnapshot:
+    trial_snapshots: list[LocalQwenCaseSnapshot] = []
+    for trial_dir in sorted(trials_root.glob("*/*/*")):
+        if not trial_dir.is_dir() or not trial_dir.name.startswith("max_tokens_"):
+            continue
+        trial_snapshots.append(_collect_trial_snapshot(trial_dir))
+
+    running_case_id = next((trial.case_id for trial in trial_snapshots if trial.status.startswith("running")), None)
+    completed_cases = sum(1 for trial in trial_snapshots if trial.status == "completed")
+    failed_cases = sum(1 for trial in trial_snapshots if trial.status == "failed")
+    return LocalQwenMonitorSnapshot(
+        output_root=output_root,
+        exists=True,
+        mode="tuning",
+        total_cases=len(trial_snapshots),
+        completed_cases=completed_cases,
+        failed_cases=failed_cases,
+        running_case_id=running_case_id,
+        cases=tuple(trial_snapshots),
+    )
+
+
+def _collect_trial_snapshot(trial_dir: Path) -> LocalQwenCaseSnapshot:
+    cases_root = trial_dir / "cases"
+    case_snapshots = [
+        _collect_case_snapshot(case_dir)
+        for case_dir in sorted(path for path in cases_root.iterdir() if path.is_dir())
+    ] if cases_root.exists() else []
+
+    if any(case.status == "failed" for case in case_snapshots):
+        status = "failed"
+    elif case_snapshots and all(case.status == "completed" for case in case_snapshots):
+        status = "completed"
+    elif case_snapshots:
+        status = "running"
+    else:
+        status = "pending"
+
+    representative = next((case for case in case_snapshots if case.status != "pending"), None)
+    if representative is None and case_snapshots:
+        representative = case_snapshots[0]
+
+    failed_case_ids = [case.case_id for case in case_snapshots if case.status == "failed"]
+    running_case_ids = [case.case_id for case in case_snapshots if case.status == "running"]
+    error = None
+    if failed_case_ids:
+        error = f"failed_cases={','.join(failed_case_ids)}"
+    elif running_case_ids:
+        error = f"running_cases={','.join(running_case_ids)}"
+
+    label = f"{trial_dir.parent.name}/{trial_dir.name}"
+    fallback_num_ctx = _extract_int_from_name(trial_dir.parent.name, "num_ctx_")
+    fallback_max_tokens = _extract_int_from_name(trial_dir.name, "max_tokens_")
+    return LocalQwenCaseSnapshot(
+        case_id=str(trial_dir.relative_to(trial_dir.parents[2])),
+        status=status,
+        label=label,
+        num_ctx=representative.num_ctx if representative and representative.num_ctx is not None else fallback_num_ctx,
+        max_tokens=(
+            representative.max_tokens
+            if representative and representative.max_tokens is not None
+            else fallback_max_tokens
+        ),
+        context_prompt_length=representative.context_prompt_length if representative else None,
+        trend_prompt_length=representative.trend_prompt_length if representative else None,
+        context_total_tokens=_max_or_none([case.context_total_tokens for case in case_snapshots]),
+        trend_total_tokens=_max_or_none([case.trend_total_tokens for case in case_snapshots]),
+        error=error,
     )
 
 
@@ -215,3 +295,15 @@ def _read_text(path: Path) -> str | None:
 
 def _fmt(value: int | None, width: int) -> str:
     return f"{('-' if value is None else value):>{width}}"
+
+
+def _extract_int_from_name(value: str, prefix: str) -> int | None:
+    if not value.startswith(prefix):
+        return None
+    suffix = value.removeprefix(prefix)
+    return int(suffix) if suffix.isdigit() else None
+
+
+def _max_or_none(values: list[int | None]) -> int | None:
+    concrete = [value for value in values if value is not None]
+    return max(concrete) if concrete else None

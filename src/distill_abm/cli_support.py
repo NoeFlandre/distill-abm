@@ -238,6 +238,20 @@ def resolve_scoring_reference_path(abm: str) -> Path:
 
 def assert_ollama_model_available(model: str) -> None:
     """Verify that a required local Ollama model is available."""
+    client_error: Exception | None = None
+    try:
+        import ollama
+
+        client = ollama.Client()
+        listed = client.list()
+        listed_names = _extract_ollama_model_names(listed)
+        if model in listed_names:
+            return
+        client.show(model)
+        return
+    except Exception as exc:  # pragma: no cover - environment dependent
+        client_error = exc
+
     try:
         completed = subprocess.run(
             ["ollama", "list"],
@@ -246,6 +260,11 @@ def assert_ollama_model_available(model: str) -> None:
             text=True,
         )
     except Exception as exc:  # pragma: no cover - environment dependent
+        if client_error is not None:
+            raise typer.BadParameter(
+                f"failed to verify local model '{model}' via Ollama client ({client_error}) "
+                f"and via 'ollama list' ({exc})"
+            ) from exc
         raise typer.BadParameter(f"failed to run 'ollama list' to verify local model '{model}': {exc}") from exc
 
     lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
@@ -253,6 +272,24 @@ def assert_ollama_model_available(model: str) -> None:
         raise typer.BadParameter(
             f"required local model '{model}' not found in 'ollama list'. Pull it before benchmark runs."
         )
+
+
+def _extract_ollama_model_names(payload: object) -> set[str]:
+    """Extract model names from the Ollama Python client's list payload."""
+    if not isinstance(payload, dict):
+        return set()
+    models = payload.get("models")
+    if not isinstance(models, list):
+        return set()
+    names: set[str] = set()
+    for item in models:
+        if not isinstance(item, dict):
+            continue
+        for key in ("model", "name"):
+            value = item.get(key)
+            if isinstance(value, str) and value.strip():
+                names.add(value.strip())
+    return names
 
 
 def validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:
