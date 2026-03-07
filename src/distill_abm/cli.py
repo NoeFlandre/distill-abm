@@ -18,6 +18,7 @@ from distill_abm.cli_actions import (
     execute_health_check_command,
     execute_ingest_netlogo_command,
     execute_ingest_netlogo_suite_command,
+    execute_monitor_local_qwen_command,
     execute_run_command,
     execute_smoke_doe_command,
     execute_smoke_ingest_command,
@@ -76,6 +77,7 @@ __all__ = [
     "ingest_netlogo",
     "ingest_netlogo_suite",
     "main",
+    "monitor_local_qwen",
     "run",
     "smoke_doe",
     "smoke_ingest_netlogo",
@@ -544,6 +546,34 @@ def smoke_local_qwen(
         create_adapter_fn=create_adapter,
         run_local_qwen_sample_smoke_fn=run_local_qwen_sample_smoke,
         load_abm_config_fn=load_abm_config,
+    )
+
+
+@app.command("monitor-local-qwen")
+def monitor_local_qwen(
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory containing local-Qwen smoke artifacts."),
+    ] = Path("results/local_qwen_smoke_latest"),
+    watch: Annotated[
+        bool,
+        typer.Option(help="Continuously refresh the dashboard until the run reaches a terminal state."),
+    ] = False,
+    interval_seconds: Annotated[
+        float,
+        typer.Option("--interval-seconds", help="Polling interval for --watch mode."),
+    ] = 2.0,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Print structured JSON instead of the dashboard."),
+    ] = False,
+) -> None:
+    """Show a compact live dashboard for the local-Qwen smoke run."""
+    execute_monitor_local_qwen_command(
+        output_root=output_root,
+        watch=watch,
+        interval_seconds=interval_seconds,
+        json_output=json_output,
     )
 
 
