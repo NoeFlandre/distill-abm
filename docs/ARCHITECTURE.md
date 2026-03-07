@@ -49,6 +49,7 @@
 - Canonical local validation orchestration for agents.
 - Runs pytest, Ruff, mypy, build, and NetLogo ingest smoke checks behind one structured report.
 - Supports validation profiles and explicit per-check status reporting.
+- Normalizes command-style checks through one helper so subprocess success and launch-failure reporting stay consistent across the validation suite.
 - Writes stable machine-readable and markdown reports for post-run inspection.
 
 ### `src/distill_abm/pipeline/run.py`

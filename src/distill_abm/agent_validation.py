@@ -144,37 +144,10 @@ def run_validation_suite(
             )
             continue
 
-        try:
-            completed = subprocess.run(check.command, capture_output=True, text=True)
-        except OSError as exc:
+        check_result = _run_command_check(check)
+        if check_result.status == "failed":
             failed_checks.append(check.check_id)
-            check_results.append(
-                ValidationCheckResult(
-                    check_id=check.check_id,
-                    description=check.description,
-                    status="failed",
-                    command=check.command,
-                    error_code="command_failed",
-                    error=str(exc),
-                )
-            )
-            continue
-
-        status = "ok" if completed.returncode == 0 else "failed"
-        if status == "failed":
-            failed_checks.append(check.check_id)
-        check_results.append(
-            ValidationCheckResult(
-                check_id=check.check_id,
-                description=check.description,
-                status=status,
-                command=check.command,
-                exit_code=completed.returncode,
-                stdout_preview=completed.stdout[:2000],
-                stderr_preview=completed.stderr[:2000],
-                error_code=None if completed.returncode == 0 else "command_failed",
-            )
-        )
+        check_results.append(check_result)
 
     for check in all_checks:
         if check.check_id in selected_ids:
@@ -221,6 +194,32 @@ def _select_checks(checks: list[str] | None, profile: ValidationProfile) -> list
         known = ", ".join(sorted(available))
         raise ValueError(f"unknown validation check(s): {', '.join(unknown)}. Known checks: {known}")
     return [available[item] for item in requested]
+
+
+def _run_command_check(check: ValidationCheck) -> ValidationCheckResult:
+    try:
+        completed = subprocess.run(check.command, capture_output=True, text=True)
+    except OSError as exc:
+        return ValidationCheckResult(
+            check_id=check.check_id,
+            description=check.description,
+            status="failed",
+            command=check.command,
+            error_code="command_failed",
+            error=str(exc),
+        )
+
+    status: ValidationStatus = "ok" if completed.returncode == 0 else "failed"
+    return ValidationCheckResult(
+        check_id=check.check_id,
+        description=check.description,
+        status=status,
+        command=check.command,
+        exit_code=completed.returncode,
+        stdout_preview=completed.stdout[:2000],
+        stderr_preview=completed.stderr[:2000],
+        error_code=None if completed.returncode == 0 else "command_failed",
+    )
 
 
 def _render_markdown_report(result: ValidationSuiteResult) -> str:
