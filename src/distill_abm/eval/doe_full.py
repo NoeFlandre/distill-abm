@@ -104,11 +104,11 @@ def _fit_anova(
     try:
         import statsmodels.formula.api as smf
         from statsmodels.stats.anova import anova_lm
-
-        model = smf.ols(formula, data=frame).fit()
-        return cast(pd.DataFrame, anova_lm(model, typ=2))
-    except Exception:
+    except ImportError:
         return _fallback_anova(frame, metric, factors, max_interaction_order)
+
+    model = smf.ols(formula, data=frame).fit()
+    return cast(pd.DataFrame, anova_lm(model, typ=2))
 
 
 def _build_formula(metric: str, factors: list[str], max_interaction_order: int) -> str:
