@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import subprocess
 from pathlib import Path
-from shutil import copy2
 from typing import Literal, cast
 
 import typer
@@ -98,34 +97,12 @@ def resolve_abm_model_path(*, abm: str, models_root: Path) -> Path:
             f"no .nlogo file found for ABM '{abm}' in {models_root}. "
             f"Searched: {candidates_desc}"
         )
-    matches = list(
-        dict.fromkeys(
-            _promote_root_model(models_root=models_root, abm=abm, model_path=match)
-            for match in matches
-        )
-    )
+    matches = list(dict.fromkeys(matches))
 
     if len(matches) > 1:
         names = ", ".join(str(match.relative_to(models_root)) for match in matches)
         raise typer.BadParameter(f"multiple .nlogo files found for ABM '{abm}': {names}.")
     return matches[0]
-
-
-def _promote_root_model(*, models_root: Path, abm: str, model_path: Path) -> Path:
-    """Copy root-level models into the ABM folder to keep canonical artifacts in one location."""
-    if model_path.parent != models_root:
-        return model_path
-
-    target_dir = models_root / f"{abm}_abm"
-    target_dir.mkdir(parents=True, exist_ok=True)
-    target_path = target_dir / model_path.name
-    if target_path.exists():
-        return target_path
-    try:
-        copy2(model_path, target_path)
-    except OSError:
-        return model_path
-    return target_path
 
 
 def resolve_abm_experiment_parameters_path(*, model_dir: Path, abm: str, explicit: Path | None) -> Path | None:
