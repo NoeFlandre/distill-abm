@@ -122,6 +122,26 @@ Prefer:
 
 If a large job is unavoidable, break it into staged commits or independently reviewable slices.
 
+### 2.6 Stop and ask when a material requirement is ambiguous
+
+Do not guess when an ambiguity would materially change implementation, outputs, or interpretation.
+
+If a task leaves an important behavior unclear:
+
+- stop before encoding an assumption,
+- ask one concise clarification question,
+- wait for the answer,
+- then continue from the clarified requirement.
+
+Reasonable local assumptions are fine for low-risk details. They are not fine for:
+
+- prompt semantics,
+- experiment design,
+- evaluation criteria,
+- data formatting passed to models,
+- benchmark or smoke-test contracts,
+- or any behavior the human explicitly asked not to guess about.
+
 ---
 
 ## 3. Default operating loop
