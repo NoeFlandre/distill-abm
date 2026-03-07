@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 from shutil import copy2
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.metrics import SummaryScores
@@ -352,6 +352,8 @@ def _build_metadata_payload(
     default_max_retries = runtime_defaults.llm_request.max_retries
     default_retry_backoff_seconds = runtime_defaults.llm_request.retry_backoff_seconds
 
+    context_usage = _extract_trace_usage(debug_trace, "context_request_path")
+    trend_usage = _extract_trace_usage(debug_trace, "trend_request_path")
     return {
         "run_timestamp_utc": datetime.now(UTC).isoformat(),
         "inputs": {
@@ -407,6 +409,11 @@ def _build_metadata_payload(
                     "max_retries": default_max_retries,
                     "retry_backoff_seconds": default_retry_backoff_seconds,
                 },
+            },
+            "usage": {
+                "context": context_usage,
+                "trend": trend_usage,
+                "total": _combine_usage(context_usage, trend_usage),
             },
         },
         "prompts": {
@@ -482,6 +489,47 @@ def _build_metadata_payload(
             "stats_table_csv_written": stats_table_csv_path.exists(),
         },
         "debug_trace": debug_trace,
+    }
+
+
+def _extract_trace_usage(debug_trace: dict[str, object], key: str) -> dict[str, int] | None:
+    trace_path_value = debug_trace.get(key)
+    if not isinstance(trace_path_value, str):
+        return None
+    trace_path = Path(trace_path_value)
+    if not trace_path.exists():
+        return None
+    try:
+        payload = json.loads(trace_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    response = _as_dict(payload.get("response"))
+    usage = response.get("usage")
+    if not isinstance(usage, dict):
+        return None
+    prompt = usage.get("prompt_tokens")
+    completion = usage.get("completion_tokens")
+    total = usage.get("total_tokens")
+    if not all(isinstance(value, int) for value in (prompt, completion, total)):
+        return None
+    prompt_tokens = cast(int, prompt)
+    completion_tokens = cast(int, completion)
+    total_tokens = cast(int, total)
+    return {
+        "prompt_tokens": prompt_tokens,
+        "completion_tokens": completion_tokens,
+        "total_tokens": total_tokens,
+    }
+
+
+def _combine_usage(*usages: dict[str, int] | None) -> dict[str, int] | None:
+    available = [usage for usage in usages if usage is not None]
+    if not available:
+        return None
+    return {
+        "prompt_tokens": sum(usage["prompt_tokens"] for usage in available),
+        "completion_tokens": sum(usage["completion_tokens"] for usage in available),
+        "total_tokens": sum(usage["total_tokens"] for usage in available),
     }
 
 

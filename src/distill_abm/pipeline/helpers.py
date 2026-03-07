@@ -8,7 +8,7 @@ import hashlib
 import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Literal, Protocol
+from typing import Literal, Protocol, cast
 
 import pandas as pd
 
@@ -16,6 +16,8 @@ from distill_abm.configs.models import PromptsConfig, SummarizerId
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMProviderError, LLMRequest
+from distill_abm.llm.resilience import ensure_circuit_closed, record_failure, record_success
+from distill_abm.structured_logging import get_logger
 from distill_abm.summarize.models import (
     summarize_with_bart,
     summarize_with_bert,
@@ -28,6 +30,7 @@ from distill_abm.viz.plots import generate_stats_table
 EvidenceMode = Literal["plot", "table", "plot+table"]
 ResolvedEvidenceMode = Literal["plot", "table", "plot+table"]
 TextSourceMode = Literal["summary_only", "full_text_only"]
+LOGGER = get_logger(__name__)
 
 
 class SweepRow(Protocol):
@@ -141,12 +144,40 @@ def invoke_adapter_with_trace(
         "message_count": len(request.messages),
         "messages": [message.model_dump() for message in request.messages],
     }
+    LOGGER.info(
+        "llm_request_start",
+        extra={
+            "event_data": {
+                "provider": adapter.provider,
+                "model": model,
+                "prompt_signature": request_block["prompt_signature"],
+                "prompt_length": request_block["prompt_length"],
+                "image_attached": request_block["image_attached"],
+                "max_retries": retries,
+            }
+        },
+    )
 
     errors: list[str] = []
     for attempt in range(retries + 1):
+        ensure_circuit_closed(provider=adapter.provider, model=model)
         try:
             response = adapter.complete(request)
             clean_text = clean_markdown_symbols(strip_think_prefix(response.text))
+            record_success(provider=adapter.provider, model=model)
+            LOGGER.info(
+                "llm_request_success",
+                extra={
+                    "event_data": {
+                        "provider": adapter.provider,
+                        "model": model,
+                        "attempt": attempt + 1,
+                        "prompt_signature": request_block["prompt_signature"],
+                        "clean_text_signature": hashlib.sha256(clean_text.encode("utf-8")).hexdigest(),
+                        "clean_text_length": len(clean_text),
+                    }
+                },
+            )
             return clean_text, {
                 "request": request_block,
                 "response": {
@@ -158,6 +189,7 @@ def invoke_adapter_with_trace(
                     "clean_text": clean_text,
                     "clean_text_length": len(clean_text),
                     "clean_text_signature": hashlib.sha256(clean_text.encode("utf-8")).hexdigest(),
+                    "usage": _extract_usage_from_raw(response.raw),
                     "raw": response.raw,
                 },
                 "attempts_made": attempt + 1,
@@ -166,6 +198,19 @@ def invoke_adapter_with_trace(
         except Exception as exc:
             wrapped = exc if isinstance(exc, LLMProviderError) else LLMProviderError(str(exc))
             errors.append(str(wrapped))
+            record_failure(provider=adapter.provider, model=model, error=str(wrapped))
+            LOGGER.warning(
+                "llm_request_failure",
+                extra={
+                    "event_data": {
+                        "provider": adapter.provider,
+                        "model": model,
+                        "attempt": attempt + 1,
+                        "prompt_signature": request_block["prompt_signature"],
+                        "error": str(wrapped),
+                    }
+                },
+            )
             is_last_attempt = attempt >= retries
             if is_last_attempt:
                 break
@@ -179,6 +224,34 @@ def invoke_adapter_with_trace(
 def encode_image(path: Path) -> str:
     """Read and base64-encode an image artifact."""
     return base64.b64encode(path.read_bytes()).decode("utf-8")
+
+
+def _extract_usage_from_raw(raw: object) -> dict[str, int] | None:
+    if not isinstance(raw, dict):
+        return None
+    usage = raw.get("usage")
+    if isinstance(usage, dict):
+        prompt = usage.get("prompt_tokens")
+        completion = usage.get("completion_tokens")
+        total = usage.get("total_tokens")
+        if all(isinstance(value, int) for value in (prompt, completion, total)):
+            prompt_tokens = cast(int, prompt)
+            completion_tokens = cast(int, completion)
+            total_tokens = cast(int, total)
+            return {
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+                "total_tokens": total_tokens,
+            }
+    prompt_eval = raw.get("prompt_eval_count")
+    eval_count = raw.get("eval_count")
+    if isinstance(prompt_eval, int) and isinstance(eval_count, int):
+        return {
+            "prompt_tokens": prompt_eval,
+            "completion_tokens": eval_count,
+            "total_tokens": prompt_eval + eval_count,
+        }
+    return None
 
 
 def summarize_report_text(

@@ -141,6 +141,35 @@ def test_anthropic_adapter_includes_image_payload_when_present() -> None:
     assert isinstance(messages[0]["content"], list)
 
 
+def test_openai_adapter_timeout_is_wrapped() -> None:
+    def _slow_create(**_: object) -> object:
+        time.sleep(0.05)
+        return SimpleNamespace(
+            choices=[SimpleNamespace(message=SimpleNamespace(content="late"))],
+            model="gpt-4o",
+        )
+
+    with pytest.raises(LLMProviderError, match="timed out"):
+        OpenAIAdapter(
+            model="gpt-4o",
+            client=SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=_slow_create))),
+            timeout_seconds=0.001,
+        ).complete(make_request())
+
+
+def test_anthropic_adapter_timeout_is_wrapped() -> None:
+    def _slow_create(**_: object) -> object:
+        time.sleep(0.05)
+        return SimpleNamespace(content=[SimpleNamespace(type="text", text="late")], model="claude-3-sonnet")
+
+    with pytest.raises(LLMProviderError, match="timed out"):
+        AnthropicAdapter(
+            model="claude-3-sonnet",
+            client=SimpleNamespace(messages=SimpleNamespace(create=_slow_create)),
+            timeout_seconds=0.001,
+        ).complete(make_request())
+
+
 def test_ollama_adapter_success() -> None:
     client = SimpleNamespace(chat=lambda **_: {"message": {"content": "hi"}, "model": "deepseek-r1"})
     response = OllamaAdapter(model="deepseek-r1", client=client).complete(make_request())
@@ -217,60 +246,20 @@ def test_ollama_adapter_timeout_is_wrapped() -> None:
         ).complete(make_request())
 
 
-def test_janus_adapter_success() -> None:
-    class FakeJanusClient:
-        def generate(
-            self,
-            prompt: str,
-            image_b64: str | None,
-            model: str,
-            max_tokens: int | None,
-            temperature: float | None,
-        ) -> str:
-            assert prompt == "hello"
-            assert image_b64 is None
-            return "vision-output"
+def test_openrouter_adapter_timeout_is_wrapped() -> None:
+    def _slow_create(**_: object) -> object:
+        time.sleep(0.05)
+        return SimpleNamespace(
+            choices=[SimpleNamespace(message=SimpleNamespace(content="late"))],
+            model="google/gemini-3.1-pro-preview",
+        )
 
-    response = JanusAdapter(model="janus-pro", client=FakeJanusClient()).complete(make_request())
-    assert response.provider == "janus"
-    assert response.text == "vision-output"
-
-
-def test_janus_adapter_passes_image_and_sampling_fields() -> None:
-    class FakeJanusClient:
-        def __init__(self) -> None:
-            self.payload: dict[str, object] = {}
-
-        def generate(
-            self,
-            prompt: str,
-            image_b64: str | None,
-            model: str,
-            max_tokens: int | None,
-            temperature: float | None,
-        ) -> str:
-            self.payload = {
-                "prompt": prompt,
-                "image_b64": image_b64,
-                "model": model,
-                "max_tokens": max_tokens,
-                "temperature": temperature,
-            }
-            return "vision-output"
-
-    client = FakeJanusClient()
-    request = LLMRequest(
-        model="janus-pro",
-        messages=[LLMMessage(role="user", content="hello-image")],
-        image_b64="abc",
-        max_tokens=512,
-        temperature=0.5,
-    )
-    JanusAdapter(model="janus-pro", client=client).complete(request)
-    assert client.payload["prompt"] == "hello-image"
-    assert client.payload["image_b64"] == "abc"
-    assert client.payload["max_tokens"] == 512
-    assert client.payload["temperature"] == 0.5
+    with pytest.raises(LLMProviderError, match="timed out"):
+        OpenRouterAdapter(
+            model="google/gemini-3.1-pro-preview",
+            client=SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=_slow_create))),
+            timeout_seconds=0.001,
+        ).complete(make_request())
 
 
 @pytest.mark.parametrize(

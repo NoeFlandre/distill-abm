@@ -10,8 +10,14 @@ import pytest
 from distill_abm.configs.models import PromptsConfig
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError, LLMRequest, LLMResponse
+from distill_abm.llm.resilience import reset_circuit_breakers
 from distill_abm.pipeline import helpers
 from distill_abm.pipeline import run as run_module
+
+
+@pytest.fixture(autouse=True)
+def _reset_circuit_breakers() -> None:
+    reset_circuit_breakers()
 
 
 def test_build_context_prompt_includes_role_only_when_enabled(tmp_path: Path) -> None:
@@ -126,6 +132,66 @@ def test_invoke_adapter_raises_after_retry_budget_exhausted() -> None:
         raise AssertionError("Expected invoke_adapter to raise after retries are exhausted")
     assert "after 2 attempt(s)" in message
     assert adapter.calls == 2
+
+
+def test_invoke_adapter_opens_circuit_after_repeated_transient_failures() -> None:
+    class AlwaysTransientAdapter(LLMAdapter):
+        provider = "flaky"
+
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def complete(self, request: LLMRequest) -> LLMResponse:
+            _ = request
+            self.calls += 1
+            raise LLMProviderError("429 rate limit")
+
+    adapter = AlwaysTransientAdapter()
+    for _ in range(3):
+        with pytest.raises(LLMProviderError, match="429 rate limit"):
+            helpers.invoke_adapter(
+                adapter=adapter,
+                model="test-model",
+                prompt="hello",
+                max_retries=0,
+                retry_backoff_seconds=0.0,
+            )
+
+    with pytest.raises(LLMProviderError, match="circuit open"):
+        helpers.invoke_adapter(
+            adapter=adapter,
+            model="test-model",
+            prompt="hello",
+            max_retries=0,
+            retry_backoff_seconds=0.0,
+        )
+    assert adapter.calls == 3
+
+
+def test_invoke_adapter_with_trace_records_token_usage_when_available() -> None:
+    class UsageAdapter(LLMAdapter):
+        provider = "openrouter"
+
+        def complete(self, request: LLMRequest) -> LLMResponse:
+            return LLMResponse(
+                provider=self.provider,
+                model=request.model,
+                text="ok",
+                raw={"usage": {"prompt_tokens": 11, "completion_tokens": 7, "total_tokens": 18}},
+            )
+
+    text, trace = helpers.invoke_adapter_with_trace(
+        adapter=UsageAdapter(),
+        model="google/gemini-3.1-pro-preview",
+        prompt="hello",
+        max_retries=0,
+        retry_backoff_seconds=0.0,
+    )
+
+    assert text == "ok"
+    response = trace["response"]
+    assert isinstance(response, dict)
+    assert response["usage"] == {"prompt_tokens": 11, "completion_tokens": 7, "total_tokens": 18}
 
 
 def test_build_stats_csv_uses_expected_column_order() -> None:
