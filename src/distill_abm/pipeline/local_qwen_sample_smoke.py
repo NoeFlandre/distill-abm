@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import shutil
 from datetime import UTC, datetime
@@ -12,6 +13,7 @@ from typing import Literal
 import pandas as pd
 from pydantic import BaseModel, Field
 
+from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline.doe_smoke_prompts import (
     build_legacy_doe_context_prompt,
@@ -147,7 +149,9 @@ def run_local_qwen_sample_smoke(
     cases: tuple[LocalQwenSampleCase, ...] | None = None,
     max_tokens: int = SMOKE_MAX_TOKENS,
     ollama_num_ctx: int = SMOKE_OLLAMA_NUM_CTX,
+    ollama_num_ctx_by_mode: dict[EvidenceMode, int] | None = None,
     resume_existing: bool = False,
+    stop_on_failure: bool = False,
     max_retries: int | None = None,
     retry_backoff_seconds: float | None = None,
 ) -> LocalQwenSampleSmokeResult:
@@ -184,26 +188,38 @@ def run_local_qwen_sample_smoke(
                 inputs_doc_path=input_bundle.documentation_path,
                 enabled=enabled,
             )
+            context_prompt = context_prompt_base
             shutil.copy2(input_bundle.parameters_path, inputs_dir / "parameters.txt")
             shutil.copy2(input_bundle.documentation_path, inputs_dir / "documentation.txt")
+            _write_text(inputs_dir / "context_prompt.txt", context_prompt)
+            _write_json(
+                requests_dir / "context_request.json",
+                _build_request_preview(
+                    model=model,
+                    prompt_with_schema=context_prompt,
+                    image_attached=False,
+                    max_tokens=max_tokens,
+                    ollama_num_ctx=_resolve_case_num_ctx(case.evidence_mode, ollama_num_ctx, ollama_num_ctx_by_mode),
+                    max_retries=max_retries,
+                    retry_backoff_seconds=retry_backoff_seconds,
+                ),
+            )
 
             try:
-                context_text, context_trace, context_prompt = _invoke_structured_smoke_text(
+                context_text, context_trace = _invoke_structured_smoke_text(
                     adapter=adapter,
                     model=model,
-                    prompt=context_prompt_base,
+                    prompt_with_schema=context_prompt,
                     max_tokens=max_tokens,
-                    ollama_num_ctx=ollama_num_ctx,
+                    ollama_num_ctx=_resolve_case_num_ctx(case.evidence_mode, ollama_num_ctx, ollama_num_ctx_by_mode),
                     max_retries=max_retries,
                     retry_backoff_seconds=retry_backoff_seconds,
                 )
             except StructuredSmokeResponseError as exc:
-                _write_text(inputs_dir / "context_prompt.txt", exc.prompt)
                 _write_json(requests_dir / "context_request.json", exc.trace["request"])
                 _write_json(outputs_dir / "context_trace.json", exc.trace)
                 _write_optional_thinking(outputs_dir / "context_thinking.txt", exc.trace)
                 raise
-            _write_text(inputs_dir / "context_prompt.txt", context_prompt)
             _write_json(requests_dir / "context_request.json", context_trace["request"])
             _write_text(outputs_dir / "context_output.txt", context_text)
             _write_json(outputs_dir / "context_trace.json", context_trace)
@@ -218,6 +234,7 @@ def run_local_qwen_sample_smoke(
                 table_csv=table_csv,
                 enabled=enabled,
             )
+            trend_prompt = trend_prompt_base
 
             image_b64: str | None = None
             image_path: Path | None = None
@@ -225,25 +242,36 @@ def run_local_qwen_sample_smoke(
                 image_path = inputs_dir / "trend_evidence_plot.png"
                 shutil.copy2(input_bundle.plot_path, image_path)
                 image_b64 = encode_image(image_path)
+            _write_text(inputs_dir / "trend_prompt.txt", trend_prompt)
+            _write_json(
+                requests_dir / "trend_request.json",
+                _build_request_preview(
+                    model=model,
+                    prompt_with_schema=trend_prompt,
+                    image_attached=image_b64 is not None,
+                    max_tokens=max_tokens,
+                    ollama_num_ctx=_resolve_case_num_ctx(case.evidence_mode, ollama_num_ctx, ollama_num_ctx_by_mode),
+                    max_retries=max_retries,
+                    retry_backoff_seconds=retry_backoff_seconds,
+                ),
+            )
 
             try:
-                trend_text, trend_trace, trend_prompt = _invoke_structured_smoke_text(
+                trend_text, trend_trace = _invoke_structured_smoke_text(
                     adapter=adapter,
                     model=model,
-                    prompt=trend_prompt_base,
+                    prompt_with_schema=trend_prompt,
                     image_b64=image_b64,
                     max_tokens=max_tokens,
-                    ollama_num_ctx=ollama_num_ctx,
+                    ollama_num_ctx=_resolve_case_num_ctx(case.evidence_mode, ollama_num_ctx, ollama_num_ctx_by_mode),
                     max_retries=max_retries,
                     retry_backoff_seconds=retry_backoff_seconds,
                 )
             except StructuredSmokeResponseError as exc:
-                _write_text(inputs_dir / "trend_prompt.txt", exc.prompt)
                 _write_json(requests_dir / "trend_request.json", exc.trace["request"])
                 _write_json(outputs_dir / "trend_trace.json", exc.trace)
                 _write_optional_thinking(outputs_dir / "trend_thinking.txt", exc.trace)
                 raise
-            _write_text(inputs_dir / "trend_prompt.txt", trend_prompt)
             _write_json(requests_dir / "trend_request.json", trend_trace["request"])
             _write_text(outputs_dir / "trend_output.txt", trend_text)
             _write_json(outputs_dir / "trend_trace.json", trend_trace)
@@ -316,6 +344,8 @@ def run_local_qwen_sample_smoke(
                     error=str(exc),
                 )
             )
+            if stop_on_failure:
+                break
 
     review_csv_path = output_root / "request_review.csv"
     _write_review_csv(review_csv_path, review_rows)
@@ -420,19 +450,13 @@ def _invoke_structured_smoke_text(
     *,
     adapter: LLMAdapter,
     model: str,
-    prompt: str,
+    prompt_with_schema: str,
     image_b64: str | None = None,
     max_tokens: int,
     ollama_num_ctx: int,
     max_retries: int | None = None,
     retry_backoff_seconds: float | None = None,
-) -> tuple[str, dict[str, object], str]:
-    schema = StructuredSmokeText.model_json_schema()
-    prompt_with_schema = (
-        f"{prompt}\n\n"
-        "Return your final answer as a JSON object that matches this schema exactly:\n"
-        f"{json.dumps(schema, indent=2, sort_keys=True)}"
-    )
+) -> tuple[str, dict[str, object]]:
     raw_text, trace = invoke_adapter_with_trace(
         adapter=adapter,
         model=model,
@@ -440,8 +464,10 @@ def _invoke_structured_smoke_text(
         image_b64=image_b64,
         max_tokens=max_tokens,
         request_metadata={
+            "structured_output_name": "structured_smoke_text",
+            "structured_output_schema": StructuredSmokeText.model_json_schema(),
             "ollama_num_ctx": ollama_num_ctx,
-            "ollama_format": schema,
+            "ollama_format": StructuredSmokeText.model_json_schema(),
             "preserve_raw_text": True,
         },
         max_retries=max_retries,
@@ -449,12 +475,12 @@ def _invoke_structured_smoke_text(
     )
     response_block = trace.get("response")
     raw_response = response_block if isinstance(response_block, dict) else {}
+    raw_payload = raw_response.get("raw")
+    raw_payload_dict = raw_payload if isinstance(raw_payload, dict) else {}
     try:
         parsed = StructuredSmokeText.model_validate_json(raw_text)
     except Exception as exc:
         thinking_text = _extract_thinking_text(trace)
-        raw_payload = raw_response.get("raw")
-        raw_payload_dict = raw_payload if isinstance(raw_payload, dict) else {}
         done_reason = raw_payload_dict.get("done_reason")
         eval_count = raw_payload_dict.get("eval_count")
         if thinking_text:
@@ -477,6 +503,13 @@ def _invoke_structured_smoke_text(
             trace=trace,
             prompt=prompt_with_schema,
         ) from exc
+    done_reason = raw_payload_dict.get("done_reason")
+    if done_reason == "length":
+        raise StructuredSmokeResponseError(
+            "model reached max_tokens before completing the structured response",
+            trace=trace,
+            prompt=prompt_with_schema,
+        )
     final_text = parsed.response_text.strip()
     if not final_text:
         raise StructuredSmokeResponseError(
@@ -486,7 +519,54 @@ def _invoke_structured_smoke_text(
         )
     if isinstance(response_block, dict):
         response_block["parsed_response"] = parsed.model_dump(mode="json")
-    return final_text, trace, prompt_with_schema
+    return final_text, trace
+
+
+def _build_request_preview(
+    *,
+    model: str,
+    prompt_with_schema: str,
+    image_attached: bool,
+    max_tokens: int,
+    ollama_num_ctx: int,
+    max_retries: int | None,
+    retry_backoff_seconds: float | None,
+) -> dict[str, object]:
+    prompt_signature = hashlib.sha256(prompt_with_schema.encode("utf-8")).hexdigest()
+    defaults = get_runtime_defaults().llm_request
+    return {
+        "provider": "ollama",
+        "model": model,
+        "temperature": 1.0,
+        "max_tokens": max_tokens,
+        "max_retries": max(defaults.max_retries if max_retries is None else max_retries, 0),
+        "retry_backoff_seconds": max(
+            defaults.retry_backoff_seconds if retry_backoff_seconds is None else retry_backoff_seconds,
+            0.0,
+        ),
+        "image_attached": image_attached,
+        "prompt_text": prompt_with_schema,
+        "prompt_length": len(prompt_with_schema),
+        "prompt_signature": prompt_signature,
+        "message_count": 1,
+        "messages": [{"role": "user", "content": prompt_with_schema}],
+        "metadata": {
+            "ollama_num_ctx": ollama_num_ctx,
+            "ollama_format": StructuredSmokeText.model_json_schema(),
+            "preserve_raw_text": True,
+        },
+    }
+
+
+def _resolve_case_num_ctx(
+    evidence_mode: EvidenceMode,
+    default_num_ctx: int,
+    num_ctx_by_mode: dict[EvidenceMode, int] | None,
+) -> int:
+    if not num_ctx_by_mode:
+        return default_num_ctx
+    resolved = num_ctx_by_mode.get(evidence_mode, default_num_ctx)
+    return resolved if resolved > 0 else default_num_ctx
 
 
 def _validate_case_inputs(input_bundle: LocalQwenCaseInput) -> None:

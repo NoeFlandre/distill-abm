@@ -39,6 +39,14 @@ def test_factory_creates_openrouter_adapter() -> None:
     """Test that openrouter provider creates OpenRouterAdapter."""
     adapter = create_adapter(provider="openrouter", model="test-model")
     assert isinstance(adapter, OpenRouterAdapter)
+    assert adapter.timeout_seconds == 120.0
+
+
+def test_factory_passes_openrouter_timeout_kwarg() -> None:
+    """Test that openrouter timeout kwarg is passed through."""
+    adapter = create_adapter(provider="openrouter", model="test-model", timeout_seconds=900.0)
+    assert isinstance(adapter, OpenRouterAdapter)
+    assert adapter.timeout_seconds == 900.0
 
 
 def test_factory_creates_anthropic_adapter() -> None:

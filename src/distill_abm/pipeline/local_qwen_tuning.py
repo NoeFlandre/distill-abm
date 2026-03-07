@@ -151,6 +151,7 @@ def run_local_qwen_tuning(
                     max_tokens=max_tokens,
                     ollama_num_ctx=num_ctx,
                     resume_existing=resume_existing,
+                    stop_on_failure=True,
                     max_retries=0,
                     retry_backoff_seconds=0.0,
                 )

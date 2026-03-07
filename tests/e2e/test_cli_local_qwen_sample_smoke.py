@@ -26,6 +26,7 @@ def _write_supporting_results(root: Path) -> None:
 def test_cli_smoke_local_qwen_invokes_sample_smoke(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
     _write_supporting_results(tmp_path)
     captured: dict[str, object] = {}
+    adapter_calls: dict[str, object] = {}
 
     def fake_run_local_qwen_sample_smoke(**kwargs):  # type: ignore[no-untyped-def]
         captured.update(kwargs)
@@ -39,7 +40,11 @@ def test_cli_smoke_local_qwen_invokes_sample_smoke(tmp_path: Path, monkeypatch) 
         )
 
     monkeypatch.setattr(cli_module, "_assert_ollama_model_available", lambda _model: None)
-    monkeypatch.setattr(cli_module, "create_adapter", lambda provider, model: object())
+    def fake_create_adapter(provider, model, **kwargs):  # type: ignore[no-untyped-def]
+        adapter_calls.update({"provider": provider, "model": model, **kwargs})
+        return object()
+
+    monkeypatch.setattr(cli_module, "create_adapter", fake_create_adapter)
     monkeypatch.setattr(cli_module, "run_local_qwen_sample_smoke", fake_run_local_qwen_sample_smoke)
 
     result = runner.invoke(
@@ -52,6 +57,16 @@ def test_cli_smoke_local_qwen_invokes_sample_smoke(tmp_path: Path, monkeypatch) 
             str(tmp_path / "viz"),
             "--output-root",
             str(tmp_path / "out"),
+            "--max-tokens",
+            "2000",
+            "--num-ctx",
+            "4096",
+            "--plot-num-ctx",
+            "4096",
+            "--table-num-ctx",
+            "4096",
+            "--plot-table-num-ctx",
+            "8192",
             "--resume",
             "--json",
         ],
@@ -61,3 +76,70 @@ def test_cli_smoke_local_qwen_invokes_sample_smoke(tmp_path: Path, monkeypatch) 
     assert "report.json" in result.output
     assert captured["model"] == "qwen3.5:0.8b"
     assert captured["resume_existing"] is True
+    assert captured["max_tokens"] == 2000
+    assert captured["ollama_num_ctx"] == 4096
+    assert captured["ollama_num_ctx_by_mode"] == {"plot": 4096, "table": 4096, "plot+table": 8192}
+    assert adapter_calls["timeout_seconds"] == 900.0
+
+
+def test_cli_smoke_local_qwen_accepts_openrouter_model_alias(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    _write_supporting_results(tmp_path)
+    captured: dict[str, object] = {}
+    adapter_calls: dict[str, object] = {}
+
+    models_path = tmp_path / "models.yaml"
+    models_path.write_text(
+        """
+models:
+  nemotron:
+    provider: openrouter
+    model: nvidia/nemotron-nano-12b-v2-vl:free
+""".strip(),
+        encoding="utf-8",
+    )
+
+    def fake_run_local_qwen_sample_smoke(**kwargs):  # type: ignore[no-untyped-def]
+        captured.update(kwargs)
+        output_root = kwargs["output_root"]
+        return SimpleNamespace(
+            success=True,
+            report_json_path=Path(output_root) / "report.json",
+            report_markdown_path=Path(output_root) / "report.md",
+            review_csv_path=Path(output_root) / "review.csv",
+            failed_case_ids=[],
+        )
+
+    def fail_if_ollama_checked(_model):  # type: ignore[no-untyped-def]
+        raise AssertionError("ollama availability check should not run for openrouter models")
+
+    def fake_create_adapter(provider, model, **kwargs):  # type: ignore[no-untyped-def]
+        adapter_calls.update({"provider": provider, "model": model, **kwargs})
+        return object()
+
+    monkeypatch.setattr(cli_module, "_assert_ollama_model_available", fail_if_ollama_checked)
+    monkeypatch.setattr(cli_module, "create_adapter", fake_create_adapter)
+    monkeypatch.setattr(cli_module, "run_local_qwen_sample_smoke", fake_run_local_qwen_sample_smoke)
+
+    result = runner.invoke(
+        app,
+        [
+            "smoke-local-qwen",
+            "--models-path",
+            str(models_path),
+            "--model-id",
+            "nemotron",
+            "--ingest-root",
+            str(tmp_path / "ingest"),
+            "--viz-root",
+            str(tmp_path / "viz"),
+            "--output-root",
+            str(tmp_path / "out"),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["model"] == "nvidia/nemotron-nano-12b-v2-vl:free"
+    assert adapter_calls["provider"] == "openrouter"
+    assert adapter_calls["model"] == "nvidia/nemotron-nano-12b-v2-vl:free"
+    assert adapter_calls["timeout_seconds"] == 900.0

@@ -523,19 +523,39 @@ def smoke_local_qwen(
     ] = Path("configs/models.yaml"),
     model_id: Annotated[
         str,
-        typer.Option(help="Local Ollama model alias from configs/models.yaml."),
+        typer.Option(help="Model alias from configs/models.yaml."),
     ] = "qwen3_5_local",
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for the sampled local-Qwen smoke artifacts."),
     ] = Path("results/local_qwen_smoke_latest"),
+    max_tokens: Annotated[
+        int,
+        typer.Option(help="Override max output tokens for the sampled local-Qwen smoke."),
+    ] = 10000,
+    num_ctx: Annotated[
+        int,
+        typer.Option(help="Override Ollama num_ctx for the sampled local-Qwen smoke."),
+    ] = 32768,
+    plot_num_ctx: Annotated[
+        int | None,
+        typer.Option(help="Override Ollama num_ctx for plot-only smoke cases."),
+    ] = None,
+    table_num_ctx: Annotated[
+        int | None,
+        typer.Option(help="Override Ollama num_ctx for table-only smoke cases."),
+    ] = None,
+    plot_table_num_ctx: Annotated[
+        int | None,
+        typer.Option(help="Override Ollama num_ctx for plot+table smoke cases."),
+    ] = None,
     resume: Annotated[
         bool,
         typer.Option("--resume/--no-resume", help="Reuse successful local-Qwen smoke cases and rerun failed ones."),
     ] = True,
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
-    """Run a small real local-Qwen smoke to inspect exact prompts, evidence, hyperparameters, and outputs."""
+    """Run a small real sampled smoke to inspect exact prompts, evidence, hyperparameters, and outputs."""
     execute_smoke_local_qwen_command(
         abms=abms,
         models_root=models_root,
@@ -544,6 +564,11 @@ def smoke_local_qwen(
         models_path=models_path,
         model_id=model_id,
         output_root=output_root,
+        max_tokens=max_tokens,
+        num_ctx=num_ctx,
+        plot_num_ctx=plot_num_ctx,
+        table_num_ctx=table_num_ctx,
+        plot_table_num_ctx=plot_table_num_ctx,
         resume=resume,
         json_output=json_output,
         discover_abms=discover_configured_abms,

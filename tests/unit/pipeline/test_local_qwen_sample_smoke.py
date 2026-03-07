@@ -49,6 +49,52 @@ class ThinkingOnlyAdapter(LLMAdapter):
         )
 
 
+class TruncatedStructuredAdapter(LLMAdapter):
+    provider = "ollama"
+
+    def complete(self, request: LLMRequest) -> LLMResponse:
+        _ = request
+        return LLMResponse(
+            provider=self.provider,
+            model="qwen3.5:0.8b",
+            text=json.dumps({"response_text": "partial but not trustworthy"}),
+            raw={
+                "message": {"content": '{"response_text":"partial but not trustworthy"}', "thinking": "reasoning"},
+                "done_reason": "length",
+                "eval_count": 2048,
+                "prompt_eval_count": 300,
+            },
+        )
+
+
+class FailFirstThenCountAdapter(LLMAdapter):
+    provider = "ollama"
+
+    def __init__(self) -> None:
+        self.requests: list[LLMRequest] = []
+
+    def complete(self, request: LLMRequest) -> LLMResponse:
+        self.requests.append(request)
+        if len(self.requests) == 1:
+            return LLMResponse(
+                provider=self.provider,
+                model="qwen3.5:0.8b",
+                text="",
+                raw={
+                    "message": {"content": "", "thinking": "reasoning only"},
+                    "done_reason": "length",
+                    "eval_count": 1024,
+                    "prompt_eval_count": 300,
+                },
+            )
+        return LLMResponse(
+            provider=self.provider,
+            model="qwen3.5:0.8b",
+            text=json.dumps({"response_text": f"response-{len(self.requests)}"}),
+            raw={"message": {"thinking": f"thinking-{len(self.requests)}"}},
+        )
+
+
 def _write_case_input(tmp_path: Path) -> LocalQwenCaseInput:
     csv_path = tmp_path / "simulation.csv"
     pd.DataFrame(
@@ -130,8 +176,14 @@ def test_run_local_qwen_sample_smoke_writes_review_friendly_case_artifacts(tmp_p
     assert context_trace["request"]["max_tokens"] == 32768
     assert context_trace["request"]["metadata"]["ollama_num_ctx"] == 131072
     assert context_trace["request"]["metadata"]["ollama_format"]["type"] == "object"
+    assert context_trace["request"]["metadata"]["structured_output_schema"]["type"] == "object"
+    assert context_trace["request"]["metadata"]["structured_output_name"] == "structured_smoke_text"
     assert trend_trace["request"]["image_attached"] is True
-    assert "response-1" in (case_dir / "01_inputs" / "trend_prompt.txt").read_text(encoding="utf-8")
+    trend_prompt_text = (case_dir / "01_inputs" / "trend_prompt.txt").read_text(encoding="utf-8")
+    context_prompt_text = (case_dir / "01_inputs" / "context_prompt.txt").read_text(encoding="utf-8")
+    assert "response-1" in trend_prompt_text
+    assert "Return your final answer as a JSON object" not in context_prompt_text
+    assert "Return your final answer as a JSON object" not in trend_prompt_text
     assert result.review_csv_path.exists()
     review_csv = result.review_csv_path.read_text(encoding="utf-8")
     assert "case_summary_path" in review_csv
@@ -195,3 +247,56 @@ def test_run_local_qwen_sample_smoke_preserves_partial_artifacts_on_thinking_onl
     assert (case_dir / "03_outputs" / "context_thinking.txt").read_text(encoding="utf-8") == "reasoning only"
     error_text = (case_dir / "03_outputs" / "error.txt").read_text(encoding="utf-8")
     assert "exhausted max_tokens on thinking" in error_text
+
+
+def test_run_local_qwen_sample_smoke_rejects_truncated_structured_output(tmp_path: Path) -> None:
+    result = run_local_qwen_sample_smoke(
+        case_inputs={"milk_consumption": _write_case_input(tmp_path)},
+        adapter=TruncatedStructuredAdapter(),
+        model="qwen3.5:0.8b",
+        output_root=tmp_path / "smoke",
+        cases=(
+            LocalQwenSampleCase(
+                case_id="milk_plot_case",
+                abm="milk_consumption",
+                evidence_mode="plot",
+                prompt_variant="none",
+            ),
+        ),
+    )
+
+    assert result.success is False
+    case_dir = result.cases[0].case_dir
+    assert (case_dir / "03_outputs" / "context_trace.json").exists()
+    error_text = (case_dir / "03_outputs" / "error.txt").read_text(encoding="utf-8")
+    assert "reached max_tokens before completing the structured response" in error_text
+
+
+def test_run_local_qwen_sample_smoke_can_stop_after_first_failure(tmp_path: Path) -> None:
+    adapter = FailFirstThenCountAdapter()
+    result = run_local_qwen_sample_smoke(
+        case_inputs={"milk_consumption": _write_case_input(tmp_path)},
+        adapter=adapter,
+        model="qwen3.5:0.8b",
+        output_root=tmp_path / "smoke",
+        cases=(
+            LocalQwenSampleCase(
+                case_id="milk_plot_case_1",
+                abm="milk_consumption",
+                evidence_mode="plot",
+                prompt_variant="none",
+            ),
+            LocalQwenSampleCase(
+                case_id="milk_plot_case_2",
+                abm="milk_consumption",
+                evidence_mode="plot",
+                prompt_variant="none",
+            ),
+        ),
+        stop_on_failure=True,
+    )
+
+    assert result.success is False
+    assert len(result.cases) == 1
+    assert result.failed_case_ids == ["milk_plot_case_1"]
+    assert len(adapter.requests) == 1
