@@ -23,29 +23,30 @@ def _write_supporting_results(root: Path) -> None:
         (viz_dir / "1.png").write_bytes(b"png")
 
 
-def test_cli_smoke_local_qwen_invokes_sample_smoke(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+def test_cli_tune_local_qwen_invokes_tuning(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
     _write_supporting_results(tmp_path)
     captured: dict[str, object] = {}
 
-    def fake_run_local_qwen_sample_smoke(**kwargs):  # type: ignore[no-untyped-def]
+    def fake_run_local_qwen_tuning(**kwargs):  # type: ignore[no-untyped-def]
         captured.update(kwargs)
         output_root = kwargs["output_root"]
         return SimpleNamespace(
             success=True,
             report_json_path=Path(output_root) / "report.json",
             report_markdown_path=Path(output_root) / "report.md",
-            review_csv_path=Path(output_root) / "review.csv",
-            failed_case_ids=[],
+            trials_csv_path=Path(output_root) / "trials.csv",
+            recommendations=[],
+            trials=[],
         )
 
     monkeypatch.setattr(cli_module, "_assert_ollama_model_available", lambda _model: None)
     monkeypatch.setattr(cli_module, "create_adapter", lambda provider, model: object())
-    monkeypatch.setattr(cli_module, "run_local_qwen_sample_smoke", fake_run_local_qwen_sample_smoke)
+    monkeypatch.setattr(cli_module, "run_local_qwen_tuning", fake_run_local_qwen_tuning)
 
     result = runner.invoke(
         app,
         [
-            "smoke-local-qwen",
+            "tune-local-qwen",
             "--ingest-root",
             str(tmp_path / "ingest"),
             "--viz-root",
@@ -61,3 +62,4 @@ def test_cli_smoke_local_qwen_invokes_sample_smoke(tmp_path: Path, monkeypatch) 
     assert "report.json" in result.output
     assert captured["model"] == "qwen3.5:0.8b"
     assert captured["resume_existing"] is True
+    assert captured["max_tokens_candidates"] == (1024, 2048, 4096, 8192, 16384)

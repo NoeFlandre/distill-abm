@@ -52,6 +52,7 @@ from distill_abm.pipeline.local_qwen_monitor import (
     stream_local_qwen_monitor,
 )
 from distill_abm.pipeline.local_qwen_sample_smoke import LocalQwenCaseInput
+from distill_abm.pipeline.local_qwen_tuning import LocalQwenTuningResult
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode
 from distill_abm.pipeline.smoke import SmokeSuiteInputs
 
@@ -524,6 +525,7 @@ def execute_smoke_local_qwen_command(
     models_path: Path,
     model_id: str,
     output_root: Path,
+    resume: bool,
     json_output: bool,
     discover_abms: Callable[[], tuple[str, ...]],
     resolve_model_from_registry: Callable[[Path, str], tuple[str, str]],
@@ -564,6 +566,7 @@ def execute_smoke_local_qwen_command(
         adapter=adapter,
         model=model,
         output_root=output_root,
+        resume_existing=resume,
     )
     command_result = SmokeCommandResult(
         command="smoke-local-qwen",
@@ -602,6 +605,7 @@ def execute_monitor_local_qwen_command(
                 {
                     "output_root": str(snapshot.output_root),
                     "exists": snapshot.exists,
+                    "mode": snapshot.mode,
                     "total_cases": snapshot.total_cases,
                     "completed_cases": snapshot.completed_cases,
                     "failed_cases": snapshot.failed_cases,
@@ -614,6 +618,86 @@ def execute_monitor_local_qwen_command(
         )
         return
     typer.echo(render_local_qwen_monitor(snapshot))
+
+
+def execute_tune_local_qwen_command(
+    *,
+    abms: list[str] | None,
+    models_root: Path,
+    ingest_root: Path,
+    viz_root: Path,
+    models_path: Path,
+    model_id: str,
+    output_root: Path,
+    num_ctx_candidates: list[int] | None,
+    max_tokens_candidates: list[int] | None,
+    resume: bool,
+    json_output: bool,
+    discover_abms: Callable[[], tuple[str, ...]],
+    resolve_model_from_registry: Callable[[Path, str], tuple[str, str]],
+    resolve_model_path: Callable[..., Path],
+    assert_ollama_model_available: Callable[[str], None],
+    create_adapter_fn: Callable[[str, str], Any],
+    run_local_qwen_tuning_fn: Callable[..., LocalQwenTuningResult],
+    load_abm_config_fn: Callable[[Path], Any],
+) -> None:
+    requested = sorted(set(abms)) if abms else list(discover_abms())
+    provider, model = resolve_model_from_registry(models_path, model_id)
+    if provider != "ollama":
+        raise typer.BadParameter(f"model id '{model_id}' must resolve to an ollama model for tune-local-qwen.")
+    assert_ollama_model_available(model)
+    resolved_num_ctx_candidates = tuple(sorted(set(num_ctx_candidates or [8192, 16384, 32768, 65536, 131072])))
+    resolved_max_tokens_candidates = tuple(sorted(set(max_tokens_candidates or [1024, 2048, 4096, 8192, 16384])))
+    if any(item <= 0 for item in resolved_max_tokens_candidates):
+        raise typer.BadParameter("--max-tokens values must be positive")
+    case_inputs: dict[str, LocalQwenCaseInput] = {}
+    for abm in requested:
+        abm_config: Any = load_abm_config_fn(Path("configs/abms") / f"{abm}.yaml")
+        _ = resolve_model_path(abm=abm, models_root=models_root)
+        if abm_config.netlogo_viz is None or not abm_config.netlogo_viz.plots:
+            raise typer.BadParameter(f"missing netlogo_viz plot config for ABM '{abm}'")
+        if not abm_config.plot_descriptions:
+            raise typer.BadParameter(f"missing plot descriptions for ABM '{abm}'")
+        first_plot = abm_config.netlogo_viz.plots[0]
+        case_inputs[abm] = LocalQwenCaseInput(
+            abm=abm,
+            csv_path=viz_root / abm / "simulation.csv",
+            parameters_path=ingest_root / abm / "TXT" / "narrative_combined.txt",
+            documentation_path=ingest_root / abm / "TXT" / "final_documentation.txt",
+            reporter_pattern=first_plot.reporter_pattern,
+            plot_description=abm_config.plot_descriptions[0],
+            plot_path=viz_root / abm / "plots" / "1.png",
+        )
+
+    adapter: Any = create_adapter_fn(provider, model)
+    result = run_local_qwen_tuning_fn(
+        case_inputs=case_inputs,
+        adapter=adapter,
+        model=model,
+        output_root=output_root,
+        num_ctx_candidates=resolved_num_ctx_candidates,
+        max_tokens_candidates=resolved_max_tokens_candidates,
+        resume_existing=resume,
+    )
+    command_result = SmokeCommandResult(
+        command="tune-local-qwen",
+        success=result.success,
+        report_json_path=result.report_json_path,
+        report_markdown_path=result.report_markdown_path,
+        failed_items=[
+            recommendation.evidence_mode
+            for recommendation in result.recommendations
+            if not recommendation.based_on_successful_trial
+        ],
+        nested_artifacts={"trials_csv": result.trials_csv_path},
+    )
+    emit_smoke_command_result(
+        command_result=command_result,
+        json_output=json_output,
+        markdown_label="local qwen tuning report (markdown)",
+        json_label="local qwen tuning report (json)",
+        failure_label="local qwen tuning failed",
+    )
 
 
 def execute_smoke_ingest_command(

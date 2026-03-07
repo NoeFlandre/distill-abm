@@ -144,6 +144,23 @@ uv run distill-abm health-check \
   --json
 ```
 
+Tune local Qwen runtime limits by evidence mode:
+
+```bash
+uv run distill-abm tune-local-qwen \
+  --ingest-root results/ingest_smoke_latest \
+  --viz-root results/viz_smoke_latest \
+  --output-root results/local_qwen_tuning_latest \
+  --resume \
+  --json
+```
+
+Monitor a local-Qwen smoke run live:
+
+```bash
+uv run distill-abm monitor-local-qwen --watch --interval-seconds 2
+```
+
 DOE smoke notes:
 
 - `smoke-doe` does not call any LLM.
@@ -195,6 +212,10 @@ Agent-oriented CLI additions:
 - `smoke-viz` provides stage-filtering and `--require-stage` for the generated simulation CSV and each ordered plot image.
 - `smoke-doe` provides a structured pre-LLM view of the full DOE matrix and writes grouped shared artifacts plus compact case/request indexes that can be reviewed without opening thousands of files.
 - `smoke-local-qwen` runs a small stratified sample with the local `qwen3_5_local` Ollama model and writes one self-contained folder per sampled case plus a review CSV with exact prompt text, evidence paths, hyperparameters, and outputs.
+- `smoke-local-qwen` supports `--resume` and reuses only successful case artifacts; failed or incomplete cases are rerun.
+- `monitor-local-qwen` renders a compact live dashboard for either a local-Qwen smoke directory or a local-Qwen tuning directory, including current case or trial, configured `num_ctx`, `max_tokens`, prompt lengths, and observed token usage.
+- `tune-local-qwen` runs local-Qwen context-window and token-budget ablations by evidence mode and writes compact recommendations for the smallest successful `num_ctx` together with the smallest successful `max_tokens` budget observed for that mode.
+- `tune-local-qwen` supports `--resume` and reuses only successful trial artifacts; failed or incomplete trials are rerun.
 - `health-check` performs a lightweight read-only validation of configured ABMs, model-registry resolution, expected ingest/viz artifact roots, and optionally local Ollama model availability.
 - `ingest-netlogo` and `ingest-netlogo-suite` now write stable artifact manifests.
 - Read-only inspection commands are available for agent loops:

@@ -26,6 +26,15 @@ SMOKE_MAX_TOKENS = 32768
 SMOKE_OLLAMA_NUM_CTX = 131072
 
 
+class StructuredSmokeResponseError(ValueError):
+    """Structured smoke response failed validation but still produced a trace worth keeping."""
+
+    def __init__(self, message: str, *, trace: dict[str, object], prompt: str) -> None:
+        super().__init__(message)
+        self.trace = trace
+        self.prompt = prompt
+
+
 class StructuredSmokeText(BaseModel):
     """Structured smoke output schema for one text response."""
 
@@ -63,6 +72,7 @@ class LocalQwenSampleCaseResult(BaseModel):
     case_dir: Path
     success: bool
     error: str | None = None
+    resumed_from_existing: bool = False
 
 
 class LocalQwenSampleSmokeResult(BaseModel):
@@ -135,6 +145,11 @@ def run_local_qwen_sample_smoke(
     model: str,
     output_root: Path,
     cases: tuple[LocalQwenSampleCase, ...] | None = None,
+    max_tokens: int = SMOKE_MAX_TOKENS,
+    ollama_num_ctx: int = SMOKE_OLLAMA_NUM_CTX,
+    resume_existing: bool = False,
+    max_retries: int | None = None,
+    retry_backoff_seconds: float | None = None,
 ) -> LocalQwenSampleSmokeResult:
     """Run a minimal real local-Qwen smoke across sampled DOE-style cases."""
     started_at = datetime.now(UTC)
@@ -153,6 +168,12 @@ def run_local_qwen_sample_smoke(
             directory.mkdir(parents=True, exist_ok=True)
         input_bundle = case_inputs[case.abm]
         try:
+            if resume_existing:
+                resumed = _load_resumable_case_result(case=case, case_dir=case_dir)
+                if resumed is not None:
+                    review_rows.append(_build_review_row_from_existing(case_dir=case_dir))
+                    results.append(resumed)
+                    continue
             _validate_case_inputs(input_bundle)
             enabled = set(case.prompt_variant.replace("all_three", "role+insights+example").split("+"))
             if case.prompt_variant == "none":
@@ -166,11 +187,22 @@ def run_local_qwen_sample_smoke(
             shutil.copy2(input_bundle.parameters_path, inputs_dir / "parameters.txt")
             shutil.copy2(input_bundle.documentation_path, inputs_dir / "documentation.txt")
 
-            context_text, context_trace, context_prompt = _invoke_structured_smoke_text(
-                adapter=adapter,
-                model=model,
-                prompt=context_prompt_base,
-            )
+            try:
+                context_text, context_trace, context_prompt = _invoke_structured_smoke_text(
+                    adapter=adapter,
+                    model=model,
+                    prompt=context_prompt_base,
+                    max_tokens=max_tokens,
+                    ollama_num_ctx=ollama_num_ctx,
+                    max_retries=max_retries,
+                    retry_backoff_seconds=retry_backoff_seconds,
+                )
+            except StructuredSmokeResponseError as exc:
+                _write_text(inputs_dir / "context_prompt.txt", exc.prompt)
+                _write_json(requests_dir / "context_request.json", exc.trace["request"])
+                _write_json(outputs_dir / "context_trace.json", exc.trace)
+                _write_optional_thinking(outputs_dir / "context_thinking.txt", exc.trace)
+                raise
             _write_text(inputs_dir / "context_prompt.txt", context_prompt)
             _write_json(requests_dir / "context_request.json", context_trace["request"])
             _write_text(outputs_dir / "context_output.txt", context_text)
@@ -194,12 +226,23 @@ def run_local_qwen_sample_smoke(
                 shutil.copy2(input_bundle.plot_path, image_path)
                 image_b64 = encode_image(image_path)
 
-            trend_text, trend_trace, trend_prompt = _invoke_structured_smoke_text(
-                adapter=adapter,
-                model=model,
-                prompt=trend_prompt_base,
-                image_b64=image_b64,
-            )
+            try:
+                trend_text, trend_trace, trend_prompt = _invoke_structured_smoke_text(
+                    adapter=adapter,
+                    model=model,
+                    prompt=trend_prompt_base,
+                    image_b64=image_b64,
+                    max_tokens=max_tokens,
+                    ollama_num_ctx=ollama_num_ctx,
+                    max_retries=max_retries,
+                    retry_backoff_seconds=retry_backoff_seconds,
+                )
+            except StructuredSmokeResponseError as exc:
+                _write_text(inputs_dir / "trend_prompt.txt", exc.prompt)
+                _write_json(requests_dir / "trend_request.json", exc.trace["request"])
+                _write_json(outputs_dir / "trend_trace.json", exc.trace)
+                _write_optional_thinking(outputs_dir / "trend_thinking.txt", exc.trace)
+                raise
             _write_text(inputs_dir / "trend_prompt.txt", trend_prompt)
             _write_json(requests_dir / "trend_request.json", trend_trace["request"])
             _write_text(outputs_dir / "trend_output.txt", trend_text)
@@ -310,12 +353,79 @@ def _build_case_table(
     return table_csv
 
 
+def _load_resumable_case_result(
+    *,
+    case: LocalQwenSampleCase,
+    case_dir: Path,
+) -> LocalQwenSampleCaseResult | None:
+    required_paths = (
+        case_dir / "00_case_summary.json",
+        case_dir / "01_inputs" / "context_prompt.txt",
+        case_dir / "01_inputs" / "trend_prompt.txt",
+        case_dir / "02_requests" / "context_request.json",
+        case_dir / "02_requests" / "trend_request.json",
+        case_dir / "02_requests" / "hyperparameters.json",
+        case_dir / "03_outputs" / "context_output.txt",
+        case_dir / "03_outputs" / "context_trace.json",
+        case_dir / "03_outputs" / "trend_output.txt",
+        case_dir / "03_outputs" / "trend_trace.json",
+    )
+    if any(not path.exists() for path in required_paths):
+        return None
+    if (case_dir / "03_outputs" / "error.txt").exists():
+        return None
+    return LocalQwenSampleCaseResult(
+        case_id=case.case_id,
+        abm=case.abm,
+        evidence_mode=case.evidence_mode,
+        prompt_variant=case.prompt_variant,
+        case_dir=case_dir,
+        success=True,
+        resumed_from_existing=True,
+    )
+
+
+def _build_review_row_from_existing(case_dir: Path) -> dict[str, str]:
+    inputs_dir = case_dir / "01_inputs"
+    outputs_dir = case_dir / "03_outputs"
+    requests_dir = case_dir / "02_requests"
+    summary_path = case_dir / "00_case_summary.json"
+    summary_payload = json.loads(summary_path.read_text(encoding="utf-8"))
+    image_path = inputs_dir / "trend_evidence_plot.png"
+    table_path = inputs_dir / "trend_evidence_table.csv"
+    return {
+        "case_id": str(summary_payload["case_id"]),
+        "abm": str(summary_payload["abm"]),
+        "evidence_mode": str(summary_payload["evidence_mode"]),
+        "prompt_variant": str(summary_payload["prompt_variant"]),
+        "model": str(summary_payload["model"]),
+        "case_summary_path": str(summary_path),
+        "context_prompt_path": str(inputs_dir / "context_prompt.txt"),
+        "context_prompt_text": (inputs_dir / "context_prompt.txt").read_text(encoding="utf-8"),
+        "trend_prompt_path": str(inputs_dir / "trend_prompt.txt"),
+        "trend_prompt_text": (inputs_dir / "trend_prompt.txt").read_text(encoding="utf-8"),
+        "image_path": str(image_path if image_path.exists() else ""),
+        "table_csv_path": str(table_path if table_path.exists() else ""),
+        "parameters_path": str(inputs_dir / "parameters.txt"),
+        "documentation_path": str(inputs_dir / "documentation.txt"),
+        "hyperparameters_path": str(requests_dir / "hyperparameters.json"),
+        "context_output_path": str(outputs_dir / "context_output.txt"),
+        "context_output_text": (outputs_dir / "context_output.txt").read_text(encoding="utf-8"),
+        "trend_output_path": str(outputs_dir / "trend_output.txt"),
+        "trend_output_text": (outputs_dir / "trend_output.txt").read_text(encoding="utf-8"),
+    }
+
+
 def _invoke_structured_smoke_text(
     *,
     adapter: LLMAdapter,
     model: str,
     prompt: str,
     image_b64: str | None = None,
+    max_tokens: int,
+    ollama_num_ctx: int,
+    max_retries: int | None = None,
+    retry_backoff_seconds: float | None = None,
 ) -> tuple[str, dict[str, object], str]:
     schema = StructuredSmokeText.model_json_schema()
     prompt_with_schema = (
@@ -328,24 +438,52 @@ def _invoke_structured_smoke_text(
         model=model,
         prompt=prompt_with_schema,
         image_b64=image_b64,
-        max_tokens=SMOKE_MAX_TOKENS,
+        max_tokens=max_tokens,
         request_metadata={
-            "ollama_num_ctx": SMOKE_OLLAMA_NUM_CTX,
+            "ollama_num_ctx": ollama_num_ctx,
             "ollama_format": schema,
             "preserve_raw_text": True,
         },
+        max_retries=max_retries,
+        retry_backoff_seconds=retry_backoff_seconds,
     )
+    response_block = trace.get("response")
+    raw_response = response_block if isinstance(response_block, dict) else {}
     try:
         parsed = StructuredSmokeText.model_validate_json(raw_text)
     except Exception as exc:
         thinking_text = _extract_thinking_text(trace)
+        raw_payload = raw_response.get("raw")
+        raw_payload_dict = raw_payload if isinstance(raw_payload, dict) else {}
+        done_reason = raw_payload_dict.get("done_reason")
+        eval_count = raw_payload_dict.get("eval_count")
         if thinking_text:
-            raise ValueError("model returned only thinking without a final structured response") from exc
-        raise ValueError("model did not return valid structured JSON for the smoke output") from exc
+            if done_reason == "length":
+                raise StructuredSmokeResponseError(
+                    (
+                        "model exhausted max_tokens on thinking before emitting a final structured response"
+                        + (f" (eval_count={eval_count})" if isinstance(eval_count, int) else "")
+                    ),
+                    trace=trace,
+                    prompt=prompt_with_schema,
+                ) from exc
+            raise StructuredSmokeResponseError(
+                "model returned only thinking without a final structured response",
+                trace=trace,
+                prompt=prompt_with_schema,
+            ) from exc
+        raise StructuredSmokeResponseError(
+            "model did not return valid structured JSON for the smoke output",
+            trace=trace,
+            prompt=prompt_with_schema,
+        ) from exc
     final_text = parsed.response_text.strip()
     if not final_text:
-        raise ValueError("structured smoke output contained an empty response_text")
-    response_block = trace.get("response")
+        raise StructuredSmokeResponseError(
+            "structured smoke output contained an empty response_text",
+            trace=trace,
+            prompt=prompt_with_schema,
+        )
     if isinstance(response_block, dict):
         response_block["parsed_response"] = parsed.model_dump(mode="json")
     return final_text, trace, prompt_with_schema

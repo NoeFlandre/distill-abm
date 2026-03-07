@@ -25,6 +25,13 @@
 - Exposes `smoke-local-qwen` for a minimal real-inference verification pass against the local Ollama Qwen model.
   - `smoke-local-qwen` resolves the latest ingest and visualization smoke artifacts for each ABM, samples a small stratified subset of evidence/prompt combinations, and runs one context plus one trend inference per sampled case.
   - It writes self-contained case folders with the exact prompt text passed to the model, copied image/table evidence, request hyperparameters, and raw outputs so a human can inspect whether the local execution path is coherent before a full run.
+  - `smoke-local-qwen` supports `--resume` and reuses only successful case artifacts; failed or incomplete cases are rerun.
+- Exposes `monitor-local-qwen` for a compact live dashboard over either a local-Qwen smoke output directory or a local-Qwen tuning output directory.
+  - The monitor surfaces current case status, configured `num_ctx`, configured `max_tokens`, prompt lengths, observed token totals, and recent errors.
+- Exposes `tune-local-qwen` for local runtime-limit ablations by evidence mode.
+  - `tune-local-qwen` runs the same prompt/evidence path as `smoke-local-qwen`, but sweeps candidate `num_ctx` and `max_tokens` values to find the smallest successful runtime budget for `plot`, `table`, and `plot+table`.
+  - It also records observed token usage and derives a practical `max_tokens` recommendation from successful trials.
+  - `tune-local-qwen` supports `--resume` and reuses only successful trial artifacts; failed or incomplete trials are rerun.
 - Exposes `health-check` for lightweight operator diagnostics.
   - `health-check` does not execute the pipeline.
   - It verifies configured ABMs, model-registry resolution, expected ingest/viz roots, and optional local Ollama availability for `qwen3.5:0.8b`.

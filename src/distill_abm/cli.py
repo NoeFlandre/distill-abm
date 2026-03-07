@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -25,10 +24,12 @@ from distill_abm.cli_actions import (
     execute_smoke_local_qwen_command,
     execute_smoke_qwen_command,
     execute_smoke_viz_command,
+    execute_tune_local_qwen_command,
     execute_validate_workspace_command,
 )
 from distill_abm.cli_support import (
     BENCHMARK_MODELS,
+    assert_ollama_model_available,
     discover_configured_abms,
     parse_summarizers,
     resolve_abm_model_path,
@@ -51,6 +52,7 @@ from distill_abm.pipeline.doe_smoke import (
     run_doe_smoke_suite,
 )
 from distill_abm.pipeline.local_qwen_sample_smoke import run_local_qwen_sample_smoke
+from distill_abm.pipeline.local_qwen_tuning import run_local_qwen_tuning
 from distill_abm.pipeline.run import EvidenceMode, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
     run_qwen_smoke_suite,
@@ -84,7 +86,7 @@ __all__ = [
     "smoke_local_qwen",
     "smoke_qwen",
     "smoke_viz",
-    "subprocess",
+    "tune_local_qwen",
     "validate_workspace",
 ]
 
@@ -527,6 +529,10 @@ def smoke_local_qwen(
         Path,
         typer.Option(help="Directory for the sampled local-Qwen smoke artifacts."),
     ] = Path("results/local_qwen_smoke_latest"),
+    resume: Annotated[
+        bool,
+        typer.Option("--resume/--no-resume", help="Reuse successful local-Qwen smoke cases and rerun failed ones."),
+    ] = True,
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run a small real local-Qwen smoke to inspect exact prompts, evidence, hyperparameters, and outputs."""
@@ -538,6 +544,7 @@ def smoke_local_qwen(
         models_path=models_path,
         model_id=model_id,
         output_root=output_root,
+        resume=resume,
         json_output=json_output,
         discover_abms=discover_configured_abms,
         resolve_model_from_registry=resolve_model_from_registry,
@@ -574,6 +581,82 @@ def monitor_local_qwen(
         watch=watch,
         interval_seconds=interval_seconds,
         json_output=json_output,
+    )
+
+
+@app.command("tune-local-qwen")
+def tune_local_qwen(
+    abms: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--abm",
+            help="ABM names to inspect. Repeat for multiple. Defaults to all configured ABMs.",
+        ),
+    ] = None,
+    models_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ABM model files for asset discovery."),
+    ] = Path("data"),
+    ingest_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ingest smoke outputs."),
+    ] = Path("results/ingest_smoke_latest"),
+    viz_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing visualization smoke outputs."),
+    ] = Path("results/viz_smoke_latest"),
+    models_path: Annotated[
+        Path,
+        typer.Option(exists=True, help="Model registry YAML path."),
+    ] = Path("configs/models.yaml"),
+    model_id: Annotated[
+        str,
+        typer.Option(help="Local Ollama model alias from configs/models.yaml."),
+    ] = "qwen3_5_local",
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for the local-Qwen tuning artifacts."),
+    ] = Path("results/local_qwen_tuning_latest"),
+    num_ctx_candidates: Annotated[
+        list[int] | None,
+        typer.Option(
+            "--num-ctx",
+            help="Candidate Ollama num_ctx values to test in ascending order. Repeat for multiple.",
+        ),
+    ] = None,
+    max_tokens_candidates: Annotated[
+        list[int] | None,
+        typer.Option(
+            "--max-tokens",
+            help="Candidate output-token budgets to test in ascending order. Repeat for multiple.",
+        ),
+    ] = None,
+    resume: Annotated[
+        bool,
+        typer.Option("--resume/--no-resume", help="Reuse successful tuning trials and rerun only failed ones."),
+    ] = True,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Tune local-Qwen num_ctx and output-token budgets by evidence mode."""
+    execute_tune_local_qwen_command(
+        abms=abms,
+        models_root=models_root,
+        ingest_root=ingest_root,
+        viz_root=viz_root,
+        models_path=models_path,
+        model_id=model_id,
+        output_root=output_root,
+        num_ctx_candidates=num_ctx_candidates,
+        max_tokens_candidates=max_tokens_candidates,
+        resume=resume,
+        json_output=json_output,
+        discover_abms=discover_configured_abms,
+        resolve_model_from_registry=resolve_model_from_registry,
+        resolve_model_path=resolve_abm_model_path,
+        assert_ollama_model_available=_assert_ollama_model_available,
+        create_adapter_fn=create_adapter,
+        run_local_qwen_tuning_fn=run_local_qwen_tuning,
+        load_abm_config_fn=load_abm_config,
     )
 
 
@@ -803,21 +886,7 @@ def main() -> None:
 
 
 def _assert_ollama_model_available(model: str) -> None:
-    try:
-        completed = subprocess.run(
-            ["ollama", "list"],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-    except Exception as exc:  # pragma: no cover - environment dependent
-        raise typer.BadParameter(f"failed to run 'ollama list' to verify local model '{model}': {exc}") from exc
-
-    lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
-    if not any(line.split()[0] == model for line in lines[1:] if line.split()):
-        raise typer.BadParameter(
-            f"required local model '{model}' not found in 'ollama list'. Pull it before benchmark runs."
-        )
+    assert_ollama_model_available(model)
 
 
 def _validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:

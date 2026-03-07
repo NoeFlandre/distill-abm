@@ -47,6 +47,7 @@ def test_collect_local_qwen_monitor_snapshot_reads_case_progress(tmp_path: Path)
 
     snapshot = collect_local_qwen_monitor_snapshot(tmp_path)
     assert snapshot.exists is True
+    assert snapshot.mode == "smoke"
     assert snapshot.total_cases == 1
     assert snapshot.completed_cases == 1
     assert snapshot.failed_cases == 0
@@ -68,3 +69,37 @@ def test_render_local_qwen_monitor_includes_main_metrics(tmp_path: Path) -> None
     assert "Local Qwen smoke" in rendered
     assert "02_case" in rendered
     assert "boom" in rendered
+
+
+def test_collect_local_qwen_monitor_snapshot_reads_tuning_trials(tmp_path: Path) -> None:
+    case_dir = tmp_path / "trials" / "plot" / "num_ctx_8192" / "max_tokens_1024" / "cases" / "01_case"
+    requests_dir = case_dir / "02_requests"
+    outputs_dir = case_dir / "03_outputs"
+    requests_dir.mkdir(parents=True, exist_ok=True)
+    outputs_dir.mkdir(parents=True, exist_ok=True)
+
+    (requests_dir / "trend_request.json").write_text(
+        json.dumps(
+            {
+                "max_tokens": 1024,
+                "prompt_length": 4800,
+                "metadata": {"ollama_num_ctx": 8192},
+            }
+        ),
+        encoding="utf-8",
+    )
+    (outputs_dir / "trend_trace.json").write_text(
+        json.dumps({"response": {"usage": {"total_tokens": 555}}}),
+        encoding="utf-8",
+    )
+
+    snapshot = collect_local_qwen_monitor_snapshot(tmp_path)
+    assert snapshot.exists is True
+    assert snapshot.mode == "tuning"
+    assert snapshot.total_cases == 1
+    assert snapshot.completed_cases == 1
+    trial = snapshot.cases[0]
+    assert trial.label == "num_ctx_8192/max_tokens_1024"
+    assert trial.num_ctx == 8192
+    assert trial.max_tokens == 1024
+    assert trial.trend_total_tokens == 555
