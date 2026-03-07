@@ -25,6 +25,7 @@ def create_adapter(provider: str, model: str, **kwargs: Any) -> LLMAdapter:
             api_key=kwargs.get("api_key"),
             site_url=kwargs.get("site_url"),
             app_name=kwargs.get("app_name", "distill-abm"),
+            timeout_seconds=kwargs.get("timeout_seconds", 120.0),
         )
     if key == "anthropic":
         return AnthropicAdapter(model=model, client=kwargs.get("client"))

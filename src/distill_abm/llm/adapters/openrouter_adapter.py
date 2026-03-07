@@ -6,7 +6,7 @@ import os
 from typing import Any
 
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError, LLMRequest, LLMResponse
-from distill_abm.llm.adapters.openai_adapter import _build_payload
+from distill_abm.llm.adapters.openai_adapter import _build_payload, _extract_completion_text, _normalize_completion
 from distill_abm.llm.adapters.timeout_utils import run_with_timeout
 
 DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
@@ -43,9 +43,11 @@ class OpenRouterAdapter(LLMAdapter):
             label="openrouter completion",
             fn=lambda: self._client_for_request().chat.completions.create(**payload),
         )
-        text = completion.choices[0].message.content or ""
-        model = getattr(completion, "model", request.model)
-        return LLMResponse(provider=self.provider, model=model, text=text, raw={"provider": "openrouter"})
+        normalized = _normalize_completion(completion)
+        text = _extract_completion_text(normalized)
+        model = str(normalized.get("model", request.model))
+        normalized.setdefault("provider", "openrouter")
+        return LLMResponse(provider=self.provider, model=model, text=text, raw=normalized)
 
     def _client_for_request(self) -> Any:
         if self._client is not None:

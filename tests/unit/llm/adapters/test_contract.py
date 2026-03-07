@@ -83,13 +83,52 @@ def test_openai_adapter_success() -> None:
 
 def test_openrouter_adapter_success() -> None:
     completion = SimpleNamespace(
-        choices=[SimpleNamespace(message=SimpleNamespace(content="hello from openrouter"))],
+        choices=[SimpleNamespace(message=SimpleNamespace(content="hello from openrouter"), finish_reason="stop")],
         model="google/gemini-3.1-pro-preview",
+        usage={"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
     )
     client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **_: completion)))
     response = OpenRouterAdapter(model="google/gemini-3.1-pro-preview", client=client).complete(make_request())
     assert response.provider == "openrouter"
     assert response.text == "hello from openrouter"
+    assert response.raw["model"] == "google/gemini-3.1-pro-preview"
+    assert response.raw["choices"][0]["finish_reason"] == "stop"
+    assert response.raw["usage"]["total_tokens"] == 15
+
+
+def test_openrouter_adapter_forwards_structured_output_metadata() -> None:
+    seen: dict[str, object] = {}
+
+    def _create(**payload):  # type: ignore[no-untyped-def]
+        seen.update(payload)
+        return SimpleNamespace(
+            choices=[SimpleNamespace(message=SimpleNamespace(content='{"response_text":"ok"}'), finish_reason="stop")],
+            model="nvidia/nemotron-nano-12b-v2-vl:free",
+        )
+
+    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=_create)))
+    request = LLMRequest(
+        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        messages=[LLMMessage(role="user", content="hello")],
+        metadata={
+            "structured_output_name": "structured_smoke_text",
+            "structured_output_schema": {
+                "type": "object",
+                "properties": {"response_text": {"type": "string"}},
+                "required": ["response_text"],
+            },
+        },
+    )
+
+    OpenRouterAdapter(model="nvidia/nemotron-nano-12b-v2-vl:free", client=client).complete(request)
+
+    assert seen["response_format"] == {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "structured_smoke_text",
+            "schema": request.metadata["structured_output_schema"],
+        },
+    }
 
 
 def test_openai_adapter_includes_image_payload_when_present() -> None:

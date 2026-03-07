@@ -26,6 +26,7 @@ def _write_supporting_results(root: Path) -> None:
 def test_cli_tune_local_qwen_invokes_tuning(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
     _write_supporting_results(tmp_path)
     captured: dict[str, object] = {}
+    adapter_calls: dict[str, object] = {}
 
     def fake_run_local_qwen_tuning(**kwargs):  # type: ignore[no-untyped-def]
         captured.update(kwargs)
@@ -40,7 +41,11 @@ def test_cli_tune_local_qwen_invokes_tuning(tmp_path: Path, monkeypatch) -> None
         )
 
     monkeypatch.setattr(cli_module, "_assert_ollama_model_available", lambda _model: None)
-    monkeypatch.setattr(cli_module, "create_adapter", lambda provider, model: object())
+    def fake_create_adapter(provider, model, **kwargs):  # type: ignore[no-untyped-def]
+        adapter_calls.update({"provider": provider, "model": model, **kwargs})
+        return object()
+
+    monkeypatch.setattr(cli_module, "create_adapter", fake_create_adapter)
     monkeypatch.setattr(cli_module, "run_local_qwen_tuning", fake_run_local_qwen_tuning)
 
     result = runner.invoke(
@@ -63,3 +68,4 @@ def test_cli_tune_local_qwen_invokes_tuning(tmp_path: Path, monkeypatch) -> None
     assert captured["model"] == "qwen3.5:0.8b"
     assert captured["resume_existing"] is True
     assert captured["max_tokens_candidates"] == (1024, 2048, 4096, 8192, 16384)
+    assert adapter_calls["timeout_seconds"] == 900.0

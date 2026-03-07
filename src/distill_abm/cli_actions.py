@@ -56,6 +56,8 @@ from distill_abm.pipeline.local_qwen_tuning import LocalQwenTuningResult
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode
 from distill_abm.pipeline.smoke import SmokeSuiteInputs
 
+LOCAL_QWEN_TIMEOUT_SECONDS = 900.0
+
 
 def execute_run_command(
     *,
@@ -102,7 +104,12 @@ def execute_run_command(
             plot_description = abm_config.plot_descriptions[0]
         scoring_reference_path = resolve_scoring_reference_path(abm)
 
-    adapter: Any = create_adapter_fn(provider, model)
+    adapter: Any = _create_local_ollama_adapter(
+        create_adapter_fn=create_adapter_fn,
+        provider=provider,
+        model=model,
+        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+    )
     result: Any = run_pipeline_fn(
         inputs=PipelineInputs(
             csv_path=csv_path,
@@ -285,7 +292,12 @@ def execute_evaluate_qualitative_command(
 ) -> None:
     validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
     prompts: Any = load_prompts_config_fn(prompts_path)
-    adapter: Any = create_adapter_fn(provider, model)
+    adapter: Any = _create_local_ollama_adapter(
+        create_adapter_fn=create_adapter_fn,
+        provider=provider,
+        model=model,
+        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+    )
     result: Any = evaluate_qualitative_score_fn(
         summary=summary_text,
         source=source_text,
@@ -347,7 +359,12 @@ def execute_smoke_qwen_command(
         sweep_plot_descriptions = list(abm_config.plot_descriptions)
         scoring_reference_path = resolve_scoring_reference_path(abm)
     selected_cases: Any = select_smoke_cases(case_ids=case_id, max_cases=max_cases, profile=profile)
-    adapter: Any = create_adapter_fn(provider, model)
+    adapter: Any = _create_local_ollama_adapter(
+        create_adapter_fn=create_adapter_fn,
+        provider=provider,
+        model=model,
+        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+    )
     result: Any = run_qwen_smoke_suite_fn(
         inputs=SmokeSuiteInputs(
             csv_path=csv_path,
@@ -525,6 +542,11 @@ def execute_smoke_local_qwen_command(
     models_path: Path,
     model_id: str,
     output_root: Path,
+    max_tokens: int,
+    num_ctx: int,
+    plot_num_ctx: int | None,
+    table_num_ctx: int | None,
+    plot_table_num_ctx: int | None,
     resume: bool,
     json_output: bool,
     discover_abms: Callable[[], tuple[str, ...]],
@@ -537,9 +559,23 @@ def execute_smoke_local_qwen_command(
 ) -> None:
     requested = sorted(set(abms)) if abms else list(discover_abms())
     provider, model = resolve_model_from_registry(models_path, model_id)
-    if provider != "ollama":
-        raise typer.BadParameter(f"model id '{model_id}' must resolve to an ollama model for smoke-local-qwen.")
-    assert_ollama_model_available(model)
+    if provider not in {"ollama", "openrouter"}:
+        raise typer.BadParameter(
+            f"model id '{model_id}' must resolve to an ollama or openrouter model for smoke-local-qwen."
+        )
+    if provider == "ollama":
+        assert_ollama_model_available(model)
+    if max_tokens <= 0:
+        raise typer.BadParameter("--max-tokens must be positive")
+    if num_ctx <= 0:
+        raise typer.BadParameter("--num-ctx must be positive")
+    for label, value in (
+        ("--plot-num-ctx", plot_num_ctx),
+        ("--table-num-ctx", table_num_ctx),
+        ("--plot-table-num-ctx", plot_table_num_ctx),
+    ):
+        if value is not None and value <= 0:
+            raise typer.BadParameter(f"{label} must be positive")
 
     case_inputs: dict[str, LocalQwenCaseInput] = {}
     for abm in requested:
@@ -560,12 +596,24 @@ def execute_smoke_local_qwen_command(
             plot_path=viz_root / abm / "plots" / "1.png",
         )
 
-    adapter: Any = create_adapter_fn(provider, model)
+    adapter: Any = _create_local_ollama_adapter(
+        create_adapter_fn=create_adapter_fn,
+        provider=provider,
+        model=model,
+        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+    )
     result: Any = run_local_qwen_sample_smoke_fn(
         case_inputs=case_inputs,
         adapter=adapter,
         model=model,
         output_root=output_root,
+        max_tokens=max_tokens,
+        ollama_num_ctx=num_ctx,
+        ollama_num_ctx_by_mode={
+            "plot": plot_num_ctx or num_ctx,
+            "table": table_num_ctx or num_ctx,
+            "plot+table": plot_table_num_ctx or num_ctx,
+        },
         resume_existing=resume,
     )
     command_result = SmokeCommandResult(
@@ -579,9 +627,9 @@ def execute_smoke_local_qwen_command(
     emit_smoke_command_result(
         command_result=command_result,
         json_output=json_output,
-        markdown_label="local qwen smoke report (markdown)",
-        json_label="local qwen smoke report (json)",
-        failure_label="local qwen smoke failed",
+        markdown_label="sampled llm smoke report (markdown)",
+        json_label="sampled llm smoke report (json)",
+        failure_label="sampled llm smoke failed",
     )
 
 
@@ -669,7 +717,12 @@ def execute_tune_local_qwen_command(
             plot_path=viz_root / abm / "plots" / "1.png",
         )
 
-    adapter: Any = create_adapter_fn(provider, model)
+    adapter: Any = _create_local_ollama_adapter(
+        create_adapter_fn=create_adapter_fn,
+        provider=provider,
+        model=model,
+        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+    )
     result = run_local_qwen_tuning_fn(
         case_inputs=case_inputs,
         adapter=adapter,
@@ -736,6 +789,19 @@ def execute_smoke_ingest_command(
         json_label="ingest smoke report (json)",
         failure_label="ingest smoke failed",
     )
+
+
+def _create_local_ollama_adapter(
+    *,
+    create_adapter_fn: Callable[..., Any],
+    provider: str,
+    model: str,
+    timeout_seconds: float,
+) -> Any:
+    try:
+        return create_adapter_fn(provider, model, timeout_seconds=timeout_seconds)
+    except TypeError:
+        return create_adapter_fn(provider, model)
 
 
 def execute_smoke_viz_command(
