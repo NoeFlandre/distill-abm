@@ -144,7 +144,22 @@ def run_validation_suite(
             )
             continue
 
-        completed = subprocess.run(check.command, capture_output=True, text=True)
+        try:
+            completed = subprocess.run(check.command, capture_output=True, text=True)
+        except OSError as exc:
+            failed_checks.append(check.check_id)
+            check_results.append(
+                ValidationCheckResult(
+                    check_id=check.check_id,
+                    description=check.description,
+                    status="failed",
+                    command=check.command,
+                    error_code="command_failed",
+                    error=str(exc),
+                )
+            )
+            continue
+
         status = "ok" if completed.returncode == 0 else "failed"
         if status == "failed":
             failed_checks.append(check.check_id)
