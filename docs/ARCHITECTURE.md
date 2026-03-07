@@ -59,6 +59,7 @@
 - Prompt composition and evidence handling (`plot`, `table`, `plot+table`).
 - Text-source selection (`summary_only`, `full_text_only`).
 - Reproducibility metadata and resumable run signatures.
+ - Run metadata now includes an `llm.observability` summary with per-request usage, total token counts, and explicit cost-status fields for debugging and future pricing support.
 
 ### `src/distill_abm/pipeline/smoke.py`
 - Smoke matrix execution and per-case artifacts.
