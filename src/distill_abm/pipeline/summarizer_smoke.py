@@ -1,0 +1,325 @@
+"""Reviewer-friendly smoke run for local summarizers on one validated full-case bundle."""
+
+from __future__ import annotations
+
+import csv
+import json
+import time
+from collections.abc import Callable
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+from distill_abm.summarize.models import (
+    summarize_with_bart,
+    summarize_with_bert,
+    summarize_with_longformer_ext,
+    summarize_with_t5,
+)
+from distill_abm.utils import detect_placeholder_signals
+
+SummarizerSmokeMode = Literal["none", "bart", "bert", "t5", "longformer_ext"]
+
+
+class ValidatedSmokeBundle(BaseModel):
+    """One manually validated full-case bundle reused for summarizer smoke."""
+
+    bundle_id: str
+    case_id: str
+    abm: str
+    context_output_path: Path
+    trend_output_paths: tuple[Path, ...]
+    validation_note: str
+
+
+class SummarizerModeResult(BaseModel):
+    """One summarizer-mode outcome for a validated bundle."""
+
+    mode: SummarizerSmokeMode
+    success: bool
+    output_path: Path
+    error: str | None = None
+    duration_seconds: float
+    input_length: int
+    output_length: int = 0
+
+
+class SummarizerBundleResult(BaseModel):
+    """Smoke result for one validated bundle."""
+
+    bundle_id: str
+    case_id: str
+    abm: str
+    bundle_dir: Path
+    success: bool
+    source_validation_error: str | None = None
+    modes: list[SummarizerModeResult] = Field(default_factory=list)
+
+
+class SummarizerSmokeResult(BaseModel):
+    """Top-level summarizer smoke result."""
+
+    started_at_utc: str
+    finished_at_utc: str
+    output_root: Path
+    report_json_path: Path
+    report_markdown_path: Path
+    review_csv_path: Path
+    validated_sources_path: Path
+    success: bool
+    failed_bundle_ids: list[str] = Field(default_factory=list)
+    bundles: list[SummarizerBundleResult] = Field(default_factory=list)
+
+
+def default_validated_smoke_bundles(source_root: Path) -> tuple[ValidatedSmokeBundle, ...]:
+    """Return the manually validated Nemotron full-case bundle reused for summarizer smoke."""
+    case_root = _discover_best_full_case_bundle(source_root / "cases")
+    case_id = case_root.name
+    return (
+        ValidatedSmokeBundle(
+            bundle_id=case_id,
+            case_id=case_id,
+            abm="grazing",
+            context_output_path=case_root / "02_context" / "context_output.txt",
+            trend_output_paths=tuple(sorted((case_root / "03_trends").glob("plot_*/trend_output.txt"))),
+            validation_note=(
+                "Functionality smoke bundle selected from the latest completed Nemotron full-case artifacts. "
+                "Used to exercise the summarizer pipeline over one context output plus all available trend outputs."
+            ),
+        ),
+    )
+
+
+def run_summarizer_smoke(
+    *,
+    source_root: Path,
+    output_root: Path,
+    validated_bundles: tuple[ValidatedSmokeBundle, ...] | None = None,
+    summarizer_fns: dict[SummarizerSmokeMode, Callable[[str], str]] | None = None,
+) -> SummarizerSmokeResult:
+    """Run all summarizers over validated full-case text bundles and persist review artifacts."""
+    started_at = datetime.now(UTC)
+    output_root.mkdir(parents=True, exist_ok=True)
+    selected_bundles = validated_bundles or default_validated_smoke_bundles(source_root)
+    resolved_summarizers = summarizer_fns or {
+        "bart": summarize_with_bart,
+        "bert": summarize_with_bert,
+        "t5": summarize_with_t5,
+        "longformer_ext": summarize_with_longformer_ext,
+    }
+    bundle_results: list[SummarizerBundleResult] = []
+    review_rows: list[dict[str, str]] = []
+    failed_bundle_ids: list[str] = []
+
+    validated_sources_path = output_root / "validated_bundles.json"
+    validated_sources_path.write_text(
+        json.dumps([bundle.model_dump(mode="json") for bundle in selected_bundles], indent=2),
+        encoding="utf-8",
+    )
+
+    for bundle in selected_bundles:
+        bundle_dir = output_root / "bundles" / bundle.bundle_id
+        input_dir = bundle_dir / "01_input"
+        trend_dir = input_dir / "trend_outputs"
+        summary_dir = bundle_dir / "02_summaries"
+        metadata_dir = bundle_dir / "03_metadata"
+        for directory in (input_dir, trend_dir, summary_dir, metadata_dir):
+            directory.mkdir(parents=True, exist_ok=True)
+
+        combined_input = ""
+        source_validation_error: str | None = None
+        try:
+            context_text = _validate_source_text(bundle.context_output_path)
+            trend_texts = [_validate_source_text(path) for path in bundle.trend_output_paths]
+            if not trend_texts:
+                raise ValueError("validated bundle must contain at least one trend output")
+            combined_input = _combine_bundle_input(context_text=context_text, trend_texts=trend_texts)
+            (input_dir / "context_output.txt").write_text(context_text, encoding="utf-8")
+            for index, trend_text in enumerate(trend_texts, start=1):
+                (trend_dir / f"{index:02d}.txt").write_text(trend_text, encoding="utf-8")
+            (input_dir / "combined_input.txt").write_text(combined_input, encoding="utf-8")
+            (bundle_dir / "00_bundle_summary.json").write_text(
+                json.dumps(
+                    {
+                        "bundle_id": bundle.bundle_id,
+                        "case_id": bundle.case_id,
+                        "abm": bundle.abm,
+                        "context_output_path": str(bundle.context_output_path),
+                        "trend_output_paths": [str(path) for path in bundle.trend_output_paths],
+                        "validation_note": bundle.validation_note,
+                        "context_length": len(context_text),
+                        "trend_count": len(trend_texts),
+                        "combined_input_length": len(combined_input),
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+        except Exception as exc:
+            source_validation_error = str(exc)
+
+        mode_results: list[SummarizerModeResult] = []
+        if source_validation_error is None:
+            for mode in ("none", "bart", "bert", "t5", "longformer_ext"):
+                output_path = summary_dir / f"{mode}.txt"
+                started = time.perf_counter()
+                try:
+                    summary_text = combined_input if mode == "none" else resolved_summarizers[mode](combined_input)
+                    duration = time.perf_counter() - started
+                    output_path.write_text(summary_text, encoding="utf-8")
+                    mode_result = SummarizerModeResult(
+                        mode=mode,
+                        success=bool(summary_text.strip()),
+                        output_path=output_path,
+                        duration_seconds=duration,
+                        input_length=len(combined_input),
+                        output_length=len(summary_text),
+                        error=None if summary_text.strip() else "summarizer produced empty text",
+                    )
+                except Exception as exc:
+                    duration = time.perf_counter() - started
+                    output_path.write_text("", encoding="utf-8")
+                    mode_result = SummarizerModeResult(
+                        mode=mode,
+                        success=False,
+                        output_path=output_path,
+                        duration_seconds=duration,
+                        input_length=len(combined_input),
+                        output_length=0,
+                        error=str(exc),
+                    )
+                mode_results.append(mode_result)
+                review_rows.append(
+                    {
+                        "bundle_id": bundle.bundle_id,
+                        "case_id": bundle.case_id,
+                        "abm": bundle.abm,
+                        "mode": mode,
+                        "success": str(mode_result.success),
+                        "context_output_path": str(bundle.context_output_path),
+                        "trend_output_paths": "|".join(str(path) for path in bundle.trend_output_paths),
+                        "combined_input_path": str(input_dir / "combined_input.txt"),
+                        "summary_output_path": str(output_path),
+                        "input_length": str(mode_result.input_length),
+                        "output_length": str(mode_result.output_length),
+                        "duration_seconds": f"{mode_result.duration_seconds:.6f}",
+                        "validation_note": bundle.validation_note,
+                        "error": mode_result.error or "",
+                    }
+                )
+
+        bundle_success = source_validation_error is None and all(result.success for result in mode_results)
+        if not bundle_success:
+            failed_bundle_ids.append(bundle.bundle_id)
+        bundle_result = SummarizerBundleResult(
+            bundle_id=bundle.bundle_id,
+            case_id=bundle.case_id,
+            abm=bundle.abm,
+            bundle_dir=bundle_dir,
+            success=bundle_success,
+            source_validation_error=source_validation_error,
+            modes=mode_results,
+        )
+        bundle_results.append(bundle_result)
+        (metadata_dir / "mode_results.json").write_text(
+            bundle_result.model_dump_json(indent=2),
+            encoding="utf-8",
+        )
+
+    review_csv_path = output_root / "review.csv"
+    _write_review_csv(review_csv_path, review_rows)
+
+    result = SummarizerSmokeResult(
+        started_at_utc=started_at.isoformat(),
+        finished_at_utc=datetime.now(UTC).isoformat(),
+        output_root=output_root,
+        report_json_path=output_root / "smoke_summarizers_report.json",
+        report_markdown_path=output_root / "smoke_summarizers_report.md",
+        review_csv_path=review_csv_path,
+        validated_sources_path=validated_sources_path,
+        success=not failed_bundle_ids,
+        failed_bundle_ids=failed_bundle_ids,
+        bundles=bundle_results,
+    )
+    result.report_json_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
+    result.report_markdown_path.write_text(_render_markdown_report(result), encoding="utf-8")
+    return result
+
+
+def _combine_bundle_input(*, context_text: str, trend_texts: list[str]) -> str:
+    parts = [context_text.strip()]
+    parts.extend(text.strip() for text in trend_texts if text.strip())
+    return "\n\n".join(part for part in parts if part)
+
+
+def _validate_source_text(path: Path) -> str:
+    if not path.exists():
+        raise FileNotFoundError(f"missing validated source: {path}")
+    text = path.read_text(encoding="utf-8").strip()
+    if not text:
+        raise ValueError(f"validated source is empty: {path}")
+    lowered = text.lower()
+    if "analysis is currently unavailable" in lowered or "please try again later" in lowered:
+        raise ValueError(f"validated source contains generic unavailable text: {path}")
+    if detect_placeholder_signals(text):
+        raise ValueError(f"validated source contains placeholder-like text: {path}")
+    return text
+
+
+def _write_review_csv(path: Path, rows: list[dict[str, str]]) -> None:
+    fieldnames = [
+        "bundle_id",
+        "case_id",
+        "abm",
+        "mode",
+        "success",
+        "context_output_path",
+        "trend_output_paths",
+        "combined_input_path",
+        "summary_output_path",
+        "input_length",
+        "output_length",
+        "duration_seconds",
+        "validation_note",
+        "error",
+    ]
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+
+def _render_markdown_report(result: SummarizerSmokeResult) -> str:
+    lines = [
+        "# Summarizer Smoke Report",
+        "",
+        f"- success: `{str(result.success).lower()}`",
+        f"- bundle_count: `{len(result.bundles)}`",
+        f"- failed_bundle_count: `{len(result.failed_bundle_ids)}`",
+        f"- review_csv_path: `{result.review_csv_path}`",
+        "",
+        "| bundle_id | case_id | abm | success |",
+        "| --- | --- | --- | --- |",
+    ]
+    for bundle in result.bundles:
+        lines.append(
+            f"| {bundle.bundle_id} | {bundle.case_id} | {bundle.abm} | {str(bundle.success).lower()} |"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def _discover_best_full_case_bundle(cases_root: Path) -> Path:
+    candidates: list[tuple[int, str, Path]] = []
+    for case_dir in sorted(cases_root.glob("*_full_case")):
+        context_path = case_dir / "02_context" / "context_output.txt"
+        trend_paths = sorted((case_dir / "03_trends").glob("plot_*/trend_output.txt"))
+        if not context_path.exists() or not trend_paths:
+            continue
+        candidates.append((len(trend_paths), case_dir.name, case_dir))
+    if not candidates:
+        raise FileNotFoundError(f"no completed full-case smoke bundle found under {cases_root}")
+    candidates.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return candidates[0][2]

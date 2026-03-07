@@ -20,9 +20,11 @@ from distill_abm.cli_actions import (
     execute_monitor_local_qwen_command,
     execute_run_command,
     execute_smoke_doe_command,
+    execute_smoke_full_case_command,
     execute_smoke_ingest_command,
     execute_smoke_local_qwen_command,
     execute_smoke_qwen_command,
+    execute_smoke_summarizers_command,
     execute_smoke_viz_command,
     execute_tune_local_qwen_command,
     execute_validate_workspace_command,
@@ -51,12 +53,14 @@ from distill_abm.llm.factory import create_adapter
 from distill_abm.pipeline.doe_smoke import (
     run_doe_smoke_suite,
 )
+from distill_abm.pipeline.full_case_smoke import run_full_case_smoke
 from distill_abm.pipeline.local_qwen_sample_smoke import run_local_qwen_sample_smoke
 from distill_abm.pipeline.local_qwen_tuning import run_local_qwen_tuning
 from distill_abm.pipeline.run import EvidenceMode, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
     run_qwen_smoke_suite,
 )
+from distill_abm.pipeline.summarizer_smoke import run_summarizer_smoke
 from distill_abm.viz.viz_smoke import run_viz_smoke_suite
 
 app = typer.Typer(help="Run ABM distillation workflows.")
@@ -82,9 +86,11 @@ __all__ = [
     "monitor_local_qwen",
     "run",
     "smoke_doe",
+    "smoke_full_case",
     "smoke_ingest_netlogo",
     "smoke_local_qwen",
     "smoke_qwen",
+    "smoke_summarizers",
     "smoke_viz",
     "tune_local_qwen",
     "validate_workspace",
@@ -577,6 +583,96 @@ def smoke_local_qwen(
         assert_ollama_model_available=_assert_ollama_model_available,
         create_adapter_fn=create_adapter,
         run_local_qwen_sample_smoke_fn=run_local_qwen_sample_smoke,
+        load_abm_config_fn=load_abm_config,
+    )
+
+
+@app.command("smoke-summarizers")
+def smoke_summarizers(
+    source_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing the vetted full-case LLM smoke outputs."),
+    ] = Path("results/full_case_smoke_latest"),
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for summarizer smoke artifacts."),
+    ] = Path("results/summarizer_smoke_latest"),
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Run the summarization stack over one hand-vetted full-case LLM bundle."""
+    execute_smoke_summarizers_command(
+        source_root=source_root,
+        output_root=output_root,
+        json_output=json_output,
+        run_summarizer_smoke_fn=run_summarizer_smoke,
+    )
+
+
+@app.command("smoke-full-case")
+def smoke_full_case(
+    abm: Annotated[str, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = "grazing",
+    models_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ABM model files for asset discovery."),
+    ] = Path("data"),
+    ingest_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ingest smoke outputs."),
+    ] = Path("results/ingest_smoke_latest"),
+    viz_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing visualization smoke outputs."),
+    ] = Path("results/viz_smoke_latest"),
+    models_path: Annotated[
+        Path,
+        typer.Option(exists=True, help="Model registry YAML path."),
+    ] = Path("configs/models.yaml"),
+    model_id: Annotated[
+        str,
+        typer.Option(help="OpenRouter model alias from configs/models.yaml."),
+    ] = "nemotron_nano_12b_v2_vl_free",
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for full-case smoke artifacts."),
+    ] = Path("results/full_case_smoke_latest"),
+    evidence_mode: Annotated[EvidenceMode, typer.Option()] = "table",
+    prompt_variant: Annotated[
+        str,
+        typer.Option(
+            help=(
+                "Prompt variant: none, role, insights, example, role+example, role+insights, "
+                "insights+example, all_three."
+            )
+        ),
+    ] = "role",
+    max_tokens: Annotated[
+        int,
+        typer.Option(help="Maximum output token budget for each call in the full-case smoke."),
+    ] = 32768,
+    resume: Annotated[
+        bool,
+        typer.Option("--resume/--no-resume", help="Reuse accepted context/trend artifacts and rerun only failed ones."),
+    ] = True,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Run one real Nemotron case through one context prompt and all trend prompts for that ABM."""
+    execute_smoke_full_case_command(
+        abm=abm,
+        models_root=models_root,
+        ingest_root=ingest_root,
+        viz_root=viz_root,
+        models_path=models_path,
+        model_id=model_id,
+        output_root=output_root,
+        evidence_mode=evidence_mode,
+        prompt_variant=prompt_variant,
+        max_tokens=max_tokens,
+        resume=resume,
+        json_output=json_output,
+        resolve_model_from_registry=resolve_model_from_registry,
+        resolve_model_path=resolve_abm_model_path,
+        create_adapter_fn=create_adapter,
+        run_full_case_smoke_fn=run_full_case_smoke,
         load_abm_config_fn=load_abm_config,
     )
 

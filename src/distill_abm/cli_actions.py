@@ -46,6 +46,7 @@ from distill_abm.pipeline.doe_smoke import (
     canonical_prompt_variants,
     canonical_summarization_specs,
 )
+from distill_abm.pipeline.full_case_smoke import FullCasePlotInput, FullCaseSmokeInput
 from distill_abm.pipeline.local_qwen_monitor import (
     collect_local_qwen_monitor_snapshot,
     render_local_qwen_monitor,
@@ -666,6 +667,119 @@ def execute_monitor_local_qwen_command(
         )
         return
     typer.echo(render_local_qwen_monitor(snapshot))
+
+
+def execute_smoke_summarizers_command(
+    *,
+    source_root: Path,
+    output_root: Path,
+    json_output: bool,
+    run_summarizer_smoke_fn: Callable[..., Any],
+) -> None:
+    result: Any = run_summarizer_smoke_fn(
+        source_root=source_root,
+        output_root=output_root,
+    )
+    command_result = SmokeCommandResult(
+        command="smoke-summarizers",
+        success=result.success,
+        report_json_path=result.report_json_path,
+        report_markdown_path=result.report_markdown_path,
+        failed_items=result.failed_bundle_ids,
+        nested_artifacts={
+            "review_csv": result.review_csv_path,
+            "validated_bundles_json": result.validated_sources_path,
+        },
+    )
+    emit_smoke_command_result(
+        command_result=command_result,
+        json_output=json_output,
+        markdown_label="summarizer smoke report (markdown)",
+        json_label="summarizer smoke report (json)",
+        failure_label="summarizer smoke failed",
+    )
+
+
+def execute_smoke_full_case_command(
+    *,
+    abm: str,
+    models_root: Path,
+    ingest_root: Path,
+    viz_root: Path,
+    models_path: Path,
+    model_id: str,
+    output_root: Path,
+    evidence_mode: EvidenceMode,
+    prompt_variant: str,
+    max_tokens: int,
+    resume: bool,
+    json_output: bool,
+    resolve_model_from_registry: Callable[[Path, str], tuple[str, str]],
+    resolve_model_path: Callable[..., Path],
+    create_adapter_fn: Callable[[str, str], Any],
+    run_full_case_smoke_fn: Callable[..., Any],
+    load_abm_config_fn: Callable[[Path], Any],
+) -> None:
+    provider, model = resolve_model_from_registry(models_path, model_id)
+    if provider != "openrouter":
+        raise typer.BadParameter(f"model id '{model_id}' must resolve to an openrouter model for smoke-full-case.")
+    abm_config: Any = load_abm_config_fn(Path("configs/abms") / f"{abm}.yaml")
+    _ = resolve_model_path(abm=abm, models_root=models_root)
+    if abm_config.netlogo_viz is None or not abm_config.netlogo_viz.plots:
+        raise typer.BadParameter(f"missing netlogo_viz plot config for ABM '{abm}'")
+    if not abm_config.plot_descriptions:
+        raise typer.BadParameter(f"missing plot descriptions for ABM '{abm}'")
+    if len(abm_config.netlogo_viz.plots) != len(abm_config.plot_descriptions):
+        raise typer.BadParameter(f"plot config and plot descriptions count mismatch for ABM '{abm}'")
+    case_input = FullCaseSmokeInput(
+        abm=abm,
+        csv_path=viz_root / abm / "simulation.csv",
+        parameters_path=ingest_root / abm / "TXT" / "narrative_combined.txt",
+        documentation_path=ingest_root / abm / "TXT" / "final_documentation.txt",
+        plots=tuple(
+            FullCasePlotInput(
+                plot_index=index,
+                reporter_pattern=plot_cfg.reporter_pattern,
+                plot_description=plot_description,
+                plot_path=viz_root / abm / "plots" / f"{index}.png",
+            )
+            for index, (plot_cfg, plot_description) in enumerate(
+                zip(abm_config.netlogo_viz.plots, abm_config.plot_descriptions, strict=True),
+                start=1,
+            )
+        ),
+    )
+    adapter: Any = _create_local_ollama_adapter(
+        create_adapter_fn=create_adapter_fn,
+        provider=provider,
+        model=model,
+        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+    )
+    result: Any = run_full_case_smoke_fn(
+        case_input=case_input,
+        adapter=adapter,
+        model=model,
+        output_root=output_root,
+        evidence_mode=evidence_mode,
+        prompt_variant=prompt_variant,
+        max_tokens=max_tokens,
+        resume_existing=resume,
+    )
+    command_result = SmokeCommandResult(
+        command="smoke-full-case",
+        success=result.success,
+        report_json_path=result.report_json_path,
+        report_markdown_path=result.report_markdown_path,
+        failed_items=[str(plot_index) for plot_index in result.failed_plot_indices],
+        nested_artifacts={"review_csv": result.review_csv_path},
+    )
+    emit_smoke_command_result(
+        command_result=command_result,
+        json_output=json_output,
+        markdown_label="full case smoke report (markdown)",
+        json_label="full case smoke report (json)",
+        failure_label="full case smoke failed",
+    )
 
 
 def execute_tune_local_qwen_command(
