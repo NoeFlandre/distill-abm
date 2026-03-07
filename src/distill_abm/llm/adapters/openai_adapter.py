@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError, LLMRequest, LLMResponse
+from distill_abm.llm.adapters.timeout_utils import run_with_timeout
 
 
 class OpenAIAdapter(LLMAdapter):
@@ -12,17 +13,19 @@ class OpenAIAdapter(LLMAdapter):
 
     provider = "openai"
 
-    def __init__(self, model: str, client: Any | None = None) -> None:
+    def __init__(self, model: str, client: Any | None = None, timeout_seconds: float = 120.0) -> None:
         self.model = model
         self._client = client
+        self.timeout_seconds = timeout_seconds
 
     def complete(self, request: LLMRequest) -> LLMResponse:
         payload = _build_payload(request)
         payload["model"] = self.model or request.model
-        try:
-            completion = self._client_for_request().chat.completions.create(**payload)
-        except Exception as exc:
-            raise LLMProviderError(f"openai completion failed: {exc}") from exc
+        completion = run_with_timeout(
+            timeout_seconds=self.timeout_seconds,
+            label="openai completion",
+            fn=lambda: self._client_for_request().chat.completions.create(**payload),
+        )
         text = completion.choices[0].message.content or ""
         model = getattr(completion, "model", request.model)
         return LLMResponse(provider=self.provider, model=model, text=text, raw={"provider": "openai"})

@@ -7,6 +7,7 @@ from typing import Any
 
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError, LLMRequest, LLMResponse
 from distill_abm.llm.adapters.openai_adapter import _build_payload
+from distill_abm.llm.adapters.timeout_utils import run_with_timeout
 
 DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
@@ -24,6 +25,7 @@ class OpenRouterAdapter(LLMAdapter):
         api_key: str | None = None,
         site_url: str | None = None,
         app_name: str = "distill-abm",
+        timeout_seconds: float = 120.0,
     ) -> None:
         self.model = model
         self._client = client
@@ -31,14 +33,16 @@ class OpenRouterAdapter(LLMAdapter):
         self.api_key = api_key
         self.site_url = site_url
         self.app_name = app_name
+        self.timeout_seconds = timeout_seconds
 
     def complete(self, request: LLMRequest) -> LLMResponse:
         payload = _build_payload(request)
         payload["model"] = self.model or request.model
-        try:
-            completion = self._client_for_request().chat.completions.create(**payload)
-        except Exception as exc:
-            raise LLMProviderError(f"openrouter completion failed: {exc}") from exc
+        completion = run_with_timeout(
+            timeout_seconds=self.timeout_seconds,
+            label="openrouter completion",
+            fn=lambda: self._client_for_request().chat.completions.create(**payload),
+        )
         text = completion.choices[0].message.content or ""
         model = getattr(completion, "model", request.model)
         return LLMResponse(provider=self.provider, model=model, text=text, raw={"provider": "openrouter"})

@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError, LLMRequest, LLMResponse
+from distill_abm.llm.adapters.timeout_utils import run_with_timeout
 
 
 class AnthropicAdapter(LLMAdapter):
@@ -12,9 +13,10 @@ class AnthropicAdapter(LLMAdapter):
 
     provider = "anthropic"
 
-    def __init__(self, model: str, client: Any | None = None) -> None:
+    def __init__(self, model: str, client: Any | None = None, timeout_seconds: float = 120.0) -> None:
         self.model = model
         self._client = client
+        self.timeout_seconds = timeout_seconds
 
     def complete(self, request: LLMRequest) -> LLMResponse:
         system, messages = _to_anthropic_messages(request)
@@ -26,10 +28,11 @@ class AnthropicAdapter(LLMAdapter):
         }
         if system:
             payload["system"] = system
-        try:
-            result = self._client_for_request().messages.create(**payload)
-        except Exception as exc:
-            raise LLMProviderError(f"anthropic completion failed: {exc}") from exc
+        result = run_with_timeout(
+            timeout_seconds=self.timeout_seconds,
+            label="anthropic completion",
+            fn=lambda: self._client_for_request().messages.create(**payload),
+        )
         text = _extract_text_blocks(result.content)
         model = getattr(result, "model", request.model)
         return LLMResponse(provider=self.provider, model=model, text=text, raw={"provider": "anthropic"})
