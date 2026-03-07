@@ -78,6 +78,7 @@ The suite is designed not only to confirm nominal behavior, but also to exercise
 - summarizer failures and summary fallback behavior
 - adapter-level request failures and provider-contract errors
 - placeholder-like or otherwise suspicious ingestion artifacts surfaced through debug traces and ingest smoke checks
+- dependency-missing fallbacks in evaluation helpers without silently hiding runtime failures inside the metric or ANOVA implementations
 
 This emphasis on error-path testing is important because the project is intended for iterative experimentation. In such settings, robustness is not only about obtaining outputs when everything is well configured; it is also about failing in ways that are legible, localized, and recoverable.
 
