@@ -10,7 +10,7 @@
 
 ### `src/distill_abm/cli.py`
 - Command entrypoint for run, smoke, qualitative scoring, DOE analysis.
-- Exposes `validate-workspace` as the canonical non-LLM verification contract for coding agents.
+- Exposes `validate-workspace` as the current non-LLM local verification entrypoint for coding agents.
 - Exposes read-only `describe-*` commands so agents can inspect ABMs, ingest outputs, and run artifacts without rerunning workflows.
 - Exposes `--json` output on the main verification and inspection surfaces.
 - Exposes `smoke-viz` for artifact-focused verification of the NetLogo-to-CSV-to-plot workflow that runs before any LLM inference.
@@ -26,6 +26,12 @@
   - `smoke-local-qwen` resolves the latest ingest and visualization smoke artifacts for each ABM, samples a small stratified subset of evidence/prompt combinations, and runs one context plus one trend inference per sampled case.
   - It writes self-contained case folders with the exact prompt text passed to the model, copied image/table evidence, request hyperparameters, and raw outputs so a human can inspect whether the local execution path is coherent before a full run.
   - `smoke-local-qwen` supports `--resume` and reuses only successful case artifacts; failed or incomplete cases are rerun.
+- Exposes `smoke-full-case` for one real full-case pass across all ordered trend prompts for a selected ABM and prompt variant.
+  - `smoke-full-case` materializes one context run plus the full ordered set of trend calls for the selected case.
+  - It writes reviewer-oriented inputs, prompts, raw outputs, traces, and a review CSV under one self-contained case directory.
+- Exposes `smoke-summarizers` for reviewer-friendly summarizer smoke runs on validated full-case bundles.
+  - `smoke-summarizers` reuses manually validated context/trend outputs and runs the local summarization stack over the combined bundle text.
+  - It writes per-mode summaries, metadata, a review CSV, and a validated-source manifest for inspection.
 - Exposes `monitor-local-qwen` for a compact live dashboard over either a local-Qwen smoke output directory or a local-Qwen tuning output directory.
   - The monitor surfaces current case status, configured `num_ctx`, configured `max_tokens`, prompt lengths, observed token totals, and recent errors.
 - Exposes `tune-local-qwen` for local runtime-limit ablations by evidence mode.
