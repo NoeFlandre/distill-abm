@@ -35,10 +35,10 @@ run:
     - t5
 qualitative:
   provider: openrouter
-  model: qwen/qwen3-vl-235b-a22b-thinking
+  model: google/gemini-3.1-pro-preview
 smoke:
   output_dir: results/smoke_debug
-  model: qwen/qwen3-vl-235b-a22b-thinking
+  model: google/gemini-3.1-pro-preview
   metric_pattern: mean-incum
   metric_description: weekly milk
   evidence_mode: table
@@ -75,10 +75,10 @@ run:
   text_source_mode: full_text_only
 qualitative:
   provider: openrouter
-  model: qwen/qwen3-vl-235b-a22b-thinking
+  model: google/gemini-3.1-pro-preview
 smoke:
   output_dir: results/smoke_debug
-  model: qwen/qwen3-vl-235b-a22b-thinking
+  model: google/gemini-3.1-pro-preview
   metric_pattern: mean
   metric_description: simulation trend
   evidence_mode: plot+table
@@ -113,10 +113,10 @@ run:
   text_source_mode: summary_only
 qualitative:
   provider: openrouter
-  model: qwen/qwen3-vl-235b-a22b-thinking
+  model: google/gemini-3.1-pro-preview
 smoke:
   output_dir: results/smoke_debug
-  model: qwen/qwen3-vl-235b-a22b-thinking
+  model: google/gemini-3.1-pro-preview
   metric_pattern: mean
   metric_description: simulation trend
   evidence_mode: plot+table

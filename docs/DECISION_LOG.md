@@ -2,8 +2,8 @@
 
 ## DL-001
 - Date: 2026-03-04
-- Decision: Keep Qwen-VL OpenRouter model as debug-only smoke path.
-- Rationale: low-cost troubleshooting model should not contaminate benchmark outputs.
+- Decision: Restrict the supported LLM roster to `qwen3.5:0.8b`, `moonshotai/kimi-k2.5`, and `google/gemini-3.1-pro-preview`.
+- Rationale: these are the only models used in the benchmark and debugging workflows; legacy Janus and Qwen-VL debug paths should not remain in the codebase because they create stale configuration and review ambiguity.
 
 ## DL-002
 - Date: 2026-03-04

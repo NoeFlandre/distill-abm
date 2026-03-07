@@ -22,7 +22,6 @@ BENCHMARK_MODELS: set[tuple[str, str]] = {
     ("openrouter", "google/gemini-3.1-pro-preview"),
     ("ollama", "qwen3.5:0.8b"),
 }
-DEBUG_MODEL: tuple[str, str] = ("openrouter", "qwen/qwen3-vl-235b-a22b-thinking")
 
 
 def load_experiment_parameters(path: Path | None) -> dict[str, bool | int | float | str]:
@@ -257,15 +256,9 @@ def assert_ollama_model_available(model: str) -> None:
 
 
 def validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:
-    """Enforce the benchmark/debug model policy used by the CLI."""
+    """Enforce the supported benchmark model policy used by the CLI."""
+    _ = allow_debug_model
     key = (provider.strip().lower(), model.strip())
-    if key == DEBUG_MODEL:
-        if not allow_debug_model:
-            raise typer.BadParameter(
-                "debug model is blocked for benchmark runs. Use --allow-debug-model to run debug workflows."
-            )
-        return
-
     if key not in BENCHMARK_MODELS:
         allowed = ", ".join(f"{p}:{m}" for p, m in sorted(BENCHMARK_MODELS))
         raise typer.BadParameter(

@@ -8,6 +8,3 @@ models:
   qwen3_5_local:
     provider: ollama
     model: qwen3.5:0.8b
-  qwen_vl_debug:
-    provider: openrouter
-    model: qwen/qwen3-vl-235b-a22b-thinking
