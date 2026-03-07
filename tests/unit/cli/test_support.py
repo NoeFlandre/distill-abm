@@ -1,16 +1,23 @@
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 import typer
 
 from distill_abm.cli_support import (
+    assert_ollama_model_available,
     discover_configured_abms,
+    load_experiment_parameters,
     parse_summarizers,
     resolve_abm_experiment_parameters_path,
+    resolve_abm_model_path,
     resolve_model_filenames,
+    resolve_viz_smoke_specs,
     select_smoke_cases,
+    validate_model_policy,
 )
 
 
@@ -59,3 +66,74 @@ def test_resolve_abm_experiment_parameters_path_prefers_existing_file(tmp_path: 
 
 def test_discover_configured_abms_reads_repo_configs() -> None:
     assert discover_configured_abms() == ("fauna", "grazing", "milk_consumption")
+
+
+def test_load_experiment_parameters_validates_json_file(tmp_path: Path) -> None:
+    target = tmp_path / "params.json"
+    target.write_text('{"runs": 3, "flag": true}', encoding="utf-8")
+
+    assert load_experiment_parameters(target) == {"runs": 3, "flag": True}
+
+
+def test_load_experiment_parameters_rejects_non_object_json(tmp_path: Path) -> None:
+    target = tmp_path / "params.json"
+    target.write_text('[1, 2]', encoding="utf-8")
+
+    with pytest.raises(typer.BadParameter, match="top level"):
+        load_experiment_parameters(target)
+
+
+def test_resolve_abm_model_path_rejects_ambiguous_matches(tmp_path: Path) -> None:
+    root = tmp_path
+    (root / "fauna.nlogo").write_text("", encoding="utf-8")
+    abm_dir = root / "fauna_abm"
+    abm_dir.mkdir()
+    (abm_dir / "fauna_model.nlogo").write_text("", encoding="utf-8")
+
+    with pytest.raises(typer.BadParameter, match=r"multiple \.nlogo files"):
+        resolve_abm_model_path(abm="fauna", models_root=root)
+
+
+def test_resolve_viz_smoke_specs_rejects_missing_netlogo_viz_config(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    model_path = tmp_path / "fauna_abm" / "fauna.nlogo"
+    model_path.parent.mkdir(parents=True)
+    model_path.write_text("", encoding="utf-8")
+
+    class DummyConfig:
+        netlogo_viz = None
+
+    monkeypatch.setattr("distill_abm.cli_support.load_abm_config", lambda _path: DummyConfig())
+
+    with pytest.raises(ValueError, match="missing netlogo_viz config"):
+        resolve_viz_smoke_specs(requested_abms=["fauna"], models_root=tmp_path)
+
+
+def test_assert_ollama_model_available_rejects_missing_model(monkeypatch: pytest.MonkeyPatch) -> None:
+    completed = subprocess.CompletedProcess(
+        args=["ollama", "list"],
+        returncode=0,
+        stdout="NAME ID SIZE\nother latest 1GB\n",
+    )
+    monkeypatch.setattr("distill_abm.cli_support.subprocess.run", lambda *args, **kwargs: completed)
+
+    with pytest.raises(typer.BadParameter, match="required local model"):
+        assert_ollama_model_available("qwen3.5:0.8b")
+
+
+def test_validate_model_policy_allows_supported_debug_model_with_flag() -> None:
+    validate_model_policy(
+        provider="openrouter",
+        model="qwen/qwen3-vl-235b-a22b-thinking",
+        allow_debug_model=True,
+    )
+
+
+def test_validate_model_policy_requires_local_ollama_model(monkeypatch: pytest.MonkeyPatch) -> None:
+    called = Mock()
+    monkeypatch.setattr("distill_abm.cli_support.assert_ollama_model_available", called)
+
+    validate_model_policy(provider="ollama", model="qwen3.5:0.8b", allow_debug_model=False)
+
+    called.assert_called_once_with("qwen3.5:0.8b")

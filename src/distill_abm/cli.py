@@ -2,36 +2,33 @@
 
 from __future__ import annotations
 
-import json
 import subprocess
 from pathlib import Path
-from typing import Annotated, Literal, cast
+from typing import Annotated, Literal
 
 import typer
 
 from distill_abm.agent_validation import ValidationProfile, run_validation_suite
-from distill_abm.cli_models import (
-    ArtifactDescriptor,
-    DescribeAbmResult,
-    DescribeArtifactsResult,
-    DescribeRunResult,
-    DoeCommandResult,
-    IngestCommandResult,
-    IngestSuiteCommandResult,
-    RunCommandResult,
-    SmokeCommandResult,
-    build_artifact_descriptors,
-    describe_artifact,
+from distill_abm.cli_actions import (
+    execute_analyze_doe_command,
+    execute_describe_abm_command,
+    execute_describe_ingest_artifacts_command,
+    execute_describe_run_command,
+    execute_evaluate_qualitative_command,
+    execute_ingest_netlogo_command,
+    execute_ingest_netlogo_suite_command,
+    execute_run_command,
+    execute_smoke_doe_command,
+    execute_smoke_ingest_command,
+    execute_smoke_qwen_command,
+    execute_smoke_viz_command,
+    execute_validate_workspace_command,
 )
-from distill_abm.cli_output import emit_smoke_command_result, ensure_required_stage_ids
 from distill_abm.cli_support import (
     BENCHMARK_MODELS,
     DEBUG_MODEL,
-    as_dict,
     discover_configured_abms,
-    load_experiment_parameters,
     parse_summarizers,
-    resolve_abm_experiment_parameters_path,
     resolve_abm_model_path,
     resolve_model_from_registry,
     resolve_scoring_reference_path,
@@ -47,22 +44,12 @@ from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
 from distill_abm.ingest.ingest_smoke import run_ingest_smoke_suite
-from distill_abm.ingest.netlogo_workflow import run_ingest_workflow
 from distill_abm.llm.factory import create_adapter
 from distill_abm.pipeline.doe_smoke import (
-    CANONICAL_DOE_MODEL_IDS,
-    CANONICAL_EVIDENCE_MODES,
-    CANONICAL_REPETITIONS,
-    DoESmokeAbmInput,
-    DoESmokeModelSpec,
-    DoESmokePlotInput,
-    canonical_prompt_variants,
-    canonical_summarization_specs,
     run_doe_smoke_suite,
 )
-from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode, run_pipeline
+from distill_abm.pipeline.run import EvidenceMode, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
-    SmokeSuiteInputs,
     run_qwen_smoke_suite,
 )
 from distill_abm.viz.viz_smoke import run_viz_smoke_suite
@@ -163,63 +150,36 @@ def run(
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run one end-to-end pipeline execution from CSV to scored report."""
-    prompts = load_prompts_config(prompts_path)
-    if model_id is not None:
-        provider, model = resolve_model_from_registry(models_path=models_path, model_id=model_id)
-    _validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
-
-    scoring_reference_path: Path | None = None
-    if abm:
-        abm_config = load_abm_config(Path("configs/abms") / f"{abm}.yaml")
-        metric_pattern = abm_config.metric_pattern
-        metric_description = abm_config.metric_description
-        if plot_description is None and abm_config.plot_descriptions:
-            plot_description = abm_config.plot_descriptions[0]
-        scoring_reference_path = _resolve_scoring_reference_path(abm)
-
-    adapter = create_adapter(provider=provider, model=model)
-    result = run_pipeline(
-        inputs=PipelineInputs(
-            csv_path=csv_path,
-            parameters_path=parameters_path,
-            documentation_path=documentation_path,
-            output_dir=output_dir,
-            model=model,
-            metric_pattern=metric_pattern,
-            metric_description=metric_description,
-            plot_description=plot_description,
-            evidence_mode=evidence_mode,
-            text_source_mode=text_source_mode,
-            allow_summary_fallback=allow_summary_fallback,
-            summarizers=_parse_summarizers(summarizer, fallback=DEFAULT_SUMMARIZERS),
-            scoring_reference_path=scoring_reference_path,
-        ),
-        prompts=prompts,
-        adapter=adapter,
-    )
-    artifact_manifest_path = output_dir / "run_artifact_manifest.json"
-    command_result = RunCommandResult(
+    execute_run_command(
+        csv_path=csv_path,
+        parameters_path=parameters_path,
+        documentation_path=documentation_path,
+        prompts_path=prompts_path,
+        models_path=models_path,
         output_dir=output_dir,
-        plot_path=result.plot_path,
-        report_csv_path=result.report_csv,
-        metadata_path=getattr(result, "metadata_path", None),
-        artifact_manifest_path=artifact_manifest_path,
-        artifacts=build_artifact_descriptors(
-            {
-                "plot": result.plot_path,
-                "report_csv": result.report_csv,
-                "metadata": getattr(result, "metadata_path", None),
-                "stats_image": getattr(result, "stats_image_path", None),
-            }
-        ),
+        provider=provider,
+        model=model,
+        model_id=model_id,
+        allow_debug_model=allow_debug_model,
+        metric_pattern=metric_pattern,
+        metric_description=metric_description,
+        plot_description=plot_description,
+        evidence_mode=evidence_mode,
+        text_source_mode=text_source_mode,
+        summarizer=summarizer,
+        allow_summary_fallback=allow_summary_fallback,
+        abm=abm,
+        json_output=json_output,
+        default_summarizers=DEFAULT_SUMMARIZERS,
+        validate_model_policy=_validate_model_policy,
+        resolve_model_from_registry=resolve_model_from_registry,
+        parse_summarizers=_parse_summarizers,
+        resolve_scoring_reference_path=_resolve_scoring_reference_path,
+        create_adapter_fn=create_adapter,
+        run_pipeline_fn=run_pipeline,
+        load_abm_config_fn=load_abm_config,
+        load_prompts_config_fn=load_prompts_config,
     )
-    artifact_manifest_path.write_text(command_result.model_dump_json(indent=2), encoding="utf-8")
-    if json_output:
-        typer.echo(command_result.model_dump_json(indent=2))
-        return
-    typer.echo(f"plot: {result.plot_path}")
-    typer.echo(f"report: {result.report_csv}")
-    typer.echo(f"artifact manifest: {artifact_manifest_path}")
 
 
 @app.command("ingest-netlogo")
@@ -240,28 +200,13 @@ def ingest_netlogo(
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run NetLogo preprocessing workflow and persist extracted artifacts."""
-    resolved_output_dir = output_dir if output_dir is not None else Path("results") / "ingest" / model_path.stem
-    experiment_parameters = load_experiment_parameters(experiment_parameters_path)
-    artifacts = run_ingest_workflow(
+    execute_ingest_netlogo_command(
         model_path=model_path,
-        experiment_parameters=experiment_parameters,
-        output_dir=resolved_output_dir,
+        experiment_parameters_path=experiment_parameters_path,
+        output_dir=output_dir,
         suffix=suffix,
+        json_output=json_output,
     )
-    artifact_manifest_path = resolved_output_dir / "ingest_manifest.json"
-    command_result = IngestCommandResult(
-        output_dir=resolved_output_dir,
-        artifact_manifest_path=artifact_manifest_path,
-        artifacts=build_artifact_descriptors(artifacts),
-    )
-    artifact_manifest_path.write_text(command_result.model_dump_json(indent=2), encoding="utf-8")
-    if json_output:
-        typer.echo(command_result.model_dump_json(indent=2))
-        return
-    typer.echo(f"NetLogo ingestion artifacts written to: {resolved_output_dir.resolve()}")
-    typer.echo(f"artifact manifest: {artifact_manifest_path}")
-    for key, path in sorted(artifacts.items()):
-        typer.echo(f"{key}: {path}")
 
 
 @app.command("ingest-netlogo-suite")
@@ -295,64 +240,15 @@ def ingest_netlogo_suite(
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run NetLogo ingestion for multiple ABMs into dedicated output folders."""
-    requested = sorted(set(abms)) if abms else discover_configured_abms()
-    missing: list[str] = []
-    shared_params = load_experiment_parameters(default_experiment_parameters_path)
-    suite_artifacts: dict[str, dict[str, ArtifactDescriptor]] = {}
-
-    for abm in requested:
-        try:
-            model_path = resolve_abm_model_path(abm=abm, models_root=models_root)
-            parameter_path = resolve_abm_experiment_parameters_path(
-                model_dir=model_path.parent,
-                abm=abm,
-                explicit=default_experiment_parameters_path,
-            )
-            if default_experiment_parameters_path is not None:
-                experiment_parameters = shared_params
-            else:
-                experiment_parameters = load_experiment_parameters(parameter_path)
-            output_dir = output_root / abm
-            artifacts = run_ingest_workflow(
-                model_path=model_path,
-                experiment_parameters=experiment_parameters,
-                output_dir=output_dir,
-                suffix=suffix,
-            )
-            manifest_path = output_dir / "ingest_manifest.json"
-            command_result = IngestCommandResult(
-                output_dir=output_dir,
-                artifact_manifest_path=manifest_path,
-                artifacts=build_artifact_descriptors(artifacts),
-            )
-            manifest_path.write_text(command_result.model_dump_json(indent=2), encoding="utf-8")
-            suite_artifacts[abm] = command_result.artifacts
-            typer.echo(f"[{abm}] NetLogo ingestion artifacts written to: {output_dir.resolve()}")
-            for key, path in sorted(artifacts.items()):
-                typer.echo(f"{abm}::{key}: {path}")
-        except typer.BadParameter as exc:
-            message = f"failed for {abm}: {exc}"
-            if continue_on_missing:
-                missing.append(message)
-                continue
-            raise typer.BadParameter(message) from exc
-
-    suite_manifest_path = output_root / "ingest_suite_manifest.json"
-    suite_result = IngestSuiteCommandResult(
+    execute_ingest_netlogo_suite_command(
+        abms=abms,
+        models_root=models_root,
         output_root=output_root,
-        artifact_manifest_path=suite_manifest_path,
-        abms=suite_artifacts,
-        skipped_abms=missing,
+        suffix=suffix,
+        continue_on_missing=continue_on_missing,
+        default_experiment_parameters_path=default_experiment_parameters_path,
+        json_output=json_output,
     )
-    suite_manifest_path.write_text(suite_result.model_dump_json(indent=2), encoding="utf-8")
-    if json_output:
-        typer.echo(suite_result.model_dump_json(indent=2))
-        return
-    typer.echo(f"suite artifact manifest: {suite_manifest_path}")
-    if missing:
-        typer.echo("ingest completed with skipped ABMs:")
-        for issue in missing:
-            typer.echo(f" - {issue}")
 
 
 @app.command("analyze-doe")
@@ -363,15 +259,13 @@ def analyze_doe(
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run full factorial ANOVA contribution analysis."""
-    output_csv.parent.mkdir(parents=True, exist_ok=True)
-    result = analyze_factorial_anova(input_csv, output_csv, max_interaction_order=max_interaction_order)
-    if result is None:
-        raise typer.Exit(code=1)
-    command_result = DoeCommandResult(success=True, output_csv=output_csv)
-    if json_output:
-        typer.echo(command_result.model_dump_json(indent=2))
-        return
-    typer.echo(f"wrote: {output_csv}")
+    execute_analyze_doe_command(
+        input_csv=input_csv,
+        output_csv=output_csv,
+        max_interaction_order=max_interaction_order,
+        json_output=json_output,
+        analyze_factorial_anova_fn=analyze_factorial_anova,
+    )
 
 
 @app.command("evaluate-qualitative")
@@ -400,19 +294,20 @@ def evaluate_qualitative(
     ] = True,
 ) -> None:
     """Evaluate coverage or faithfulness with an LLM and return JSON output."""
-    _validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
-    prompts = load_prompts_config(prompts_path)
-    adapter = create_adapter(provider=provider, model=model)
-    result = evaluate_qualitative_score(
-        summary=summary_text,
-        source=source_text,
+    execute_evaluate_qualitative_command(
+        summary_text=summary_text,
+        source_text=source_text,
         metric=metric,
-        model=model,
-        prompts=prompts,
-        adapter=adapter,
         source_image_path=source_image_path,
+        prompts_path=prompts_path,
+        provider=provider,
+        model=model,
+        allow_debug_model=allow_debug_model,
+        validate_model_policy=_validate_model_policy,
+        create_adapter_fn=create_adapter,
+        load_prompts_config_fn=load_prompts_config,
+        evaluate_qualitative_score_fn=evaluate_qualitative_score,
     )
-    typer.echo(result.model_dump_json())
 
 
 @app.command("smoke-qwen")
@@ -491,78 +386,41 @@ def smoke_qwen(
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run full debug smoke validation across evidence/text modes plus DoE and sweep artifacts."""
-    _validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
-
-    prompts = load_prompts_config(prompts_path)
-    sweep_plot_descriptions: list[str] | None = None
-    scoring_reference_path: Path | None = None
-    if abm:
-        abm_config = load_abm_config(Path("configs/abms") / f"{abm}.yaml")
-        metric_pattern = abm_config.metric_pattern
-        metric_description = abm_config.metric_description
-        if plot_description is None and abm_config.plot_descriptions:
-            plot_description = abm_config.plot_descriptions[0]
-        sweep_plot_descriptions = list(abm_config.plot_descriptions)
-        scoring_reference_path = _resolve_scoring_reference_path(abm)
-    selected_cases = _select_smoke_cases(case_ids=case_id, max_cases=max_cases, profile=profile)
-    adapter = create_adapter(provider=provider, model=model)
-    result = run_qwen_smoke_suite(
-        inputs=SmokeSuiteInputs(
-            csv_path=csv_path,
-            parameters_path=parameters_path,
-            documentation_path=documentation_path,
-            output_dir=output_dir,
-            model=model,
-            metric_pattern=metric_pattern,
-            metric_description=metric_description,
-            plot_description=plot_description,
-            sweep_plot_descriptions=sweep_plot_descriptions,
-            allow_summary_fallback=allow_summary_fallback,
-            summarizers=_parse_summarizers(summarizer, fallback=RUNTIME_DEFAULTS.smoke.summarizers),
-            text_source_mode=text_source_mode,
-            evidence_mode=evidence_mode,
-            scoring_reference_path=scoring_reference_path,
-        ),
-        prompts=prompts,
-        adapter=adapter,
-        run_qualitative=not skip_qualitative,
+    execute_smoke_qwen_command(
+        csv_path=csv_path,
+        parameters_path=parameters_path,
+        documentation_path=documentation_path,
         doe_input_csv=doe_input_csv,
-        run_sweep=not skip_sweep,
-        cases=selected_cases,
-        resume_existing=resume,
+        prompts_path=prompts_path,
+        output_dir=output_dir,
+        provider=provider,
+        model=model,
+        allow_debug_model=allow_debug_model,
+        metric_pattern=metric_pattern,
+        metric_description=metric_description,
+        plot_description=plot_description,
+        evidence_mode=evidence_mode,
+        text_source_mode=text_source_mode,
+        allow_summary_fallback=allow_summary_fallback,
+        abm=abm,
+        summarizer=summarizer,
+        skip_qualitative=skip_qualitative,
+        skip_sweep=skip_sweep,
+        profile=profile,
+        case_id=case_id,
+        max_cases=max_cases,
+        resume=resume,
+        json_output=json_output,
+        smoke_default_summarizers=RUNTIME_DEFAULTS.smoke.summarizers,
+        validate_model_policy=_validate_model_policy,
+        select_smoke_cases=_select_smoke_cases,
+        parse_summarizers=_parse_summarizers,
+        resolve_scoring_reference_path=_resolve_scoring_reference_path,
+        create_adapter_fn=create_adapter,
+        run_qwen_smoke_suite_fn=run_qwen_smoke_suite,
+        load_abm_config_fn=load_abm_config,
+        load_prompts_config_fn=load_prompts_config,
     )
-    command_result = SmokeCommandResult(
-        command="smoke-qwen",
-        success=result.success,
-        report_json_path=result.report_json_path,
-        report_markdown_path=result.report_markdown_path,
-        failed_items=result.failed_cases,
-        nested_artifacts={
-            key: value
-            for key, value in {
-                "doe_output_csv": result.doe_output_csv,
-                "sweep_output_csv": result.sweep_output_csv,
-                "run_master_csv": getattr(result, "run_master_csv_path", None),
-                "global_master_csv": getattr(result, "global_master_csv_path", None),
-            }.items()
-            if value is not None
-        },
-    )
-    if json_output:
-        typer.echo(command_result.model_dump_json(indent=2))
-        if not result.success:
-            raise typer.Exit(code=1)
-        return
-    typer.echo(f"smoke report (markdown): {result.report_markdown_path}")
-    typer.echo(f"smoke report (json): {result.report_json_path}")
-    if result.doe_output_csv is not None:
-        typer.echo(f"doe output: {result.doe_output_csv}")
-    if result.sweep_output_csv is not None:
-        typer.echo(f"sweep output: {result.sweep_output_csv}")
-    if not result.success:
-        failed = ", ".join(result.failed_cases) if result.failed_cases else "doe/sweep"
-        typer.echo(f"smoke suite failed: {failed}")
-        raise typer.Exit(code=1)
 
 
 @app.command("smoke-doe")
@@ -611,101 +469,23 @@ def smoke_doe(
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Inspect the full pre-LLM DOE design and materialize shared artifacts plus compact case indexes."""
-    prompts = load_prompts_config(prompts_path)
-    requested = sorted(set(abms)) if abms else list(discover_configured_abms())
-    selected_model_ids = tuple(dict.fromkeys(model_ids or list(CANONICAL_DOE_MODEL_IDS)))
-    model_specs: list[DoESmokeModelSpec] = []
-    for candidate_model_id in selected_model_ids:
-        provider, model = resolve_model_from_registry(models_path=models_path, model_id=candidate_model_id)
-        model_specs.append(
-            DoESmokeModelSpec(
-                model_id=candidate_model_id,
-                provider=provider,
-                model=model,
-            )
-        )
-
-    abm_inputs: dict[str, DoESmokeAbmInput] = {}
-    for abm in requested:
-        abm_config = load_abm_config(Path("configs/abms") / f"{abm}.yaml")
-        _ = resolve_abm_model_path(abm=abm, models_root=models_root)
-        input_csv_path = viz_root / abm / "simulation.csv"
-        parameters_path = ingest_root / abm / "TXT" / "narrative_combined.txt"
-        documentation_path = ingest_root / abm / "TXT" / "final_documentation.txt"
-        artifact_source_path = viz_root / abm / "artifact_source.txt"
-        artifact_source: Literal["simulated", "fallback", "unknown"] = "unknown"
-        if artifact_source_path.exists():
-            loaded_source = artifact_source_path.read_text(encoding="utf-8").strip()
-            if loaded_source in {"simulated", "fallback"}:
-                artifact_source = cast(Literal["simulated", "fallback"], loaded_source)
-        if abm_config.netlogo_viz is None:
-            raise typer.BadParameter(f"missing netlogo_viz config for ABM '{abm}'")
-        plot_specs: list[DoESmokePlotInput] = []
-        plot_config_count = len(abm_config.netlogo_viz.plots)
-        plot_description_count = len(abm_config.plot_descriptions)
-        max_plot_count = max(plot_config_count, plot_description_count)
-        for plot_index in range(1, max_plot_count + 1):
-            reporter_pattern = (
-                abm_config.netlogo_viz.plots[plot_index - 1].reporter_pattern
-                if plot_index <= plot_config_count
-                else "missing-reporter-pattern"
-            )
-            plot_description = (
-                abm_config.plot_descriptions[plot_index - 1]
-                if plot_index <= plot_description_count
-                else "TODO missing plot description"
-            )
-            plot_specs.append(
-                DoESmokePlotInput(
-                    plot_index=plot_index,
-                    reporter_pattern=reporter_pattern,
-                    plot_description=plot_description,
-                    plot_path=viz_root / abm / "plots" / f"{plot_index}.png",
-                )
-            )
-        abm_inputs[abm] = DoESmokeAbmInput(
-            abm=abm,
-            csv_path=input_csv_path,
-            parameters_path=parameters_path,
-            documentation_path=documentation_path,
-            metric_pattern=abm_config.metric_pattern,
-            metric_description=abm_config.metric_description,
-            plots=plot_specs,
-            source_viz_artifact_source=artifact_source,
-        )
-
-    result = run_doe_smoke_suite(
-        abm_inputs=abm_inputs,
-        prompts=prompts,
-        model_specs=model_specs,
+    execute_smoke_doe_command(
+        abms=abms,
+        models_root=models_root,
+        ingest_root=ingest_root,
+        viz_root=viz_root,
+        prompts_path=prompts_path,
+        models_path=models_path,
+        model_ids=model_ids,
         output_root=output_root,
-        evidence_modes=CANONICAL_EVIDENCE_MODES,
-        summarization_specs=canonical_summarization_specs(),
-        prompt_variants=canonical_prompt_variants(),
-        repetitions=CANONICAL_REPETITIONS,
+        json_output=json_output,
+        discover_abms=discover_configured_abms,
+        resolve_model_from_registry=resolve_model_from_registry,
+        resolve_model_path=resolve_abm_model_path,
+        run_doe_smoke_suite_fn=run_doe_smoke_suite,
+        load_abm_config_fn=load_abm_config,
+        load_prompts_config_fn=load_prompts_config,
     )
-    command_result = SmokeCommandResult(
-        command="smoke-doe",
-        success=result.success,
-        report_json_path=result.report_json_path,
-        report_markdown_path=result.report_markdown_path,
-        failed_items=result.failed_case_ids,
-        nested_artifacts={
-            "design_matrix_csv": result.design_matrix_csv_path,
-            "request_matrix_csv": result.request_matrix_csv_path,
-        },
-    )
-    if json_output:
-        typer.echo(command_result.model_dump_json(indent=2))
-        if not result.success:
-            raise typer.Exit(code=1)
-        return
-    typer.echo(f"doe smoke report (markdown): {result.report_markdown_path}")
-    typer.echo(f"doe smoke report (json): {result.report_json_path}")
-    typer.echo(f"design matrix (csv): {result.design_matrix_csv_path}")
-    if not result.success:
-        typer.echo(f"doe smoke failed: {', '.join(result.failed_case_ids)}")
-        raise typer.Exit(code=1)
 
 
 @app.command("smoke-ingest-netlogo")
@@ -738,31 +518,14 @@ def smoke_ingest_netlogo(
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run artifact-focused smoke checks for NetLogo ingestion across configured ABMs."""
-    requested = sorted(set(abms)) if abms else list(discover_configured_abms())
-    abm_models = {abm: resolve_abm_model_path(abm=abm, models_root=models_root) for abm in requested}
-    try:
-        result = run_ingest_smoke_suite(abm_models=abm_models, output_root=output_root, stage_ids=stage)
-    except ValueError as exc:
-        raise typer.BadParameter(str(exc)) from exc
-    if require_stage:
-        ensure_required_stage_ids(
-            selected_stage_ids=result.selected_stage_ids,
-            required_stage_ids=require_stage,
-            label="ingest smoke",
-        )
-    command_result = SmokeCommandResult(
-        command="smoke-ingest-netlogo",
-        success=result.success,
-        report_json_path=result.report_json_path,
-        report_markdown_path=result.report_markdown_path,
-        failed_items=result.failed_abms,
-    )
-    emit_smoke_command_result(
-        command_result=command_result,
+    execute_smoke_ingest_command(
+        abms=abms,
+        models_root=models_root,
+        output_root=output_root,
+        stage=stage,
+        require_stage=require_stage,
         json_output=json_output,
-        markdown_label="ingest smoke report (markdown)",
-        json_label="ingest smoke report (json)",
-        failure_label="ingest smoke failed",
+        run_ingest_smoke_suite_fn=run_ingest_smoke_suite,
     )
 
 
@@ -803,40 +566,16 @@ def smoke_viz(
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run NetLogo simulations and generate the ordered plot PNGs used before LLM inference."""
-    requested = sorted(set(abms)) if abms else list(discover_configured_abms())
-    try:
-        if not netlogo_home.strip():
-            raise ValueError(
-                "missing NetLogo installation directory. Provide --netlogo-home or set DISTILL_ABM_NETLOGO_HOME."
-            )
-        specs = _resolve_viz_smoke_specs(requested_abms=requested, models_root=models_root)
-        result = run_viz_smoke_suite(
-            specs=specs,
-            netlogo_home=netlogo_home,
-            output_root=output_root,
-            stage_ids=stage,
-        )
-    except ValueError as exc:
-        raise typer.BadParameter(str(exc)) from exc
-    if require_stage:
-        ensure_required_stage_ids(
-            selected_stage_ids=result.selected_stage_ids,
-            required_stage_ids=require_stage,
-            label="viz smoke",
-        )
-    command_result = SmokeCommandResult(
-        command="smoke-viz",
-        success=result.success,
-        report_json_path=result.report_json_path,
-        report_markdown_path=result.report_markdown_path,
-        failed_items=result.failed_abms,
-    )
-    emit_smoke_command_result(
-        command_result=command_result,
+    execute_smoke_viz_command(
+        abms=abms,
+        models_root=models_root,
+        netlogo_home=netlogo_home,
+        stage=stage,
+        require_stage=require_stage,
+        output_root=output_root,
         json_output=json_output,
-        markdown_label="viz smoke report (markdown)",
-        json_label="viz smoke report (json)",
-        failure_label="viz smoke failed",
+        resolve_viz_smoke_specs=_resolve_viz_smoke_specs,
+        run_viz_smoke_suite_fn=run_viz_smoke_suite,
     )
 
 
@@ -880,30 +619,16 @@ def validate_workspace(
     ] = False,
 ) -> None:
     """Run the canonical non-LLM validation suite for coding-agent verification."""
-    requested = sorted(set(abms)) if abms else list(discover_configured_abms())
-    abm_models = {abm: resolve_abm_model_path(abm=abm, models_root=models_root) for abm in requested}
-    try:
-        result = run_validation_suite(
-            output_root=output_root,
-            abm_models=abm_models,
-            checks=checks,
-            ingest_stage_ids=ingest_stage,
-            profile=profile,
-        )
-    except ValueError as exc:
-        raise typer.BadParameter(str(exc)) from exc
-    if json_output:
-        typer.echo(result.model_dump_json(indent=2))
-    else:
-        typer.echo(f"validation report (markdown): {result.report_markdown_path}")
-        typer.echo(f"validation report (json): {result.report_json_path}")
-        if result.ingest_smoke_report_json_path is not None:
-            typer.echo(f"ingest smoke report (json): {result.ingest_smoke_report_json_path}")
-        if result.ingest_smoke_report_markdown_path is not None:
-            typer.echo(f"ingest smoke report (markdown): {result.ingest_smoke_report_markdown_path}")
-    if not result.success:
-        typer.echo(f"validation failed: {', '.join(result.failed_checks)}")
-        raise typer.Exit(code=1)
+    execute_validate_workspace_command(
+        checks=checks,
+        abms=abms,
+        models_root=models_root,
+        ingest_stage=ingest_stage,
+        profile=profile,
+        output_root=output_root,
+        json_output=json_output,
+        run_validation_suite_fn=run_validation_suite,
+    )
 
 
 @app.command("describe-abm")
@@ -916,36 +641,13 @@ def describe_abm(
     json_output: Annotated[bool, typer.Option("--json", help="Print structured JSON to stdout.")] = False,
 ) -> None:
     """Describe the resolved configuration and local assets for one ABM without running the pipeline."""
-    config_path = Path("configs/abms") / f"{abm}.yaml"
-    abm_config = load_abm_config(config_path)
-    model_path = resolve_abm_model_path(abm=abm, models_root=models_root)
-    experiment_parameters_path = resolve_abm_experiment_parameters_path(
-        model_dir=model_path.parent,
+    execute_describe_abm_command(
         abm=abm,
-        explicit=None,
+        models_root=models_root,
+        json_output=json_output,
+        resolve_scoring_reference_path=_resolve_scoring_reference_path,
+        load_abm_config_fn=load_abm_config,
     )
-    result = DescribeAbmResult(
-        abm=abm,
-        config_path=config_path,
-        model_path=model_path,
-        experiment_parameters_path=experiment_parameters_path,
-        scoring_reference_path=(
-            _resolve_scoring_reference_path(abm) if abm in {"fauna", "grazing", "milk_consumption"} else None
-        ),
-        metric_pattern=abm_config.metric_pattern,
-        metric_description=abm_config.metric_description,
-        plot_descriptions=list(abm_config.plot_descriptions),
-    )
-    if json_output:
-        typer.echo(result.model_dump_json(indent=2))
-        return
-    typer.echo(f"abm: {result.abm}")
-    typer.echo(f"config: {result.config_path}")
-    typer.echo(f"model: {result.model_path}")
-    if result.experiment_parameters_path is not None:
-        typer.echo(f"experiment parameters: {result.experiment_parameters_path}")
-    if result.scoring_reference_path is not None:
-        typer.echo(f"scoring reference: {result.scoring_reference_path}")
 
 
 @app.command("describe-ingest-artifacts")
@@ -954,37 +656,7 @@ def describe_ingest_artifacts(
     json_output: Annotated[bool, typer.Option("--json", help="Print structured JSON to stdout.")] = False,
 ) -> None:
     """Describe an existing ingest artifact directory without rerunning ingestion."""
-    manifest_path = root / "ingest_manifest.json"
-    artifact_index_path = root / "ingest_artifact_index.json"
-    artifacts: dict[str, ArtifactDescriptor] = {}
-    source_path: Path | None = None
-    if manifest_path.exists():
-        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
-        for key, value in payload.get("artifacts", {}).items():
-            artifacts[key] = ArtifactDescriptor.model_validate(value)
-        source_path = manifest_path
-    elif artifact_index_path.exists():
-        payload = json.loads(artifact_index_path.read_text(encoding="utf-8"))
-        artifacts = build_artifact_descriptors({key: Path(value) for key, value in payload.items()})
-        source_path = artifact_index_path
-    else:
-        for path in sorted(root.rglob("*")):
-            if path.is_file():
-                artifacts[str(path.relative_to(root))] = describe_artifact(path)
-    result = DescribeArtifactsResult(
-        root=root,
-        manifest_path=manifest_path if manifest_path.exists() else None,
-        artifact_index_path=artifact_index_path if artifact_index_path.exists() else None,
-        artifacts=artifacts,
-    )
-    if json_output:
-        typer.echo(result.model_dump_json(indent=2))
-        return
-    typer.echo(f"root: {root}")
-    if source_path is not None:
-        typer.echo(f"source: {source_path}")
-    for key, artifact in sorted(result.artifacts.items()):
-        typer.echo(f"{key}: {artifact.path}")
+    execute_describe_ingest_artifacts_command(root=root, json_output=json_output)
 
 
 @app.command("describe-run")
@@ -993,50 +665,7 @@ def describe_run(
     json_output: Annotated[bool, typer.Option("--json", help="Print structured JSON to stdout.")] = False,
 ) -> None:
     """Describe an existing run output directory from its metadata without rerunning the pipeline."""
-    metadata_path = output_dir / "pipeline_run_metadata.json"
-    if not metadata_path.exists():
-        raise typer.BadParameter(f"missing pipeline metadata file: {metadata_path}")
-    payload = json.loads(metadata_path.read_text(encoding="utf-8"))
-    artifacts_payload = as_dict(payload.get("artifacts"))
-    reproducibility = as_dict(payload.get("reproducibility"))
-    execution = as_dict(payload.get("execution"))
-    debug_trace = as_dict(payload.get("debug_trace"))
-    frame_summary = as_dict(debug_trace.get("frame_summary"))
-    matched_metric_columns_raw = frame_summary.get("matched_metric_columns", [])
-    available_artifacts = {
-        key: Path(value)
-        for key, value in artifacts_payload.items()
-        if isinstance(value, str) and value
-    }
-    result = DescribeRunResult(
-        output_dir=output_dir,
-        metadata_path=metadata_path,
-        available_artifacts=available_artifacts,
-        run_signature=str(reproducibility.get("run_signature")) if reproducibility.get("run_signature") else None,
-        selected_text_source=(
-            str(execution.get("selected_text_source")) if execution.get("selected_text_source") else None
-        ),
-        evidence_mode=str(execution.get("evidence_mode")) if execution.get("evidence_mode") else None,
-        requested_evidence_mode=(
-            str(execution.get("requested_evidence_mode")) if execution.get("requested_evidence_mode") else None
-        ),
-        matched_metric_columns=(
-            [str(item) for item in matched_metric_columns_raw if isinstance(item, str)]
-            if isinstance(matched_metric_columns_raw, list)
-            else []
-        ),
-    )
-    if json_output:
-        typer.echo(result.model_dump_json(indent=2))
-        return
-    typer.echo(f"output_dir: {result.output_dir}")
-    typer.echo(f"metadata: {result.metadata_path}")
-    if result.run_signature:
-        typer.echo(f"run_signature: {result.run_signature}")
-    if result.selected_text_source:
-        typer.echo(f"selected_text_source: {result.selected_text_source}")
-    if result.evidence_mode:
-        typer.echo(f"evidence_mode: {result.evidence_mode}")
+    execute_describe_run_command(output_dir=output_dir, json_output=json_output)
 
 
 def main() -> None:

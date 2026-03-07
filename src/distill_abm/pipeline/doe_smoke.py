@@ -2,20 +2,95 @@
 
 from __future__ import annotations
 
-import csv
-import hashlib
 import json
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Literal, cast
+from typing import Literal
 
-import pandas as pd
 from pydantic import BaseModel, Field
 
 from distill_abm.configs.models import PromptsConfig, SummarizerId
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
-from distill_abm.ingest.csv_ingest import load_simulation_csv, matching_columns
+from distill_abm.ingest.csv_ingest import load_simulation_csv
+from distill_abm.pipeline.doe_smoke_layout import (
+    case_index_dir as _case_index_dir,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    layout_guide_path as _layout_guide_path,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    overview_dir as _overview_dir,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_abm_dir as _shared_abm_dir,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_context_prompt_path as _shared_context_prompt_path,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_global_dir as _shared_global_dir,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_inputs_dir as _shared_inputs_dir,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_plot_copy_path as _shared_plot_copy_path,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_plots_dir as _shared_plots_dir,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_prompts_dir as _shared_prompts_dir,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_root_dir as _shared_root_dir,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_table_path as _shared_table_path,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_tables_dir as _shared_tables_dir,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_trend_prompt_path as _shared_trend_prompt_path,
+)
+from distill_abm.pipeline.doe_smoke_prompts import (
+    CONTEXT_PLACEHOLDER,
+)
+from distill_abm.pipeline.doe_smoke_prompts import (
+    build_legacy_doe_context_prompt as _build_legacy_doe_context_prompt,
+)
+from distill_abm.pipeline.doe_smoke_prompts import (
+    build_legacy_doe_trend_prompt as _build_legacy_doe_trend_prompt,
+)
+from distill_abm.pipeline.doe_smoke_prompts import (
+    build_raw_table_csv as _build_raw_table_csv,
+)
+from distill_abm.pipeline.doe_smoke_reporting import (
+    render_layout_guide as _render_layout_guide,
+)
+from distill_abm.pipeline.doe_smoke_reporting import (
+    render_markdown_report as _render_markdown_report,
+)
+from distill_abm.pipeline.doe_smoke_reporting import (
+    request_plan as _request_plan,
+)
+from distill_abm.pipeline.doe_smoke_reporting import (
+    request_review_row as _request_review_row,
+)
+from distill_abm.pipeline.doe_smoke_reporting import (
+    request_row as _request_row,
+)
+from distill_abm.pipeline.doe_smoke_reporting import (
+    write_csv as _write_csv,
+)
+from distill_abm.pipeline.doe_smoke_reporting import (
+    write_jsonl as _write_jsonl,
+)
+from distill_abm.pipeline.doe_smoke_reporting import (
+    write_shared_global_indexes as _write_shared_global_indexes,
+)
 from distill_abm.utils import detect_placeholder_signals
 
 DoESmokeStatus = Literal["ok", "failed"]
@@ -28,53 +103,9 @@ DoESmokeErrorCode = Literal[
 ]
 DoETextSourceMode = Literal["summary_only", "full_text_only"]
 
-CONTEXT_PLACEHOLDER = "<<context_response_from_context_llm>>"
 CANONICAL_DOE_MODEL_IDS: tuple[str, ...] = ("qwen3_5_local", "kimi_k2_5", "gemini_3_1_pro_preview")
 CANONICAL_EVIDENCE_MODES: tuple[Literal["plot", "table", "plot+table"], ...] = ("plot", "table", "plot+table")
 CANONICAL_REPETITIONS: tuple[int, ...] = (1, 2, 3)
-LEGACY_EXAMPLE_TEXT = (
-    "Here is an example of the style of the report: “ The total number of earthquakes recorded in the region "
-    "starts at 5,000 then it declines rapidly over the first 400 time steps. This initial decline could be "
-    "attributed to the depletion of immediate stress points within the fault lines, as the most susceptible areas "
-    "release their pent-up energy early in the simulation. It increases briefly at around 500 steps, likely due "
-    "to the aftershocks and secondary stress points being triggered as the system seeks a new equilibrium. The "
-    "simulation ends with the number of earthquakes near zero, indicating that the majority of the stress has been "
-    "released and the system has stabilized.\n\nThe total seismic activity follows the same pattern, starting at "
-    "10,000 events and declining steadily. This steady decline reflects a systematic reduction in seismic energy "
-    "over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance "
-    "across simulation runs in the first 100 steps, but deviations become noticeable afterward. This suggests that "
-    "while the initial reactions to stress are highly predictable, as time progresses, the system's complexity "
-    "introduces more variability. This variability could be due to differences in secondary stress points and the "
-    "non-linear nature of seismic energy release over time.“"
-)
-LEGACY_INSIGHTS_TEXT = "When summarizing trends, provide brief insights about their implications for decision makers."
-LEGACY_CONTEXT_PROMPT_TEMPLATE = (
-    "Your goal is to explain an agent-based model. Your explanation must include the context of the model, its goals, "
-    "and key parameters. For each parameter, include the range of values (if provided) and the value that we have set. "
-    "Do not write any summary or conclusion. {parameters}\n\n"
-    "The context and goals of the model are as follows. {documentation}"
-)
-LEGACY_TREND_PROMPT_TEMPLATE = (
-    "We have a plot from repeated simulations of an agent based model. Your goal is to describe the trends in details "
-    "from the plot, mentioning key time steps and values taken by the metric in the plot, and interpreting them based "
-    "on the context of the model. The report must objectively describe the trends in the data without addressing the "
-    "quality of the simulation. Do not refer to the plot or any visual in your description. If a plot has very simple "
-    "dynamics, simply state them without expanding."
-)
-LEGACY_ABM_ROLE_TEXTS: dict[str, tuple[str, str]] = {
-    "fauna": (
-        "You are an expert in megaherbivore extinction without any statistics background.",
-        "You are an expert in megaherbivore extinction with a statistic background.",
-    ),
-    "grazing": (
-        "You are an expert in grazing systems without any statistics background.",
-        "You are an expert in grazing systems with a statistic background.",
-    ),
-    "milk_consumption": (
-        "You are an expert in Consumer Behavior without any statistics background.",
-        "You are an expert in Consumer Behavior with a statistic background.",
-    ),
-}
 
 
 class DoESmokePlotInput(BaseModel):
@@ -251,70 +282,6 @@ def canonical_summarization_specs() -> tuple[DoESmokeSummarizationSpec, ...]:
             summarizers=("longformer_ext",),
         ),
     )
-
-
-def _overview_dir(output_root: Path) -> Path:
-    return output_root / "00_overview"
-
-
-def _shared_root_dir(output_root: Path) -> Path:
-    return output_root / "10_shared"
-
-
-def _shared_global_dir(output_root: Path) -> Path:
-    return _shared_root_dir(output_root) / "global"
-
-
-def _case_index_dir(output_root: Path) -> Path:
-    return output_root / "20_case_index"
-
-
-def _shared_abm_dir(*, output_root: Path, abm: str) -> Path:
-    return _shared_root_dir(output_root) / abm
-
-
-def _shared_inputs_dir(*, output_root: Path, abm: str) -> Path:
-    return _shared_abm_dir(output_root=output_root, abm=abm) / "01_inputs"
-
-
-def _shared_evidence_dir(*, output_root: Path, abm: str) -> Path:
-    return _shared_abm_dir(output_root=output_root, abm=abm) / "02_evidence"
-
-
-def _shared_plots_dir(*, output_root: Path, abm: str) -> Path:
-    return _shared_evidence_dir(output_root=output_root, abm=abm) / "plots"
-
-
-def _shared_prompts_dir(*, output_root: Path, abm: str) -> Path:
-    return _shared_abm_dir(output_root=output_root, abm=abm) / "03_prompts"
-
-
-def _shared_tables_dir(*, output_root: Path, abm: str) -> Path:
-    return _shared_evidence_dir(output_root=output_root, abm=abm) / "tables"
-
-
-def _shared_context_prompt_path(*, output_root: Path, abm: str, prompt_variant: str) -> Path:
-    return _shared_prompts_dir(output_root=output_root, abm=abm) / "context" / f"{prompt_variant}.txt"
-
-
-def _shared_trend_prompt_path(
-    *, output_root: Path, abm: str, prompt_variant: str, evidence_mode: str, plot_index: int
-) -> Path:
-    return (
-        _shared_prompts_dir(output_root=output_root, abm=abm)
-        / "trend"
-        / evidence_mode
-        / prompt_variant
-        / f"plot_{plot_index}.txt"
-    )
-
-
-def _shared_plot_copy_path(*, output_root: Path, abm: str, plot_index: int) -> Path:
-    return _shared_plots_dir(output_root=output_root, abm=abm) / f"plot_{plot_index}.png"
-
-
-def _layout_guide_path(output_root: Path) -> Path:
-    return _overview_dir(output_root) / "README.md"
 
 
 def run_doe_smoke_suite(
@@ -821,10 +788,6 @@ def _validate_text_artifact(*, path: Path, label: str, stage_errors: list[str]) 
         stage_errors.append(f"{label} contains placeholder-like text: {', '.join(hits)}")
 
 
-def _shared_table_path(*, output_root: Path, abm: str, plot_index: int) -> Path:
-    return _shared_tables_dir(output_root=output_root, abm=abm) / f"plot_{plot_index}.csv"
-
-
 def _validate_plot_request(
     *,
     plot_path: Path,
@@ -849,452 +812,3 @@ def _validate_plot_request(
         return "failed", "placeholder_detected", "plot description contains placeholder-like text"
     return "ok", None, None
 
-
-def _request_plan(
-    *,
-    provider: str,
-    model: str,
-    model_id: str,
-    prompt_path: Path,
-    prompt_text: str,
-    image_path: Path | None,
-    table_csv_path: Path | None,
-    evidence_mode: str,
-    summarization_mode: str,
-    text_source_mode: str,
-    prompt_variant: str,
-    enabled_style_features: tuple[str, ...],
-    summarizers: tuple[SummarizerId, ...],
-    repetition: int,
-    request_kind: Literal["context", "trend"],
-    plot_index: int | None,
-    temperature: float | None,
-    max_tokens: int | None,
-    max_retries: int,
-    retry_backoff_seconds: float,
-    unresolved_context: bool,
-) -> dict[str, object]:
-    return {
-        "request_kind": request_kind,
-        "plot_index": plot_index,
-        "provider": provider,
-        "model": model,
-        "model_id": model_id,
-        "temperature": temperature,
-        "max_tokens": max_tokens,
-        "max_retries": max_retries,
-        "retry_backoff_seconds": retry_backoff_seconds,
-        "evidence_mode": evidence_mode,
-        "summarization_mode": summarization_mode,
-        "text_source_mode": text_source_mode,
-        "prompt_variant": prompt_variant,
-        "enabled_style_features": list(enabled_style_features),
-        "summarizers": list(summarizers),
-        "repetition": repetition,
-        "prompt_path": str(prompt_path),
-        "prompt_text": prompt_text,
-        "prompt_length": len(prompt_text),
-        "prompt_signature": hashlib.sha256(prompt_text.encode("utf-8")).hexdigest(),
-        "image_attached": image_path is not None,
-        "image_path": str(image_path) if image_path is not None else None,
-        "table_csv_path": str(table_csv_path) if table_csv_path is not None else None,
-        "unresolved_context_placeholder": unresolved_context,
-        "context_placeholder": CONTEXT_PLACEHOLDER if unresolved_context else None,
-    }
-
-
-def _request_row(*, case_id: str, abm: str, request_plan: dict[str, object]) -> dict[str, str]:
-    enabled_style_features = cast(list[object], request_plan.get("enabled_style_features", []))
-    summarizers = cast(list[object], request_plan.get("summarizers", []))
-    return {
-        "case_id": case_id,
-        "abm": abm,
-        "request_kind": str(request_plan["request_kind"]),
-        "plot_index": str(request_plan["plot_index"] or ""),
-        "model_id": str(request_plan["model_id"]),
-        "provider": str(request_plan["provider"]),
-        "model": str(request_plan["model"]),
-        "evidence_mode": str(request_plan["evidence_mode"]),
-        "summarization_mode": str(request_plan["summarization_mode"]),
-        "text_source_mode": str(request_plan["text_source_mode"]),
-        "prompt_variant": str(request_plan["prompt_variant"]),
-        "enabled_style_features": "|".join(str(item) for item in enabled_style_features),
-        "summarizers": "|".join(str(item) for item in summarizers),
-        "repetition": str(request_plan["repetition"]),
-        "prompt_path": str(request_plan["prompt_path"]),
-        "prompt_signature": str(request_plan["prompt_signature"]),
-        "image_path": str(request_plan["image_path"] or ""),
-        "table_csv_path": str(request_plan["table_csv_path"] or ""),
-        "status": str(request_plan.get("status", "ok")),
-        "error_code": str(request_plan.get("error_code") or ""),
-        "error": str(request_plan.get("error") or ""),
-    }
-
-
-def _request_review_row(*, case_id: str, abm: str, request_plan: dict[str, object]) -> dict[str, str]:
-    enabled_style_features = cast(list[object], request_plan.get("enabled_style_features", []))
-    summarizers = cast(list[object], request_plan.get("summarizers", []))
-    return {
-        "case_id": case_id,
-        "abm": abm,
-        "request_kind": str(request_plan["request_kind"]),
-        "plot_index": str(request_plan["plot_index"] or ""),
-        "model_id": str(request_plan["model_id"]),
-        "provider": str(request_plan["provider"]),
-        "model": str(request_plan["model"]),
-        "evidence_mode": str(request_plan["evidence_mode"]),
-        "summarization_mode": str(request_plan["summarization_mode"]),
-        "text_source_mode": str(request_plan["text_source_mode"]),
-        "prompt_variant": str(request_plan["prompt_variant"]),
-        "enabled_style_features": "|".join(str(item) for item in enabled_style_features),
-        "summarizers": "|".join(str(item) for item in summarizers),
-        "repetition": str(request_plan["repetition"]),
-        "reporter_pattern": str(request_plan.get("reporter_pattern") or ""),
-        "plot_description": str(request_plan.get("plot_description") or ""),
-        "prompt_path": str(request_plan["prompt_path"]),
-        "prompt_preview": _prompt_preview(str(request_plan["prompt_text"])),
-        "prompt_length": str(request_plan["prompt_length"]),
-        "prompt_signature": str(request_plan["prompt_signature"]),
-        "image_path": str(request_plan["image_path"] or ""),
-        "table_csv_path": str(request_plan["table_csv_path"] or ""),
-        "status": str(request_plan.get("status", "ok")),
-        "error_code": str(request_plan.get("error_code") or ""),
-        "error": str(request_plan.get("error") or ""),
-    }
-
-
-def _prompt_preview(prompt_text: str, limit: int = 400) -> str:
-    compact = " ".join(prompt_text.split())
-    if len(compact) <= limit:
-        return compact
-    return f"{compact[:limit]}..."
-
-
-def _legacy_role_texts(abm: str) -> tuple[str, str]:
-    try:
-        return LEGACY_ABM_ROLE_TEXTS[abm]
-    except KeyError as exc:
-        raise ValueError(f"missing legacy DOE role text for ABM '{abm}'") from exc
-
-
-def _build_legacy_doe_context_prompt(
-    *,
-    abm: str,
-    inputs_csv_path: Path,
-    inputs_doc_path: Path,
-    enabled: set[str] | None,
-) -> str:
-    parameters = inputs_csv_path.read_text(encoding="utf-8")
-    documentation = inputs_doc_path.read_text(encoding="utf-8")
-    base = LEGACY_CONTEXT_PROMPT_TEMPLATE.format(parameters=parameters, documentation=documentation)
-    context_role, _trend_role = _legacy_role_texts(abm)
-    if enabled is not None and "role" not in enabled:
-        return base
-    return f"{context_role}\n\n{base}"
-
-
-def _build_legacy_doe_trend_prompt(
-    *,
-    abm: str,
-    context_response: str,
-    plot_description: str,
-    evidence_mode: str,
-    table_csv: str,
-    enabled: set[str] | None,
-) -> str:
-    parts: list[str] = []
-    active = enabled or set()
-    _context_role, trend_role = _legacy_role_texts(abm)
-    if enabled is None or "role" in active:
-        parts.append(trend_role)
-    parts.append(_legacy_trend_prompt_for_evidence_mode(evidence_mode))
-    parts.append(f"The context and goals of the model are as follows. {context_response}")
-    if enabled is None or "example" in active:
-        parts.append(LEGACY_EXAMPLE_TEXT)
-    if enabled is None or "insights" in active:
-        parts.append(LEGACY_INSIGHTS_TEXT)
-    if plot_description.strip():
-        parts.append(
-            _legacy_plot_description_for_evidence_mode(
-                plot_description=plot_description,
-                evidence_mode=evidence_mode,
-            )
-        )
-    if evidence_mode in {"table", "plot+table"}:
-        parts.append(f"Relevant simulation columns (CSV):\n{table_csv}")
-    return "\n\n".join(parts)
-
-
-def _build_raw_table_csv(*, frame: pd.DataFrame, reporter_pattern: str) -> str:
-    columns = [str(column) for column in frame.columns]
-    matched = matching_columns(columns, include_pattern=reporter_pattern)
-    if not matched:
-        return "unmatched metric pattern\n"
-    leading_column = _preferred_time_column(columns)
-    selected = [leading_column, *matched] if leading_column is not None else matched
-    return frame[selected].to_csv(index=False)
-
-
-def _preferred_time_column(columns: list[str]) -> str | None:
-    for candidate in ("[step]", "time_step", "step"):
-        if candidate in columns:
-            return candidate
-    return None
-
-
-def _legacy_trend_prompt_for_evidence_mode(evidence_mode: str) -> str:
-    if evidence_mode == "plot":
-        return LEGACY_TREND_PROMPT_TEMPLATE
-    if evidence_mode == "table":
-        return (
-            LEGACY_TREND_PROMPT_TEMPLATE
-            .replace("a plot", "a data table", 1)
-            .replace("from the plot", "from the data table", 1)
-            .replace("the plot", "the data table")
-            .replace("If a plot has very simple dynamics", "If a data table has very simple dynamics")
-        )
-    if evidence_mode == "plot+table":
-        return LEGACY_TREND_PROMPT_TEMPLATE.replace(
-            (
-                "We have a plot from repeated simulations of an agent based model. "
-                "Your goal is to describe the trends in details from the plot, "
-                "mentioning key time steps and values taken by the metric in the plot, "
-                "and interpreting them based on the context of the model. "
-                "The report must objectively describe the trends in the data without "
-                "addressing the quality of the simulation. "
-                "Do not refer to the plot or any visual in your description. "
-                "If a plot has very simple dynamics, simply state them without expanding."
-            ),
-            (
-                "We have a plot and a data table from repeated simulations of an agent based model. "
-                "Your goal is to describe the trends in details from the plot and the data table, "
-                "mentioning key time steps and values taken by the metric in the plot and the data table, "
-                "and interpreting them based on the context of the model. "
-                "The report must objectively describe the trends in the data without "
-                "addressing the quality of the simulation. "
-                "Do not refer to the plot and the data table or any visual in your description. "
-                "If the plot and data table have very simple dynamics, simply state them without expanding."
-            ),
-        )
-    raise ValueError(f"unsupported DOE evidence mode: {evidence_mode}")
-
-
-def _legacy_plot_description_for_evidence_mode(*, plot_description: str, evidence_mode: str) -> str:
-    stripped = plot_description.strip()
-    if evidence_mode == "plot":
-        return stripped
-    if evidence_mode == "table":
-        return stripped.replace("The attachment is the plot representing", "The data table represents", 1)
-    if evidence_mode == "plot+table":
-        return stripped.replace(
-            "The attachment is the plot representing",
-            "The attachment includes the plot, and the data table represents",
-            1,
-        )
-    raise ValueError(f"unsupported DOE evidence mode: {evidence_mode}")
-
-
-def _write_csv(*, path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> None:
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in rows:
-            writer.writerow(row)
-
-
-def _write_jsonl(*, path: Path, rows: list[dict[str, object]]) -> None:
-    with path.open("w", encoding="utf-8") as handle:
-        for row in rows:
-            handle.write(json.dumps(row, sort_keys=True) + "\n")
-
-
-def _write_shared_global_indexes(
-    *,
-    output_root: Path,
-    model_specs: list[DoESmokeModelSpec],
-    summarization_specs: tuple[DoESmokeSummarizationSpec, ...],
-    prompt_variants: tuple[DoESmokePromptVariant, ...],
-    evidence_modes: tuple[Literal["plot", "table", "plot+table"], ...],
-) -> None:
-    shared_global_dir = _shared_global_dir(output_root)
-    (shared_global_dir / "models.json").write_text(
-        json.dumps([spec.model_dump(mode="json") for spec in model_specs], indent=2, sort_keys=True),
-        encoding="utf-8",
-    )
-    (shared_global_dir / "summarization_modes.json").write_text(
-        json.dumps([spec.model_dump(mode="json") for spec in summarization_specs], indent=2, sort_keys=True),
-        encoding="utf-8",
-    )
-    (shared_global_dir / "prompt_variants.json").write_text(
-        json.dumps([variant.model_dump(mode="json") for variant in prompt_variants], indent=2, sort_keys=True),
-        encoding="utf-8",
-    )
-    (shared_global_dir / "evidence_modes.json").write_text(
-        json.dumps(list(evidence_modes), indent=2),
-        encoding="utf-8",
-    )
-
-
-def _render_layout_guide(output_root: Path) -> str:
-    return (
-        "# DOE smoke layout\n\n"
-        "Use this directory in three passes:\n\n"
-        "1. `00_overview/` for the global report and matrix CSVs.\n"
-        "2. `10_shared/` for global DOE factors and ABM-level shared inputs, evidence, and prompts.\n"
-        "3. `20_case_index/` for compact case and request indexes.\n\n"
-        "## 00_overview\n\n"
-        "- `doe_smoke_report.md`\n"
-        "- `doe_smoke_report.json`\n"
-        "- `design_matrix.csv`\n"
-        "- `request_matrix.csv`\n\n"
-        "- `request_review.csv`\n\n"
-        "## 10_shared/global\n\n"
-        "- `models.json`\n"
-        "- `summarization_modes.json`\n"
-        "- `prompt_variants.json`\n"
-        "- `evidence_modes.json`\n\n"
-        "## 10_shared/<abm>\n\n"
-        "- `01_inputs/`: copied simulation CSV, parameters narrative, final documentation\n"
-        "- `02_evidence/plots/`: copied plot images used by the DOE smoke\n"
-        "- `02_evidence/tables/`: full raw simulation CSV subsets matched to each plot\n"
-        "- `03_prompts/context/`: shared context prompts by prompt variant\n"
-        "- `03_prompts/trend/<evidence_mode>/<prompt_variant>/`: per-plot trend prompts\n\n"
-        "## 20_case_index\n\n"
-        "- `cases.jsonl`: one compact JSON object per DOE case\n"
-        "- `requests.jsonl`: one compact JSON object per planned request\n\n"
-        "Use the matrix CSVs first. Use the JSONL indexes only when you need richer case detail without opening "
-        "hundreds of files.\n"
-        f"\nGenerated at: `{output_root}`\n"
-    )
-
-
-def _render_markdown_report(result: DoESmokeSuiteResult) -> str:
-    case_count_by_abm: dict[str, int] = {}
-    case_count_by_model: dict[str, int] = {}
-    request_count_by_abm: dict[str, int] = {}
-    failure_count_by_model: dict[str, int] = {}
-    failure_count_by_abm: dict[str, int] = {}
-    failure_reason_counts: dict[str, int] = {}
-    for case in result.cases:
-        case_count_by_abm[case.abm] = case_count_by_abm.get(case.abm, 0) + 1
-        case_count_by_model[case.model_id] = case_count_by_model.get(case.model_id, 0) + 1
-        request_count_by_abm[case.abm] = request_count_by_abm.get(case.abm, 0) + case.request_count
-        if case.status == "failed":
-            failure_count_by_abm[case.abm] = failure_count_by_abm.get(case.abm, 0) + 1
-            failure_count_by_model[case.model_id] = failure_count_by_model.get(case.model_id, 0) + 1
-            for error_code in case.error_codes:
-                failure_reason_counts[error_code] = failure_reason_counts.get(error_code, 0) + 1
-
-    lines = [
-        "# DOE Smoke Report",
-        "",
-        "## Overview",
-        "",
-        "This report materializes the exact pre-LLM design matrix for the current DOE setup.",
-        "It groups shared ABM artifacts separately from case-specific request plans.",
-        "",
-        f"- total_cases: `{result.total_cases}`",
-        f"- total_planned_requests: `{result.total_planned_requests}`",
-        f"- total_context_requests: `{result.total_context_requests}`",
-        f"- total_trend_requests: `{result.total_trend_requests}`",
-        f"- success: `{str(result.success).lower()}`",
-        f"- design_matrix_csv_path: `{result.design_matrix_csv_path}`",
-        f"- request_matrix_csv_path: `{result.request_matrix_csv_path}`",
-        f"- request_review_csv_path: `{result.request_review_csv_path}`",
-        f"- layout_guide_path: `{_layout_guide_path(result.output_root)}`",
-        f"- shared_root: `{_shared_root_dir(result.output_root)}`",
-        f"- case_index_root: `{_case_index_dir(result.output_root)}`",
-        f"- case_index_jsonl_path: `{result.case_index_jsonl_path}`",
-        f"- request_index_jsonl_path: `{result.request_index_jsonl_path}`",
-        "",
-        "## DOE Dimensions",
-        "",
-        f"- abm_count: `{len(result.abm_shared)}`",
-        f"- model_count: `{len(case_count_by_model)}`",
-        "- evidence_mode_count: `3`",
-        "- summarization_count: `5`",
-        "- prompt_variant_count: `8`",
-        "- repetition_count: `3`",
-        "",
-        "## Case Distribution",
-        "",
-        "| group | id | case_count | request_count |",
-        "| --- | --- | --- | --- |",
-    ]
-    for abm in sorted(case_count_by_abm):
-        lines.append(f"| abm | {abm} | {case_count_by_abm[abm]} | {request_count_by_abm[abm]} |")
-    for model_id in sorted(case_count_by_model):
-        lines.append(f"| model | {model_id} | {case_count_by_model[model_id]} | - |")
-    lines.extend(
-        [
-            "",
-        "## Shared ABM Bundles",
-        "",
-        "| abm | plot_count | source | shared_dir | stage_errors |",
-        "| --- | --- | --- | --- | --- |",
-        ]
-    )
-    for abm, shared in sorted(result.abm_shared.items()):
-        lines.append(
-            f"| {abm} | {shared.plot_count} | {shared.source_viz_artifact_source} | "
-            f"`{shared.shared_dir}` | {'; '.join(shared.stage_errors)} |"
-        )
-    lines.extend(
-        [
-            "",
-            "## Failure Summary",
-            "",
-        ]
-    )
-    if not result.failed_case_ids:
-        lines.append("No failed DOE smoke cases.")
-    else:
-        lines.extend(
-            [
-                "| group | id | failed_case_count |",
-                "| --- | --- | --- |",
-            ]
-        )
-        for abm in sorted(failure_count_by_abm):
-            lines.append(f"| abm | {abm} | {failure_count_by_abm[abm]} |")
-        for model_id in sorted(failure_count_by_model):
-            lines.append(f"| model | {model_id} | {failure_count_by_model[model_id]} |")
-        lines.extend(
-            [
-                "",
-                "| error_code | occurrences |",
-                "| --- | --- |",
-            ]
-        )
-        for error_code in sorted(failure_reason_counts):
-            lines.append(f"| {error_code} | {failure_reason_counts[error_code]} |")
-        lines.extend(
-            [
-                "",
-                "## Failed Case Examples",
-                "",
-            ]
-        )
-        for case_id in result.failed_case_ids[:20]:
-            lines.append(f"- `{case_id}`")
-        remaining_failed = len(result.failed_case_ids) - min(len(result.failed_case_ids), 20)
-        if remaining_failed > 0:
-            lines.append(
-                f"- `{remaining_failed}` additional failed cases omitted here; "
-                "inspect `design_matrix.csv` for the full list."
-            )
-    lines.extend(
-        [
-            "",
-            "## Failed Cases",
-            "",
-        ]
-    )
-    if not result.failed_case_ids:
-        lines.append("No failed DOE smoke cases.")
-    else:
-        lines.append(
-            "Use `design_matrix.csv`, `request_matrix.csv`, and the compact indexes under `20_case_index/` "
-            "for the complete failed-case set."
-        )
-    return "\n".join(lines) + "\n"
