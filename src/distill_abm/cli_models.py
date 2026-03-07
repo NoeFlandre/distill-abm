@@ -103,6 +103,21 @@ class DescribeArtifactsResult(BaseModel):
     artifacts: dict[str, ArtifactDescriptor] = Field(default_factory=dict)
 
 
+class HealthCheckItem(BaseModel):
+    """One health-check item with status and details."""
+
+    ok: bool
+    detail: str
+
+
+class HealthCheckResult(BaseModel):
+    """Structured result for repository health checks."""
+
+    command: str = "health-check"
+    success: bool
+    checks: dict[str, HealthCheckItem]
+
+
 def build_artifact_descriptors(paths: Mapping[str, Path | None]) -> dict[str, ArtifactDescriptor]:
     """Describe a set of artifact paths with stable metadata."""
     return {
@@ -122,4 +137,3 @@ def describe_artifact(path: Path) -> ArtifactDescriptor:
         size_bytes=path.stat().st_size,
         sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
     )
-

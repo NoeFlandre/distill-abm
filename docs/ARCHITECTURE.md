@@ -25,6 +25,9 @@
 - Exposes `smoke-local-qwen` for a minimal real-inference verification pass against the local Ollama Qwen model.
   - `smoke-local-qwen` resolves the latest ingest and visualization smoke artifacts for each ABM, samples a small stratified subset of evidence/prompt combinations, and runs one context plus one trend inference per sampled case.
   - It writes self-contained case folders with the exact prompt text passed to the model, copied image/table evidence, request hyperparameters, and raw outputs so a human can inspect whether the local execution path is coherent before a full run.
+- Exposes `health-check` for lightweight operator diagnostics.
+  - `health-check` does not execute the pipeline.
+  - It verifies configured ABMs, model-registry resolution, expected ingest/viz roots, and optional local Ollama availability for `qwen3.5:0.8b`.
 - Benchmark/debug model gating.
 - Model registry resolution via `configs/models.yaml`.
 

@@ -323,6 +323,51 @@ def test_cli_validate_workspace_accepts_profile(tmp_path: Path, monkeypatch: pyt
     assert captured["profile"] == "quick"
 
 
+def test_health_check_prints_json_report(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    model_root = tmp_path / "data"
+    _write_min_nlogo_model_dir(model_root, "fauna", "Fauna doc")
+    _write_min_nlogo_model_dir(model_root, "grazing", "Grazing doc")
+    _write_min_nlogo_model_dir(model_root, "milk_consumption", "Milk doc")
+    ingest_root = tmp_path / "ingest"
+    viz_root = tmp_path / "viz"
+    ingest_root.mkdir()
+    viz_root.mkdir()
+
+    models = tmp_path / "models.yaml"
+    models.write_text(
+        """
+models:
+  qwen3_5_local:
+    provider: ollama
+    model: qwen3.5:0.8b
+""",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(cli_module, "_assert_ollama_model_available", lambda _model: None)
+    result = runner.invoke(
+        app,
+        [
+            "health-check",
+            "--models-root",
+            str(model_root),
+            "--ingest-root",
+            str(ingest_root),
+            "--viz-root",
+            str(viz_root),
+            "--models-path",
+            str(models),
+            "--include-ollama",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.output)
+    assert payload["success"] is True
+    assert payload["checks"]["ollama_local_qwen"]["ok"] is True
+
+
 def test_cli_run_with_abm_uses_scoring_reference(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     csv_path, params, docs, prompts = _write_min_inputs(tmp_path)
     captured: dict[str, Any] = {}

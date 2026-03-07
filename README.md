@@ -134,6 +134,16 @@ uv run distill-abm smoke-local-qwen \
   --json
 ```
 
+Run a lightweight repository health check:
+
+```bash
+uv run distill-abm health-check \
+  --models-root data \
+  --ingest-root results/ingest_smoke_latest \
+  --viz-root results/viz_smoke_latest \
+  --json
+```
+
 DOE smoke notes:
 
 - `smoke-doe` does not call any LLM.
@@ -185,6 +195,7 @@ Agent-oriented CLI additions:
 - `smoke-viz` provides stage-filtering and `--require-stage` for the generated simulation CSV and each ordered plot image.
 - `smoke-doe` provides a structured pre-LLM view of the full DOE matrix and writes grouped shared artifacts plus compact case/request indexes that can be reviewed without opening thousands of files.
 - `smoke-local-qwen` runs a small stratified sample with the local `qwen3_5_local` Ollama model and writes one self-contained folder per sampled case plus a review CSV with exact prompt text, evidence paths, hyperparameters, and outputs.
+- `health-check` performs a lightweight read-only validation of configured ABMs, model-registry resolution, expected ingest/viz artifact roots, and optionally local Ollama model availability.
 - `ingest-netlogo` and `ingest-netlogo-suite` now write stable artifact manifests.
 - Read-only inspection commands are available for agent loops:
   - `uv run distill-abm describe-abm --abm grazing --json`
