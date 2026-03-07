@@ -17,7 +17,7 @@ def test_json_log_formatter_includes_event_data() -> None:
         args=(),
         exc_info=None,
     )
-    setattr(record, "event_data", {"provider": "ollama", "model": "qwen3.5:0.8b"})
+    record.event_data = {"provider": "ollama", "model": "qwen3.5:0.8b"}  # type: ignore[attr-defined]
 
     payload = json.loads(formatter.format(record))
 
