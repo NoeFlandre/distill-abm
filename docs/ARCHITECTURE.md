@@ -43,6 +43,7 @@
   - It verifies configured ABMs, model-registry resolution, expected ingest/viz roots, and optional local Ollama availability for `qwen3.5:0.8b`.
 - Benchmark/debug model gating.
 - Model registry resolution via `configs/models.yaml`.
+- CLI-side asset discovery is read-only; model resolution and inspection commands should not rewrite the repository layout while resolving ABM assets.
 
 ### `src/distill_abm/agent_validation.py`
 - Canonical local validation orchestration for agents.

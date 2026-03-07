@@ -96,6 +96,17 @@ def test_resolve_abm_model_path_rejects_ambiguous_matches(tmp_path: Path) -> Non
         resolve_abm_model_path(abm="fauna", models_root=root)
 
 
+def test_resolve_abm_model_path_does_not_mutate_model_layout(tmp_path: Path) -> None:
+    root = tmp_path
+    root_model = root / "fauna.nlogo"
+    root_model.write_text("", encoding="utf-8")
+
+    resolved = resolve_abm_model_path(abm="fauna", models_root=root)
+
+    assert resolved == root_model
+    assert not (root / "fauna_abm").exists()
+
+
 def test_resolve_viz_smoke_specs_rejects_missing_netlogo_viz_config(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
