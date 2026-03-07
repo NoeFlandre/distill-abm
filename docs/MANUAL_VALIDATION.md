@@ -33,12 +33,12 @@ uv run pytest -q | perl -pe 's/ in [0-9]+\.[0-9]+s$/ in <elapsed>/'
 264 passed in <elapsed>
 ```
 
-The main pre-LLM debug surfaces are the ingest smoke, visualization smoke, and DOE smoke result trees under results/. The DOE smoke is strictly pre-LLM: it materializes prompts, evidence references, and request plans without creating adapters or sending any model request.
+The main pre-LLM debug surfaces are the ingest smoke, visualization smoke, and DOE smoke result trees under results/. The DOE smoke is strictly pre-LLM: it materializes prompts, evidence references, and request plans without creating adapters, checking local model runtime availability, or sending any model request.
 
-Evidence locations: results/ingest_smoke_latest/, results/viz_smoke_latest/, results/doe_smoke_latest/, and results/agent_validation/latest/. Reviewers can inspect the grouped shared DOE inputs first, then drill into case manifests only for cases they care about.
+Evidence locations: results/ingest_smoke_latest/, results/viz_smoke_latest/, results/doe_smoke_latest/, and results/agent_validation/latest/. Reviewers can inspect `00_overview/` first, then `10_shared/global/`, then `10_shared/<abm>/`, and finally `20_case_index/` only when they need compact case-level or request-level indexing.
 
 ```bash
-python -c "import json; from pathlib import Path; data=json.loads(Path('results/doe_smoke_latest/doe_smoke_report.json').read_text()); print('total_cases=', data['total_cases']); print('total_planned_requests=', data['total_planned_requests']); print('failed_cases=', len(data['failed_case_ids'])); print('shared_abms=', ','.join(sorted(data['abm_shared'])));"
+python -c "import json; from pathlib import Path; data=json.loads(Path('results/doe_smoke_latest/00_overview/doe_smoke_report.json').read_text()); print('total_cases=', data['total_cases']); print('total_planned_requests=', data['total_planned_requests']); print('failed_cases=', len(data['failed_case_ids'])); print('shared_abms=', ','.join(sorted(data['abm_shared'])));"
 ```
 
 ```output

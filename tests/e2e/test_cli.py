@@ -674,7 +674,7 @@ def test_cli_smoke_doe_supports_json_output(tmp_path: Path, monkeypatch: pytest.
     assert '"command": "smoke-doe"' in result.output
 
 
-def test_cli_smoke_doe_records_model_preflight_errors_without_failing_fast(
+def test_cli_smoke_doe_treats_candidate_models_as_design_factors_only(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     model_root = tmp_path / "data"
@@ -696,11 +696,6 @@ def test_cli_smoke_doe_records_model_preflight_errors_without_failing_fast(
         (abm_viz / "artifact_source.txt").write_text("fallback\n", encoding="utf-8")
 
     captured_model_specs: list[DoESmokeModelSpec] = []
-
-    def fake_validate_model_policy(*, provider, model, allow_debug_model):  # type: ignore[no-untyped-def]
-        _ = allow_debug_model
-        if provider == "ollama" and model == "qwen3.5:0.8b":
-            raise typer.BadParameter("ollama list crashed")
 
     def fake_run_doe_smoke_suite(  # type: ignore[no-untyped-def]
         *,
@@ -724,15 +719,14 @@ def test_cli_smoke_doe_records_model_preflight_errors_without_failing_fast(
         )
         captured_model_specs.extend(model_specs)
         return SimpleNamespace(
-            success=False,
-            failed_case_ids=["fauna::qwen3_5_local::plot::none::none::rep1"],
+            success=True,
+            failed_case_ids=[],
             report_markdown_path=Path("doe_smoke.md"),
             report_json_path=Path("doe_smoke.json"),
             design_matrix_csv_path=Path("design_matrix.csv"),
             request_matrix_csv_path=Path("request_matrix.csv"),
         )
 
-    monkeypatch.setattr(cli_module, "_validate_model_policy", fake_validate_model_policy)
     monkeypatch.setattr(cli_module, "run_doe_smoke_suite", fake_run_doe_smoke_suite)
 
     result = runner.invoke(
@@ -751,8 +745,9 @@ def test_cli_smoke_doe_records_model_preflight_errors_without_failing_fast(
         ],
     )
 
-    assert result.exit_code == 1
-    assert captured_model_specs[0].preflight_error == "ollama list crashed"
+    assert result.exit_code == 0
+    assert captured_model_specs[0].model_id == "qwen3_5_local"
+    assert captured_model_specs[0].preflight_error is None
 
 
 def test_cli_ingest_netlogo_suite_supports_root_level_model_files(tmp_path: Path) -> None:

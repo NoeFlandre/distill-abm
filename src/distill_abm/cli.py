@@ -606,28 +606,22 @@ def smoke_doe(
     ] = None,
     output_root: Annotated[
         Path,
-        typer.Option(help="Directory for DOE smoke reports and per-case artifacts."),
+        typer.Option(help="Directory for DOE smoke reports, shared artifacts, and compact case indexes."),
     ] = Path("results/doe_smoke_latest"),
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
-    """Inspect the full pre-LLM smoke design and materialize exact case payload artifacts."""
+    """Inspect the full pre-LLM DOE design and materialize shared artifacts plus compact case indexes."""
     prompts = load_prompts_config(prompts_path)
     requested = sorted(set(abms)) if abms else list(discover_configured_abms())
     selected_model_ids = tuple(dict.fromkeys(model_ids or list(CANONICAL_DOE_MODEL_IDS)))
     model_specs: list[DoESmokeModelSpec] = []
     for candidate_model_id in selected_model_ids:
         provider, model = resolve_model_from_registry(models_path=models_path, model_id=candidate_model_id)
-        preflight_error: str | None = None
-        try:
-            _validate_model_policy(provider=provider, model=model, allow_debug_model=False)
-        except typer.BadParameter as exc:
-            preflight_error = str(exc)
         model_specs.append(
             DoESmokeModelSpec(
                 model_id=candidate_model_id,
                 provider=provider,
                 model=model,
-                preflight_error=preflight_error,
             )
         )
 

@@ -39,3 +39,8 @@
 - Date: 2026-03-06
 - Decision: Freeze `docs/GROUND_TRUTHS_GPT5.2.md` unless a task explicitly requests changes.
 - Rationale: the GPT-5.2 ground-truth supplementary material has been manually curated into the validated structure and wording expected for the paper supplement, while preserving prompt and model-output content, and should not be modified casually.
+
+## DL-009
+- Date: 2026-03-07
+- Decision: Freeze the validated pre-LLM DOE smoke workflow unless a task explicitly requests changes.
+- Rationale: the current DOE smoke path has been manually validated as the review surface for the full pre-LLM experiment design, including grouped shared artifacts, exact context/trend prompt materialization, context-placeholder handoff semantics, evidence-mode-specific prompt wording, raw table evidence extraction from plot-relevant simulation columns, compact request/case indexes, and the request-review CSV used to verify prompt-to-evidence pairing. This path should not be modified casually once validated.

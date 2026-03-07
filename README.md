@@ -133,10 +133,11 @@ DOE smoke notes:
 
 - `smoke-doe` does not call any LLM.
 - It materializes the full pre-LLM DOE matrix across ABMs, benchmark models, evidence modes, summarization conditions, prompt variants, and repetitions.
-- It groups shared ABM artifacts under `results/doe_smoke_latest/shared/<abm>/` and writes case-specific manifests under `results/doe_smoke_latest/cases/...` so review stays tractable.
+- It treats candidate models as design factors only, so local model availability does not affect DOE smoke success or failure.
+- It groups shared DOE factors under `results/doe_smoke_latest/10_shared/global/`, shared ABM artifacts under `results/doe_smoke_latest/10_shared/<abm>/`, and compact case/request indexes under `results/doe_smoke_latest/20_case_index/`.
 - It writes the exact context prompt, the exact trend prompt for each plot, the per-request model and hyperparameter settings, the exact image/table evidence paths, and the unresolved context placeholder that would still exist before the first LLM call.
 - It uses the latest ingest and visualization smoke outputs as the default pre-LLM inputs, so the report makes it easy to catch wrong documentation, wrong parameter narrative, wrong simulation CSV, wrong evidence image, wrong prompt composition, wrong model choice, or placeholder leakage before any model execution.
-- It writes `design_matrix.csv`, `request_matrix.csv`, a grouped markdown/json report, and per-case bundles under `results/doe_smoke_latest/`.
+- It writes `design_matrix.csv`, `request_matrix.csv`, `cases.jsonl`, `requests.jsonl`, and a grouped markdown/json report under `results/doe_smoke_latest/`.
 
 Visualization smoke caveat:
 
@@ -177,7 +178,7 @@ Agent-oriented CLI additions:
   - `full`: currently equivalent to `default`, reserved as the strictest profile
 - `smoke-ingest-netlogo` supports `--require-stage` so callers can assert that specific stage checks are present.
 - `smoke-viz` provides stage-filtering and `--require-stage` for the generated simulation CSV and each ordered plot image.
-- `smoke-doe` provides a structured pre-LLM view of the full DOE matrix and writes the grouped shared artifacts plus the exact case-level prompt and request artifacts that would be used by the benchmark pipeline.
+- `smoke-doe` provides a structured pre-LLM view of the full DOE matrix and writes grouped shared artifacts plus compact case/request indexes that can be reviewed without opening thousands of files.
 - `ingest-netlogo` and `ingest-netlogo-suite` now write stable artifact manifests.
 - Read-only inspection commands are available for agent loops:
   - `uv run distill-abm describe-abm --abm grazing --json`

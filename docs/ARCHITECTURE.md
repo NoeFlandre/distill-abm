@@ -18,8 +18,9 @@
   - Milk model input CSVs and grazing `.nls` include files are now stored inside the repository so the NetLogo launch path no longer depends on the temporary notebook workspace.
 - Exposes `smoke-doe` for pre-LLM inspection of the smoke matrix.
   - `smoke-doe` resolves the full benchmark DOE matrix over ABMs, candidate models, evidence modes, summarization settings, prompt variants, and repetitions.
-  - It groups shared ABM artifacts under `results/doe_smoke_latest/shared/<abm>/` and writes case-specific manifests under `results/doe_smoke_latest/cases/...`.
+  - It groups global DOE factors under `results/doe_smoke_latest/10_shared/global/`, shared ABM artifacts under `results/doe_smoke_latest/10_shared/<abm>/`, and compact case/request indexes under `results/doe_smoke_latest/20_case_index/`.
   - It writes the exact context prompt, the exact trend prompt for each plot, per-request hyperparameters, image/table evidence paths, and unresolved context placeholders that define the pre-LLM boundary.
+  - It is strictly pre-LLM: model availability is not preflighted and cannot cause DOE smoke failure.
   - The command is intended to debug wrong input artifacts, wrong prompts, wrong model settings, and placeholder leakage before any model call is made.
 - Benchmark/debug model gating.
 - Model registry resolution via `configs/models.yaml`.
