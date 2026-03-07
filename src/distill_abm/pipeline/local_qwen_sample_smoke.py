@@ -22,8 +22,8 @@ from distill_abm.pipeline.helpers import encode_image, invoke_adapter_with_trace
 from distill_abm.utils import detect_placeholder_signals
 
 EvidenceMode = Literal["plot", "table", "plot+table"]
-SMOKE_MAX_TOKENS = 4096
-SMOKE_OLLAMA_NUM_CTX = 16384
+SMOKE_MAX_TOKENS = 32768
+SMOKE_OLLAMA_NUM_CTX = 131072
 
 
 class StructuredSmokeText(BaseModel):

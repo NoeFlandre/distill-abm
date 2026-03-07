@@ -109,8 +109,8 @@ def test_run_local_qwen_sample_smoke_writes_review_friendly_case_artifacts(tmp_p
     context_trace = json.loads((case_dir / "03_outputs" / "context_trace.json").read_text(encoding="utf-8"))
     trend_trace = json.loads((case_dir / "03_outputs" / "trend_trace.json").read_text(encoding="utf-8"))
     assert context_trace["request"]["model"] == "qwen3.5:0.8b"
-    assert context_trace["request"]["max_tokens"] == 4096
-    assert context_trace["request"]["metadata"]["ollama_num_ctx"] == 16384
+    assert context_trace["request"]["max_tokens"] == 32768
+    assert context_trace["request"]["metadata"]["ollama_num_ctx"] == 131072
     assert context_trace["request"]["metadata"]["ollama_format"]["type"] == "object"
     assert trend_trace["request"]["image_attached"] is True
     assert "response-1" in (case_dir / "01_inputs" / "trend_prompt.txt").read_text(encoding="utf-8")

@@ -46,6 +46,11 @@ from distill_abm.pipeline.doe_smoke import (
     canonical_prompt_variants,
     canonical_summarization_specs,
 )
+from distill_abm.pipeline.local_qwen_monitor import (
+    collect_local_qwen_monitor_snapshot,
+    render_local_qwen_monitor,
+    stream_local_qwen_monitor,
+)
 from distill_abm.pipeline.local_qwen_sample_smoke import LocalQwenCaseInput
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode
 from distill_abm.pipeline.smoke import SmokeSuiteInputs
@@ -575,6 +580,40 @@ def execute_smoke_local_qwen_command(
         json_label="local qwen smoke report (json)",
         failure_label="local qwen smoke failed",
     )
+
+
+def execute_monitor_local_qwen_command(
+    *,
+    output_root: Path,
+    watch: bool,
+    interval_seconds: float,
+    json_output: bool,
+) -> None:
+    if watch:
+        if json_output:
+            raise typer.BadParameter("--json cannot be used together with --watch")
+        stream_local_qwen_monitor(output_root=output_root, interval_seconds=interval_seconds)
+        return
+
+    snapshot = collect_local_qwen_monitor_snapshot(output_root)
+    if json_output:
+        typer.echo(
+            json.dumps(
+                {
+                    "output_root": str(snapshot.output_root),
+                    "exists": snapshot.exists,
+                    "total_cases": snapshot.total_cases,
+                    "completed_cases": snapshot.completed_cases,
+                    "failed_cases": snapshot.failed_cases,
+                    "running_case_id": snapshot.running_case_id,
+                    "terminal": snapshot.terminal,
+                    "cases": [case.__dict__ for case in snapshot.cases],
+                },
+                indent=2,
+            )
+        )
+        return
+    typer.echo(render_local_qwen_monitor(snapshot))
 
 
 def execute_smoke_ingest_command(
