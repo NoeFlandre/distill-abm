@@ -915,7 +915,7 @@ def test_validate_model_policy_allows_supported_benchmark_models(monkeypatch: py
         _ = (cmd, check, capture_output, text)
         return SimpleNamespace(stdout="NAME           ID\nqwen3.5:0.8b   0\n", returncode=0)
 
-    monkeypatch.setattr(cli_module.subprocess, "run", fake_run)
+    monkeypatch.setattr("distill_abm.cli_support.subprocess.run", fake_run)
     cli_module._validate_model_policy(
         provider="openrouter", model="moonshotai/kimi-k2.5", allow_debug_model=False
     )
@@ -945,7 +945,7 @@ def test_validate_model_policy_requires_local_ollama_model_available(monkeypatch
         captured["cmd"] = " ".join(cmd)
         return SimpleNamespace(stdout="NAME           ID\nqwen3.5:0.8b   0\n", returncode=0)
 
-    monkeypatch.setattr(cli_module.subprocess, "run", fake_run)
+    monkeypatch.setattr("distill_abm.cli_support.subprocess.run", fake_run)
     cli_module._validate_model_policy(provider="ollama", model="qwen3.5:0.8b", allow_debug_model=False)
     assert captured["cmd"] == "ollama list"
 
