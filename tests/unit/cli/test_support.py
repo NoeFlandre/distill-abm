@@ -33,6 +33,10 @@ def test_parse_summarizers_deduplicates_and_uses_fallback() -> None:
     assert parse_summarizers(None, fallback=("bart", "t5")) == ("bart", "t5")
 
 
+def test_parse_summarizers_normalizes_whitespace() -> None:
+    assert parse_summarizers([" bert ", "t5 "], fallback=("bart",)) == ("bert", "t5")
+
+
 def test_select_smoke_cases_validates_unknown_case_ids() -> None:
     with pytest.raises(typer.BadParameter):
         select_smoke_cases(case_ids=["missing-case"], max_cases=None, profile="matrix")
