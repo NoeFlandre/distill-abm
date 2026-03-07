@@ -15,11 +15,13 @@ from distill_abm.cli_actions import (
     execute_describe_ingest_artifacts_command,
     execute_describe_run_command,
     execute_evaluate_qualitative_command,
+    execute_health_check_command,
     execute_ingest_netlogo_command,
     execute_ingest_netlogo_suite_command,
     execute_run_command,
     execute_smoke_doe_command,
     execute_smoke_ingest_command,
+    execute_smoke_local_qwen_command,
     execute_smoke_qwen_command,
     execute_smoke_viz_command,
     execute_validate_workspace_command,
@@ -47,6 +49,7 @@ from distill_abm.llm.factory import create_adapter
 from distill_abm.pipeline.doe_smoke import (
     run_doe_smoke_suite,
 )
+from distill_abm.pipeline.local_qwen_sample_smoke import run_local_qwen_sample_smoke
 from distill_abm.pipeline.run import EvidenceMode, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
     run_qwen_smoke_suite,
@@ -69,12 +72,14 @@ __all__ = [
     "analyze_doe",
     "app",
     "evaluate_qualitative",
+    "health_check",
     "ingest_netlogo",
     "ingest_netlogo_suite",
     "main",
     "run",
     "smoke_doe",
     "smoke_ingest_netlogo",
+    "smoke_local_qwen",
     "smoke_qwen",
     "smoke_viz",
     "subprocess",
@@ -487,6 +492,61 @@ def smoke_doe(
     )
 
 
+@app.command("smoke-local-qwen")
+def smoke_local_qwen(
+    abms: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--abm",
+            help="ABM names to inspect. Repeat for multiple. Defaults to all configured ABMs.",
+        ),
+    ] = None,
+    models_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ABM model files for asset discovery."),
+    ] = Path("data"),
+    ingest_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ingest smoke outputs."),
+    ] = Path("results/ingest_smoke_latest"),
+    viz_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing visualization smoke outputs."),
+    ] = Path("results/viz_smoke_latest"),
+    models_path: Annotated[
+        Path,
+        typer.Option(exists=True, help="Model registry YAML path."),
+    ] = Path("configs/models.yaml"),
+    model_id: Annotated[
+        str,
+        typer.Option(help="Local Ollama model alias from configs/models.yaml."),
+    ] = "qwen3_5_local",
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for the sampled local-Qwen smoke artifacts."),
+    ] = Path("results/local_qwen_smoke_latest"),
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Run a small real local-Qwen smoke to inspect exact prompts, evidence, hyperparameters, and outputs."""
+    execute_smoke_local_qwen_command(
+        abms=abms,
+        models_root=models_root,
+        ingest_root=ingest_root,
+        viz_root=viz_root,
+        models_path=models_path,
+        model_id=model_id,
+        output_root=output_root,
+        json_output=json_output,
+        discover_abms=discover_configured_abms,
+        resolve_model_from_registry=resolve_model_from_registry,
+        resolve_model_path=resolve_abm_model_path,
+        assert_ollama_model_available=_assert_ollama_model_available,
+        create_adapter_fn=create_adapter,
+        run_local_qwen_sample_smoke_fn=run_local_qwen_sample_smoke,
+        load_abm_config_fn=load_abm_config,
+    )
+
+
 @app.command("smoke-ingest-netlogo")
 def smoke_ingest_netlogo(
     abms: Annotated[
@@ -665,6 +725,46 @@ def describe_run(
 ) -> None:
     """Describe an existing run output directory from its metadata without rerunning the pipeline."""
     execute_describe_run_command(output_dir=output_dir, json_output=json_output)
+
+
+@app.command("health-check")
+def health_check(
+    models_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ABM model files for asset discovery."),
+    ] = Path("data"),
+    ingest_root: Annotated[
+        Path,
+        typer.Option(help="Expected ingest smoke output root."),
+    ] = Path("results/ingest_smoke_latest"),
+    viz_root: Annotated[
+        Path,
+        typer.Option(help="Expected visualization smoke output root."),
+    ] = Path("results/viz_smoke_latest"),
+    models_path: Annotated[
+        Path,
+        typer.Option(exists=True, help="Model registry YAML path."),
+    ] = Path("configs/models.yaml"),
+    include_ollama: Annotated[
+        bool,
+        typer.Option(help="Also verify that the local Ollama qwen3.5 model is available."),
+    ] = False,
+    json_output: Annotated[bool, typer.Option("--json", help="Print structured JSON to stdout.")] = False,
+) -> None:
+    """Run lightweight operator health checks without executing the pipeline."""
+    execute_health_check_command(
+        models_root=models_root,
+        ingest_root=ingest_root,
+        viz_root=viz_root,
+        include_ollama=include_ollama,
+        json_output=json_output,
+        discover_abms=discover_configured_abms,
+        resolve_model_path=resolve_abm_model_path,
+        resolve_model_from_registry=resolve_model_from_registry,
+        models_path=models_path,
+        assert_ollama_model_available=_assert_ollama_model_available,
+        load_abm_config_fn=load_abm_config,
+    )
 
 
 def main() -> None:

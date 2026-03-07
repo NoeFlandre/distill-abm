@@ -16,6 +16,8 @@ from distill_abm.cli_models import (
     DescribeArtifactsResult,
     DescribeRunResult,
     DoeCommandResult,
+    HealthCheckItem,
+    HealthCheckResult,
     IngestCommandResult,
     IngestSuiteCommandResult,
     RunCommandResult,
@@ -44,6 +46,7 @@ from distill_abm.pipeline.doe_smoke import (
     canonical_prompt_variants,
     canonical_summarization_specs,
 )
+from distill_abm.pipeline.local_qwen_sample_smoke import LocalQwenCaseInput
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode
 from distill_abm.pipeline.smoke import SmokeSuiteInputs
 
@@ -507,6 +510,73 @@ def execute_smoke_doe_command(
         raise typer.Exit(code=1)
 
 
+def execute_smoke_local_qwen_command(
+    *,
+    abms: list[str] | None,
+    models_root: Path,
+    ingest_root: Path,
+    viz_root: Path,
+    models_path: Path,
+    model_id: str,
+    output_root: Path,
+    json_output: bool,
+    discover_abms: Callable[[], tuple[str, ...]],
+    resolve_model_from_registry: Callable[[Path, str], tuple[str, str]],
+    resolve_model_path: Callable[..., Path],
+    assert_ollama_model_available: Callable[[str], None],
+    create_adapter_fn: Callable[[str, str], Any],
+    run_local_qwen_sample_smoke_fn: Callable[..., Any],
+    load_abm_config_fn: Callable[[Path], Any],
+) -> None:
+    requested = sorted(set(abms)) if abms else list(discover_abms())
+    provider, model = resolve_model_from_registry(models_path, model_id)
+    if provider != "ollama":
+        raise typer.BadParameter(f"model id '{model_id}' must resolve to an ollama model for smoke-local-qwen.")
+    assert_ollama_model_available(model)
+
+    case_inputs: dict[str, LocalQwenCaseInput] = {}
+    for abm in requested:
+        abm_config: Any = load_abm_config_fn(Path("configs/abms") / f"{abm}.yaml")
+        _ = resolve_model_path(abm=abm, models_root=models_root)
+        if abm_config.netlogo_viz is None or not abm_config.netlogo_viz.plots:
+            raise typer.BadParameter(f"missing netlogo_viz plot config for ABM '{abm}'")
+        if not abm_config.plot_descriptions:
+            raise typer.BadParameter(f"missing plot descriptions for ABM '{abm}'")
+        first_plot = abm_config.netlogo_viz.plots[0]
+        case_inputs[abm] = LocalQwenCaseInput(
+            abm=abm,
+            csv_path=viz_root / abm / "simulation.csv",
+            parameters_path=ingest_root / abm / "TXT" / "narrative_combined.txt",
+            documentation_path=ingest_root / abm / "TXT" / "final_documentation.txt",
+            reporter_pattern=first_plot.reporter_pattern,
+            plot_description=abm_config.plot_descriptions[0],
+            plot_path=viz_root / abm / "plots" / "1.png",
+        )
+
+    adapter: Any = create_adapter_fn(provider, model)
+    result: Any = run_local_qwen_sample_smoke_fn(
+        case_inputs=case_inputs,
+        adapter=adapter,
+        model=model,
+        output_root=output_root,
+    )
+    command_result = SmokeCommandResult(
+        command="smoke-local-qwen",
+        success=result.success,
+        report_json_path=result.report_json_path,
+        report_markdown_path=result.report_markdown_path,
+        failed_items=result.failed_case_ids,
+        nested_artifacts={"request_review_csv": result.review_csv_path},
+    )
+    emit_smoke_command_result(
+        command_result=command_result,
+        json_output=json_output,
+        markdown_label="local qwen smoke report (markdown)",
+        json_label="local qwen smoke report (json)",
+        failure_label="local qwen smoke failed",
+    )
+
+
 def execute_smoke_ingest_command(
     *,
     abms: list[str] | None,
@@ -621,13 +691,73 @@ def execute_validate_workspace_command(
         typer.echo(result.model_dump_json(indent=2))
     else:
         typer.echo(f"validation report (markdown): {result.report_markdown_path}")
-        typer.echo(f"validation report (json): {result.report_json_path}")
-        if result.ingest_smoke_report_json_path is not None:
-            typer.echo(f"ingest smoke report (json): {result.ingest_smoke_report_json_path}")
-        if result.ingest_smoke_report_markdown_path is not None:
-            typer.echo(f"ingest smoke report (markdown): {result.ingest_smoke_report_markdown_path}")
-    if not result.success:
-        typer.echo(f"validation failed: {', '.join(result.failed_checks)}")
+    typer.echo(f"validation report (json): {result.report_json_path}")
+
+
+def execute_health_check_command(
+    *,
+    models_root: Path,
+    ingest_root: Path,
+    viz_root: Path,
+    include_ollama: bool,
+    json_output: bool,
+    discover_abms: Callable[[], tuple[str, ...]],
+    resolve_model_path: Callable[..., Path],
+    resolve_model_from_registry: Callable[[Path, str], tuple[str, str]],
+    models_path: Path,
+    assert_ollama_model_available: Callable[[str], None],
+    load_abm_config_fn: Callable[[Path], Any],
+) -> None:
+    checks: dict[str, HealthCheckItem] = {}
+    requested = list(discover_abms())
+    checks["configured_abms"] = HealthCheckItem(ok=bool(requested), detail=", ".join(requested))
+
+    try:
+        provider, model = resolve_model_from_registry(models_path, "qwen3_5_local")
+        checks["model_registry"] = HealthCheckItem(ok=True, detail=f"qwen3_5_local -> {provider}:{model}")
+    except Exception as exc:
+        checks["model_registry"] = HealthCheckItem(ok=False, detail=str(exc))
+
+    abm_ok = True
+    abm_details: list[str] = []
+    for abm in requested:
+        try:
+            config = load_abm_config_fn(Path("configs/abms") / f"{abm}.yaml")
+            resolve_model_path(abm=abm, models_root=models_root)
+            plot_count = len(getattr(config, "plot_descriptions", []))
+            abm_details.append(f"{abm}({plot_count} plots)")
+        except Exception as exc:
+            abm_ok = False
+            abm_details.append(f"{abm}(error: {exc})")
+    checks["abm_configs"] = HealthCheckItem(ok=abm_ok, detail=", ".join(abm_details))
+
+    checks["ingest_root"] = HealthCheckItem(
+        ok=ingest_root.exists(),
+        detail=str(ingest_root),
+    )
+    checks["viz_root"] = HealthCheckItem(
+        ok=viz_root.exists(),
+        detail=str(viz_root),
+    )
+
+    if include_ollama:
+        try:
+            assert_ollama_model_available("qwen3.5:0.8b")
+            checks["ollama_local_qwen"] = HealthCheckItem(ok=True, detail="qwen3.5:0.8b available")
+        except Exception as exc:
+            checks["ollama_local_qwen"] = HealthCheckItem(ok=False, detail=str(exc))
+
+    success = all(item.ok for item in checks.values())
+    result = HealthCheckResult(success=success, checks=checks)
+    if json_output:
+        typer.echo(result.model_dump_json(indent=2))
+        if not success:
+            raise typer.Exit(code=1)
+        return
+    for name, item in result.checks.items():
+        status = "ok" if item.ok else "failed"
+        typer.echo(f"{name}: {status} - {item.detail}")
+    if not success:
         raise typer.Exit(code=1)
 
 
