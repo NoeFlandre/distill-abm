@@ -14,10 +14,9 @@
 - [ ] Reproducibility artifacts/schema updated (describe below)
 
 ## Validation
-- [ ] `uv run pytest`
-- [ ] `uv run ruff check .`
-- [ ] `uv run mypy src tests`
-- [ ] `uv build`
+- Commands run:
+- Results observed:
+- Any intentionally skipped checks and why:
 
 ## Documentation
 - [ ] README updated
