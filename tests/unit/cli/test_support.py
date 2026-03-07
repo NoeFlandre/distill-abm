@@ -122,10 +122,10 @@ def test_assert_ollama_model_available_rejects_missing_model(monkeypatch: pytest
         assert_ollama_model_available("qwen3.5:0.8b")
 
 
-def test_validate_model_policy_allows_supported_debug_model_with_flag() -> None:
+def test_validate_model_policy_allows_supported_benchmark_model_with_flag() -> None:
     validate_model_policy(
         provider="openrouter",
-        model="qwen/qwen3-vl-235b-a22b-thinking",
+        model="google/gemini-3.1-pro-preview",
         allow_debug_model=True,
     )
 

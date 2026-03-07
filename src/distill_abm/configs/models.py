@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import AliasChoices, BaseModel, Field
 
-ProviderName = Literal["openai", "openrouter", "anthropic", "ollama", "janus", "echo"]
+ProviderName = Literal["openai", "openrouter", "anthropic", "ollama", "echo"]
 SummarizerId = Literal["bart", "bert", "t5", "longformer_ext"]
 RuntimeEvidenceMode = Literal["plot", "table", "plot+table"]
 RuntimeTextSourceMode = Literal["summary_only", "full_text_only"]
@@ -152,7 +152,7 @@ class RuntimeQualitativeDefaults(BaseModel):
     """Defines CLI defaults for qualitative evaluation command."""
 
     provider: ProviderName = "openrouter"
-    model: str = "qwen/qwen3-vl-235b-a22b-thinking"
+    model: str = "google/gemini-3.1-pro-preview"
 
 
 class RuntimeSmokeDefaults(BaseModel):
@@ -160,7 +160,7 @@ class RuntimeSmokeDefaults(BaseModel):
 
     provider: ProviderName = "openrouter"
     output_dir: str = "results/smoke_debug"
-    model: str = "qwen/qwen3-vl-235b-a22b-thinking"
+    model: str = "google/gemini-3.1-pro-preview"
     metric_pattern: str = "mean"
     metric_description: str = "simulation trend"
     evidence_mode: RuntimeEvidenceMode = "plot+table"

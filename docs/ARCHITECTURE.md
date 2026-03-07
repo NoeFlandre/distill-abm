@@ -22,6 +22,9 @@
   - It writes the exact context prompt, the exact trend prompt for each plot, per-request hyperparameters, image/table evidence paths, and unresolved context placeholders that define the pre-LLM boundary.
   - It is strictly pre-LLM: model availability is not preflighted and cannot cause DOE smoke failure.
   - The command is intended to debug wrong input artifacts, wrong prompts, wrong model settings, and placeholder leakage before any model call is made.
+- Exposes `smoke-local-qwen` for a minimal real-inference verification pass against the local Ollama Qwen model.
+  - `smoke-local-qwen` resolves the latest ingest and visualization smoke artifacts for each ABM, samples a small stratified subset of evidence/prompt combinations, and runs one context plus one trend inference per sampled case.
+  - It writes self-contained case folders with the exact prompt text passed to the model, copied image/table evidence, request hyperparameters, and raw outputs so a human can inspect whether the local execution path is coherent before a full run.
 - Benchmark/debug model gating.
 - Model registry resolution via `configs/models.yaml`.
 
@@ -49,7 +52,7 @@
 
 ### `src/distill_abm/llm/*`
 - Provider-neutral adapter interface.
-- Provider-specific adapters for OpenRouter, Ollama, OpenAI, Anthropic, Janus, Echo.
+- Provider-specific adapters for OpenRouter, Ollama, OpenAI, Anthropic, and Echo.
 
 ### `src/distill_abm/summarize/*`
 - Summarizer runners: BART, BERT, T5, LongformerExt.

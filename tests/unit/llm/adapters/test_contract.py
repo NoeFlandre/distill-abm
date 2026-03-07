@@ -11,7 +11,6 @@ from distill_abm.llm.adapters.base import (
     LLMRequest,
     LLMResponse,
 )
-from distill_abm.llm.adapters.janus_adapter import JanusAdapter
 from distill_abm.llm.adapters.ollama_adapter import OllamaAdapter
 from distill_abm.llm.adapters.openai_adapter import OpenAIAdapter
 from distill_abm.llm.adapters.openrouter_adapter import OpenRouterAdapter
@@ -62,12 +61,12 @@ def test_factory_creates_openrouter_adapter() -> None:
             completions=SimpleNamespace(
                 create=lambda **_: SimpleNamespace(
                     choices=[SimpleNamespace(message=SimpleNamespace(content="ok"))],
-                    model="qwen/qwen3-vl-235b-a22b-thinking",
+                    model="google/gemini-3.1-pro-preview",
                 )
             )
         )
     )
-    adapter = create_adapter("openrouter", model="qwen/qwen3-vl-235b-a22b-thinking", client=client)
+    adapter = create_adapter("openrouter", model="google/gemini-3.1-pro-preview", client=client)
     assert isinstance(adapter, OpenRouterAdapter)
 
 
@@ -85,10 +84,10 @@ def test_openai_adapter_success() -> None:
 def test_openrouter_adapter_success() -> None:
     completion = SimpleNamespace(
         choices=[SimpleNamespace(message=SimpleNamespace(content="hello from openrouter"))],
-        model="qwen/qwen3-vl-235b-a22b-thinking",
+        model="google/gemini-3.1-pro-preview",
     )
     client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **_: completion)))
-    response = OpenRouterAdapter(model="qwen/qwen3-vl-235b-a22b-thinking", client=client).complete(make_request())
+    response = OpenRouterAdapter(model="google/gemini-3.1-pro-preview", client=client).complete(make_request())
     assert response.provider == "openrouter"
     assert response.text == "hello from openrouter"
 
@@ -347,24 +346,6 @@ def test_openrouter_adapter_raises_on_completion_failure(monkeypatch: pytest.Mon
         adapter.complete(request)
     
     assert "completion failed" in str(exc_info.value).lower()
-
-
-def test_janus_adapter_raises_on_http_error() -> None:
-    """Test that JanusAdapter raises LLMProviderError when HTTP error occurs."""
-
-    class FakeJanusClient:
-        def generate(
-            self,
-            prompt: str,
-            image_b64: str | None,
-            model: str,
-            max_tokens: int | None,
-            temperature: float | None,
-        ) -> str:
-            raise RuntimeError("HTTP 500: Internal Server Error")
-
-    with pytest.raises(LLMProviderError):
-        JanusAdapter(model="janus-pro", client=FakeJanusClient()).complete(make_request())
 
 
 def test_ollama_adapter_raises_on_connection_error() -> None:

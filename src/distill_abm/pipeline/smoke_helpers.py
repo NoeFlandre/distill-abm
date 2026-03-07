@@ -669,7 +669,7 @@ def _render_markdown_report(result: SmokeSuiteResult) -> str:
     lines.append(f"- Started (UTC): `{result.started_at_utc}`")
     lines.append(f"- Finished (UTC): `{result.finished_at_utc}`")
     lines.append(f"- Success: `{result.success}`")
-    lines.append("- Qualitative policy: `debug_same_model` (debug-only: same generation model is reused for scoring)")
+    lines.append("- Qualitative policy: `same_generation_model_for_scoring`")
     lines.append("")
     lines.append("## Inputs")
     lines.append("")

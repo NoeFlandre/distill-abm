@@ -865,15 +865,6 @@ def test_validate_model_policy_blocks_unsupported_model() -> None:
         cli_module._validate_model_policy(provider="openai", model="gpt-4o", allow_debug_model=False)
 
 
-def test_validate_model_policy_blocks_debug_model_without_flag() -> None:
-    with pytest.raises(typer.BadParameter):
-        cli_module._validate_model_policy(
-            provider="openrouter",
-            model="qwen/qwen3-vl-235b-a22b-thinking",
-            allow_debug_model=False,
-        )
-
-
 def test_validate_model_policy_allows_supported_benchmark_models(monkeypatch: pytest.MonkeyPatch) -> None:
     def fake_run(cmd: list[str], check: bool, capture_output: bool, text: bool):  # type: ignore[no-untyped-def]
         _ = (cmd, check, capture_output, text)
@@ -894,10 +885,10 @@ def test_validate_model_policy_blocks_unsupported_benchmark_model() -> None:
         cli_module._validate_model_policy(provider="openrouter", model="unsupported-model", allow_debug_model=False)
 
 
-def test_validate_model_policy_debug_model_allowed_with_flag() -> None:
+def test_validate_model_policy_supported_model_is_allowed_with_flag() -> None:
     cli_module._validate_model_policy(
         provider="openrouter",
-        model="qwen/qwen3-vl-235b-a22b-thinking",
+        model="google/gemini-3.1-pro-preview",
         allow_debug_model=True,
     )
 

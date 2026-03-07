@@ -4,7 +4,6 @@ import pytest
 
 from distill_abm.llm.adapters.anthropic_adapter import AnthropicAdapter
 from distill_abm.llm.adapters.echo_adapter import EchoAdapter
-from distill_abm.llm.adapters.janus_adapter import JanusAdapter
 from distill_abm.llm.adapters.ollama_adapter import OllamaAdapter
 from distill_abm.llm.adapters.openai_adapter import OpenAIAdapter
 from distill_abm.llm.adapters.openrouter_adapter import OpenRouterAdapter
@@ -52,12 +51,6 @@ def test_factory_creates_ollama_adapter() -> None:
     """Test that ollama provider creates OllamaAdapter."""
     adapter = create_adapter(provider="ollama", model="test-model")
     assert isinstance(adapter, OllamaAdapter)
-
-
-def test_factory_creates_janus_adapter() -> None:
-    """Test that janus provider creates JanusAdapter."""
-    adapter = create_adapter(provider="janus", model="test-model")
-    assert isinstance(adapter, JanusAdapter)
 
 
 def test_factory_creates_echo_adapter() -> None:

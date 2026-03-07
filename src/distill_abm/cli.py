@@ -26,7 +26,6 @@ from distill_abm.cli_actions import (
 )
 from distill_abm.cli_support import (
     BENCHMARK_MODELS,
-    DEBUG_MODEL,
     discover_configured_abms,
     parse_summarizers,
     resolve_abm_model_path,
@@ -692,14 +691,8 @@ def _assert_ollama_model_available(model: str) -> None:
 
 
 def _validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:
+    _ = allow_debug_model
     key = (provider.strip().lower(), model.strip())
-    if key == DEBUG_MODEL:
-        if not allow_debug_model:
-            raise typer.BadParameter(
-                "debug model is blocked for benchmark runs. Use --allow-debug-model to run debug workflows."
-            )
-        return
-
     if key not in BENCHMARK_MODELS:
         allowed = ", ".join(f"{p}:{m}" for p, m in sorted(BENCHMARK_MODELS))
         raise typer.BadParameter(

@@ -26,7 +26,6 @@
 | `kimi_k2_5` | `openrouter` | `moonshotai/kimi-k2.5` |
 | `gemini_3_1_pro_preview` | `openrouter` | `google/gemini-3.1-pro-preview` |
 | `qwen3_5_local` | `ollama` | `qwen3.5:0.8b` |
-| `qwen_vl_debug` | `openrouter` | `qwen/qwen3-vl-235b-a22b-thinking` |
 
 ## Summarizer Runtimes
 
