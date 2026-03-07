@@ -102,6 +102,8 @@ def invoke_adapter(
     model: str,
     prompt: str,
     image_b64: str | None = None,
+    max_tokens: int | None = None,
+    request_metadata: dict[str, object] | None = None,
     max_retries: int | None = None,
     retry_backoff_seconds: float | None = None,
 ) -> str:
@@ -111,6 +113,8 @@ def invoke_adapter(
         model=model,
         prompt=prompt,
         image_b64=image_b64,
+        max_tokens=max_tokens,
+        request_metadata=request_metadata,
         max_retries=max_retries,
         retry_backoff_seconds=retry_backoff_seconds,
     )
@@ -122,14 +126,23 @@ def invoke_adapter_with_trace(
     model: str,
     prompt: str,
     image_b64: str | None = None,
+    max_tokens: int | None = None,
+    request_metadata: dict[str, object] | None = None,
     max_retries: int | None = None,
     retry_backoff_seconds: float | None = None,
 ) -> tuple[str, dict[str, object]]:
     """Execute one LLM call and return normalized text plus a debug trace payload."""
-    request = LLMRequest(model=model, messages=[LLMMessage(role="user", content=prompt)], image_b64=image_b64)
+    request = LLMRequest(
+        model=model,
+        messages=[LLMMessage(role="user", content=prompt)],
+        image_b64=image_b64,
+        max_tokens=max_tokens,
+        metadata=dict(request_metadata or {}),
+    )
     defaults = get_runtime_defaults().llm_request
     retries = max(defaults.max_retries if max_retries is None else max_retries, 0)
     backoff = max(defaults.retry_backoff_seconds if retry_backoff_seconds is None else retry_backoff_seconds, 0.0)
+    preserve_raw_text = bool(request.metadata.get("preserve_raw_text"))
     request_block = {
         "provider": adapter.provider,
         "model": model,
@@ -143,6 +156,7 @@ def invoke_adapter_with_trace(
         "prompt_signature": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
         "message_count": len(request.messages),
         "messages": [message.model_dump() for message in request.messages],
+        "metadata": request.metadata,
     }
     LOGGER.info(
         "llm_request_start",
@@ -163,7 +177,10 @@ def invoke_adapter_with_trace(
         ensure_circuit_closed(provider=adapter.provider, model=model)
         try:
             response = adapter.complete(request)
-            clean_text = clean_markdown_symbols(strip_think_prefix(response.text))
+            if preserve_raw_text:
+                clean_text = response.text
+            else:
+                clean_text = clean_markdown_symbols(strip_think_prefix(response.text))
             record_success(provider=adapter.provider, model=model)
             LOGGER.info(
                 "llm_request_success",

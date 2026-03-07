@@ -22,6 +22,14 @@ from distill_abm.pipeline.helpers import encode_image, invoke_adapter_with_trace
 from distill_abm.utils import detect_placeholder_signals
 
 EvidenceMode = Literal["plot", "table", "plot+table"]
+SMOKE_MAX_TOKENS = 4096
+SMOKE_OLLAMA_NUM_CTX = 16384
+
+
+class StructuredSmokeText(BaseModel):
+    """Structured smoke output schema for one text response."""
+
+    response_text: str
 
 
 class LocalQwenCaseInput(BaseModel):
@@ -149,27 +157,28 @@ def run_local_qwen_sample_smoke(
             enabled = set(case.prompt_variant.replace("all_three", "role+insights+example").split("+"))
             if case.prompt_variant == "none":
                 enabled = set()
-            context_prompt = build_legacy_doe_context_prompt(
+            context_prompt_base = build_legacy_doe_context_prompt(
                 abm=input_bundle.abm,
                 inputs_csv_path=input_bundle.parameters_path,
                 inputs_doc_path=input_bundle.documentation_path,
                 enabled=enabled,
             )
-            _write_text(inputs_dir / "context_prompt.txt", context_prompt)
             shutil.copy2(input_bundle.parameters_path, inputs_dir / "parameters.txt")
             shutil.copy2(input_bundle.documentation_path, inputs_dir / "documentation.txt")
 
-            context_text, context_trace = invoke_adapter_with_trace(
+            context_text, context_trace, context_prompt = _invoke_structured_smoke_text(
                 adapter=adapter,
                 model=model,
-                prompt=context_prompt,
+                prompt=context_prompt_base,
             )
+            _write_text(inputs_dir / "context_prompt.txt", context_prompt)
             _write_json(requests_dir / "context_request.json", context_trace["request"])
             _write_text(outputs_dir / "context_output.txt", context_text)
             _write_json(outputs_dir / "context_trace.json", context_trace)
+            _write_optional_thinking(outputs_dir / "context_thinking.txt", context_trace)
 
             table_csv = _build_case_table(inputs_dir=inputs_dir, case=case, input_bundle=input_bundle)
-            trend_prompt = build_legacy_doe_trend_prompt(
+            trend_prompt_base = build_legacy_doe_trend_prompt(
                 abm=input_bundle.abm,
                 context_response=context_text,
                 plot_description=input_bundle.plot_description,
@@ -177,7 +186,6 @@ def run_local_qwen_sample_smoke(
                 table_csv=table_csv,
                 enabled=enabled,
             )
-            _write_text(inputs_dir / "trend_prompt.txt", trend_prompt)
 
             image_b64: str | None = None
             image_path: Path | None = None
@@ -186,15 +194,17 @@ def run_local_qwen_sample_smoke(
                 shutil.copy2(input_bundle.plot_path, image_path)
                 image_b64 = encode_image(image_path)
 
-            trend_text, trend_trace = invoke_adapter_with_trace(
+            trend_text, trend_trace, trend_prompt = _invoke_structured_smoke_text(
                 adapter=adapter,
                 model=model,
-                prompt=trend_prompt,
+                prompt=trend_prompt_base,
                 image_b64=image_b64,
             )
+            _write_text(inputs_dir / "trend_prompt.txt", trend_prompt)
             _write_json(requests_dir / "trend_request.json", trend_trace["request"])
             _write_text(outputs_dir / "trend_output.txt", trend_text)
             _write_json(outputs_dir / "trend_trace.json", trend_trace)
+            _write_optional_thinking(outputs_dir / "trend_thinking.txt", trend_trace)
             _write_json(
                 requests_dir / "hyperparameters.json",
                 {
@@ -300,6 +310,47 @@ def _build_case_table(
     return table_csv
 
 
+def _invoke_structured_smoke_text(
+    *,
+    adapter: LLMAdapter,
+    model: str,
+    prompt: str,
+    image_b64: str | None = None,
+) -> tuple[str, dict[str, object], str]:
+    schema = StructuredSmokeText.model_json_schema()
+    prompt_with_schema = (
+        f"{prompt}\n\n"
+        "Return your final answer as a JSON object that matches this schema exactly:\n"
+        f"{json.dumps(schema, indent=2, sort_keys=True)}"
+    )
+    raw_text, trace = invoke_adapter_with_trace(
+        adapter=adapter,
+        model=model,
+        prompt=prompt_with_schema,
+        image_b64=image_b64,
+        max_tokens=SMOKE_MAX_TOKENS,
+        request_metadata={
+            "ollama_num_ctx": SMOKE_OLLAMA_NUM_CTX,
+            "ollama_format": schema,
+            "preserve_raw_text": True,
+        },
+    )
+    try:
+        parsed = StructuredSmokeText.model_validate_json(raw_text)
+    except Exception as exc:
+        thinking_text = _extract_thinking_text(trace)
+        if thinking_text:
+            raise ValueError("model returned only thinking without a final structured response") from exc
+        raise ValueError("model did not return valid structured JSON for the smoke output") from exc
+    final_text = parsed.response_text.strip()
+    if not final_text:
+        raise ValueError("structured smoke output contained an empty response_text")
+    response_block = trace.get("response")
+    if isinstance(response_block, dict):
+        response_block["parsed_response"] = parsed.model_dump(mode="json")
+    return final_text, trace, prompt_with_schema
+
+
 def _validate_case_inputs(input_bundle: LocalQwenCaseInput) -> None:
     required_paths = (
         input_bundle.csv_path,
@@ -326,6 +377,26 @@ def _write_text(path: Path, text: str) -> None:
 
 def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+
+
+def _write_optional_thinking(path: Path, trace: dict[str, object]) -> None:
+    thinking_text = _extract_thinking_text(trace)
+    if thinking_text:
+        _write_text(path, thinking_text)
+
+
+def _extract_thinking_text(trace: dict[str, object]) -> str:
+    response_block = trace.get("response")
+    if not isinstance(response_block, dict):
+        return ""
+    raw_block = response_block.get("raw")
+    if not isinstance(raw_block, dict):
+        return ""
+    message_block = raw_block.get("message")
+    if not isinstance(message_block, dict):
+        return ""
+    thinking = message_block.get("thinking")
+    return str(thinking).strip() if isinstance(thinking, str) else ""
 
 
 def _write_review_csv(path: Path, rows: list[dict[str, str]]) -> None:

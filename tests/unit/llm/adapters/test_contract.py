@@ -215,6 +215,51 @@ def test_ollama_adapter_forwards_max_tokens_as_num_predict() -> None:
     assert options["num_predict"] == 321
 
 
+def test_ollama_adapter_forwards_num_ctx_when_requested() -> None:
+    seen: dict[str, object] = {}
+
+    def _chat(**payload):  # type: ignore[no-untyped-def]
+        seen.update(payload)
+        return {"message": {"content": "hi"}, "model": "qwen3.5:0.8b"}
+
+    request = LLMRequest(
+        model="qwen3.5:0.8b",
+        messages=[LLMMessage(role="user", content="hello")],
+        metadata={"ollama_num_ctx": 16384},
+    )
+    OllamaAdapter(model="qwen3.5:0.8b", client=SimpleNamespace(chat=_chat)).complete(request)
+    options = seen["options"]
+    assert isinstance(options, dict)
+    assert options["num_ctx"] == 16384
+
+
+def test_ollama_adapter_forwards_structured_output_metadata() -> None:
+    seen: dict[str, object] = {}
+
+    def _chat(**payload):  # type: ignore[no-untyped-def]
+        seen.update(payload)
+        return {
+            "message": {"content": '{"response_text":"ok"}', "thinking": "hidden"},
+            "model": "qwen3.5:0.8b",
+        }
+
+    request = LLMRequest(
+        model="qwen3.5:0.8b",
+        messages=[LLMMessage(role="user", content="hello")],
+        metadata={
+            "ollama_format": {
+                "type": "object",
+                "properties": {"response_text": {"type": "string"}},
+                "required": ["response_text"],
+            },
+        },
+    )
+    response = OllamaAdapter(model="qwen3.5:0.8b", client=SimpleNamespace(chat=_chat)).complete(request)
+    assert response.text == '{"response_text":"ok"}'
+    assert "think" not in seen
+    assert seen["format"] == request.metadata["ollama_format"]
+
+
 def test_ollama_adapter_normalizes_chatresponse_objects() -> None:
     class ChatResponse:
         def __init__(self) -> None:
@@ -231,6 +276,18 @@ def test_ollama_adapter_normalizes_chatresponse_objects() -> None:
     assert response.provider == "ollama"
     assert response.text == "hi-from-object"
     assert response.raw["message"]["content"] == "hi-from-object"
+
+
+def test_ollama_adapter_preserves_thinking_field_in_raw_message() -> None:
+    client = SimpleNamespace(
+        chat=lambda **_: {
+            "message": {"content": "final", "thinking": "chain of thought"},
+            "model": "qwen3.5:0.8b",
+        }
+    )
+    response = OllamaAdapter(model="qwen3.5:0.8b", client=client).complete(make_request())
+    assert response.text == "final"
+    assert response.raw["message"]["thinking"] == "chain of thought"
 
 
 def test_ollama_adapter_timeout_is_wrapped() -> None:
