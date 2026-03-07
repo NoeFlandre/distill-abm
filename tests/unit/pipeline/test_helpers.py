@@ -194,6 +194,31 @@ def test_invoke_adapter_with_trace_records_token_usage_when_available() -> None:
     assert response["usage"] == {"prompt_tokens": 11, "completion_tokens": 7, "total_tokens": 18}
 
 
+def test_invoke_adapter_with_trace_preserves_raw_text_when_requested() -> None:
+    class JsonAdapter(LLMAdapter):
+        provider = "ollama"
+
+        def complete(self, request: LLMRequest) -> LLMResponse:
+            assert request.metadata["preserve_raw_text"] is True
+            return LLMResponse(
+                provider=self.provider,
+                model=request.model,
+                text='{"response_text":"# keep * raw"}',
+                raw={},
+            )
+
+    text, _trace = helpers.invoke_adapter_with_trace(
+        adapter=JsonAdapter(),
+        model="qwen3.5:0.8b",
+        prompt="hello",
+        request_metadata={"preserve_raw_text": True},
+        max_retries=0,
+        retry_backoff_seconds=0.0,
+    )
+
+    assert text == '{"response_text":"# keep * raw"}'
+
+
 def test_build_stats_csv_uses_expected_column_order() -> None:
     stats_table = pd.DataFrame(
         {

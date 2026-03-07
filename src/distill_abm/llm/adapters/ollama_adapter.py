@@ -30,11 +30,18 @@ class OllamaAdapter(LLMAdapter):
         options: dict[str, float | int | None] = {"temperature": request.temperature}
         if request.max_tokens is not None:
             options["num_predict"] = request.max_tokens
+        ollama_num_ctx = request.metadata.get("ollama_num_ctx")
+        if isinstance(ollama_num_ctx, int) and ollama_num_ctx > 0:
+            options["num_ctx"] = ollama_num_ctx
         payload = {
             "model": self.model or request.model,
             "messages": _build_messages(request),
             "options": options,
         }
+        if "ollama_think" in request.metadata:
+            payload["think"] = request.metadata["ollama_think"]
+        if "ollama_format" in request.metadata:
+            payload["format"] = request.metadata["ollama_format"]
         try:
             with ThreadPoolExecutor(max_workers=1) as pool:
                 future = pool.submit(self._client_for_request().chat, **payload)
@@ -95,6 +102,12 @@ def _normalize_chat_result(result: Any) -> dict[str, Any]:
     message = payload.get("message")
     if message is not None and not isinstance(message, dict):
         content = getattr(message, "content", None)
+        thinking = getattr(message, "thinking", None)
+        normalized_message: dict[str, Any] = {}
         if content is not None:
-            payload["message"] = {"content": content}
+            normalized_message["content"] = content
+        if thinking is not None:
+            normalized_message["thinking"] = thinking
+        if normalized_message:
+            payload["message"] = normalized_message
     return payload
