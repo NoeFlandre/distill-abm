@@ -21,6 +21,7 @@ BENCHMARK_MODELS: set[tuple[str, str]] = {
     ("openrouter", "google/gemini-3.1-pro-preview"),
     ("ollama", "qwen3.5:0.8b"),
 }
+SUPPORTED_SUMMARIZERS: tuple[SummarizerId, ...] = ("bart", "bert", "t5", "longformer_ext")
 
 
 def load_experiment_parameters(path: Path | None) -> dict[str, bool | int | float | str]:
@@ -176,13 +177,13 @@ def resolve_viz_smoke_specs(*, requested_abms: list[str], models_root: Path) -> 
 
 def parse_summarizers(values: list[str] | None, fallback: tuple[SummarizerId, ...]) -> tuple[SummarizerId, ...]:
     """Validate and normalize summarizer ids."""
-    allowed = {"bart", "bert", "t5", "longformer_ext"}
-    normalized = tuple(dict.fromkeys(values or list(fallback)))
+    allowed = set(SUPPORTED_SUMMARIZERS)
+    normalized = tuple(dict.fromkeys(value.strip() for value in (values or list(fallback))))
     invalid = [value for value in normalized if value not in allowed]
     if invalid:
         raise typer.BadParameter(
             "unsupported summarizer(s): "
-            f"{', '.join(invalid)}. Allowed: bart, bert, t5, longformer_ext."
+            f"{', '.join(invalid)}. Allowed: {', '.join(SUPPORTED_SUMMARIZERS)}."
         )
     return cast(tuple[SummarizerId, ...], normalized)
 

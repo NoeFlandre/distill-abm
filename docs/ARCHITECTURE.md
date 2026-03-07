@@ -44,12 +44,14 @@
 - Benchmark/debug model gating.
 - Model registry resolution via `configs/models.yaml`.
 - CLI-side asset discovery is read-only; model resolution and inspection commands should not rewrite the repository layout while resolving ABM assets.
+- CLI-side summarizer parsing normalizes repeated values and surrounding whitespace before validation so command-line invocations remain tolerant of minor input formatting noise.
 
 ### `src/distill_abm/agent_validation.py`
 - Canonical local validation orchestration for agents.
 - Runs pytest, Ruff, mypy, build, and NetLogo ingest smoke checks behind one structured report.
 - Supports validation profiles and explicit per-check status reporting.
 - Normalizes command-style checks through one helper so subprocess success and launch-failure reporting stay consistent across the validation suite.
+- Shapes ingest-smoke execution through a dedicated helper so artifact-path reporting and failed-ABM summaries stay consistent with the command-style checks.
 - Writes stable machine-readable and markdown reports for post-run inspection.
 
 ### `src/distill_abm/pipeline/run.py`
