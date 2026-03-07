@@ -194,6 +194,8 @@ def run_validation_suite(
     report_json_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
     report_markdown_path.write_text(_render_markdown_report(result), encoding="utf-8")
     return result
+
+
 def _select_checks(checks: list[str] | None, profile: ValidationProfile) -> list[ValidationCheck]:
     available = {item.check_id: item for item in default_validation_checks()}
     requested = checks if checks is not None else validation_checks_for_profile(profile)

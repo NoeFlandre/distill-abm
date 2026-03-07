@@ -21,7 +21,7 @@ These four gates serve distinct purposes. `pytest` validates behavioral expectat
 
 ## Test Inventory
 
-The current test suite contains `218` collected tests across `38` test files. The suite is organized into three complementary layers.
+The test suite is organized into three complementary layers. Because the repository is under active development, the exact number of collected tests and files changes over time and should be measured from the current workspace rather than copied into this document.
 
 ### Unit Tests
 
@@ -113,11 +113,13 @@ What the checklist does provide is a disciplined basis for confidence. It demons
 
 ## Current Status
 
-At the time of this document revision, the repository-level testing checklist is satisfied:
+This document does not serve as a durable claim that the repository is currently green.
 
-1. `pytest` passes on the full suite (`218` tests collected).
-2. `ruff` passes on the full repository.
-3. `mypy` passes on `src` and `tests`.
-4. `uv build` succeeds.
+The authoritative status is the output of the repository-level quality gates run against the present workspace:
 
-Accordingly, the current implementation meets the project’s present testing standard for experimental use, debugging, and supplementary-material reporting.
+1. `uv run pytest`
+2. `uv run ruff check .`
+3. `uv run mypy src tests`
+4. `uv build`
+
+Before citing a passing state in a PR, release note, or demo artifact, rerun those commands and record the actual results, including any collection failures, skipped surfaces, or environment-dependent checks.
