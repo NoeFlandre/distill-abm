@@ -354,6 +354,7 @@ def _build_metadata_payload(
 
     context_usage = _extract_trace_usage(debug_trace, "context_request_path")
     trend_usage = _extract_trace_usage(debug_trace, "trend_request_path")
+    observability = _build_observability_summary(context_usage=context_usage, trend_usage=trend_usage)
     return {
         "run_timestamp_utc": datetime.now(UTC).isoformat(),
         "inputs": {
@@ -415,6 +416,7 @@ def _build_metadata_payload(
                 "trend": trend_usage,
                 "total": _combine_usage(context_usage, trend_usage),
             },
+            "observability": observability,
         },
         "prompts": {
             "context_prompt": context_prompt,
@@ -530,6 +532,27 @@ def _combine_usage(*usages: dict[str, int] | None) -> dict[str, int] | None:
         "prompt_tokens": sum(usage["prompt_tokens"] for usage in available),
         "completion_tokens": sum(usage["completion_tokens"] for usage in available),
         "total_tokens": sum(usage["total_tokens"] for usage in available),
+    }
+
+
+def _build_observability_summary(
+    *,
+    context_usage: dict[str, int] | None,
+    trend_usage: dict[str, int] | None,
+) -> dict[str, object]:
+    total_usage = _combine_usage(context_usage, trend_usage)
+    return {
+        "request_count": 2,
+        "usage": {
+            "context": context_usage,
+            "trend": trend_usage,
+            "total": total_usage,
+        },
+        "cost": {
+            "status": "unpriced",
+            "estimated_total_usd": None,
+            "currency": "USD",
+        },
     }
 
 

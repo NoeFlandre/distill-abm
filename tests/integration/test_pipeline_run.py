@@ -23,6 +23,27 @@ class FakeAdapter(LLMAdapter):
         return LLMResponse(provider="fake", model=request.model, text=f"resp-{len(self.calls)}", raw={})
 
 
+class UsageReportingAdapter(LLMAdapter):
+    provider = "fake"
+
+    def __init__(self) -> None:
+        self.calls: list[LLMRequest] = []
+
+    def complete(self, request: LLMRequest) -> LLMResponse:
+        self.calls.append(request)
+        call_index = len(self.calls)
+        usage = {
+            1: {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
+            2: {"prompt_tokens": 20, "completion_tokens": 7, "total_tokens": 27},
+        }[call_index]
+        return LLMResponse(
+            provider="fake",
+            model=request.model,
+            text=f"resp-{call_index}",
+            raw={"usage": usage},
+        )
+
+
 def _write_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
@@ -304,6 +325,57 @@ def test_run_pipeline_resume_existing_reuses_artifacts(tmp_path: Path) -> None:
 
     assert len(adapter.calls) == calls_after_first
     assert first.report_csv == second.report_csv
+
+
+def test_run_pipeline_metadata_includes_run_observability_summary(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    csv_path, parameters_path, documentation_path = _write_inputs(tmp_path)
+    monkeypatch.setattr(
+        run_module,
+        "score_summary",
+        lambda reference, candidate: SummaryScores(
+            token_f1=0.5,
+            precision=0.5,
+            recall=0.5,
+            bleu=0.5,
+            meteor=0.5,
+            rouge1=0.5,
+            rouge2=0.5,
+            rouge_l=0.5,
+            flesch_reading_ease=50.0,
+            reference_length=len(reference.split()),
+            candidate_length=len(candidate.split()),
+        ),
+    )
+
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=parameters_path,
+            documentation_path=documentation_path,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            text_source_mode="full_text_only",
+            evidence_mode="plot",
+        ),
+        prompts=_prompts(),
+        adapter=UsageReportingAdapter(),
+    )
+
+    assert result.metadata_path is not None
+    metadata = json.loads(result.metadata_path.read_text(encoding="utf-8"))
+
+    observability = metadata["llm"]["observability"]
+    assert observability["request_count"] == 2
+    assert observability["usage"]["context"]["total_tokens"] == 15
+    assert observability["usage"]["trend"]["total_tokens"] == 27
+    assert observability["usage"]["total"]["total_tokens"] == 42
+    assert observability["cost"]["status"] == "unpriced"
+    assert observability["cost"]["estimated_total_usd"] is None
 
 
 def test_run_pipeline_resume_fails_on_signature_mismatch(tmp_path: Path) -> None:
