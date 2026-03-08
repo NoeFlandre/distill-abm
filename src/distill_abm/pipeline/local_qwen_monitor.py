@@ -138,7 +138,7 @@ def stream_local_qwen_monitor(
 
 
 def _collect_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
-    if (case_dir / "03_outputs").exists():
+    if (case_dir / "02_requests").exists() or (case_dir / "03_outputs").exists():
         return _collect_sample_case_snapshot(case_dir)
     if (case_dir / "03_trends").exists():
         return _collect_full_case_snapshot(case_dir)
