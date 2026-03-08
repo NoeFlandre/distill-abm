@@ -377,24 +377,29 @@ def _collect_full_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
     context_dir = case_dir / "02_context"
     trends_root = case_dir / "03_trends"
     trend_dirs = sorted(path for path in trends_root.iterdir() if path.is_dir())
+    validation_state = _read_json(case_dir / "validation_state.json")
     context_request = _read_json(context_dir / "context_request.json")
     context_trace = _read_json(context_dir / "context_trace.json")
     context_error = _read_text(context_dir / "error.txt")
     trend_requests = [_read_json(path / "trend_request.json") for path in trend_dirs]
     trend_traces = [_read_json(path / "trend_trace.json") for path in trend_dirs]
-    trend_errors = {path.name: _read_text(path / "error.txt") for path in trend_dirs}
-    failed_trends = [name for name, error in trend_errors.items() if error]
+    representative_trend_trace = next((trace for trace in trend_traces if trace is not None), None)
+    failed_trends = _failed_trends_from_validation_state(validation_state, trend_dirs)
+    accepted_trends = _accepted_trend_count_from_validation_state(validation_state)
     completed_trends = [trace for trace in trend_traces if trace is not None]
-    started_trends = [
-        directory
-        for directory, request, trace in zip(trend_dirs, trend_requests, trend_traces, strict=False)
-        if request is not None or trace is not None
-    ]
+    any_started_trend = any(
+        (trend_dir / "trend_request.json").exists() or (trend_dir / "trend_trace.json").exists()
+        for trend_dir in trend_dirs
+    )
+    context_accepted = _validation_context_status(validation_state) == "accepted"
     if context_error or failed_trends:
         status = "failed"
-    elif context_trace is not None and len(completed_trends) == len(trend_dirs) and trend_dirs:
+    elif (
+        (context_accepted and accepted_trends == len(trend_dirs) and trend_dirs)
+        or (context_trace is not None and len(completed_trends) == len(trend_dirs) and trend_dirs)
+    ):
         status = "completed"
-    elif context_request is not None or started_trends:
+    elif context_request is not None or any_started_trend:
         status = "running"
     else:
         status = "pending"
@@ -414,7 +419,7 @@ def _collect_full_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
         context_prompt_length=_extract_prompt_length(context_request),
         trend_prompt_length=_max_or_none([_extract_prompt_length(request) for request in trend_requests]),
         context_total_tokens=_extract_total_tokens(context_trace),
-        trend_total_tokens=_max_or_none([_extract_total_tokens(trace) for trace in trend_traces]),
+        trend_total_tokens=_extract_total_tokens(representative_trend_trace),
         error=error,
     )
 
@@ -539,6 +544,47 @@ def _read_text(path: Path) -> str | None:
         return None
     text = path.read_text(encoding="utf-8").strip()
     return text or None
+
+
+def _validation_context_status(validation_state: dict[str, Any] | None) -> str | None:
+    if not isinstance(validation_state, dict):
+        return None
+    context = validation_state.get("context")
+    if not isinstance(context, dict):
+        return None
+    status = context.get("status")
+    return status if isinstance(status, str) else None
+
+
+def _accepted_trend_count_from_validation_state(validation_state: dict[str, Any] | None) -> int:
+    if not isinstance(validation_state, dict):
+        return 0
+    trends = validation_state.get("trends")
+    if not isinstance(trends, dict):
+        return 0
+    return sum(
+        1
+        for payload in trends.values()
+        if isinstance(payload, dict) and payload.get("status") == "accepted"
+    )
+
+
+def _failed_trends_from_validation_state(validation_state: dict[str, Any] | None, trend_dirs: list[Path]) -> list[str]:
+    if not isinstance(validation_state, dict):
+        return [path.name for path in trend_dirs if _read_text(path / "error.txt")]
+    trends = validation_state.get("trends")
+    if not isinstance(trends, dict):
+        return [path.name for path in trend_dirs if _read_text(path / "error.txt")]
+    failed: list[str] = []
+    for path in trend_dirs:
+        plot_key = path.name.removeprefix("plot_").lstrip("0") or "0"
+        payload = trends.get(plot_key)
+        if isinstance(payload, dict) and payload.get("status") == "retry":
+            failed.append(path.name)
+            continue
+        if _read_text(path / "error.txt"):
+            failed.append(path.name)
+    return failed
 
 
 def _fmt(value: int | None, width: int) -> str:
