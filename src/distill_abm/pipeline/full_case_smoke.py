@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import shutil
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
@@ -83,6 +84,19 @@ class FullCaseValidationState(BaseModel):
 
     context: dict[str, object]
     trends: dict[str, dict[str, object]]
+
+
+class _TrendExecutionResult(BaseModel):
+    plot_input: FullCasePlotInput
+    trend_dir: Path
+    image_path: Path | None
+    success: bool
+    trend_text: str | None = None
+    trend_trace: dict[str, object] | None = None
+    error: str | None = None
+
+
+MAX_PARALLEL_TRENDS = 4
 
 
 def run_full_case_smoke(
@@ -194,29 +208,14 @@ def run_full_case_smoke(
         _record_context_review_row(review_rows=review_rows, context_dir=context_dir, validation_status="accepted")
 
     frame = pd.read_csv(case_input.csv_path, sep=";")
+    pending_plots: list[tuple[FullCasePlotInput, Path, Path | None]] = []
     for plot_input in case_input.plots:
         trend_dir = trends_dir / f"plot_{plot_input.plot_index:02d}"
         trend_dir.mkdir(parents=True, exist_ok=True)
-        trend_prompt = build_legacy_doe_trend_prompt(
-            abm=case_input.abm,
-            context_response=context_text,
-            plot_description=plot_input.plot_description,
-            evidence_mode=evidence_mode,
-            table_csv=_build_trend_table_csv(
-                frame=frame,
-                evidence_mode=evidence_mode,
-                plot_input=plot_input,
-                trend_dir=trend_dir,
-            ),
-            enabled=enabled,
-        )
-        _write_text(trend_dir / "trend_prompt.txt", trend_prompt)
-        image_b64: str | None = None
         image_path: Path | None = None
         if evidence_mode in {"plot", "plot+table"}:
             image_path = trend_dir / "trend_evidence_plot.png"
             shutil.copy2(plot_input.plot_path, image_path)
-            image_b64 = encode_image(image_path)
         if resume_existing and _is_trend_accepted(
             plot_index=plot_input.plot_index,
             trend_dir=trend_dir,
@@ -235,17 +234,46 @@ def run_full_case_smoke(
                 validation_status="accepted",
             )
             continue
-        try:
-            trend_text, trend_trace = _invoke_structured_smoke_text(
-                adapter=adapter,
-                model=model,
-                prompt_with_schema=trend_prompt,
-                image_b64=image_b64,
-                max_tokens=max_tokens,
-                ollama_num_ctx=0,
-                max_retries=max_retries,
-                retry_backoff_seconds=retry_backoff_seconds,
-            )
+        pending_plots.append((plot_input, trend_dir, image_path))
+
+    trend_results_by_index: dict[int, _TrendExecutionResult] = {}
+    if pending_plots:
+        with ThreadPoolExecutor(max_workers=min(MAX_PARALLEL_TRENDS, len(pending_plots))) as executor:
+            future_to_plot: dict[Future[_TrendExecutionResult], int] = {
+                executor.submit(
+                    _execute_full_case_trend,
+                    case_input=case_input,
+                    plot_input=plot_input,
+                    trend_dir=trend_dir,
+                    image_path=image_path,
+                    context_text=context_text,
+                    evidence_mode=evidence_mode,
+                    enabled=enabled,
+                    frame=frame,
+                    adapter=adapter,
+                    model=model,
+                    max_tokens=max_tokens,
+                    max_retries=max_retries,
+                    retry_backoff_seconds=retry_backoff_seconds,
+                ): plot_input.plot_index
+                for plot_input, trend_dir, image_path in pending_plots
+            }
+            for future in as_completed(future_to_plot):
+                result_payload = future.result()
+                trend_results_by_index[result_payload.plot_input.plot_index] = result_payload
+
+    for plot_input in case_input.plots:
+        trend_dir = trends_dir / f"plot_{plot_input.plot_index:02d}"
+        image_path = trend_dir / "trend_evidence_plot.png" if (trend_dir / "trend_evidence_plot.png").exists() else None
+        result_payload_opt = trend_results_by_index.get(plot_input.plot_index)
+        if result_payload_opt is None:
+            continue
+        result_payload = result_payload_opt
+        if result_payload.success:
+            assert result_payload.trend_text is not None
+            assert result_payload.trend_trace is not None
+            trend_text = result_payload.trend_text
+            trend_trace = result_payload.trend_trace
             _write_json(trend_dir / "trend_request.json", trend_trace["request"])
             _write_text(trend_dir / "trend_output.txt", trend_text)
             _write_json(trend_dir / "trend_trace.json", trend_trace)
@@ -268,22 +296,29 @@ def run_full_case_smoke(
                 error="",
                 validation_status="accepted",
             )
-        except StructuredSmokeResponseError as exc:
-            _write_json(trend_dir / "trend_request.json", exc.trace["request"])
-            _write_json(trend_dir / "trend_trace.json", exc.trace)
-            _write_optional_thinking(trend_dir / "trend_thinking.txt", exc.trace)
-            _write_text(trend_dir / "error.txt", str(exc))
+        else:
+            assert result_payload.error is not None
+            error = StructuredSmokeResponseError(
+                result_payload.error,
+                trace=result_payload.trend_trace or {"request": {}, "response": {"raw": None}},
+                prompt=(trend_dir / "trend_prompt.txt").read_text(encoding="utf-8"),
+            )
+            error_text = str(error)
+            _write_json(trend_dir / "trend_request.json", error.trace["request"])
+            _write_json(trend_dir / "trend_trace.json", error.trace)
+            _write_optional_thinking(trend_dir / "trend_thinking.txt", error.trace)
+            _write_text(trend_dir / "error.txt", error_text)
             failed_plot_indices.append(plot_input.plot_index)
             validation_state.trends[str(plot_input.plot_index)] = {
                 "status": "retry",
-                "error": str(exc),
+                "error": error_text,
             }
             trend_results.append(
                 FullCaseTrendResult(
                     plot_index=plot_input.plot_index,
                     trend_dir=trend_dir,
                     success=False,
-                    error=str(exc),
+                    error=error_text,
                 )
             )
             _record_trend_review_row(
@@ -292,7 +327,7 @@ def run_full_case_smoke(
                 trend_dir=trend_dir,
                 image_path=image_path,
                 success=False,
-                error=str(exc),
+                error=error_text,
                 validation_status="retry",
             )
 
@@ -319,6 +354,66 @@ def run_full_case_smoke(
         validation_state=validation_state,
     )
     return result
+
+
+def _execute_full_case_trend(
+    *,
+    case_input: FullCaseSmokeInput,
+    plot_input: FullCasePlotInput,
+    trend_dir: Path,
+    image_path: Path | None,
+    context_text: str,
+    evidence_mode: EvidenceMode,
+    enabled: set[str],
+    frame: pd.DataFrame,
+    adapter: LLMAdapter,
+    model: str,
+    max_tokens: int,
+    max_retries: int | None,
+    retry_backoff_seconds: float | None,
+) -> _TrendExecutionResult:
+    trend_prompt = build_legacy_doe_trend_prompt(
+        abm=case_input.abm,
+        context_response=context_text,
+        plot_description=plot_input.plot_description,
+        evidence_mode=evidence_mode,
+        table_csv=_build_trend_table_csv(
+            frame=frame,
+            evidence_mode=evidence_mode,
+            plot_input=plot_input,
+            trend_dir=trend_dir,
+        ),
+        enabled=enabled,
+    )
+    _write_text(trend_dir / "trend_prompt.txt", trend_prompt)
+    try:
+        trend_text, trend_trace = _invoke_structured_smoke_text(
+            adapter=adapter,
+            model=model,
+            prompt_with_schema=trend_prompt,
+            image_b64=encode_image(image_path) if image_path is not None else None,
+            max_tokens=max_tokens,
+            ollama_num_ctx=0,
+            max_retries=max_retries,
+            retry_backoff_seconds=retry_backoff_seconds,
+        )
+    except StructuredSmokeResponseError as exc:
+        return _TrendExecutionResult(
+            plot_input=plot_input,
+            trend_dir=trend_dir,
+            image_path=image_path,
+            success=False,
+            trend_trace=dict(exc.trace),
+            error=str(exc),
+        )
+    return _TrendExecutionResult(
+        plot_input=plot_input,
+        trend_dir=trend_dir,
+        image_path=image_path,
+        success=True,
+        trend_text=trend_text,
+        trend_trace=trend_trace,
+    )
 
 
 def _enabled_features_from_variant(prompt_variant: str) -> set[str]:
