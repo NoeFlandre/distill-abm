@@ -11,6 +11,7 @@ from distill_abm.configs.loader import ConfigError, load_logging_config
 from distill_abm.configs.models import LoggingConfig
 
 _CONFIGURED = False
+_FILE_HANDLERS: set[Path] = set()
 
 
 class JsonLogFormatter(logging.Formatter):
@@ -46,6 +47,20 @@ def get_logger(name: str) -> logging.Logger:
     """Return a configured structured logger."""
     configure_logging()
     return logging.getLogger(name)
+
+
+def attach_json_log_file(path: Path) -> Path:
+    """Attach one persistent JSON-lines log file to the root logger."""
+    configure_logging()
+    resolved = path.resolve()
+    if resolved in _FILE_HANDLERS:
+        return resolved
+    resolved.parent.mkdir(parents=True, exist_ok=True)
+    handler = logging.FileHandler(resolved, encoding="utf-8")
+    handler.setFormatter(JsonLogFormatter())
+    logging.getLogger().addHandler(handler)
+    _FILE_HANDLERS.add(resolved)
+    return resolved
 
 
 def _load_default_logging_config() -> LoggingConfig:
