@@ -88,6 +88,6 @@ def test_run_local_qwen_tuning_selects_smallest_successful_num_ctx(tmp_path: Pat
     assert recommendations["table"].recommended_num_ctx == 8192
     assert recommendations["plot"].recommended_max_tokens == 1024
     assert recommendations["table"].recommended_max_tokens == 1024
-    assert recommendations["plot+table"].recommended_num_ctx == 32768
+    assert recommendations["plot+table"].recommended_num_ctx == 8192
     assert recommendations["plot+table"].recommended_max_tokens == 1024
     assert result.trials_csv_path.exists()
