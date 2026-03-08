@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated, Literal, cast
+from typing import Annotated, Literal
 
 import typer
 
@@ -31,6 +31,19 @@ from distill_abm.cli_actions import (
     execute_tune_local_qwen_command,
     execute_validate_workspace_command,
 )
+from distill_abm.cli_defaults import (
+    DEFAULT_EVIDENCE_MODE,
+    DEFAULT_FULL_CASE_MATRIX_EVIDENCE_MODES,
+    DEFAULT_FULL_CASE_MATRIX_PROMPT_VARIANTS,
+    DEFAULT_FULL_CASE_MATRIX_REPETITIONS,
+    DEFAULT_SUMMARIZERS,
+    DEFAULT_TEXT_SOURCE_MODE,
+    RUNTIME_DEFAULTS,
+    resolve_full_case_matrix_evidence_modes,
+    resolve_full_case_matrix_prompt_variants,
+    resolve_full_case_matrix_repetitions,
+)
+from distill_abm.cli_policy import validate_benchmark_model_policy
 from distill_abm.cli_support import (
     BENCHMARK_MODELS,
     assert_ollama_model_available,
@@ -46,8 +59,6 @@ from distill_abm.configs.loader import (
     load_abm_config,
     load_prompts_config,
 )
-from distill_abm.configs.models import SummarizerId
-from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.qualitative_runner import QualitativeMetric, evaluate_qualitative_score
 from distill_abm.ingest.ingest_smoke import run_ingest_smoke_suite
@@ -67,10 +78,6 @@ from distill_abm.pipeline.summarizer_smoke import run_summarizer_smoke
 from distill_abm.viz.viz_smoke import run_viz_smoke_suite
 
 app = typer.Typer(help="Run ABM distillation workflows.")
-RUNTIME_DEFAULTS = get_runtime_defaults()
-DEFAULT_EVIDENCE_MODE: EvidenceMode = RUNTIME_DEFAULTS.run.evidence_mode
-DEFAULT_TEXT_SOURCE_MODE: TextSourceMode = RUNTIME_DEFAULTS.run.text_source_mode
-DEFAULT_SUMMARIZERS: tuple[SummarizerId, ...] = RUNTIME_DEFAULTS.run.summarizers
 
 # Backward-compatible helper aliases kept for tests and local call sites.
 _resolve_scoring_reference_path = resolve_scoring_reference_path
@@ -730,18 +737,33 @@ def smoke_full_case_matrix(
     ] = Path("results/nemotron_abm_smoke_latest"),
     evidence_mode: Annotated[
         list[str] | None,
-        typer.Option("--evidence-mode", help="Evidence modes to include. Repeat for multiple."),
+        typer.Option(
+            "--evidence-mode",
+            help=(
+                "Evidence modes to include. Repeat for multiple. "
+                f"Defaults to {', '.join(DEFAULT_FULL_CASE_MATRIX_EVIDENCE_MODES)}."
+            ),
+        ),
     ] = None,
     prompt_variant: Annotated[
         list[str] | None,
         typer.Option(
             "--prompt-variant",
-            help="Prompt variants to include. Repeat for multiple. Defaults to all eight legacy variants.",
+            help=(
+                "Prompt variants to include. Repeat for multiple. "
+                f"Defaults to {', '.join(DEFAULT_FULL_CASE_MATRIX_PROMPT_VARIANTS)}."
+            ),
         ),
     ] = None,
     repetition: Annotated[
         list[int] | None,
-        typer.Option("--repetition", help="Repetitions to include. Repeat for multiple. Defaults to 1, 2, 3."),
+        typer.Option(
+            "--repetition",
+            help=(
+                "Repetitions to include. Repeat for multiple. "
+                f"Defaults to {', '.join(str(item) for item in DEFAULT_FULL_CASE_MATRIX_REPETITIONS)}."
+            ),
+        ),
     ] = None,
     max_tokens: Annotated[
         int,
@@ -762,21 +784,9 @@ def smoke_full_case_matrix(
         models_path=models_path,
         model_id=model_id,
         output_root=output_root,
-        evidence_modes=tuple(cast(EvidenceMode, item) for item in (evidence_mode or ("plot", "table", "plot+table"))),
-        prompt_variants=tuple(
-            prompt_variant
-            or (
-                "none",
-                "role",
-                "insights",
-                "example",
-                "role+example",
-                "role+insights",
-                "insights+example",
-                "all_three",
-            )
-        ),
-        repetitions=tuple(repetition or (1, 2, 3)),
+        evidence_modes=resolve_full_case_matrix_evidence_modes(evidence_mode),
+        prompt_variants=resolve_full_case_matrix_prompt_variants(prompt_variant),
+        repetitions=resolve_full_case_matrix_repetitions(repetition),
         max_tokens=max_tokens,
         resume=resume,
         json_output=json_output,
@@ -1150,16 +1160,13 @@ def _assert_ollama_model_available(model: str) -> None:
 
 
 def _validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:
-    _ = allow_debug_model
-    key = (provider.strip().lower(), model.strip())
-    if key not in BENCHMARK_MODELS:
-        allowed = ", ".join(f"{p}:{m}" for p, m in sorted(BENCHMARK_MODELS))
-        raise typer.BadParameter(
-            f"unsupported benchmark model '{provider}:{model}'. Allowed benchmark models: {allowed}."
-        )
-
-    if key == ("ollama", "qwen3.5:0.8b"):
-        _assert_ollama_model_available(model)
+    validate_benchmark_model_policy(
+        provider=provider,
+        model=model,
+        allow_debug_model=allow_debug_model,
+        benchmark_models=BENCHMARK_MODELS,
+        assert_ollama_model_available=_assert_ollama_model_available,
+    )
 
 
 if __name__ == "__main__":
