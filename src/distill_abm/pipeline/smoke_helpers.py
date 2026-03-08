@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import csv
 import json
-import shutil
 import traceback
 from collections.abc import Callable
 from itertools import cycle
@@ -17,6 +15,7 @@ from distill_abm.eval.qualitative_runner import evaluate_qualitative_score
 from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline import run as run_module
 from distill_abm.pipeline.run import PipelineInputs, PipelineResult
+from distill_abm.pipeline.smoke_io import copy_if_exists, dedupe_rows, read_csv_rows, write_csv_rows
 from distill_abm.pipeline.smoke_response_bundle import (
     build_case_response_row,
     build_fallback_error_row,
@@ -294,19 +293,19 @@ def _ensure_case_response_bundles(case_result: SmokeCaseResult, smoke_inputs: Sm
     for path in (inputs_dir, prompts_dir, evidence_dir, outputs_dir, responses_root):
         path.mkdir(parents=True, exist_ok=True)
 
-    _copy_if_exists(smoke_inputs.csv_path, inputs_dir / "simulation.csv")
-    _copy_if_exists(smoke_inputs.parameters_path, inputs_dir / "parameters.txt")
-    _copy_if_exists(smoke_inputs.documentation_path, inputs_dir / "documentation.txt")
+    copy_if_exists(smoke_inputs.csv_path, inputs_dir / "simulation.csv")
+    copy_if_exists(smoke_inputs.parameters_path, inputs_dir / "parameters.txt")
+    copy_if_exists(smoke_inputs.documentation_path, inputs_dir / "documentation.txt")
     if smoke_inputs.scoring_reference_path is not None:
-        _copy_if_exists(smoke_inputs.scoring_reference_path, inputs_dir / "ground_truth.txt")
+        copy_if_exists(smoke_inputs.scoring_reference_path, inputs_dir / "ground_truth.txt")
 
-    _copy_if_exists(case_result.context_prompt_path, prompts_dir / "context_prompt.txt")
-    _copy_if_exists(case_result.trend_prompt_path, prompts_dir / "trend_prompt.txt")
-    _copy_if_exists(case_result.plot_path, evidence_dir / "plot.png")
-    _copy_if_exists(case_result.stats_table_csv_path, evidence_dir / "stats_table.csv")
-    _copy_if_exists(case_result.report_csv, outputs_dir / "report.csv")
-    _copy_if_exists(case_result.metadata_path, outputs_dir / "pipeline_run_metadata.json")
-    _copy_if_exists(case_result.case_manifest_path, outputs_dir / "case_manifest.json")
+    copy_if_exists(case_result.context_prompt_path, prompts_dir / "context_prompt.txt")
+    copy_if_exists(case_result.trend_prompt_path, prompts_dir / "trend_prompt.txt")
+    copy_if_exists(case_result.plot_path, evidence_dir / "plot.png")
+    copy_if_exists(case_result.stats_table_csv_path, evidence_dir / "stats_table.csv")
+    copy_if_exists(case_result.report_csv, outputs_dir / "report.csv")
+    copy_if_exists(case_result.metadata_path, outputs_dir / "pipeline_run_metadata.json")
+    copy_if_exists(case_result.case_manifest_path, outputs_dir / "case_manifest.json")
 
     rows = _build_case_response_rows(case_result=case_result, smoke_inputs=smoke_inputs)
     if not rows:
@@ -317,10 +316,10 @@ def _ensure_case_response_bundles(case_result: SmokeCaseResult, smoke_inputs: Sm
         response_dir.mkdir(parents=True, exist_ok=True)
         response_path = Path(str(row["response_path"])) if row["response_path"] else None
         if response_path is not None and response_path.exists():
-            _copy_if_exists(response_path, response_dir / "response.txt")
-        _write_csv_rows(response_dir / "response_bundle.csv", [row], RESPONSE_BUNDLE_COLUMNS)
+            copy_if_exists(response_path, response_dir / "response.txt")
+        write_csv_rows(response_dir / "response_bundle.csv", [row], RESPONSE_BUNDLE_COLUMNS)
     case_rows_csv = case_dir / "case_responses.csv"
-    _write_csv_rows(case_rows_csv, rows, RESPONSE_BUNDLE_COLUMNS)
+    write_csv_rows(case_rows_csv, rows, RESPONSE_BUNDLE_COLUMNS)
     case_result.case_rows_csv_path = case_rows_csv
 
 
@@ -417,9 +416,9 @@ def _write_run_master_csv(output_root: Path, case_results: list[SmokeCaseResult]
         case_rows_path = case_result.case_rows_csv_path or (case_result.output_dir / "case_responses.csv")
         if not case_rows_path.exists():
             continue
-        rows.extend(_read_csv_rows(case_rows_path))
+        rows.extend(read_csv_rows(case_rows_path))
     run_master_csv = output_root / "master_responses.csv"
-    _write_csv_rows(run_master_csv, _dedupe_rows(rows), RESPONSE_BUNDLE_COLUMNS)
+    write_csv_rows(run_master_csv, dedupe_rows(rows), RESPONSE_BUNDLE_COLUMNS)
     return run_master_csv
 
 
@@ -434,59 +433,21 @@ def _write_global_master_csv(run_master_csv: Path) -> Path:
 
     global_master = Path("results") / "master_responses.csv"
     global_master.parent.mkdir(parents=True, exist_ok=True)
-    existing = _read_csv_rows(global_master) if global_master.exists() else []
-    incoming = _read_csv_rows(run_master_csv)
-    merged = _dedupe_rows([*existing, *incoming])
-    _write_csv_rows(global_master, merged, RESPONSE_BUNDLE_COLUMNS)
+    existing = read_csv_rows(global_master) if global_master.exists() else []
+    incoming = read_csv_rows(run_master_csv)
+    merged = dedupe_rows([*existing, *incoming])
+    write_csv_rows(global_master, merged, RESPONSE_BUNDLE_COLUMNS)
     return global_master
-
-
-def _read_csv_rows(path: Path) -> list[dict[str, str]]:
-    if not path.exists():
-        return []
-    with path.open("r", encoding="utf-8", newline="") as handle:
-        reader = csv.DictReader(handle)
-        return [dict(row) for row in reader]
-
-
-def _write_csv_rows(path: Path, rows: list[dict[str, str]], columns: tuple[str, ...]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(columns))
-        writer.writeheader()
-        for row in rows:
-            writer.writerow({column: row.get(column, "") for column in columns})
-
-
-def _dedupe_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
-    seen: set[tuple[str, str, str, str, str]] = set()
-    deduped: list[dict[str, str]] = []
-    for row in rows:
-        key = (
-            row.get("run_output_dir", ""),
-            row.get("case_id", ""),
-            row.get("response_kind", ""),
-            row.get("prompt_signature", ""),
-            row.get("response_path", ""),
-        )
-        if key in seen:
-            continue
-        seen.add(key)
-        deduped.append(row)
-    return deduped
-
-
-def _copy_if_exists(source: Path | None, destination: Path) -> None:
-    if source is None or not source.exists():
-        return
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(source, destination)
 
 
 _extract_metadata_blocks = extract_metadata_blocks
 _flatten_score_fields = flatten_score_fields
 _build_case_response_row = build_case_response_row
 _build_fallback_error_row = build_fallback_error_row
+_read_csv_rows = read_csv_rows
+_write_csv_rows = write_csv_rows
+_dedupe_rows = dedupe_rows
+_copy_if_exists = copy_if_exists
 _dict = dict_block
 _stringify = stringify
 
