@@ -13,6 +13,7 @@ from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline import run as run_module
 from distill_abm.pipeline.run import PipelineInputs, PipelineResult
 from distill_abm.pipeline.smoke_io import copy_if_exists, dedupe_rows, read_csv_rows, write_csv_rows
+from distill_abm.pipeline.smoke_manifests import load_resumable_case, write_case_manifest
 from distill_abm.pipeline.smoke_optional_steps import run_doe_if_requested, run_sweep_if_requested
 from distill_abm.pipeline.smoke_reporting import (
     render_markdown_report,
@@ -52,7 +53,7 @@ def _run_smoke_case(
     case_dir.mkdir(parents=True, exist_ok=True)
     case_manifest = case_dir / "case_manifest.json"
     if resume_existing:
-        resumed = _load_resumable_case(case_manifest)
+        resumed = load_resumable_case(case_manifest)
         if resumed is not None:
             resumed.resumed_from_existing = True
             return resumed
@@ -78,7 +79,7 @@ def _run_smoke_case(
             adapter,
         )
     except Exception:
-        return _write_case_manifest(
+        return write_case_manifest(
             SmokeCaseResult(
                 case=case,
                 status="failed",
@@ -133,14 +134,11 @@ def _run_smoke_case(
         qualitative=qualitative,
         error=case_error,
     )
-    return _write_case_manifest(case_result)
+    return write_case_manifest(case_result)
 
 
 def _write_case_manifest(case_result: SmokeCaseResult) -> SmokeCaseResult:
-    manifest_path = case_result.output_dir / "case_manifest.json"
-    case_result.case_manifest_path = manifest_path
-    manifest_path.write_text(case_result.model_dump_json(indent=2), encoding="utf-8")
-    return case_result
+    return write_case_manifest(case_result)
 
 
 def _write_prompt_artifacts(case_dir: Path, metadata_path: Path | None) -> tuple[Path | None, Path | None]:
@@ -390,16 +388,7 @@ _stringify = stringify
 
 
 def _load_resumable_case(case_manifest: Path) -> SmokeCaseResult | None:
-    if not case_manifest.exists():
-        return None
-    try:
-        loaded = SmokeCaseResult.model_validate_json(case_manifest.read_text(encoding="utf-8"))
-    except Exception:
-        return None
-    if loaded.status != "ok":
-        return None
-    loaded.case_manifest_path = case_manifest
-    return loaded
+    return load_resumable_case(case_manifest)
 
 
 def _render_markdown_report(result: SmokeSuiteResult) -> str:
