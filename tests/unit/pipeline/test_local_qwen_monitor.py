@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 from rich.console import Console
@@ -12,6 +13,7 @@ from distill_abm.pipeline.local_qwen_monitor import (
     MonitorViewState,
     apply_monitor_keypress,
     collect_local_qwen_monitor_snapshot,
+    next_snapshot_due,
     render_local_qwen_monitor,
     render_local_qwen_monitor_rich,
     stream_local_qwen_monitor,
@@ -257,7 +259,7 @@ def test_stream_local_qwen_monitor_can_stay_open_after_terminal(monkeypatch) -> 
         max_refreshes=2,
     )
 
-    assert calls["count"] == 2
+    assert calls["count"] == 3
 
 
 def test_apply_monitor_keypress_moves_selection_and_scroll_window() -> None:
@@ -297,3 +299,11 @@ def test_visible_monitor_cases_returns_selected_window() -> None:
     visible = visible_monitor_cases(cases=cases, state=state)
 
     assert [case.case_id for case in visible] == ["02", "03"]
+
+
+def test_next_snapshot_due_decouples_fast_input_polling_from_refresh_interval() -> None:
+    due = next_snapshot_due(last_snapshot_at=10.0, now=10.05, interval_seconds=2.0)
+    assert math.isclose(due, 1.95)
+
+    due = next_snapshot_due(last_snapshot_at=10.0, now=12.5, interval_seconds=2.0)
+    assert due == 0.0
