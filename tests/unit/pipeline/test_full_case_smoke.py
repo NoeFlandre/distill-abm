@@ -41,6 +41,33 @@ class _FakeAdapter(LLMAdapter):
         return self._calls
 
 
+class _FlakyTrendAdapter(LLMAdapter):
+    provider = "openrouter"
+
+    def __init__(self) -> None:
+        self._calls = 0
+
+    def complete(self, request):  # type: ignore[no-untyped-def]
+        self._calls += 1
+        if self._calls == 2:
+            text = (
+                '{"response_text":"The analysis is currently unavailable. '
+                'The requested information cannot be retrieved or interpreted at this time. '
+                'Please try again later or consult additional resources for further details."}'
+            )
+        else:
+            text = f'{{"response_text":"response-{self._calls}"}}'
+        return LLMResponse(
+            provider="openrouter",
+            model=request.model,
+            text=text,
+            raw={
+                "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
+                "choices": [{"message": {"content": text}}],
+            },
+        )
+
+
 def test_run_full_case_smoke_writes_context_and_all_trends(tmp_path: Path) -> None:
     csv_path = tmp_path / "simulation.csv"
     csv_path.write_text("tick;metric one;metric two\n0;1;2\n1;3;4\n", encoding="utf-8")
@@ -315,3 +342,55 @@ def test_run_full_case_matrix_smoke_reuses_identical_context_across_cases(tmp_pa
     assert context_outputs == ["response-1", "response-1"]
     assert result.cases[0].resumed_from_existing is False
     assert result.cases[1].resumed_from_existing is False
+
+
+def test_run_full_case_matrix_smoke_retries_failed_case_in_same_invocation(tmp_path: Path) -> None:
+    csv_path = tmp_path / "simulation.csv"
+    csv_path.write_text("tick;metric one\n0;1\n1;3\n", encoding="utf-8")
+    parameters_path = tmp_path / "parameters.txt"
+    parameters_path.write_text("parameter narrative", encoding="utf-8")
+    documentation_path = tmp_path / "documentation.txt"
+    documentation_path.write_text("documentation body", encoding="utf-8")
+    plot_one = tmp_path / "1.png"
+    plot_one.write_bytes(b"plot-one")
+    case_input = FullCaseSmokeInput(
+        abm="grazing",
+        csv_path=csv_path,
+        parameters_path=parameters_path,
+        documentation_path=documentation_path,
+        plots=(
+            FullCasePlotInput(
+                plot_index=1,
+                reporter_pattern="metric one",
+                plot_description="This plot represents herd size.",
+                plot_path=plot_one,
+            ),
+        ),
+    )
+    adapter = _FlakyTrendAdapter()
+
+    result = run_full_case_matrix_smoke(
+        case_input=case_input,
+        adapter=adapter,
+        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        output_root=tmp_path / "out",
+        cases=(
+            FullCaseMatrixCaseSpec(
+                case_id="01_grazing_none_plot_rep1",
+                abm="grazing",
+                evidence_mode="plot",
+                prompt_variant="none",
+                repetition=1,
+            ),
+        ),
+        max_tokens=128,
+        resume_existing=True,
+    )
+
+    assert result.success is True
+    assert adapter._calls == 3
+    assert result.failed_case_ids == []
+    trend_output = (result.cases[0].case_dir / "03_trends" / "plot_01" / "trend_output.txt").read_text(
+        encoding="utf-8"
+    )
+    assert trend_output == "response-3"
