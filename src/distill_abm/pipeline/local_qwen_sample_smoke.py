@@ -102,6 +102,12 @@ class LocalQwenSampleSmokeResult(BaseModel):
     run_id: str
 
 
+class _CachedContextResult(BaseModel):
+    prompt: str
+    text: str
+    trace: dict[str, object]
+
+
 def default_local_qwen_sample_cases() -> tuple[LocalQwenSampleCase, ...]:
     """Return a small stratified sample across ABMs, evidence modes, and prompt variants."""
     return (
@@ -179,6 +185,7 @@ def run_local_qwen_sample_smoke(
     review_rows: list[dict[str, str]] = []
     results: list[LocalQwenSampleCaseResult] = []
     failed_case_ids: list[str] = []
+    context_cache: dict[str, _CachedContextResult] = {}
 
     for case in selected_cases:
         case_dir = run_root / "cases" / case.case_id
@@ -213,38 +220,53 @@ def run_local_qwen_sample_smoke(
             shutil.copy2(input_bundle.parameters_path, inputs_dir / "parameters.txt")
             shutil.copy2(input_bundle.documentation_path, inputs_dir / "documentation.txt")
             _write_text(inputs_dir / "context_prompt.txt", context_prompt)
-            _write_json(
-                requests_dir / "context_request.json",
-                _build_request_preview(
-                    model=model,
-                    prompt_with_schema=context_prompt,
-                    image_attached=False,
-                    max_tokens=max_tokens,
-                    ollama_num_ctx=_resolve_case_num_ctx(case.evidence_mode, ollama_num_ctx, ollama_num_ctx_by_mode),
-                    max_retries=max_retries,
-                    retry_backoff_seconds=retry_backoff_seconds,
-                ),
-            )
-
-            try:
-                context_text, context_trace = _invoke_structured_smoke_text(
-                    adapter=adapter,
-                    model=model,
-                    prompt_with_schema=context_prompt,
-                    max_tokens=max_tokens,
-                    ollama_num_ctx=_resolve_case_num_ctx(case.evidence_mode, ollama_num_ctx, ollama_num_ctx_by_mode),
-                    max_retries=max_retries,
-                    retry_backoff_seconds=retry_backoff_seconds,
+            context_cache_key = _context_cache_key(prompt=context_prompt, model=model)
+            cached_context = context_cache.get(context_cache_key)
+            if cached_context is None:
+                case_num_ctx = _resolve_case_num_ctx(case.evidence_mode, ollama_num_ctx, ollama_num_ctx_by_mode)
+                _write_json(
+                    requests_dir / "context_request.json",
+                    _build_request_preview(
+                        model=model,
+                        prompt_with_schema=context_prompt,
+                        image_attached=False,
+                        max_tokens=max_tokens,
+                        ollama_num_ctx=case_num_ctx,
+                        max_retries=max_retries,
+                        retry_backoff_seconds=retry_backoff_seconds,
+                    ),
                 )
-            except StructuredSmokeResponseError as exc:
-                _write_json(requests_dir / "context_request.json", exc.trace["request"])
-                _write_json(outputs_dir / "context_trace.json", exc.trace)
-                _write_optional_thinking(outputs_dir / "context_thinking.txt", exc.trace)
-                raise
-            _write_json(requests_dir / "context_request.json", context_trace["request"])
-            _write_text(outputs_dir / "context_output.txt", context_text)
-            _write_json(outputs_dir / "context_trace.json", context_trace)
-            _write_optional_thinking(outputs_dir / "context_thinking.txt", context_trace)
+
+                try:
+                    context_text, context_trace = _invoke_structured_smoke_text(
+                        adapter=adapter,
+                        model=model,
+                        prompt_with_schema=context_prompt,
+                        max_tokens=max_tokens,
+                        ollama_num_ctx=case_num_ctx,
+                        max_retries=max_retries,
+                        retry_backoff_seconds=retry_backoff_seconds,
+                    )
+                except StructuredSmokeResponseError as exc:
+                    _write_json(requests_dir / "context_request.json", exc.trace["request"])
+                    _write_json(outputs_dir / "context_trace.json", exc.trace)
+                    _write_optional_thinking(outputs_dir / "context_thinking.txt", exc.trace)
+                    raise
+                context_cache[context_cache_key] = _CachedContextResult(
+                    prompt=context_prompt,
+                    text=context_text,
+                    trace=context_trace,
+                )
+            else:
+                context_text = cached_context.text
+                context_trace = cached_context.trace
+
+            _materialize_context_artifacts(
+                requests_dir=requests_dir,
+                outputs_dir=outputs_dir,
+                context_text=context_text,
+                context_trace=context_trace,
+            )
 
             image_b64: str | None = None
             image_path: Path | None = None
@@ -382,6 +404,23 @@ def _build_case_table(
     input_bundle: LocalQwenCaseInput,
 ) -> str:
     return _build_case_table_for_stride(inputs_dir=inputs_dir, case=case, input_bundle=input_bundle, stride=1)
+
+
+def _context_cache_key(*, prompt: str, model: str) -> str:
+    return hashlib.sha256(f"{model}\n{prompt}".encode()).hexdigest()
+
+
+def _materialize_context_artifacts(
+    *,
+    requests_dir: Path,
+    outputs_dir: Path,
+    context_text: str,
+    context_trace: dict[str, object],
+) -> None:
+    _write_json(requests_dir / "context_request.json", context_trace["request"])
+    _write_text(outputs_dir / "context_output.txt", context_text)
+    _write_json(outputs_dir / "context_trace.json", context_trace)
+    _write_optional_thinking(outputs_dir / "context_thinking.txt", context_trace)
 
 
 def _build_case_table_for_stride(
