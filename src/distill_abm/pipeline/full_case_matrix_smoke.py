@@ -6,6 +6,7 @@ import csv
 import json
 import shutil
 import time
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -105,6 +106,17 @@ class _CachedContext(BaseModel):
 
 DEFAULT_MAX_CASE_ATTEMPTS = 3
 DEFAULT_MATRIX_PASS_WAIT_SECONDS = CIRCUIT_BREAKER_OPEN_SECONDS
+MAX_PARALLEL_TRENDS = 4
+
+
+class _MatrixTrendExecutionResult(BaseModel):
+    plot_input: FullCasePlotInput
+    trend_dir: Path
+    image_path: Path | None
+    success: bool
+    trend_text: str | None = None
+    trend_trace: dict[str, object] | None = None
+    error: str | None = None
 
 
 def build_full_case_matrix_case_specs(
@@ -350,6 +362,7 @@ def _run_full_case_matrix_case(
     frame = pd.read_csv(case_input.csv_path, sep=";")
     failed = False
     error_text = ""
+    pending_plots: list[tuple[FullCasePlotInput, Path, Path | None]] = []
     for plot_input in case_input.plots:
         trend_dir = trends_dir / f"plot_{plot_input.plot_index:02d}"
         trend_dir.mkdir(parents=True, exist_ok=True)
@@ -372,21 +385,45 @@ def _run_full_case_matrix_case(
                 validation_status="accepted",
             )
             continue
-        try:
-            trend_text, trend_trace = _run_trend_with_fitting_table(
-                adapter=adapter,
-                model=model,
-                case=case,
-                case_input=case_input,
-                plot_input=plot_input,
-                context_text=context_text,
-                trend_dir=trend_dir,
-                frame=frame,
-                max_tokens=max_tokens,
-                max_retries=max_retries,
-                retry_backoff_seconds=retry_backoff_seconds,
-                image_path=image_path,
-            )
+        pending_plots.append((plot_input, trend_dir, image_path))
+
+    trend_results_by_index: dict[int, _MatrixTrendExecutionResult] = {}
+    if pending_plots:
+        with ThreadPoolExecutor(max_workers=min(MAX_PARALLEL_TRENDS, len(pending_plots))) as executor:
+            future_to_plot: dict[Future[_MatrixTrendExecutionResult], int] = {
+                executor.submit(
+                    _execute_matrix_trend,
+                    adapter=adapter,
+                    model=model,
+                    case=case,
+                    case_input=case_input,
+                    plot_input=plot_input,
+                    context_text=context_text,
+                    trend_dir=trend_dir,
+                    frame=frame,
+                    max_tokens=max_tokens,
+                    max_retries=max_retries,
+                    retry_backoff_seconds=retry_backoff_seconds,
+                    image_path=image_path,
+                ): plot_input.plot_index
+                for plot_input, trend_dir, image_path in pending_plots
+            }
+            for future in as_completed(future_to_plot):
+                result_payload = future.result()
+                trend_results_by_index[result_payload.plot_input.plot_index] = result_payload
+
+    for plot_input in case_input.plots:
+        trend_dir = trends_dir / f"plot_{plot_input.plot_index:02d}"
+        image_path = trend_dir / "trend_evidence_plot.png" if (trend_dir / "trend_evidence_plot.png").exists() else None
+        result_payload_opt = trend_results_by_index.get(plot_input.plot_index)
+        if result_payload_opt is None:
+            continue
+        result_payload = result_payload_opt
+        if result_payload.success:
+            assert result_payload.trend_text is not None
+            assert result_payload.trend_trace is not None
+            trend_text = result_payload.trend_text
+            trend_trace = result_payload.trend_trace
             _write_json(trend_dir / "trend_request.json", trend_trace["request"])
             _write_text(trend_dir / "trend_output.txt", trend_text)
             _write_json(trend_dir / "trend_trace.json", trend_trace)
@@ -403,23 +440,29 @@ def _run_full_case_matrix_case(
                 error="",
                 validation_status="accepted",
             )
-        except StructuredSmokeResponseError as exc:
-            _write_json(trend_dir / "trend_request.json", exc.trace["request"])
-            _write_json(trend_dir / "trend_trace.json", exc.trace)
-            _write_optional_thinking(trend_dir / "trend_thinking.txt", exc.trace)
-            _write_text(trend_dir / "error.txt", str(exc))
-            validation_state.trends[str(plot_input.plot_index)] = {"status": "retry", "error": str(exc)}
+        else:
+            error = StructuredSmokeResponseError(
+                result_payload.error or "trend execution failed",
+                trace=result_payload.trend_trace or {"request": {}, "response": {"raw": None}},
+                prompt=(trend_dir / "trend_prompt.txt").read_text(encoding="utf-8"),
+            )
+            error_text = str(error)
+            _write_json(trend_dir / "trend_request.json", error.trace["request"])
+            _write_json(trend_dir / "trend_trace.json", error.trace)
+            _write_optional_thinking(trend_dir / "trend_thinking.txt", error.trace)
+            _write_text(trend_dir / "error.txt", error_text)
+            validation_state.trends[str(plot_input.plot_index)] = {"status": "retry", "error": error_text}
             _record_trend_review_row(
                 review_rows=review_rows,
                 plot_input=plot_input,
                 trend_dir=trend_dir,
                 image_path=image_path,
                 success=False,
-                error=str(exc),
+                error=error_text,
                 validation_status="retry",
             )
             failed = True
-            error_text = str(exc)
+            error_text = error_text
 
     _finalize_case(
         case_dir=case_dir,
@@ -438,6 +481,55 @@ def _run_full_case_matrix_case(
         success=not failed,
         resumed_from_existing=reused_from_previous,
         error=error_text or None,
+    )
+
+
+def _execute_matrix_trend(
+    *,
+    adapter: LLMAdapter,
+    model: str,
+    case: FullCaseMatrixCaseSpec,
+    case_input: FullCaseSmokeInput,
+    plot_input: FullCasePlotInput,
+    context_text: str,
+    trend_dir: Path,
+    frame: pd.DataFrame,
+    max_tokens: int,
+    max_retries: int | None,
+    retry_backoff_seconds: float | None,
+    image_path: Path | None,
+) -> _MatrixTrendExecutionResult:
+    try:
+        trend_text, trend_trace = _run_trend_with_fitting_table(
+            adapter=adapter,
+            model=model,
+            case=case,
+            case_input=case_input,
+            plot_input=plot_input,
+            context_text=context_text,
+            trend_dir=trend_dir,
+            frame=frame,
+            max_tokens=max_tokens,
+            max_retries=max_retries,
+            retry_backoff_seconds=retry_backoff_seconds,
+            image_path=image_path,
+        )
+    except StructuredSmokeResponseError as exc:
+        return _MatrixTrendExecutionResult(
+            plot_input=plot_input,
+            trend_dir=trend_dir,
+            image_path=image_path,
+            success=False,
+            trend_trace=dict(exc.trace),
+            error=str(exc),
+        )
+    return _MatrixTrendExecutionResult(
+        plot_input=plot_input,
+        trend_dir=trend_dir,
+        image_path=image_path,
+        success=True,
+        trend_text=trend_text,
+        trend_trace=trend_trace,
     )
 
 
