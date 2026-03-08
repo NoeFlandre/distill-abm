@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import csv
 import hashlib
+import logging
 import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
@@ -17,7 +18,7 @@ from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMProviderError, LLMRequest
 from distill_abm.llm.resilience import ensure_circuit_closed, record_failure, record_success
-from distill_abm.structured_logging import get_logger
+from distill_abm.structured_logging import get_logger, log_event
 from distill_abm.summarize.models import (
     summarize_with_bart,
     summarize_with_bert,
@@ -158,18 +159,15 @@ def invoke_adapter_with_trace(
         "messages": [message.model_dump() for message in request.messages],
         "metadata": request.metadata,
     }
-    LOGGER.info(
+    log_event(
+        LOGGER,
         "llm_request_start",
-        extra={
-            "event_data": {
-                "provider": adapter.provider,
-                "model": model,
-                "prompt_signature": request_block["prompt_signature"],
-                "prompt_length": request_block["prompt_length"],
-                "image_attached": request_block["image_attached"],
-                "max_retries": retries,
-            }
-        },
+        provider=adapter.provider,
+        model=model,
+        prompt_signature=request_block["prompt_signature"],
+        prompt_length=request_block["prompt_length"],
+        image_attached=request_block["image_attached"],
+        max_retries=retries,
     )
 
     errors: list[str] = []
@@ -182,18 +180,15 @@ def invoke_adapter_with_trace(
             else:
                 clean_text = clean_markdown_symbols(strip_think_prefix(response.text))
             record_success(provider=adapter.provider, model=model)
-            LOGGER.info(
+            log_event(
+                LOGGER,
                 "llm_request_success",
-                extra={
-                    "event_data": {
-                        "provider": adapter.provider,
-                        "model": model,
-                        "attempt": attempt + 1,
-                        "prompt_signature": request_block["prompt_signature"],
-                        "clean_text_signature": hashlib.sha256(clean_text.encode("utf-8")).hexdigest(),
-                        "clean_text_length": len(clean_text),
-                    }
-                },
+                provider=adapter.provider,
+                model=model,
+                attempt=attempt + 1,
+                prompt_signature=request_block["prompt_signature"],
+                clean_text_signature=hashlib.sha256(clean_text.encode("utf-8")).hexdigest(),
+                clean_text_length=len(clean_text),
             )
             return clean_text, {
                 "request": request_block,
@@ -216,17 +211,15 @@ def invoke_adapter_with_trace(
             wrapped = exc if isinstance(exc, LLMProviderError) else LLMProviderError(str(exc))
             errors.append(str(wrapped))
             record_failure(provider=adapter.provider, model=model, error=str(wrapped))
-            LOGGER.warning(
+            log_event(
+                LOGGER,
                 "llm_request_failure",
-                extra={
-                    "event_data": {
-                        "provider": adapter.provider,
-                        "model": model,
-                        "attempt": attempt + 1,
-                        "prompt_signature": request_block["prompt_signature"],
-                        "error": str(wrapped),
-                    }
-                },
+                level=logging.WARNING,
+                provider=adapter.provider,
+                model=model,
+                attempt=attempt + 1,
+                prompt_signature=request_block["prompt_signature"],
+                error=str(wrapped),
             )
             is_last_attempt = attempt >= retries
             if is_last_attempt:

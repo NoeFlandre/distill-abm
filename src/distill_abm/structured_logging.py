@@ -18,10 +18,12 @@ class JsonLogFormatter(logging.Formatter):
     """Render log records as one JSON object per line."""
 
     def format(self, record: logging.LogRecord) -> str:
+        event_name = record.getMessage()
         payload: dict[str, Any] = {
             "level": record.levelname,
             "logger": record.name,
-            "message": record.getMessage(),
+            "event": event_name,
+            "message": event_name,
         }
         event_data = getattr(record, "event_data", None)
         if isinstance(event_data, dict):
@@ -47,6 +49,11 @@ def get_logger(name: str) -> logging.Logger:
     """Return a configured structured logger."""
     configure_logging()
     return logging.getLogger(name)
+
+
+def log_event(logger: logging.Logger, event: str, /, level: int = logging.INFO, **event_data: Any) -> None:
+    """Write one structured event with a stable `event` field."""
+    logger.log(level, event, extra={"event_data": event_data})
 
 
 def attach_json_log_file(path: Path) -> Path:
