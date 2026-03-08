@@ -101,6 +101,9 @@ class _CachedContext(BaseModel):
     trace: dict[str, object]
 
 
+DEFAULT_MAX_CASE_ATTEMPTS = 3
+
+
 def build_full_case_matrix_case_specs(
     *,
     abm: str,
@@ -138,6 +141,7 @@ def run_full_case_matrix_smoke(
     max_retries: int | None = None,
     retry_backoff_seconds: float | None = None,
     resume_existing: bool = True,
+    max_case_attempts: int = DEFAULT_MAX_CASE_ATTEMPTS,
 ) -> FullCaseMatrixSmokeResult:
     """Run many full ABM cases in one separated run root with resume and review artifacts."""
     started_at = datetime.now(UTC)
@@ -151,32 +155,39 @@ def run_full_case_matrix_smoke(
     _validate_full_case_inputs(case_input)
 
     context_cache: dict[str, _CachedContext] = {}
-    case_results: list[FullCaseMatrixCaseResult] = []
-    failed_case_ids: list[str] = []
+    case_results_by_id: dict[str, FullCaseMatrixCaseResult] = {}
+    remaining_cases = list(cases)
+    for _attempt in range(1, max(max_case_attempts, 1) + 1):
+        next_remaining: list[FullCaseMatrixCaseSpec] = []
+        for case in remaining_cases:
+            case_dir = run_root / "cases" / case.case_id
+            previous_case_dir = previous_run_root / "cases" / case.case_id if previous_run_root else None
+            if resume_existing and previous_case_dir and previous_case_dir.exists() and not case_dir.exists():
+                shutil.copytree(previous_case_dir, case_dir)
+            else:
+                case_dir.mkdir(parents=True, exist_ok=True)
+            case_result = _run_full_case_matrix_case(
+                case_input=case_input,
+                adapter=adapter,
+                model=model,
+                case=case,
+                case_dir=case_dir,
+                max_tokens=max_tokens,
+                max_retries=max_retries,
+                retry_backoff_seconds=retry_backoff_seconds,
+                resume_existing=resume_existing,
+                context_cache=context_cache,
+                reused_from_previous=bool(previous_case_dir and previous_case_dir.exists()),
+            )
+            case_results_by_id[case.case_id] = case_result
+            if not case_result.success:
+                next_remaining.append(case)
+        if not next_remaining:
+            break
+        remaining_cases = next_remaining
 
-    for case in cases:
-        case_dir = run_root / "cases" / case.case_id
-        previous_case_dir = previous_run_root / "cases" / case.case_id if previous_run_root else None
-        if resume_existing and previous_case_dir and previous_case_dir.exists() and not case_dir.exists():
-            shutil.copytree(previous_case_dir, case_dir)
-        else:
-            case_dir.mkdir(parents=True, exist_ok=True)
-        case_result = _run_full_case_matrix_case(
-            case_input=case_input,
-            adapter=adapter,
-            model=model,
-            case=case,
-            case_dir=case_dir,
-            max_tokens=max_tokens,
-            max_retries=max_retries,
-            retry_backoff_seconds=retry_backoff_seconds,
-            resume_existing=resume_existing,
-            context_cache=context_cache,
-            reused_from_previous=bool(previous_case_dir and previous_case_dir.exists()),
-        )
-        case_results.append(case_result)
-        if not case_result.success:
-            failed_case_ids.append(case_result.case_id)
+    case_results = [case_results_by_id[case.case_id] for case in cases]
+    failed_case_ids = [case.case_id for case in case_results if not case.success]
 
     review_csv_path = run_root / "request_review.csv"
     _write_run_review_csv(
