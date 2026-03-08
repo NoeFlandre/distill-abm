@@ -34,6 +34,18 @@ from distill_abm.pipeline.local_qwen_sample_response import (
     looks_like_context_overflow,
     parse_structured_smoke_text,
 )
+from distill_abm.pipeline.run_artifact_contracts import (
+    case_summary_path,
+    latest_report_pointer_path,
+    latest_run_pointer_path,
+    sampled_smoke_report_path,
+)
+from distill_abm.pipeline.run_artifact_contracts import (
+    run_log_path as run_log_contract_path,
+)
+from distill_abm.pipeline.run_artifact_contracts import (
+    viewer_html_path as viewer_html_contract_path,
+)
 from distill_abm.run_viewer import render_run_viewer
 from distill_abm.structured_logging import attach_json_log_file
 from distill_abm.utils import detect_placeholder_signals
@@ -170,9 +182,9 @@ def run_local_qwen_sample_smoke(
     run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
     run_root = output_root / "runs" / run_id
     run_root.mkdir(parents=True, exist_ok=True)
-    _write_text(output_root / "latest_run.txt", str(run_root))
+    _write_text(latest_run_pointer_path(output_root), str(run_root))
     previous_run_root = resolve_previous_run_root(output_root=output_root, current_run_id=run_id)
-    run_log_path = attach_json_log_file(run_root / "run.log.jsonl")
+    run_log_path = attach_json_log_file(run_log_contract_path(run_root))
     selected_cases = cases or default_local_qwen_sample_cases()
     review_rows: list[dict[str, str]] = []
     results: list[LocalQwenSampleCaseResult] = []
@@ -312,7 +324,7 @@ def run_local_qwen_sample_smoke(
                 },
             )
             _write_json(
-                case_dir / "00_case_summary.json",
+                case_summary_path(case_dir),
                 {
                     "case_id": case.case_id,
                     "abm": case.abm,
@@ -332,7 +344,7 @@ def run_local_qwen_sample_smoke(
                     "evidence_mode": case.evidence_mode,
                     "prompt_variant": case.prompt_variant,
                     "model": model,
-                    "case_summary_path": str(case_dir / "00_case_summary.json"),
+                    "case_summary_path": str(case_summary_path(case_dir)),
                     "context_prompt_path": str(inputs_dir / "context_prompt.txt"),
                     "context_prompt_text": context_prompt,
                     "trend_prompt_path": str(inputs_dir / "trend_prompt.txt"),
@@ -382,7 +394,7 @@ def run_local_qwen_sample_smoke(
     review_csv_path = run_root / "request_review.csv"
     _write_review_csv(review_csv_path, review_rows)
     finished_at = datetime.now(UTC)
-    report_json_path = run_root / "smoke_local_qwen_report.json"
+    report_json_path = sampled_smoke_report_path(run_root)
     report_markdown_path = run_root / "smoke_local_qwen_report.md"
     result = LocalQwenSampleSmokeResult(
         started_at_utc=started_at.isoformat(),
@@ -392,7 +404,7 @@ def run_local_qwen_sample_smoke(
         report_markdown_path=report_markdown_path,
         review_csv_path=review_csv_path,
         run_log_path=run_log_path,
-        viewer_html_path=run_root / "review.html",
+        viewer_html_path=viewer_html_contract_path(run_root),
         run_id=run_id,
         success=not failed_case_ids,
         failed_case_ids=failed_case_ids,
@@ -403,7 +415,7 @@ def run_local_qwen_sample_smoke(
     viewer_html_path = render_run_viewer(run_root)
     result.viewer_html_path = viewer_html_path
     _write_json(report_json_path, result.model_dump(mode="json"))
-    _write_text(output_root / "latest_report_path.txt", str(report_json_path))
+    _write_text(latest_report_pointer_path(output_root), str(report_json_path))
     return result
 
 

@@ -7,6 +7,8 @@ import shutil
 from collections.abc import Mapping
 from pathlib import Path
 
+from distill_abm.pipeline.run_artifact_contracts import CASE_SUMMARY_FILENAME
+
 
 def resolve_previous_run_root(*, output_root: Path, current_run_id: str) -> Path | None:
     """Return the most recent previous run root, including legacy flat layouts."""
@@ -39,7 +41,7 @@ def copy_resumable_case_result(
         return False
     source_case_dir = previous_run_root / "cases" / case_id
     required_paths = (
-        source_case_dir / "00_case_summary.json",
+        source_case_dir / CASE_SUMMARY_FILENAME,
         source_case_dir / "01_inputs" / "context_prompt.txt",
         source_case_dir / "01_inputs" / "trend_prompt.txt",
         source_case_dir / "02_requests" / "context_request.json",
@@ -65,7 +67,7 @@ def build_review_row_from_existing(case_dir: Path) -> dict[str, str]:
     inputs_dir = case_dir / "01_inputs"
     outputs_dir = case_dir / "03_outputs"
     requests_dir = case_dir / "02_requests"
-    summary_path = case_dir / "00_case_summary.json"
+    summary_path = case_dir / CASE_SUMMARY_FILENAME
     summary_payload = json.loads(summary_path.read_text(encoding="utf-8"))
     image_path = inputs_dir / "trend_evidence_plot.png"
     table_path = inputs_dir / "trend_evidence_table.csv"

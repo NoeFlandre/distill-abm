@@ -26,6 +26,7 @@ from distill_abm.pipeline.local_qwen_sample_smoke import (
     _write_optional_thinking,
     _write_text,
 )
+from distill_abm.pipeline.run_artifact_contracts import case_summary_path, validation_state_path
 
 EvidenceMode = Literal["plot", "table", "plot+table"]
 
@@ -99,7 +100,7 @@ def run_full_case_smoke(
     output_root.mkdir(parents=True, exist_ok=True)
     case_id = f"01_{case_input.abm}_{prompt_variant}_{evidence_mode.replace('+', '_plus_')}_full_case"
     case_dir = output_root / "cases" / case_id
-    validation_state_path = case_dir / "validation_state.json"
+    validation_state_file = validation_state_path(case_dir)
     inputs_dir = case_dir / "01_inputs"
     context_dir = case_dir / "02_context"
     trends_dir = case_dir / "03_trends"
@@ -121,7 +122,7 @@ def run_full_case_smoke(
     review_rows: list[dict[str, str]] = []
     trend_results: list[FullCaseTrendResult] = []
     failed_plot_indices: list[int] = []
-    validation_state = _load_validation_state(validation_state_path)
+    validation_state = _load_validation_state(validation_state_file)
     _backfill_validation_state_from_artifacts(
         validation_state=validation_state,
         context_dir=context_dir,
@@ -152,7 +153,7 @@ def run_full_case_smoke(
                 "status": "retry",
                 "error": str(exc),
             }
-            _write_json(validation_state_path, validation_state.model_dump(mode="json"))
+            _write_json(validation_state_file, validation_state.model_dump(mode="json"))
             result = FullCaseSmokeResult(
                 started_at_utc=started_at.isoformat(),
                 finished_at_utc=datetime.now(UTC).isoformat(),
@@ -379,8 +380,8 @@ def _finalize_full_case_result(
         "success": result.success,
         "failed_plot_indices": result.failed_plot_indices,
     }
-    _write_json(result.case_dir / "00_case_summary.json", summary_payload)
-    _write_json(result.case_dir / "validation_state.json", validation_state.model_dump(mode="json"))
+    _write_json(case_summary_path(result.case_dir), summary_payload)
+    _write_json(validation_state_path(result.case_dir), validation_state.model_dump(mode="json"))
     _write_review_csv(result.review_csv_path, review_rows)
     _write_json(result.report_json_path, result.model_dump(mode="json"))
     _write_text(result.report_markdown_path, _render_report(result))
