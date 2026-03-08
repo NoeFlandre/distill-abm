@@ -9,10 +9,13 @@ import distill_abm.pipeline.local_qwen_monitor as monitor_module
 from distill_abm.pipeline.local_qwen_monitor import (
     LocalQwenCaseSnapshot,
     LocalQwenMonitorSnapshot,
+    MonitorViewState,
+    apply_monitor_keypress,
     collect_local_qwen_monitor_snapshot,
     render_local_qwen_monitor,
     render_local_qwen_monitor_rich,
     stream_local_qwen_monitor,
+    visible_monitor_cases,
 )
 
 
@@ -222,3 +225,42 @@ def test_stream_local_qwen_monitor_can_stay_open_after_terminal(monkeypatch) -> 
     )
 
     assert calls["count"] == 2
+
+
+def test_apply_monitor_keypress_moves_selection_and_scroll_window() -> None:
+    state = MonitorViewState(selected_index=0, scroll_offset=0, visible_rows=2)
+
+    state = apply_monitor_keypress(state, "down", total_cases=5)
+    assert state.selected_index == 1
+    assert state.scroll_offset == 0
+
+    state = apply_monitor_keypress(state, "down", total_cases=5)
+    assert state.selected_index == 2
+    assert state.scroll_offset == 1
+
+    state = apply_monitor_keypress(state, "up", total_cases=5)
+    assert state.selected_index == 1
+    assert state.scroll_offset == 1
+
+
+def test_visible_monitor_cases_returns_selected_window() -> None:
+    cases = tuple(
+        LocalQwenCaseSnapshot(
+            case_id=f"{index:02d}",
+            status="completed",
+            label=f"case-{index}",
+            num_ctx=None,
+            max_tokens=None,
+            context_prompt_length=None,
+            trend_prompt_length=None,
+            context_total_tokens=None,
+            trend_total_tokens=None,
+            error=None,
+        )
+        for index in range(5)
+    )
+    state = MonitorViewState(selected_index=3, scroll_offset=2, visible_rows=2)
+
+    visible = visible_monitor_cases(cases=cases, state=state)
+
+    assert [case.case_id for case in visible] == ["02", "03"]
