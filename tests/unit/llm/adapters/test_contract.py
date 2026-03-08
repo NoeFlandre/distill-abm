@@ -406,7 +406,7 @@ def test_openrouter_adapter_raises_on_missing_api_key(monkeypatch: pytest.Monkey
     
     with pytest.raises(LLMProviderError) as exc_info:
         adapter.complete(request)
-    
+
     assert "api key missing" in str(exc_info.value).lower()
 
 

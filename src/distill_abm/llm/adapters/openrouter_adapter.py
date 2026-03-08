@@ -52,13 +52,13 @@ class OpenRouterAdapter(LLMAdapter):
     def _client_for_request(self) -> Any:
         if self._client is not None:
             return self._client
+        api_key = self.api_key or os.getenv("OPENROUTER_API_KEY")
+        if not api_key:
+            raise LLMProviderError("openrouter api key missing: set OPENROUTER_API_KEY")
         try:
             from openai import OpenAI
         except Exception as exc:
             raise LLMProviderError(f"openrouter OpenAI SDK unavailable: {exc}") from exc
-        api_key = self.api_key or os.getenv("OPENROUTER_API_KEY")
-        if not api_key:
-            raise LLMProviderError("openrouter api key missing: set OPENROUTER_API_KEY")
         default_headers: dict[str, str] = {}
         if self.site_url:
             default_headers["HTTP-Referer"] = self.site_url

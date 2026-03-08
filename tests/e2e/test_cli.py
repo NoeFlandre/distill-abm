@@ -1133,7 +1133,9 @@ def test_cli_smoke_qwen_rejects_unknown_case_id(tmp_path: Path, monkeypatch: pyt
     )
 
     assert result.exit_code != 0
-    assert "unknown --case-id" in result.output
+    assert "--case-id" in result.output
+    assert "nonexistent-case-id" in result.output
+    assert "Known cases" in result.output
 
 
 def test_cli_run_fails_on_unknown_model_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
