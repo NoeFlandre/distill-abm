@@ -46,8 +46,11 @@ Use the narrowest command that proves the point, then widen.
 ### Canonical Agent Verification
 
 - `uv run distill-abm validate-workspace --json`
+- `uv run distill-abm quality-gate --scope pre-llm --json`
 
 This is the default agent-facing verification entrypoint when a change touches multiple subsystems.
+
+Use `quality-gate` when the change scope is obvious and you want the CLI to choose the matching validation profile or check roster for you. Use `validate-workspace` when you need direct control over the exact checks.
 
 ## Evidence Expectations
 

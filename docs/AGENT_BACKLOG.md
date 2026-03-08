@@ -60,9 +60,31 @@ Why it matters:
 - makes long runs more practical
 - makes review reproducible instead of informal
 
+### 4. Stronger Unified Logging
+
+Some workflows already emit structured run logs, but logging is not yet consistent across the whole codebase.
+
+Desired end state:
+
+- one shared structured logging contract across workflow surfaces
+- consistent event names and fields for:
+  - request start
+  - request finish
+  - retries
+  - fallbacks
+  - resume reuse
+  - validation failures
+- one durable log file per run type by default
+
+Why it matters:
+
+- makes debugging faster for both humans and agents
+- reduces the gap between console output and persisted evidence
+- makes monitoring and postmortem analysis more reliable
+
 ## Medium Priority
 
-### 4. Golden Tests for Prompts and Run Layout
+### 5. Golden Tests for Prompts and Run Layout
 
 The codebase now relies heavily on prompt rendering, run layout, and machine-readable review artifacts.
 
@@ -77,7 +99,7 @@ Why it matters:
 - makes safe refactoring much easier
 - catches accidental contract drift early
 
-### 5. Clearer Runtime State Machine
+### 6. Clearer Runtime State Machine
 
 Run and case statuses exist, but they are not yet modeled as one explicit state machine across workflows.
 
@@ -98,7 +120,7 @@ Why it matters:
 - improves monitor behavior
 - makes reporting easier to reason about
 
-### 6. Further Separation of Concerns
+### 7. Further Separation of Concerns
 
 Large workflow modules have already been reduced, but some still mix orchestration, persistence, validation, and rendering.
 
@@ -118,7 +140,7 @@ Why it matters:
 
 ## Lower Priority
 
-### 7. Stronger Typing for Intermediate Payloads
+### 8. Stronger Typing for Intermediate Payloads
 
 Some internal payloads are still anonymous dictionaries.
 
@@ -132,7 +154,7 @@ Why it matters:
 - improves static analysis
 - reduces field-name drift and implicit contracts
 
-### 8. More Artifact Invariant Tests
+### 9. More Artifact Invariant Tests
 
 The repository already has useful artifact checks. Additional invariants would make refactors safer.
 

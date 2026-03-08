@@ -198,6 +198,12 @@ Run the preferred non-LLM validation suite for coding-agent verification:
 uv run distill-abm validate-workspace --json
 ```
 
+Scope-oriented convenience wrapper:
+
+```bash
+uv run distill-abm quality-gate --scope pre-llm --json
+```
+
 This command is the current repository entrypoint for non-LLM local verification. It runs the standard local checks, emits a structured JSON report, and nests the NetLogo ingest-smoke report under `results/agent_validation/latest/` so agents can inspect outcomes without ad hoc artifact hunting. As with the testing report, treat the command output from the present workspace as authoritative rather than relying on a stale claimed status in documentation.
 
 Repo workflow notes:
@@ -209,6 +215,10 @@ Repo workflow notes:
 Agent-oriented CLI additions:
 
 - Most verification-oriented commands now support `--json` so agents can consume structured output instead of parsing human text.
+- `quality-gate` is a thin convenience wrapper around `validate-workspace` that maps a declared change scope to the appropriate validation profile and default checks:
+  - `static` -> `ruff` + `mypy`
+  - `pre-llm` -> quick validation profile
+  - `full` -> default validation profile
 - `validate-workspace` supports profiles:
   - `quick`: fast static + ingest verification
   - `default`: full local verification
