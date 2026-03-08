@@ -1,6 +1,7 @@
 # Documentation Index
 
 - `ARCHITECTURE.md` - runtime architecture and module boundaries.
+- `AGENT_BACKLOG.md` - highest-value remaining agent-friendly quality improvements.
 - `AGENT_WORKFLOW.md` - repository-specific agentic engineering workflow and verification order.
 - `MANUAL_VALIDATION.md` - evidence-style manual verification record for the pre-LLM workflow surfaces.
 - `WALKTHROUGH.md` - command-level walkthrough for standard and ablation runs.
