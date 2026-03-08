@@ -8,6 +8,7 @@ from distill_abm.pipeline.local_qwen_sample_response import (
     is_generic_unavailable_response,
     looks_like_context_overflow,
     parse_structured_smoke_text,
+    validate_structured_smoke_text_content,
 )
 
 
@@ -61,3 +62,8 @@ def test_parse_structured_smoke_text_rejects_pathologically_large_response() -> 
 
     with pytest.raises(StructuredSmokeResponseError, match="pathologically large"):
         parse_structured_smoke_text(raw_text=oversized, trace=trace, prompt="prompt")
+
+
+def test_validate_structured_smoke_text_content_rejects_generic_unavailable_text() -> None:
+    with pytest.raises(ValueError, match="generic unavailable"):
+        validate_structured_smoke_text_content("The analysis is currently unavailable.")

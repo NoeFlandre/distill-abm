@@ -18,7 +18,10 @@ from distill_abm.pipeline.doe_smoke_prompts import (
     build_raw_table_csv,
 )
 from distill_abm.pipeline.helpers import encode_image
-from distill_abm.pipeline.local_qwen_sample_response import StructuredSmokeResponseError
+from distill_abm.pipeline.local_qwen_sample_response import (
+    StructuredSmokeResponseError,
+    validate_structured_smoke_text_content,
+)
 from distill_abm.pipeline.local_qwen_sample_smoke import (
     _invoke_structured_smoke_text,
     _validate_case_inputs,
@@ -494,20 +497,32 @@ def _backfill_validation_state_from_artifacts(
 
 
 def _is_context_accepted(*, context_dir: Path, validation_state: FullCaseValidationState) -> bool:
-    return (
-        validation_state.context.get("status") == "accepted"
-        and _context_artifacts_exist(context_dir)
-        and not (context_dir / "error.txt").exists()
-    )
+    if (
+        validation_state.context.get("status") != "accepted"
+        or not _context_artifacts_exist(context_dir)
+        or (context_dir / "error.txt").exists()
+    ):
+        return False
+    try:
+        validate_structured_smoke_text_content((context_dir / "context_output.txt").read_text(encoding="utf-8"))
+    except ValueError:
+        return False
+    return True
 
 
 def _is_trend_accepted(*, plot_index: int, trend_dir: Path, validation_state: FullCaseValidationState) -> bool:
     status_payload = validation_state.trends.get(str(plot_index), {})
-    return (
-        status_payload.get("status") == "accepted"
-        and _trend_artifacts_exist(trend_dir)
-        and not (trend_dir / "error.txt").exists()
-    )
+    if (
+        status_payload.get("status") != "accepted"
+        or not _trend_artifacts_exist(trend_dir)
+        or (trend_dir / "error.txt").exists()
+    ):
+        return False
+    try:
+        validate_structured_smoke_text_content((trend_dir / "trend_output.txt").read_text(encoding="utf-8"))
+    except ValueError:
+        return False
+    return True
 
 
 def _context_artifacts_exist(context_dir: Path) -> bool:
