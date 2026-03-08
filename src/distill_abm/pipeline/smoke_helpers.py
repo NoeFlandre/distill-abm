@@ -17,6 +17,14 @@ from distill_abm.eval.qualitative_runner import evaluate_qualitative_score
 from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline import run as run_module
 from distill_abm.pipeline.run import PipelineInputs, PipelineResult
+from distill_abm.pipeline.smoke_response_bundle import (
+    build_case_response_row,
+    build_fallback_error_row,
+    dict_block,
+    extract_metadata_blocks,
+    flatten_score_fields,
+    stringify,
+)
 from distill_abm.pipeline.smoke_types import (
     RESPONSE_BUNDLE_COLUMNS,
     QualitativeOutcome,
@@ -325,7 +333,7 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
             metadata_payload = None
 
     if metadata_payload is None:
-        return _build_fallback_error_row(case_result=case_result, smoke_inputs=smoke_inputs)
+        return build_fallback_error_row(case_result=case_result, smoke_inputs=smoke_inputs)
 
     (
         inputs_block,
@@ -338,11 +346,11 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
         reference_block,
         reproducibility_block,
         summarizers_block,
-    ) = _extract_metadata_blocks(metadata_payload)
+    ) = extract_metadata_blocks(metadata_payload)
 
-    selected_scores = _dict(scores_block.get("selected_scores"))
-    full_scores = _dict(scores_block.get("full_scores"))
-    summary_scores = _dict(scores_block.get("summary_scores"))
+    selected_scores = dict_block(scores_block.get("selected_scores"))
+    full_scores = dict_block(scores_block.get("full_scores"))
+    summary_scores = dict_block(scores_block.get("summary_scores"))
 
     base = {
         "run_output_dir": str(smoke_inputs.output_dir),
@@ -351,30 +359,30 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
         "resumed_from_existing": str(case_result.resumed_from_existing),
         "provider": str(llm_block.get("provider", "")),
         "model": str(llm_block.get("model", "")),
-        "temperature": _stringify(request_block.get("temperature")),
-        "max_tokens": _stringify(request_block.get("max_tokens")),
-        "max_retries": _stringify(request_block.get("max_retries")),
-        "retry_backoff_seconds": _stringify(request_block.get("retry_backoff_seconds")),
+        "temperature": stringify(request_block.get("temperature")),
+        "max_tokens": stringify(request_block.get("max_tokens")),
+        "max_retries": stringify(request_block.get("max_retries")),
+        "retry_backoff_seconds": stringify(request_block.get("retry_backoff_seconds")),
         "evidence_mode": str(inputs_block.get("evidence_mode", case_result.case.evidence_mode)),
         "text_source_mode": str(inputs_block.get("text_source_mode", case_result.case.text_source_mode)),
-        "enabled_style_features": _stringify(inputs_block.get("enabled_style_features")),
-        "summarizers": _stringify(inputs_block.get("summarizers")),
+        "enabled_style_features": stringify(inputs_block.get("enabled_style_features")),
+        "summarizers": stringify(inputs_block.get("summarizers")),
         "input_csv_path": str(inputs_block.get("csv_path", smoke_inputs.csv_path)),
         "parameters_path": str(inputs_block.get("parameters_path", smoke_inputs.parameters_path)),
         "documentation_path": str(inputs_block.get("documentation_path", smoke_inputs.documentation_path)),
-        "scoring_reference_path": _stringify(reference_block.get("path")),
-        "scoring_reference_source": _stringify(reference_block.get("source")),
-        "scoring_reference_text": _stringify(reference_block.get("text")),
-        "evidence_image_path": _stringify(artifacts_block.get("trend_evidence_image_path")),
-        "plot_path": _stringify(artifacts_block.get("plot_path")),
-        "stats_table_csv_path": _stringify(artifacts_block.get("stats_table_csv_path")),
-        "report_csv_path": _stringify(artifacts_block.get("report_csv")),
+        "scoring_reference_path": stringify(reference_block.get("path")),
+        "scoring_reference_source": stringify(reference_block.get("source")),
+        "scoring_reference_text": stringify(reference_block.get("text")),
+        "evidence_image_path": stringify(artifacts_block.get("trend_evidence_image_path")),
+        "plot_path": stringify(artifacts_block.get("plot_path")),
+        "stats_table_csv_path": stringify(artifacts_block.get("stats_table_csv_path")),
+        "report_csv_path": stringify(artifacts_block.get("report_csv")),
         "metadata_path": str(case_result.metadata_path or ""),
         "case_manifest_path": str(case_result.case_manifest_path or ""),
-        "error": _stringify(case_result.error),
-        **_flatten_score_fields(selected_scores, "selected"),
-        **_flatten_score_fields(full_scores, "full"),
-        **_flatten_score_fields(summary_scores, "summary"),
+        "error": stringify(case_result.error),
+        **flatten_score_fields(selected_scores, "selected"),
+        **flatten_score_fields(full_scores, "full"),
+        **flatten_score_fields(summary_scores, "summary"),
         "inputs_json": json.dumps(inputs_block, sort_keys=True),
         "llm_json": json.dumps(llm_block, sort_keys=True),
         "scores_json": json.dumps(scores_block, sort_keys=True),
@@ -384,7 +392,7 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
 
     metadata_fields = (prompts_block, reproducibility_block, responses_block)
     return [
-        _build_case_response_row(
+        build_case_response_row(
             base=base,
             case_result=case_result,
             metadata_fields=metadata_fields,
@@ -392,7 +400,7 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
             prompt_path=case_result.context_prompt_path,
             response_path=case_result.context_response_path,
         ),
-        _build_case_response_row(
+        build_case_response_row(
             base=base,
             case_result=case_result,
             metadata_fields=metadata_fields,
@@ -400,163 +408,6 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
             prompt_path=case_result.trend_prompt_path,
             response_path=case_result.trend_full_response_path,
         ),
-    ]
-
-
-def _extract_metadata_blocks(metadata_payload: dict[str, object]) -> tuple[
-    dict[str, object],
-    dict[str, object],
-    dict[str, object],
-    dict[str, object],
-    dict[str, object],
-    dict[str, object],
-    dict[str, object],
-    dict[str, object],
-    dict[str, object],
-    dict[str, object],
-]:
-    payload = metadata_payload or {}
-    inputs_block = _dict(payload.get("inputs"))
-    llm_block = _dict(payload.get("llm"))
-    request_block = _dict(llm_block.get("request"))
-    prompts_block = _dict(payload.get("prompts"))
-    responses_block = _dict(payload.get("responses"))
-    artifacts_block = _dict(payload.get("artifacts"))
-    scores_block = _dict(payload.get("scores"))
-    reference_block = _dict(scores_block.get("reference"))
-    reproducibility_block = _dict(payload.get("reproducibility"))
-    summarizers_block = _dict(payload.get("summarizers"))
-    return (
-        inputs_block,
-        llm_block,
-        request_block,
-        prompts_block,
-        responses_block,
-        artifacts_block,
-        scores_block,
-        reference_block,
-        reproducibility_block,
-        summarizers_block,
-    )
-
-
-def _flatten_score_fields(scores: dict[str, object], prefix: str) -> dict[str, str]:
-    return {
-        f"{prefix}_token_f1": _stringify(scores.get("token_f1")),
-        f"{prefix}_bleu": _stringify(scores.get("bleu")),
-        f"{prefix}_meteor": _stringify(scores.get("meteor")),
-        f"{prefix}_rouge1": _stringify(scores.get("rouge1")),
-        f"{prefix}_rouge2": _stringify(scores.get("rouge2")),
-        f"{prefix}_rouge_l": _stringify(scores.get("rouge_l")),
-        f"{prefix}_flesch_reading_ease": _stringify(scores.get("flesch_reading_ease")),
-    }
-
-
-def _build_case_response_row(
-    *,
-    base: dict[str, str],
-    case_result: SmokeCaseResult,
-    metadata_fields: tuple[dict[str, object], dict[str, object], dict[str, object]],
-    response_kind: str,
-    prompt_path: Path | None,
-    response_path: Path | None,
-) -> dict[str, str]:
-    prompts_block, reproducibility_block, responses_block = metadata_fields
-    is_context = response_kind == "context"
-    if is_context:
-        prompt_text = _stringify(prompts_block.get("context_prompt"))
-        response_text = _stringify(responses_block.get("context_response"))
-        response_path_value = response_path if response_path is not None else case_result.context_response_path
-        prompt_signature = _stringify(reproducibility_block.get("context_prompt_signature"))
-        prompt_length = _stringify(reproducibility_block.get("context_prompt_length"))
-    else:
-        prompt_text = _stringify(prompts_block.get("trend_prompt"))
-        response_text = _stringify(responses_block.get("trend_full_response"))
-        response_path_value = response_path if response_path is not None else case_result.trend_full_response_path
-        prompt_signature = _stringify(reproducibility_block.get("trend_prompt_signature"))
-        prompt_length = _stringify(reproducibility_block.get("trend_prompt_length"))
-
-    row = dict(base)
-    row.update(
-        {
-            "response_kind": response_kind,
-            "prompt_path": str(prompt_path) if prompt_path else "",
-            "prompt_text": prompt_text,
-            "prompt_signature": prompt_signature,
-            "prompt_length": prompt_length,
-            "response_path": str(response_path_value) if response_path_value else "",
-            "response_text": response_text,
-            "response_length": str(len(response_text)),
-        }
-    )
-    return row
-
-
-def _build_fallback_error_row(case_result: SmokeCaseResult, smoke_inputs: SmokeSuiteInputs) -> list[dict[str, str]]:
-    return [
-        {
-            "run_output_dir": str(smoke_inputs.output_dir),
-            "case_id": case_result.case.case_id,
-            "response_kind": "context",
-            "case_status": case_result.status,
-            "resumed_from_existing": str(case_result.resumed_from_existing),
-            "provider": "",
-            "model": smoke_inputs.model,
-            "temperature": "",
-            "max_tokens": "",
-            "max_retries": "",
-            "retry_backoff_seconds": "",
-            "evidence_mode": case_result.case.evidence_mode,
-            "text_source_mode": case_result.case.text_source_mode,
-            "enabled_style_features": _stringify(case_result.case.enabled_style_features),
-            "summarizers": _stringify(case_result.case.summarizers or smoke_inputs.summarizers),
-            "input_csv_path": str(smoke_inputs.csv_path),
-            "parameters_path": str(smoke_inputs.parameters_path),
-            "documentation_path": str(smoke_inputs.documentation_path),
-            "scoring_reference_path": str(smoke_inputs.scoring_reference_path or ""),
-            "scoring_reference_source": "",
-            "scoring_reference_text": "",
-            "prompt_path": "",
-            "prompt_text": "",
-            "prompt_signature": "",
-            "prompt_length": "",
-            "response_path": "",
-            "response_text": "",
-            "response_length": "",
-            "evidence_image_path": "",
-            "plot_path": str(case_result.plot_path or ""),
-            "stats_table_csv_path": str(case_result.stats_table_csv_path or ""),
-            "report_csv_path": str(case_result.report_csv or ""),
-            "metadata_path": str(case_result.metadata_path or ""),
-            "case_manifest_path": str(case_result.case_manifest_path or ""),
-            "selected_token_f1": "",
-            "selected_bleu": "",
-            "selected_meteor": "",
-            "selected_rouge1": "",
-            "selected_rouge2": "",
-            "selected_rouge_l": "",
-            "selected_flesch_reading_ease": "",
-            "full_token_f1": "",
-            "full_bleu": "",
-            "full_meteor": "",
-            "full_rouge1": "",
-            "full_rouge2": "",
-            "full_rouge_l": "",
-            "full_flesch_reading_ease": "",
-            "summary_token_f1": "",
-            "summary_bleu": "",
-            "summary_meteor": "",
-            "summary_rouge1": "",
-            "summary_rouge2": "",
-            "summary_rouge_l": "",
-            "summary_flesch_reading_ease": "",
-            "error": _stringify(case_result.error),
-            "inputs_json": "",
-            "llm_json": "",
-            "scores_json": "",
-            "reproducibility_json": "",
-            "summarizers_json": "",
-        }
     ]
 
 
@@ -632,18 +483,12 @@ def _copy_if_exists(source: Path | None, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
-def _dict(value: object) -> dict[str, object]:
-    if isinstance(value, dict):
-        return value
-    return {}
-
-
-def _stringify(value: object) -> str:
-    if value is None:
-        return ""
-    if isinstance(value, (str, int, float, bool)):
-        return str(value)
-    return json.dumps(value, sort_keys=True)
+_extract_metadata_blocks = extract_metadata_blocks
+_flatten_score_fields = flatten_score_fields
+_build_case_response_row = build_case_response_row
+_build_fallback_error_row = build_fallback_error_row
+_dict = dict_block
+_stringify = stringify
 
 
 def _load_resumable_case(case_manifest: Path) -> SmokeCaseResult | None:
