@@ -3,7 +3,12 @@
 from __future__ import annotations
 
 import json
+import os
+import select
+import sys
+import termios
 import time
+import tty
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -49,6 +54,15 @@ class LocalQwenMonitorSnapshot:
     @property
     def terminal(self) -> bool:
         return self.exists and self.total_cases > 0 and self.completed_cases + self.failed_cases >= self.total_cases
+
+
+@dataclass(frozen=True)
+class MonitorViewState:
+    """Client-side TUI state for selection and scrolling."""
+
+    selected_index: int = 0
+    scroll_offset: int = 0
+    visible_rows: int = 12
 
 
 def collect_local_qwen_monitor_snapshot(output_root: Path) -> LocalQwenMonitorSnapshot:
@@ -127,6 +141,15 @@ def render_local_qwen_monitor(snapshot: LocalQwenMonitorSnapshot) -> str:
 
 def render_local_qwen_monitor_rich(snapshot: LocalQwenMonitorSnapshot) -> RenderableType:
     """Render a richer TUI-friendly dashboard for live monitoring."""
+    return render_local_qwen_monitor_rich_with_state(snapshot=snapshot, state=MonitorViewState())
+
+
+def render_local_qwen_monitor_rich_with_state(
+    *,
+    snapshot: LocalQwenMonitorSnapshot,
+    state: MonitorViewState,
+) -> RenderableType:
+    """Render a richer TUI-friendly dashboard for live monitoring with selection state."""
     summary = Table.grid(expand=True)
     summary.add_column(justify="left", ratio=2)
     summary.add_column(justify="left", ratio=3)
@@ -148,17 +171,20 @@ def render_local_qwen_monitor_rich(snapshot: LocalQwenMonitorSnapshot) -> Render
     cases_table.add_column("tr_tok", justify="right")
     cases_table.add_column("ctx_len", justify="right")
     cases_table.add_column("tr_len", justify="right")
-    for case in snapshot.cases:
+    visible_cases = visible_monitor_cases(cases=snapshot.cases, state=state)
+    for row_index, case in enumerate(visible_cases):
+        absolute_index = state.scroll_offset + row_index
+        selected = absolute_index == state.selected_index
         cases_table.add_row(
-            _style_status(case.status),
-            case.label or case.case_id,
+            _style_status(case.status, selected=selected),
+            _selected_label(case.label or case.case_id, selected=selected),
             _fmt(case.num_ctx, 7).strip(),
             _fmt(case.max_tokens, 7).strip(),
             _fmt(case.context_total_tokens, 7).strip(),
             _fmt(case.trend_total_tokens, 6).strip(),
             _fmt(case.context_prompt_length, 7).strip(),
             _fmt(case.trend_prompt_length, 6).strip(),
-            style=_row_style(case.status),
+            style=_row_style(case.status, selected=selected),
         )
 
     failures = [case for case in snapshot.cases if case.error]
@@ -176,10 +202,22 @@ def render_local_qwen_monitor_rich(snapshot: LocalQwenMonitorSnapshot) -> Render
     title_style = "green" if snapshot.exists and not snapshot.failed_cases else "yellow"
     if snapshot.failed_cases:
         title_style = "red"
+    selected_case = _selected_case(snapshot=snapshot, state=state)
+    details_panel = Panel(
+        _render_selected_case_details(selected_case),
+        title="Selected Case",
+        border_style="cyan" if selected_case is not None else "dim",
+    )
+    footer = Panel(
+        Text("Up/Down: move  PgUp/PgDn: page  Home/End: jump  q: quit", style="dim"),
+        border_style="dim",
+    )
     return Group(
         Panel(summary, title="Run Monitor", border_style=title_style),
         Panel(cases_table, title="Cases" if snapshot.mode == "smoke" else "Trials"),
+        details_panel,
         failure_panel,
+        footer,
     )
 
 
@@ -194,16 +232,89 @@ def stream_local_qwen_monitor(
     """Continuously render the dashboard until interrupted or explicitly told to exit."""
     console = Console()
     refresh_count = 0
-    with Live(console=console, refresh_per_second=4, screen=clear_screen, transient=False) as live:
-        while True:
-            snapshot = collect_local_qwen_monitor_snapshot(output_root)
-            live.update(render_local_qwen_monitor_rich(snapshot))
-            refresh_count += 1
-            if max_refreshes is not None and refresh_count >= max_refreshes:
-                return
-            if snapshot.terminal and exit_when_terminal:
-                return
-            time.sleep(interval_seconds)
+    view_state = MonitorViewState()
+    with _MonitorKeyboardReader() as keyboard_reader:
+        with Live(console=console, refresh_per_second=4, screen=clear_screen, transient=False) as live:
+            while True:
+                snapshot = collect_local_qwen_monitor_snapshot(output_root)
+                view_state = view_state_for_snapshot(view_state=view_state, snapshot=snapshot)
+                key = keyboard_reader()
+                if key == "quit":
+                    return
+                if key is not None:
+                    view_state = apply_monitor_keypress(view_state, key, total_cases=len(snapshot.cases))
+                live.update(render_local_qwen_monitor_rich_with_state(snapshot=snapshot, state=view_state))
+                refresh_count += 1
+                if max_refreshes is not None and refresh_count >= max_refreshes:
+                    return
+                if snapshot.terminal and exit_when_terminal:
+                    return
+                time.sleep(interval_seconds)
+
+
+def visible_monitor_cases(
+    *,
+    cases: tuple[LocalQwenCaseSnapshot, ...],
+    state: MonitorViewState,
+) -> tuple[LocalQwenCaseSnapshot, ...]:
+    """Return the visible case window for the current scroll offset."""
+    start = max(state.scroll_offset, 0)
+    end = max(start + state.visible_rows, start)
+    return cases[start:end]
+
+
+def view_state_for_snapshot(
+    *,
+    view_state: MonitorViewState,
+    snapshot: LocalQwenMonitorSnapshot,
+) -> MonitorViewState:
+    """Clamp selection state to the current snapshot size."""
+    if not snapshot.cases:
+        return MonitorViewState(selected_index=0, scroll_offset=0, visible_rows=view_state.visible_rows)
+    max_index = len(snapshot.cases) - 1
+    selected_index = min(max(view_state.selected_index, 0), max_index)
+    max_scroll = max(len(snapshot.cases) - view_state.visible_rows, 0)
+    scroll_offset = min(max(view_state.scroll_offset, 0), max_scroll)
+    if selected_index < scroll_offset:
+        scroll_offset = selected_index
+    elif selected_index >= scroll_offset + view_state.visible_rows:
+        scroll_offset = max(selected_index - view_state.visible_rows + 1, 0)
+    return MonitorViewState(
+        selected_index=selected_index,
+        scroll_offset=scroll_offset,
+        visible_rows=view_state.visible_rows,
+    )
+
+
+def apply_monitor_keypress(state: MonitorViewState, key: str, *, total_cases: int) -> MonitorViewState:
+    """Update the monitor view state for one navigation keypress."""
+    if total_cases <= 0:
+        return state
+    selected_index = state.selected_index
+    if key == "down":
+        selected_index = min(selected_index + 1, total_cases - 1)
+    elif key == "up":
+        selected_index = max(selected_index - 1, 0)
+    elif key == "page_down":
+        selected_index = min(selected_index + state.visible_rows, total_cases - 1)
+    elif key == "page_up":
+        selected_index = max(selected_index - state.visible_rows, 0)
+    elif key == "home":
+        selected_index = 0
+    elif key == "end":
+        selected_index = total_cases - 1
+    max_scroll = max(total_cases - state.visible_rows, 0)
+    scroll_offset = state.scroll_offset
+    if selected_index < scroll_offset:
+        scroll_offset = selected_index
+    elif selected_index >= scroll_offset + state.visible_rows:
+        scroll_offset = selected_index - state.visible_rows + 1
+    scroll_offset = min(max(scroll_offset, 0), max_scroll)
+    return MonitorViewState(
+        selected_index=selected_index,
+        scroll_offset=scroll_offset,
+        visible_rows=state.visible_rows,
+    )
 
 
 def _collect_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
@@ -434,23 +545,107 @@ def _fmt(value: int | None, width: int) -> str:
     return f"{('-' if value is None else value):>{width}}"
 
 
-def _style_status(status: str) -> Text:
+def _style_status(status: str, *, selected: bool = False) -> Text:
     style = {
         "completed": "green",
         "failed": "red",
         "running": "yellow",
         "pending": "dim",
     }.get(status, "white")
+    if selected:
+        style = f"bold {style}"
     return Text(status, style=style)
 
 
-def _row_style(status: str) -> str:
-    return {
+def _row_style(status: str, *, selected: bool = False) -> str:
+    style = {
         "completed": "green",
         "failed": "red",
         "running": "yellow",
         "pending": "dim",
     }.get(status, "")
+    if selected:
+        return f"reverse {style}".strip()
+    return style
+
+
+def _selected_label(label: str, *, selected: bool) -> str:
+    return f"> {label}" if selected else f"  {label}"
+
+
+def _selected_case(
+    *,
+    snapshot: LocalQwenMonitorSnapshot,
+    state: MonitorViewState,
+) -> LocalQwenCaseSnapshot | None:
+    if not snapshot.cases:
+        return None
+    index = min(max(state.selected_index, 0), len(snapshot.cases) - 1)
+    return snapshot.cases[index]
+
+
+def _render_selected_case_details(case: LocalQwenCaseSnapshot | None) -> RenderableType:
+    if case is None:
+        return Text("No case selected", style="dim")
+    details = Table.grid(expand=True)
+    details.add_column(justify="left", ratio=2)
+    details.add_column(justify="left", ratio=5)
+    details.add_row("Case", case.label or case.case_id)
+    details.add_row("Status", case.status)
+    details.add_row("num_ctx", "-" if case.num_ctx is None else str(case.num_ctx))
+    details.add_row("max_tokens", "-" if case.max_tokens is None else str(case.max_tokens))
+    details.add_row("context tokens", "-" if case.context_total_tokens is None else str(case.context_total_tokens))
+    details.add_row("trend tokens", "-" if case.trend_total_tokens is None else str(case.trend_total_tokens))
+    details.add_row(
+        "context length",
+        "-" if case.context_prompt_length is None else str(case.context_prompt_length),
+    )
+    details.add_row(
+        "trend length",
+        "-" if case.trend_prompt_length is None else str(case.trend_prompt_length),
+    )
+    details.add_row("error", case.error or "-")
+    return details
+
+
+class _MonitorKeyboardReader:
+    """POSIX keyboard reader for non-blocking arrow-key monitor navigation."""
+
+    def __enter__(self) -> Any:
+        if not sys.stdin.isatty():
+            return lambda: None
+        self._fd = sys.stdin.fileno()
+        self._old_settings = termios.tcgetattr(self._fd)
+        tty.setcbreak(self._fd)
+        return self._read_key
+
+    def __exit__(self, exc_type: object, exc: object, tb: object) -> None:
+        if hasattr(self, "_old_settings"):
+            termios.tcsetattr(self._fd, termios.TCSADRAIN, self._old_settings)
+
+    def _read_key(self) -> str | None:
+        ready, _, _ = select.select([sys.stdin], [], [], 0)
+        if not ready:
+            return None
+        first = os.read(self._fd, 1)
+        if not first:
+            return None
+        if first == b"q":
+            return "quit"
+        if first == b"\x1b":
+            remainder = os.read(self._fd, 2)
+            sequence = first + remainder
+            return {
+                b"\x1b[A": "up",
+                b"\x1b[B": "down",
+                b"\x1b[H": "home",
+                b"\x1b[F": "end",
+            }.get(sequence)
+        if first == b"j":
+            return "down"
+        if first == b"k":
+            return "up"
+        return None
 
 
 def _extract_int_from_name(value: str, prefix: str) -> int | None:
