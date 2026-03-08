@@ -47,7 +47,8 @@ def test_default_branch_smoke_cases_cover_three_variants() -> None:
     }
 
 
-def test_run_qwen_smoke_suite_writes_matrix_and_reports(tmp_path: Path) -> None:
+def test_run_qwen_smoke_suite_writes_matrix_and_reports(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.chdir(tmp_path)
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
     params = tmp_path / "params.txt"
