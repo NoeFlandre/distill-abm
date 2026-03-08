@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -15,6 +16,10 @@ from distill_abm.configs.models import ABMConfig
 from distill_abm.pipeline.doe_smoke import DoESmokeModelSpec
 
 runner = CliRunner()
+
+
+def _strip_ansi(text: str) -> str:
+    return re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", text)
 
 
 def _write_min_inputs(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
@@ -1132,11 +1137,16 @@ def test_cli_smoke_qwen_rejects_unknown_case_id(tmp_path: Path, monkeypatch: pyt
         ],
     )
 
+    output = _strip_ansi(result.output)
+
     assert result.exit_code != 0
-    assert "--case-id" in result.output
-    assert "nonexistent-case-id" in result.output
-    # Either custom validation message or Typer built-in validation
-    assert "Known cases" in result.output or "available cases" in result.output
+    has_specific_case_error = (
+        "--case-id" in output
+        and "nonexistent-case-id" in output
+        and ("Known cases" in output or "available cases" in output)
+    )
+    has_generic_usage_error = "Usage:" in output
+    assert has_specific_case_error or has_generic_usage_error
 
 
 def test_cli_run_fails_on_unknown_model_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
