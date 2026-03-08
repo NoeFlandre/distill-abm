@@ -41,6 +41,16 @@ from distill_abm.pipeline.local_qwen_sample_smoke import (
     _write_optional_thinking,
     _write_text,
 )
+from distill_abm.pipeline.run_artifact_contracts import (
+    FULL_CASE_MATRIX_REPORT_FILENAME,
+    case_summary_path,
+    latest_run_pointer_path,
+    validation_state_path,
+    viewer_html_path,
+)
+from distill_abm.pipeline.run_artifact_contracts import (
+    run_log_path as run_log_contract_path,
+)
 from distill_abm.run_viewer import render_run_viewer
 from distill_abm.structured_logging import attach_json_log_file
 
@@ -135,9 +145,9 @@ def run_full_case_matrix_smoke(
     run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
     run_root = output_root / "runs" / run_id
     run_root.mkdir(parents=True, exist_ok=True)
-    _write_text(output_root / "latest_run.txt", str(run_root))
+    _write_text(latest_run_pointer_path(output_root), str(run_root))
     previous_run_root = _resolve_previous_run_root(output_root=output_root, current_run_id=run_id)
-    run_log_path = attach_json_log_file(run_root / "run.log.jsonl")
+    run_log_path = attach_json_log_file(run_log_contract_path(run_root))
     _validate_full_case_inputs(case_input)
 
     context_cache: dict[str, _CachedContext] = {}
@@ -179,9 +189,9 @@ def run_full_case_matrix_smoke(
                 "prompt_variant": case.prompt_variant,
                 "repetition": str(case.repetition),
                 "case_dir": str(case.case_dir),
-                "case_summary_path": str(case.case_dir / "00_case_summary.json"),
+                "case_summary_path": str(case_summary_path(case.case_dir)),
                 "review_csv_path": str(case.case_dir / "review.csv"),
-                "validation_state_path": str(case.case_dir / "validation_state.json"),
+                "validation_state_path": str(validation_state_path(case.case_dir)),
                 "success": str(case.success),
                 "resumed_from_existing": str(case.resumed_from_existing),
                 "error": case.error or "",
@@ -195,11 +205,11 @@ def run_full_case_matrix_smoke(
         finished_at_utc=finished_at.isoformat(),
         output_root=run_root,
         run_id=run_id,
-        report_json_path=run_root / "smoke_full_case_matrix_report.json",
+        report_json_path=run_root / FULL_CASE_MATRIX_REPORT_FILENAME,
         report_markdown_path=run_root / "smoke_full_case_matrix_report.md",
         review_csv_path=review_csv_path,
         run_log_path=run_log_path,
-        viewer_html_path=run_root / "review.html",
+        viewer_html_path=viewer_html_path(run_root),
         success=not failed_case_ids,
         failed_case_ids=failed_case_ids,
         cases=case_results,
@@ -240,8 +250,8 @@ def _run_full_case_matrix_case(
         enabled=_enabled_features_from_variant(case.prompt_variant),
     )
     _write_text(inputs_dir / "context_prompt.txt", context_prompt)
-    validation_state_path = case_dir / "validation_state.json"
-    validation_state = _load_validation_state(validation_state_path)
+    validation_state_file = validation_state_path(case_dir)
+    validation_state = _load_validation_state(validation_state_file)
     _backfill_validation_state_from_artifacts(
         validation_state=validation_state,
         context_dir=context_dir,
@@ -286,7 +296,7 @@ def _run_full_case_matrix_case(
             _write_optional_thinking(context_dir / "context_thinking.txt", exc.trace)
             _write_text(context_dir / "error.txt", str(exc))
             validation_state.context = {"status": "retry", "error": str(exc)}
-            _write_json(validation_state_path, validation_state.model_dump(mode="json"))
+            _write_json(validation_state_file, validation_state.model_dump(mode="json"))
             _finalize_case(
                 case_dir=case_dir,
                 case=case,
@@ -510,7 +520,7 @@ def _finalize_case(
     validation_state: FullCaseValidationState,
 ) -> None:
     _write_json(
-        case_dir / "00_case_summary.json",
+        case_summary_path(case_dir),
         {
             "case_id": case.case_id,
             "abm": case.abm,
@@ -520,7 +530,7 @@ def _finalize_case(
             "model": model,
         },
     )
-    _write_json(case_dir / "validation_state.json", validation_state.model_dump(mode="json"))
+    _write_json(validation_state_path(case_dir), validation_state.model_dump(mode="json"))
     _write_case_review_csv(case_dir / "review.csv", review_rows)
 
 

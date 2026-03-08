@@ -6,11 +6,21 @@ import json
 from pathlib import Path
 from typing import Any, cast
 
+from distill_abm.pipeline.run_artifact_contracts import (
+    CASE_SUMMARY_FILENAME,
+    FULL_CASE_MATRIX_REPORT_FILENAME,
+    LATEST_RUN_POINTER_FILENAME,
+    RUN_LOG_FILENAME,
+    SAMPLED_SMOKE_REPORT_FILENAME,
+    VALIDATION_STATE_FILENAME,
+    VIEWER_HTML_FILENAME,
+)
+
 
 def render_run_viewer(run_root: Path, output_path: Path | None = None) -> Path:
     """Render one self-contained HTML viewer for a case-based run directory."""
     resolved_run_root = resolve_run_root(run_root)
-    target_path = output_path or resolved_run_root / "review.html"
+    target_path = output_path or resolved_run_root / VIEWER_HTML_FILENAME
     payload = _build_viewer_payload(resolved_run_root)
     target_path.write_text(_render_html(payload), encoding="utf-8")
     return target_path
@@ -19,7 +29,7 @@ def render_run_viewer(run_root: Path, output_path: Path | None = None) -> Path:
 def resolve_run_root(path: Path) -> Path:
     """Resolve either a concrete run directory or a root containing latest_run.txt."""
     candidate = path
-    latest_run_path = candidate / "latest_run.txt"
+    latest_run_path = candidate / LATEST_RUN_POINTER_FILENAME
     if latest_run_path.exists():
         latest_text = latest_run_path.read_text(encoding="utf-8").strip()
         if latest_text:
@@ -30,7 +40,7 @@ def resolve_run_root(path: Path) -> Path:
 def _build_viewer_payload(run_root: Path) -> dict[str, Any]:
     report_path = _resolve_report_path(run_root)
     report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.exists() else {}
-    run_log_path = run_root / "run.log.jsonl"
+    run_log_path = run_root / RUN_LOG_FILENAME
     cases_root = run_root / "cases"
     cases = []
     for case_dir in sorted(path for path in cases_root.iterdir() if path.is_dir()):
@@ -51,15 +61,15 @@ def _build_viewer_payload(run_root: Path) -> dict[str, Any]:
 
 
 def _resolve_report_path(run_root: Path) -> Path:
-    for name in ("smoke_local_qwen_report.json", "smoke_full_case_matrix_report.json"):
+    for name in (SAMPLED_SMOKE_REPORT_FILENAME, FULL_CASE_MATRIX_REPORT_FILENAME):
         candidate = run_root / name
         if candidate.exists():
             return candidate
-    return run_root / "smoke_local_qwen_report.json"
+    return run_root / SAMPLED_SMOKE_REPORT_FILENAME
 
 
 def _build_sample_case_payload(*, run_root: Path, report: dict[str, Any], case_dir: Path) -> dict[str, Any]:
-    case_summary = _read_optional_json(case_dir / "00_case_summary.json")
+    case_summary = _read_optional_json(case_dir / CASE_SUMMARY_FILENAME)
     inputs_dir = case_dir / "01_inputs"
     requests_dir = case_dir / "02_requests"
     outputs_dir = case_dir / "03_outputs"
@@ -102,7 +112,7 @@ def _build_sample_case_payload(*, run_root: Path, report: dict[str, Any], case_d
 
 
 def _build_full_case_payload(*, run_root: Path, report: dict[str, Any], case_dir: Path) -> dict[str, Any]:
-    case_summary = _read_optional_json(case_dir / "00_case_summary.json")
+    case_summary = _read_optional_json(case_dir / CASE_SUMMARY_FILENAME)
     inputs_dir = case_dir / "01_inputs"
     context_dir = case_dir / "02_context"
     trends_root = case_dir / "03_trends"
@@ -143,7 +153,7 @@ def _build_full_case_payload(*, run_root: Path, report: dict[str, Any], case_dir
             "context_output": _relative_path(run_root, context_dir / "context_output.txt"),
             "context_trace": _relative_path(run_root, context_dir / "context_trace.json"),
             "review_csv": _relative_path(run_root, case_dir / "review.csv"),
-            "validation_state": _relative_path(run_root, case_dir / "validation_state.json"),
+            "validation_state": _relative_path(run_root, case_dir / VALIDATION_STATE_FILENAME),
         },
         "context_prompt_text": _read_optional_text(inputs_dir / "context_prompt.txt"),
         "documentation_text": _read_optional_text(inputs_dir / "documentation.txt"),
