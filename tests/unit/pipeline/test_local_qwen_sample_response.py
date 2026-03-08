@@ -53,3 +53,11 @@ def test_parse_structured_smoke_text_rejects_thinking_only_length_stop() -> None
 
     with pytest.raises(StructuredSmokeResponseError, match="thinking"):
         parse_structured_smoke_text(raw_text="", trace=trace, prompt="prompt")
+
+
+def test_parse_structured_smoke_text_rejects_pathologically_large_response() -> None:
+    trace = {"response": {"raw": {"message": {"content": '{"response_text":"x"}'}, "done_reason": "stop"}}}
+    oversized = '{"response_text":"' + ("x" * 50001) + '"}'
+
+    with pytest.raises(StructuredSmokeResponseError, match="pathologically large"):
+        parse_structured_smoke_text(raw_text=oversized, trace=trace, prompt="prompt")

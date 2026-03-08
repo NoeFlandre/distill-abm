@@ -12,6 +12,7 @@ GENERIC_UNAVAILABLE_PATTERNS = (
     "please try again later",
     "consult additional resources",
 )
+MAX_STRUCTURED_SMOKE_RESPONSE_CHARS = 50_000
 
 
 class StructuredSmokeResponseError(ValueError):
@@ -106,6 +107,15 @@ def parse_structured_smoke_text(*, raw_text: str, trace: Mapping[str, object], p
     if not final_text:
         raise StructuredSmokeResponseError(
             "structured smoke output contained an empty response_text",
+            trace=trace,
+            prompt=prompt,
+        )
+    if len(final_text) > MAX_STRUCTURED_SMOKE_RESPONSE_CHARS:
+        raise StructuredSmokeResponseError(
+            (
+                "structured smoke output is pathologically large"
+                f" ({len(final_text)} chars > {MAX_STRUCTURED_SMOKE_RESPONSE_CHARS})"
+            ),
             trace=trace,
             prompt=prompt,
         )
