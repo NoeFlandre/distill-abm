@@ -14,6 +14,10 @@ SAMPLED_SMOKE_REPORT_FILENAME = "smoke_local_qwen_report.json"
 FULL_CASE_MATRIX_REPORT_FILENAME = "smoke_full_case_matrix_report.json"
 
 
+def runs_root_path(output_root: Path) -> Path:
+    return output_root / "runs"
+
+
 def latest_run_pointer_path(output_root: Path) -> Path:
     return output_root / LATEST_RUN_POINTER_FILENAME
 
@@ -44,3 +48,13 @@ def case_summary_path(case_dir: Path) -> Path:
 
 def validation_state_path(case_dir: Path) -> Path:
     return case_dir / VALIDATION_STATE_FILENAME
+
+
+def resolve_run_root(path: Path) -> Path:
+    """Resolve either a concrete run directory or a root containing a latest-run pointer."""
+    latest_run_path = latest_run_pointer_path(path)
+    if latest_run_path.exists():
+        latest_text = latest_run_path.read_text(encoding="utf-8").strip()
+        if latest_text:
+            return Path(latest_text)
+    return path

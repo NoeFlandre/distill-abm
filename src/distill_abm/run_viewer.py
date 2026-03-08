@@ -9,11 +9,11 @@ from typing import Any, cast
 from distill_abm.pipeline.run_artifact_contracts import (
     CASE_SUMMARY_FILENAME,
     FULL_CASE_MATRIX_REPORT_FILENAME,
-    LATEST_RUN_POINTER_FILENAME,
     RUN_LOG_FILENAME,
     SAMPLED_SMOKE_REPORT_FILENAME,
     VALIDATION_STATE_FILENAME,
     VIEWER_HTML_FILENAME,
+    resolve_run_root,
 )
 
 
@@ -24,18 +24,6 @@ def render_run_viewer(run_root: Path, output_path: Path | None = None) -> Path:
     payload = _build_viewer_payload(resolved_run_root)
     target_path.write_text(_render_html(payload), encoding="utf-8")
     return target_path
-
-
-def resolve_run_root(path: Path) -> Path:
-    """Resolve either a concrete run directory or a root containing latest_run.txt."""
-    candidate = path
-    latest_run_path = candidate / LATEST_RUN_POINTER_FILENAME
-    if latest_run_path.exists():
-        latest_text = latest_run_path.read_text(encoding="utf-8").strip()
-        if latest_text:
-            return Path(latest_text)
-    return candidate
-
 
 def _build_viewer_payload(run_root: Path) -> dict[str, Any]:
     report_path = _resolve_report_path(run_root)
