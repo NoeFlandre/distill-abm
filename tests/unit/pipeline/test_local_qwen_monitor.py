@@ -3,9 +3,16 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from rich.console import Console
+
+import distill_abm.pipeline.local_qwen_monitor as monitor_module
 from distill_abm.pipeline.local_qwen_monitor import (
+    LocalQwenCaseSnapshot,
+    LocalQwenMonitorSnapshot,
     collect_local_qwen_monitor_snapshot,
     render_local_qwen_monitor,
+    render_local_qwen_monitor_rich,
+    stream_local_qwen_monitor,
 )
 
 
@@ -139,3 +146,79 @@ def test_collect_local_qwen_monitor_snapshot_resolves_latest_run_and_full_case_l
     assert case.trend_prompt_length == 900
     assert case.context_total_tokens == 111
     assert case.trend_total_tokens == 222
+
+
+def test_render_local_qwen_monitor_rich_includes_summary_and_failures() -> None:
+    snapshot = LocalQwenMonitorSnapshot(
+        output_root=Path("results/run"),
+        exists=True,
+        mode="smoke",
+        total_cases=3,
+        completed_cases=1,
+        failed_cases=1,
+        running_case_id="02_case",
+        cases=(
+            LocalQwenCaseSnapshot(
+                case_id="01_case",
+                status="completed",
+                label="01_case",
+                num_ctx=8192,
+                max_tokens=2048,
+                context_prompt_length=100,
+                trend_prompt_length=200,
+                context_total_tokens=50,
+                trend_total_tokens=75,
+                error=None,
+            ),
+            LocalQwenCaseSnapshot(
+                case_id="02_case",
+                status="failed",
+                label="02_case",
+                num_ctx=8192,
+                max_tokens=2048,
+                context_prompt_length=100,
+                trend_prompt_length=200,
+                context_total_tokens=50,
+                trend_total_tokens=75,
+                error="boom",
+            ),
+        ),
+    )
+
+    console = Console(record=True, width=140)
+    console.print(render_local_qwen_monitor_rich(snapshot))
+    rendered = console.export_text()
+
+    assert "Run Monitor" in rendered
+    assert "02_case" in rendered
+    assert "boom" in rendered
+    assert "running" in rendered.lower()
+
+
+def test_stream_local_qwen_monitor_can_stay_open_after_terminal(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    calls = {"count": 0}
+    snapshot = LocalQwenMonitorSnapshot(
+        output_root=Path("results/run"),
+        exists=True,
+        mode="smoke",
+        total_cases=1,
+        completed_cases=1,
+        failed_cases=0,
+        running_case_id=None,
+        cases=(),
+    )
+
+    def fake_collect(_output_root: Path) -> LocalQwenMonitorSnapshot:
+        calls["count"] += 1
+        return snapshot
+
+    monkeypatch.setattr(monitor_module, "collect_local_qwen_monitor_snapshot", fake_collect)
+
+    stream_local_qwen_monitor(
+        output_root=Path("results/run"),
+        interval_seconds=0.0,
+        exit_when_terminal=False,
+        max_refreshes=2,
+    )
+
+    assert calls["count"] == 2

@@ -8,6 +8,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from rich.console import Console, Group, RenderableType
+from rich.live import Live
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
+
 from distill_abm.pipeline.run_artifact_contracts import resolve_run_root
 
 
@@ -119,22 +125,85 @@ def render_local_qwen_monitor(snapshot: LocalQwenMonitorSnapshot) -> str:
     return "\n".join(lines)
 
 
+def render_local_qwen_monitor_rich(snapshot: LocalQwenMonitorSnapshot) -> RenderableType:
+    """Render a richer TUI-friendly dashboard for live monitoring."""
+    summary = Table.grid(expand=True)
+    summary.add_column(justify="left", ratio=2)
+    summary.add_column(justify="left", ratio=3)
+    summary.add_row("Run root", str(snapshot.output_root))
+    summary.add_row("Mode", snapshot.mode)
+    summary.add_row(
+        "Progress",
+        f"{snapshot.completed_cases} completed / {snapshot.failed_cases} failed / {snapshot.total_cases} discovered",
+    )
+    summary.add_row("Running", snapshot.running_case_id or "-")
+    summary.add_row("Terminal", "yes" if snapshot.terminal else "no")
+
+    cases_table = Table(expand=True, box=None, show_header=True)
+    cases_table.add_column("Status", style="bold")
+    cases_table.add_column("Item", overflow="fold", ratio=3)
+    cases_table.add_column("num_ctx", justify="right")
+    cases_table.add_column("max_tok", justify="right")
+    cases_table.add_column("ctx_tok", justify="right")
+    cases_table.add_column("tr_tok", justify="right")
+    cases_table.add_column("ctx_len", justify="right")
+    cases_table.add_column("tr_len", justify="right")
+    for case in snapshot.cases:
+        cases_table.add_row(
+            _style_status(case.status),
+            case.label or case.case_id,
+            _fmt(case.num_ctx, 7).strip(),
+            _fmt(case.max_tokens, 7).strip(),
+            _fmt(case.context_total_tokens, 7).strip(),
+            _fmt(case.trend_total_tokens, 6).strip(),
+            _fmt(case.context_prompt_length, 7).strip(),
+            _fmt(case.trend_prompt_length, 6).strip(),
+            style=_row_style(case.status),
+        )
+
+    failures = [case for case in snapshot.cases if case.error]
+    failure_panel: RenderableType
+    if failures:
+        failure_table = Table(expand=True, box=None, show_header=True)
+        failure_table.add_column("Case", ratio=2)
+        failure_table.add_column("Error", ratio=5, overflow="fold")
+        for case in failures[-8:]:
+            failure_table.add_row(case.label or case.case_id, case.error or "")
+        failure_panel = Panel(failure_table, title="Recent Failures", border_style="red")
+    else:
+        failure_panel = Panel(Text("No recorded failures", style="green"), title="Recent Failures")
+
+    title_style = "green" if snapshot.exists and not snapshot.failed_cases else "yellow"
+    if snapshot.failed_cases:
+        title_style = "red"
+    return Group(
+        Panel(summary, title="Run Monitor", border_style=title_style),
+        Panel(cases_table, title="Cases" if snapshot.mode == "smoke" else "Trials"),
+        failure_panel,
+    )
+
+
 def stream_local_qwen_monitor(
     *,
     output_root: Path,
     interval_seconds: float,
     clear_screen: bool = True,
+    exit_when_terminal: bool = False,
+    max_refreshes: int | None = None,
 ) -> None:
-    """Continuously render the dashboard until the smoke reaches a terminal state."""
-    while True:
-        snapshot = collect_local_qwen_monitor_snapshot(output_root)
-        rendered = render_local_qwen_monitor(snapshot)
-        if clear_screen:
-            print("\033[2J\033[H", end="")
-        print(rendered, flush=True)
-        if snapshot.terminal:
-            return
-        time.sleep(interval_seconds)
+    """Continuously render the dashboard until interrupted or explicitly told to exit."""
+    console = Console()
+    refresh_count = 0
+    with Live(console=console, refresh_per_second=4, screen=clear_screen, transient=False) as live:
+        while True:
+            snapshot = collect_local_qwen_monitor_snapshot(output_root)
+            live.update(render_local_qwen_monitor_rich(snapshot))
+            refresh_count += 1
+            if max_refreshes is not None and refresh_count >= max_refreshes:
+                return
+            if snapshot.terminal and exit_when_terminal:
+                return
+            time.sleep(interval_seconds)
 
 
 def _collect_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
@@ -363,6 +432,25 @@ def _read_text(path: Path) -> str | None:
 
 def _fmt(value: int | None, width: int) -> str:
     return f"{('-' if value is None else value):>{width}}"
+
+
+def _style_status(status: str) -> Text:
+    style = {
+        "completed": "green",
+        "failed": "red",
+        "running": "yellow",
+        "pending": "dim",
+    }.get(status, "white")
+    return Text(status, style=style)
+
+
+def _row_style(status: str) -> str:
+    return {
+        "completed": "green",
+        "failed": "red",
+        "running": "yellow",
+        "pending": "dim",
+    }.get(status, "")
 
 
 def _extract_int_from_name(value: str, prefix: str) -> int | None:

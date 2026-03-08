@@ -814,6 +814,13 @@ def monitor_local_qwen(
         float,
         typer.Option("--interval-seconds", help="Polling interval for --watch mode."),
     ] = 2.0,
+    exit_when_terminal: Annotated[
+        bool,
+        typer.Option(
+            "--exit-when-terminal/--stay-open",
+            help="In --watch mode, exit automatically on terminal state or keep the dashboard open.",
+        ),
+    ] = False,
     json_output: Annotated[
         bool,
         typer.Option("--json", help="Print structured JSON instead of the dashboard."),
@@ -824,6 +831,7 @@ def monitor_local_qwen(
         output_root=output_root,
         watch=watch,
         interval_seconds=interval_seconds,
+        exit_when_terminal=exit_when_terminal,
         json_output=json_output,
     )
 
@@ -842,6 +850,13 @@ def monitor_run(
         float,
         typer.Option("--interval-seconds", help="Polling interval for --watch mode."),
     ] = 2.0,
+    exit_when_terminal: Annotated[
+        bool,
+        typer.Option(
+            "--exit-when-terminal/--stay-open",
+            help="In --watch mode, exit automatically on terminal state or keep the dashboard open.",
+        ),
+    ] = False,
     json_output: Annotated[
         bool,
         typer.Option("--json", help="Print structured JSON instead of the dashboard."),
@@ -852,6 +867,7 @@ def monitor_run(
         output_root=output_root,
         watch=watch,
         interval_seconds=interval_seconds,
+        exit_when_terminal=exit_when_terminal,
         json_output=json_output,
     )
 
