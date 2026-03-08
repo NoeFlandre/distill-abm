@@ -10,6 +10,13 @@ from typing import Any, Literal, cast
 import typer
 
 from distill_abm.agent_validation import ValidationProfile
+from distill_abm.cli_abm_inputs import (
+    apply_abm_metric_defaults,
+    build_doe_plot_inputs,
+    build_full_case_smoke_input,
+    build_local_qwen_case_input,
+    load_abm_config_for_cli,
+)
 from distill_abm.cli_models import (
     ArtifactDescriptor,
     DescribeAbmResult,
@@ -42,20 +49,17 @@ from distill_abm.pipeline.doe_smoke import (
     CANONICAL_REPETITIONS,
     DoESmokeAbmInput,
     DoESmokeModelSpec,
-    DoESmokePlotInput,
     canonical_prompt_variants,
     canonical_summarization_specs,
 )
 from distill_abm.pipeline.full_case_matrix_smoke import (
     build_full_case_matrix_case_specs,
 )
-from distill_abm.pipeline.full_case_smoke import FullCasePlotInput, FullCaseSmokeInput
 from distill_abm.pipeline.local_qwen_monitor import (
     collect_local_qwen_monitor_snapshot,
     render_local_qwen_monitor,
     stream_local_qwen_monitor,
 )
-from distill_abm.pipeline.local_qwen_sample_smoke import LocalQwenCaseInput
 from distill_abm.pipeline.local_qwen_tuning import LocalQwenTuningResult
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode
 from distill_abm.pipeline.smoke import SmokeSuiteInputs
@@ -102,11 +106,13 @@ def execute_run_command(
 
     scoring_reference_path: Path | None = None
     if abm:
-        abm_config: Any = load_abm_config_fn(Path("configs/abms") / f"{abm}.yaml")
-        metric_pattern = abm_config.metric_pattern
-        metric_description = abm_config.metric_description
-        if plot_description is None and abm_config.plot_descriptions:
-            plot_description = abm_config.plot_descriptions[0]
+        abm_config = load_abm_config_for_cli(abm=abm, load_abm_config_fn=load_abm_config_fn)
+        metric_pattern, metric_description, plot_description = apply_abm_metric_defaults(
+            abm_config=abm_config,
+            metric_pattern=metric_pattern,
+            metric_description=metric_description,
+            plot_description=plot_description,
+        )
         scoring_reference_path = resolve_scoring_reference_path(abm)
 
     adapter: Any = _create_local_ollama_adapter(
@@ -356,11 +362,13 @@ def execute_smoke_qwen_command(
     sweep_plot_descriptions: list[str] | None = None
     scoring_reference_path: Path | None = None
     if abm:
-        abm_config: Any = load_abm_config_fn(Path("configs/abms") / f"{abm}.yaml")
-        metric_pattern = abm_config.metric_pattern
-        metric_description = abm_config.metric_description
-        if plot_description is None and abm_config.plot_descriptions:
-            plot_description = abm_config.plot_descriptions[0]
+        abm_config = load_abm_config_for_cli(abm=abm, load_abm_config_fn=load_abm_config_fn)
+        metric_pattern, metric_description, plot_description = apply_abm_metric_defaults(
+            abm_config=abm_config,
+            metric_pattern=metric_pattern,
+            metric_description=metric_description,
+            plot_description=plot_description,
+        )
         sweep_plot_descriptions = list(abm_config.plot_descriptions)
         scoring_reference_path = resolve_scoring_reference_path(abm)
     selected_cases: Any = select_smoke_cases(case_ids=case_id, max_cases=max_cases, profile=profile)
@@ -457,7 +465,7 @@ def execute_smoke_doe_command(
 
     abm_inputs: dict[str, DoESmokeAbmInput] = {}
     for abm in requested:
-        abm_config: Any = load_abm_config_fn(Path("configs/abms") / f"{abm}.yaml")
+        abm_config = load_abm_config_for_cli(abm=abm, load_abm_config_fn=load_abm_config_fn)
         _ = resolve_model_path(abm=abm, models_root=models_root)
         input_csv_path = viz_root / abm / "simulation.csv"
         parameters_path = ingest_root / abm / "TXT" / "narrative_combined.txt"
@@ -468,31 +476,6 @@ def execute_smoke_doe_command(
             loaded_source = artifact_source_path.read_text(encoding="utf-8").strip()
             if loaded_source in {"simulated", "fallback"}:
                 artifact_source = cast(Literal["simulated", "fallback"], loaded_source)
-        if abm_config.netlogo_viz is None:
-            raise typer.BadParameter(f"missing netlogo_viz config for ABM '{abm}'")
-        plot_specs: list[DoESmokePlotInput] = []
-        plot_config_count = len(abm_config.netlogo_viz.plots)
-        plot_description_count = len(abm_config.plot_descriptions)
-        max_plot_count = max(plot_config_count, plot_description_count)
-        for plot_index in range(1, max_plot_count + 1):
-            reporter_pattern = (
-                abm_config.netlogo_viz.plots[plot_index - 1].reporter_pattern
-                if plot_index <= plot_config_count
-                else "missing-reporter-pattern"
-            )
-            plot_description = (
-                abm_config.plot_descriptions[plot_index - 1]
-                if plot_index <= plot_description_count
-                else "TODO missing plot description"
-            )
-            plot_specs.append(
-                DoESmokePlotInput(
-                    plot_index=plot_index,
-                    reporter_pattern=reporter_pattern,
-                    plot_description=plot_description,
-                    plot_path=viz_root / abm / "plots" / f"{plot_index}.png",
-                )
-            )
         abm_inputs[abm] = DoESmokeAbmInput(
             abm=abm,
             csv_path=input_csv_path,
@@ -500,7 +483,7 @@ def execute_smoke_doe_command(
             documentation_path=documentation_path,
             metric_pattern=abm_config.metric_pattern,
             metric_description=abm_config.metric_description,
-            plots=plot_specs,
+            plots=build_doe_plot_inputs(abm=abm, abm_config=abm_config, viz_root=viz_root),
             source_viz_artifact_source=artifact_source,
         )
 
@@ -582,23 +565,15 @@ def execute_smoke_local_qwen_command(
         if value is not None and value <= 0:
             raise typer.BadParameter(f"{label} must be positive")
 
-    case_inputs: dict[str, LocalQwenCaseInput] = {}
+    case_inputs = {}
     for abm in requested:
-        abm_config: Any = load_abm_config_fn(Path("configs/abms") / f"{abm}.yaml")
+        abm_config = load_abm_config_for_cli(abm=abm, load_abm_config_fn=load_abm_config_fn)
         _ = resolve_model_path(abm=abm, models_root=models_root)
-        if abm_config.netlogo_viz is None or not abm_config.netlogo_viz.plots:
-            raise typer.BadParameter(f"missing netlogo_viz plot config for ABM '{abm}'")
-        if not abm_config.plot_descriptions:
-            raise typer.BadParameter(f"missing plot descriptions for ABM '{abm}'")
-        first_plot = abm_config.netlogo_viz.plots[0]
-        case_inputs[abm] = LocalQwenCaseInput(
+        case_inputs[abm] = build_local_qwen_case_input(
             abm=abm,
-            csv_path=viz_root / abm / "simulation.csv",
-            parameters_path=ingest_root / abm / "TXT" / "narrative_combined.txt",
-            documentation_path=ingest_root / abm / "TXT" / "final_documentation.txt",
-            reporter_pattern=first_plot.reporter_pattern,
-            plot_description=abm_config.plot_descriptions[0],
-            plot_path=viz_root / abm / "plots" / "1.png",
+            abm_config=abm_config,
+            ingest_root=ingest_root,
+            viz_root=viz_root,
         )
 
     adapter: Any = _create_local_ollama_adapter(
@@ -743,31 +718,13 @@ def execute_smoke_full_case_command(
     provider, model = resolve_model_from_registry(models_path, model_id)
     if provider != "openrouter":
         raise typer.BadParameter(f"model id '{model_id}' must resolve to an openrouter model for smoke-full-case.")
-    abm_config: Any = load_abm_config_fn(Path("configs/abms") / f"{abm}.yaml")
+    abm_config = load_abm_config_for_cli(abm=abm, load_abm_config_fn=load_abm_config_fn)
     _ = resolve_model_path(abm=abm, models_root=models_root)
-    if abm_config.netlogo_viz is None or not abm_config.netlogo_viz.plots:
-        raise typer.BadParameter(f"missing netlogo_viz plot config for ABM '{abm}'")
-    if not abm_config.plot_descriptions:
-        raise typer.BadParameter(f"missing plot descriptions for ABM '{abm}'")
-    if len(abm_config.netlogo_viz.plots) != len(abm_config.plot_descriptions):
-        raise typer.BadParameter(f"plot config and plot descriptions count mismatch for ABM '{abm}'")
-    case_input = FullCaseSmokeInput(
+    case_input = build_full_case_smoke_input(
         abm=abm,
-        csv_path=viz_root / abm / "simulation.csv",
-        parameters_path=ingest_root / abm / "TXT" / "narrative_combined.txt",
-        documentation_path=ingest_root / abm / "TXT" / "final_documentation.txt",
-        plots=tuple(
-            FullCasePlotInput(
-                plot_index=index,
-                reporter_pattern=plot_cfg.reporter_pattern,
-                plot_description=plot_description,
-                plot_path=viz_root / abm / "plots" / f"{index}.png",
-            )
-            for index, (plot_cfg, plot_description) in enumerate(
-                zip(abm_config.netlogo_viz.plots, abm_config.plot_descriptions, strict=True),
-                start=1,
-            )
-        ),
+        abm_config=abm_config,
+        ingest_root=ingest_root,
+        viz_root=viz_root,
     )
     adapter: Any = _create_local_ollama_adapter(
         create_adapter_fn=create_adapter_fn,
@@ -828,31 +785,13 @@ def execute_smoke_full_case_matrix_command(
         raise typer.BadParameter(
             f"model id '{model_id}' must resolve to an openrouter model for smoke-full-case-matrix."
         )
-    abm_config: Any = load_abm_config_fn(Path("configs/abms") / f"{abm}.yaml")
+    abm_config = load_abm_config_for_cli(abm=abm, load_abm_config_fn=load_abm_config_fn)
     _ = resolve_model_path(abm=abm, models_root=models_root)
-    if abm_config.netlogo_viz is None or not abm_config.netlogo_viz.plots:
-        raise typer.BadParameter(f"missing netlogo_viz plot config for ABM '{abm}'")
-    if not abm_config.plot_descriptions:
-        raise typer.BadParameter(f"missing plot descriptions for ABM '{abm}'")
-    if len(abm_config.netlogo_viz.plots) != len(abm_config.plot_descriptions):
-        raise typer.BadParameter(f"plot config and plot descriptions count mismatch for ABM '{abm}'")
-    case_input = FullCaseSmokeInput(
+    case_input = build_full_case_smoke_input(
         abm=abm,
-        csv_path=viz_root / abm / "simulation.csv",
-        parameters_path=ingest_root / abm / "TXT" / "narrative_combined.txt",
-        documentation_path=ingest_root / abm / "TXT" / "final_documentation.txt",
-        plots=tuple(
-            FullCasePlotInput(
-                plot_index=index,
-                reporter_pattern=plot_cfg.reporter_pattern,
-                plot_description=plot_description,
-                plot_path=viz_root / abm / "plots" / f"{index}.png",
-            )
-            for index, (plot_cfg, plot_description) in enumerate(
-                zip(abm_config.netlogo_viz.plots, abm_config.plot_descriptions, strict=True),
-                start=1,
-            )
-        ),
+        abm_config=abm_config,
+        ingest_root=ingest_root,
+        viz_root=viz_root,
     )
     adapter: Any = _create_local_ollama_adapter(
         create_adapter_fn=create_adapter_fn,
@@ -922,23 +861,15 @@ def execute_tune_local_qwen_command(
     resolved_max_tokens_candidates = tuple(sorted(set(max_tokens_candidates or [1024, 2048, 4096, 8192, 16384])))
     if any(item <= 0 for item in resolved_max_tokens_candidates):
         raise typer.BadParameter("--max-tokens values must be positive")
-    case_inputs: dict[str, LocalQwenCaseInput] = {}
+    case_inputs = {}
     for abm in requested:
-        abm_config: Any = load_abm_config_fn(Path("configs/abms") / f"{abm}.yaml")
+        abm_config = load_abm_config_for_cli(abm=abm, load_abm_config_fn=load_abm_config_fn)
         _ = resolve_model_path(abm=abm, models_root=models_root)
-        if abm_config.netlogo_viz is None or not abm_config.netlogo_viz.plots:
-            raise typer.BadParameter(f"missing netlogo_viz plot config for ABM '{abm}'")
-        if not abm_config.plot_descriptions:
-            raise typer.BadParameter(f"missing plot descriptions for ABM '{abm}'")
-        first_plot = abm_config.netlogo_viz.plots[0]
-        case_inputs[abm] = LocalQwenCaseInput(
+        case_inputs[abm] = build_local_qwen_case_input(
             abm=abm,
-            csv_path=viz_root / abm / "simulation.csv",
-            parameters_path=ingest_root / abm / "TXT" / "narrative_combined.txt",
-            documentation_path=ingest_root / abm / "TXT" / "final_documentation.txt",
-            reporter_pattern=first_plot.reporter_pattern,
-            plot_description=abm_config.plot_descriptions[0],
-            plot_path=viz_root / abm / "plots" / "1.png",
+            abm_config=abm_config,
+            ingest_root=ingest_root,
+            viz_root=viz_root,
         )
 
     adapter: Any = _create_local_ollama_adapter(
