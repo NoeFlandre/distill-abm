@@ -6,8 +6,11 @@ from pathlib import Path
 
 from distill_abm.llm.adapters.base import LLMAdapter, LLMResponse
 from distill_abm.pipeline.full_case_matrix_smoke import (
+    DEFAULT_MATRIX_PASS_WAIT_SECONDS,
+    FullCaseMatrixCaseResult,
     FullCaseMatrixCaseSpec,
     build_full_case_matrix_case_specs,
+    compute_matrix_retry_wait_seconds,
     run_full_case_matrix_smoke,
 )
 from distill_abm.pipeline.full_case_smoke import (
@@ -394,3 +397,22 @@ def test_run_full_case_matrix_smoke_retries_failed_case_in_same_invocation(tmp_p
         encoding="utf-8"
     )
     assert trend_output == "response-3"
+
+
+def test_compute_matrix_retry_wait_seconds_uses_transient_failures() -> None:
+    wait_seconds = compute_matrix_retry_wait_seconds(
+        [
+            FullCaseMatrixCaseResult(
+                case_id="01",
+                abm="grazing",
+                evidence_mode="plot",
+                prompt_variant="none",
+                repetition=1,
+                case_dir=Path("/tmp/case"),
+                success=False,
+                error="circuit open for openrouter:model; retry after 59.0s",
+            )
+        ]
+    )
+
+    assert wait_seconds == DEFAULT_MATRIX_PASS_WAIT_SECONDS
