@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import shutil
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -12,6 +13,7 @@ import pandas as pd
 from pydantic import BaseModel, Field
 
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError
+from distill_abm.llm.resilience import CIRCUIT_BREAKER_OPEN_SECONDS, is_transient_provider_error
 from distill_abm.pipeline.doe_smoke_prompts import build_legacy_doe_context_prompt, build_legacy_doe_trend_prompt
 from distill_abm.pipeline.full_case_smoke import (
     EvidenceMode,
@@ -102,6 +104,7 @@ class _CachedContext(BaseModel):
 
 
 DEFAULT_MAX_CASE_ATTEMPTS = 3
+DEFAULT_MATRIX_PASS_WAIT_SECONDS = CIRCUIT_BREAKER_OPEN_SECONDS
 
 
 def build_full_case_matrix_case_specs(
@@ -184,6 +187,9 @@ def run_full_case_matrix_smoke(
                 next_remaining.append(case)
         if not next_remaining:
             break
+        wait_seconds = compute_matrix_retry_wait_seconds([case_results_by_id[case.case_id] for case in next_remaining])
+        if wait_seconds > 0:
+            time.sleep(wait_seconds)
         remaining_cases = next_remaining
 
     case_results = [case_results_by_id[case.case_id] for case in cases]
@@ -617,3 +623,13 @@ def _render_report(result: FullCaseMatrixSmokeResult) -> str:
             f"{str(case.success).lower()} | {str(case.resumed_from_existing).lower()} |"
         )
     return "\n".join(lines) + "\n"
+
+
+def compute_matrix_retry_wait_seconds(case_results: list[FullCaseMatrixCaseResult]) -> float:
+    """Return how long to wait before another failed-case pass."""
+    for case_result in case_results:
+        if case_result.error and (
+            is_transient_provider_error(case_result.error) or "circuit open" in case_result.error.lower()
+        ):
+            return DEFAULT_MATRIX_PASS_WAIT_SECONDS
+    return 0.0
