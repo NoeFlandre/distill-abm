@@ -400,6 +400,7 @@ def smoke_qwen(
         typer.Option(
             "--case-id",
             help="Optional smoke case id filter. Repeat this option to run a subset of the matrix.",
+            shell_complete=False,  # Disable shell completion to avoid early validation errors
         ),
     ] = None,
     max_cases: Annotated[
