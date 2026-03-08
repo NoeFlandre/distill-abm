@@ -167,11 +167,20 @@ def legacy_plot_description_for_evidence_mode(*, plot_description: str, evidence
     if evidence_mode == "plot":
         return stripped
     if evidence_mode == "table":
-        return stripped.replace("The attachment is the plot representing", "The data table represents", 1)
+        return (
+            stripped.replace("The attachment is the plot representing", "The data table represents", 1)
+            .replace("This plot represents", "This data table represents", 1)
+        )
     if evidence_mode == "plot+table":
-        return stripped.replace(
-            "The attachment is the plot representing",
-            "The attachment includes the plot, and the data table represents",
-            1,
+        return (
+            stripped.replace(
+                "The attachment is the plot representing",
+                "The attachment includes the plot, and the data table represents",
+                1,
+            ).replace(
+                "This plot represents",
+                "This plot and data table represent",
+                1,
+            )
         )
     raise ValueError(f"unsupported DOE evidence mode: {evidence_mode}")

@@ -30,6 +30,18 @@ class FakeAdapter(LLMAdapter):
             raw={"ok": True, "message": {"thinking": f"thinking-{len(self.requests)}"}},
         )
 
+    @property
+    def context_request_count(self) -> int:
+        return sum(
+            1
+            for request in self.requests
+            if "Your goal is to explain an agent-based model." in request.user_prompt()
+        )
+
+    @property
+    def trend_request_count(self) -> int:
+        return sum(1 for request in self.requests if "We have a " in request.user_prompt())
+
 
 class ThinkingOnlyAdapter(LLMAdapter):
     provider = "ollama"
@@ -410,3 +422,40 @@ def test_run_local_qwen_sample_smoke_flags_generic_unavailable_output_as_failure
     error_path = result.cases[0].case_dir / "03_outputs" / "error.txt"
     assert error_path.exists()
     assert "generic unavailable" in error_path.read_text(encoding="utf-8").lower()
+
+
+def test_run_local_qwen_sample_smoke_reuses_context_outputs_for_same_abm_and_role_state(tmp_path: Path) -> None:
+    adapter = FakeAdapter()
+    case_input = _write_case_input(tmp_path)
+    result = run_local_qwen_sample_smoke(
+        case_inputs={"milk_consumption": case_input},
+        adapter=adapter,
+        model="qwen3.5:0.8b",
+        output_root=tmp_path / "smoke",
+        cases=(
+            LocalQwenSampleCase(
+                case_id="milk_role_plot_case",
+                abm="milk_consumption",
+                evidence_mode="plot",
+                prompt_variant="role",
+            ),
+            LocalQwenSampleCase(
+                case_id="milk_role_table_case",
+                abm="milk_consumption",
+                evidence_mode="table",
+                prompt_variant="role",
+            ),
+        ),
+    )
+
+    assert result.success is True
+    assert adapter.context_request_count == 1
+    assert adapter.trend_request_count == 2
+    first_context = (
+        result.cases[0].case_dir / "03_outputs" / "context_output.txt"
+    ).read_text(encoding="utf-8")
+    second_context = (
+        result.cases[1].case_dir / "03_outputs" / "context_output.txt"
+    ).read_text(encoding="utf-8")
+    assert first_context == "response-1"
+    assert second_context == "response-1"

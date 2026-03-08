@@ -16,6 +16,7 @@ from distill_abm.pipeline.doe_smoke import (
     canonical_summarization_specs,
     run_doe_smoke_suite,
 )
+from distill_abm.pipeline.doe_smoke_prompts import legacy_plot_description_for_evidence_mode
 
 
 def _write_case_inputs(tmp_path: Path) -> DoESmokeAbmInput:
@@ -219,6 +220,17 @@ def test_run_doe_smoke_suite_adapts_plot_and_table_prompt_wording_to_combined_ev
         "of whole milk per agent."
         in trend_prompt
     )
+
+
+def test_legacy_plot_description_for_evidence_mode_rewrites_plot_only_language_for_table() -> None:
+    rewritten = legacy_plot_description_for_evidence_mode(
+        plot_description=(
+            "This plot represents the average initial risk attitude of all social learning agents."
+        ),
+        evidence_mode="table",
+    )
+
+    assert rewritten == "This data table represents the average initial risk attitude of all social learning agents."
 
 
 def test_run_doe_smoke_suite_flags_placeholder_inputs(tmp_path: Path) -> None:
