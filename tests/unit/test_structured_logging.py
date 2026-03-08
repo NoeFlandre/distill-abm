@@ -4,7 +4,9 @@ import json
 import logging
 from pathlib import Path
 
-from distill_abm.structured_logging import JsonLogFormatter, attach_json_log_file, get_logger
+import pytest
+
+from distill_abm.structured_logging import JsonLogFormatter, attach_json_log_file, get_logger, log_event
 
 
 def test_json_log_formatter_includes_event_data() -> None:
@@ -23,6 +25,7 @@ def test_json_log_formatter_includes_event_data() -> None:
     payload = json.loads(formatter.format(record))
 
     assert payload["level"] == "INFO"
+    assert payload["event"] == "hello"
     assert payload["logger"] == "distill_abm.test"
     assert payload["message"] == "hello"
     assert payload["provider"] == "ollama"
@@ -37,5 +40,18 @@ def test_attach_json_log_file_writes_json_lines(tmp_path: Path) -> None:
     contents = log_path.read_text(encoding="utf-8").strip().splitlines()
     assert contents
     payload = json.loads(contents[-1])
+    assert payload["event"] == "smoke_event"
     assert payload["message"] == "smoke_event"
     assert payload["case_id"] == "case-1"
+
+
+def test_log_event_writes_named_event_field(caplog: pytest.LogCaptureFixture) -> None:
+    logger = get_logger("distill_abm.test.event")
+
+    with caplog.at_level(logging.INFO):
+        log_event(logger, "retry_scheduled", provider="openrouter", attempt=2)
+
+    payload = json.loads(JsonLogFormatter().format(caplog.records[-1]))
+    assert payload["event"] == "retry_scheduled"
+    assert payload["provider"] == "openrouter"
+    assert payload["attempt"] == 2
