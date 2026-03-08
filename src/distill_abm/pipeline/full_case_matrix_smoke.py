@@ -29,11 +29,13 @@ from distill_abm.pipeline.full_case_smoke import (
     _validate_full_case_inputs,
 )
 from distill_abm.pipeline.helpers import encode_image
-from distill_abm.pipeline.local_qwen_sample_smoke import (
+from distill_abm.pipeline.local_qwen_sample_response import (
     StructuredSmokeResponseError,
+    looks_like_context_overflow,
+)
+from distill_abm.pipeline.local_qwen_sample_smoke import (
     _context_cache_key,
     _invoke_structured_smoke_text,
-    _looks_like_context_overflow,
     _materialize_context_artifacts,
     _write_json,
     _write_optional_thinking,
@@ -458,11 +460,11 @@ def _run_trend_with_fitting_table(
                 request_metadata={"table_downsample_stride": stride},
             )
         except StructuredSmokeResponseError as exc:
-            if case.evidence_mode not in {"table", "plot+table"} or not _looks_like_context_overflow(str(exc)):
+            if case.evidence_mode not in {"table", "plot+table"} or not looks_like_context_overflow(str(exc)):
                 raise
             last_exc = exc
         except LLMProviderError as exc:
-            if case.evidence_mode not in {"table", "plot+table"} or not _looks_like_context_overflow(str(exc)):
+            if case.evidence_mode not in {"table", "plot+table"} or not looks_like_context_overflow(str(exc)):
                 raise
             last_exc = StructuredSmokeResponseError(
                 str(exc),

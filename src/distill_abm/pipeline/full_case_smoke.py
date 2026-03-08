@@ -18,8 +18,8 @@ from distill_abm.pipeline.doe_smoke_prompts import (
     build_raw_table_csv,
 )
 from distill_abm.pipeline.helpers import encode_image
+from distill_abm.pipeline.local_qwen_sample_response import StructuredSmokeResponseError
 from distill_abm.pipeline.local_qwen_sample_smoke import (
-    StructuredSmokeResponseError,
     _invoke_structured_smoke_text,
     _validate_case_inputs,
     _write_json,

@@ -19,11 +19,11 @@ from distill_abm.pipeline.doe_smoke_prompts import (
     build_legacy_doe_trend_prompt,
     build_raw_table_csv,
 )
+from distill_abm.pipeline.local_qwen_sample_response import StructuredSmokeText
 from distill_abm.pipeline.local_qwen_sample_smoke import (
     LocalQwenCaseInput,
     LocalQwenSampleCase,
     LocalQwenSampleSmokeResult,
-    StructuredSmokeText,
     default_local_qwen_sample_cases,
     run_local_qwen_sample_smoke,
 )
