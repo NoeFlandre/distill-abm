@@ -95,6 +95,65 @@ class FailFirstThenCountAdapter(LLMAdapter):
         )
 
 
+class ContextOverflowThenSuccessAdapter(LLMAdapter):
+    provider = "openrouter"
+
+    def __init__(self) -> None:
+        self.requests: list[LLMRequest] = []
+
+    def complete(self, request: LLMRequest) -> LLMResponse:
+        self.requests.append(request)
+        if len(self.requests) == 1:
+            return LLMResponse(
+                provider=self.provider,
+                model=request.model,
+                text=json.dumps({"response_text": "context-ok"}),
+                raw={"choices": [{"message": {"content": '{"response_text":"context-ok"}'}, "finish_reason": "stop"}]},
+            )
+        if request.metadata.get("table_downsample_stride") == 1:
+            raise ValueError(
+                "This model's maximum context length is 131072 tokens. "
+                "Your request has too many input tokens."
+            )
+        return LLMResponse(
+            provider=self.provider,
+            model=request.model,
+            text=json.dumps({"response_text": "trend-ok"}),
+            raw={"choices": [{"message": {"content": '{"response_text":"trend-ok"}'}, "finish_reason": "stop"}]},
+        )
+
+
+class GenericUnavailableAdapter(LLMAdapter):
+    provider = "openrouter"
+
+    def __init__(self) -> None:
+        self.requests: list[LLMRequest] = []
+
+    def complete(self, request: LLMRequest) -> LLMResponse:
+        self.requests.append(request)
+        if len(self.requests) == 1:
+            return LLMResponse(
+                provider=self.provider,
+                model=request.model,
+                text=json.dumps({"response_text": "context-ok"}),
+                raw={"choices": [{"message": {"content": '{"response_text":"context-ok"}'}, "finish_reason": "stop"}]},
+            )
+        return LLMResponse(
+            provider=self.provider,
+            model=request.model,
+            text=json.dumps(
+                {
+                    "response_text": (
+                        "The analysis is currently unavailable. "
+                        "The requested information cannot be retrieved or interpreted at this time. "
+                        "Please try again later or consult additional resources for further details."
+                    )
+                }
+            ),
+            raw={"choices": [{"message": {"content": "unavailable"}, "finish_reason": "stop"}]},
+        )
+
+
 def _write_case_input(tmp_path: Path) -> LocalQwenCaseInput:
     csv_path = tmp_path / "simulation.csv"
     pd.DataFrame(
@@ -200,7 +259,7 @@ def test_run_local_qwen_sample_smoke_resume_reuses_successful_case(tmp_path: Pat
         prompt_variant="none",
     )
     output_root = tmp_path / "smoke"
-    run_local_qwen_sample_smoke(
+    first_result = run_local_qwen_sample_smoke(
         case_inputs={"milk_consumption": _write_case_input(tmp_path)},
         adapter=adapter,
         model="qwen3.5:0.8b",
@@ -220,6 +279,9 @@ def test_run_local_qwen_sample_smoke_resume_reuses_successful_case(tmp_path: Pat
 
     assert resumed.success is True
     assert resumed.cases[0].resumed_from_existing is True
+    assert resumed.output_root != first_result.output_root
+    assert resumed.cases[0].case_dir != first_result.cases[0].case_dir
+    assert (output_root / "latest_run.txt").read_text(encoding="utf-8").strip() == str(resumed.output_root)
     assert resumed_adapter.requests == []
 
 
@@ -300,3 +362,51 @@ def test_run_local_qwen_sample_smoke_can_stop_after_first_failure(tmp_path: Path
     assert len(result.cases) == 1
     assert result.failed_case_ids == ["milk_plot_case_1"]
     assert len(adapter.requests) == 1
+
+
+def test_run_local_qwen_sample_smoke_downsamples_table_when_prompt_too_large(tmp_path: Path) -> None:
+    adapter = ContextOverflowThenSuccessAdapter()
+    result = run_local_qwen_sample_smoke(
+        case_inputs={"milk_consumption": _write_case_input(tmp_path)},
+        adapter=adapter,
+        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        output_root=tmp_path / "smoke",
+        cases=(
+            LocalQwenSampleCase(
+                case_id="milk_table_case",
+                abm="milk_consumption",
+                evidence_mode="table",
+                prompt_variant="none",
+            ),
+        ),
+        max_retries=0,
+    )
+
+    assert result.success is True
+    assert len(adapter.requests) == 3
+    assert adapter.requests[2].metadata["table_downsample_stride"] == 2
+    table_csv = (result.cases[0].case_dir / "01_inputs" / "trend_evidence_table.csv").read_text(encoding="utf-8")
+    assert "1;11.0" not in table_csv
+
+
+def test_run_local_qwen_sample_smoke_flags_generic_unavailable_output_as_failure(tmp_path: Path) -> None:
+    result = run_local_qwen_sample_smoke(
+        case_inputs={"milk_consumption": _write_case_input(tmp_path)},
+        adapter=GenericUnavailableAdapter(),
+        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        output_root=tmp_path / "smoke",
+        cases=(
+            LocalQwenSampleCase(
+                case_id="milk_plot_case",
+                abm="milk_consumption",
+                evidence_mode="plot",
+                prompt_variant="none",
+            ),
+        ),
+    )
+
+    assert result.success is False
+    assert result.failed_case_ids == ["milk_plot_case"]
+    error_path = result.cases[0].case_dir / "03_outputs" / "error.txt"
+    assert error_path.exists()
+    assert "generic unavailable" in error_path.read_text(encoding="utf-8").lower()
