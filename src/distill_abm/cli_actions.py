@@ -635,11 +635,16 @@ def execute_monitor_local_qwen_command(
     watch: bool,
     interval_seconds: float,
     json_output: bool,
+    exit_when_terminal: bool = False,
 ) -> None:
     if watch:
         if json_output:
             raise typer.BadParameter("--json cannot be used together with --watch")
-        stream_local_qwen_monitor(output_root=output_root, interval_seconds=interval_seconds)
+        stream_local_qwen_monitor(
+            output_root=output_root,
+            interval_seconds=interval_seconds,
+            exit_when_terminal=exit_when_terminal,
+        )
         return
 
     snapshot = collect_local_qwen_monitor_snapshot(output_root)
