@@ -44,6 +44,7 @@ from distill_abm.cli_defaults import (
     resolve_full_case_matrix_repetitions,
 )
 from distill_abm.cli_policy import validate_benchmark_model_policy
+from distill_abm.cli_quality_gate import QualityGateScope, resolve_quality_gate_selection
 from distill_abm.cli_support import (
     BENCHMARK_MODELS,
     assert_ollama_model_available,
@@ -94,6 +95,7 @@ __all__ = [
     "ingest_netlogo_suite",
     "main",
     "monitor_local_qwen",
+    "quality_gate",
     "render_run_viewer",
     "run",
     "smoke_doe",
@@ -1067,6 +1069,67 @@ def validate_workspace(
         models_root=models_root,
         ingest_stage=ingest_stage,
         profile=profile,
+        output_root=output_root,
+        json_output=json_output,
+        run_validation_suite_fn=run_validation_suite,
+    )
+
+
+@app.command("quality-gate")
+def quality_gate(
+    scope: Annotated[
+        QualityGateScope,
+        typer.Option(help="Convenience validation scope: static, pre-llm, or full."),
+    ] = "full",
+    checks: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--check",
+            help="Optional validation check filter. Overrides the scope default when provided.",
+        ),
+    ] = None,
+    abms: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--abm",
+            help="ABM names to process for the smoke-ingest-netlogo validation step. Defaults to all configured ABMs.",
+        ),
+    ] = None,
+    models_root: Annotated[
+        Path,
+        typer.Option(
+            help="Root directory containing ABM models for the smoke-ingest-netlogo validation step.",
+        ),
+    ] = Path("data"),
+    ingest_stage: Annotated[
+        list[str] | None,
+        typer.Option("--ingest-stage", help="Optional ingest stage filter for the smoke-ingest-netlogo check."),
+    ] = None,
+    profile: Annotated[
+        ValidationProfile | None,
+        typer.Option(help="Optional explicit validation profile override."),
+    ] = None,
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for structured validation reports and nested artifacts."),
+    ] = Path("results/agent_validation/latest"),
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Print the full validation report JSON to stdout."),
+    ] = False,
+) -> None:
+    """Run the canonical validation command with a scope-oriented convenience wrapper."""
+    selection = resolve_quality_gate_selection(
+        scope=scope,
+        explicit_checks=checks,
+        explicit_profile=profile,
+    )
+    execute_validate_workspace_command(
+        checks=selection.checks,
+        abms=abms,
+        models_root=models_root,
+        ingest_stage=ingest_stage,
+        profile=selection.profile,
         output_root=output_root,
         json_output=json_output,
         run_validation_suite_fn=run_validation_suite,
