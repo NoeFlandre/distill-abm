@@ -28,53 +28,16 @@ def resolve_run_root(path: Path) -> Path:
 
 
 def _build_viewer_payload(run_root: Path) -> dict[str, Any]:
-    report_path = run_root / "smoke_local_qwen_report.json"
+    report_path = _resolve_report_path(run_root)
     report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.exists() else {}
     run_log_path = run_root / "run.log.jsonl"
     cases_root = run_root / "cases"
     cases = []
     for case_dir in sorted(path for path in cases_root.iterdir() if path.is_dir()):
-        case_summary = _read_optional_json(case_dir / "00_case_summary.json")
-        inputs_dir = case_dir / "01_inputs"
-        requests_dir = case_dir / "02_requests"
-        outputs_dir = case_dir / "03_outputs"
-        cases.append(
-            {
-                "case_id": case_summary.get("case_id", case_dir.name),
-                "abm": case_summary.get("abm", ""),
-                "evidence_mode": case_summary.get("evidence_mode", ""),
-                "prompt_variant": case_summary.get("prompt_variant", ""),
-                "model": case_summary.get("model", ""),
-                "resumed_from_existing": _lookup_resumed_flag(
-                    report=report,
-                    case_id=case_summary.get("case_id", case_dir.name),
-                ),
-                "success": not (outputs_dir / "error.txt").exists(),
-                "error_text": _read_optional_text(outputs_dir / "error.txt"),
-                "paths": {
-                    "case_dir": _relative_path(run_root, case_dir),
-                    "context_prompt": _relative_path(run_root, inputs_dir / "context_prompt.txt"),
-                    "documentation": _relative_path(run_root, inputs_dir / "documentation.txt"),
-                    "parameters": _relative_path(run_root, inputs_dir / "parameters.txt"),
-                    "trend_prompt": _relative_path(run_root, inputs_dir / "trend_prompt.txt"),
-                    "table_csv": _relative_path(run_root, inputs_dir / "trend_evidence_table.csv"),
-                    "image": _relative_path(run_root, inputs_dir / "trend_evidence_plot.png"),
-                    "context_output": _relative_path(run_root, outputs_dir / "context_output.txt"),
-                    "trend_output": _relative_path(run_root, outputs_dir / "trend_output.txt"),
-                    "hyperparameters": _relative_path(run_root, requests_dir / "hyperparameters.json"),
-                    "context_trace": _relative_path(run_root, outputs_dir / "context_trace.json"),
-                    "trend_trace": _relative_path(run_root, outputs_dir / "trend_trace.json"),
-                },
-                "context_prompt_text": _read_optional_text(inputs_dir / "context_prompt.txt"),
-                "documentation_text": _read_optional_text(inputs_dir / "documentation.txt"),
-                "parameters_text": _read_optional_text(inputs_dir / "parameters.txt"),
-                "trend_prompt_text": _read_optional_text(inputs_dir / "trend_prompt.txt"),
-                "table_csv_text": _read_optional_text(inputs_dir / "trend_evidence_table.csv"),
-                "context_output_text": _read_optional_text(outputs_dir / "context_output.txt"),
-                "trend_output_text": _read_optional_text(outputs_dir / "trend_output.txt"),
-                "hyperparameters_text": _read_optional_text(requests_dir / "hyperparameters.json"),
-            }
-        )
+        if (case_dir / "03_outputs").exists():
+            cases.append(_build_sample_case_payload(run_root=run_root, report=report, case_dir=case_dir))
+        elif (case_dir / "03_trends").exists():
+            cases.append(_build_full_case_payload(run_root=run_root, report=report, case_dir=case_dir))
     return {
         "run_root": str(run_root),
         "report_path": str(report_path) if report_path.exists() else "",
@@ -84,6 +47,113 @@ def _build_viewer_payload(run_root: Path) -> dict[str, Any]:
         "started_at_utc": report.get("started_at_utc", ""),
         "finished_at_utc": report.get("finished_at_utc", ""),
         "cases": cases,
+    }
+
+
+def _resolve_report_path(run_root: Path) -> Path:
+    for name in ("smoke_local_qwen_report.json", "smoke_full_case_matrix_report.json"):
+        candidate = run_root / name
+        if candidate.exists():
+            return candidate
+    return run_root / "smoke_local_qwen_report.json"
+
+
+def _build_sample_case_payload(*, run_root: Path, report: dict[str, Any], case_dir: Path) -> dict[str, Any]:
+    case_summary = _read_optional_json(case_dir / "00_case_summary.json")
+    inputs_dir = case_dir / "01_inputs"
+    requests_dir = case_dir / "02_requests"
+    outputs_dir = case_dir / "03_outputs"
+    return {
+        "case_id": case_summary.get("case_id", case_dir.name),
+        "abm": case_summary.get("abm", ""),
+        "evidence_mode": case_summary.get("evidence_mode", ""),
+        "prompt_variant": case_summary.get("prompt_variant", ""),
+        "model": case_summary.get("model", ""),
+        "resumed_from_existing": _lookup_resumed_flag(
+            report=report,
+            case_id=case_summary.get("case_id", case_dir.name),
+        ),
+        "success": not (outputs_dir / "error.txt").exists(),
+        "error_text": _read_optional_text(outputs_dir / "error.txt"),
+        "paths": {
+            "case_dir": _relative_path(run_root, case_dir),
+            "context_prompt": _relative_path(run_root, inputs_dir / "context_prompt.txt"),
+            "documentation": _relative_path(run_root, inputs_dir / "documentation.txt"),
+            "parameters": _relative_path(run_root, inputs_dir / "parameters.txt"),
+            "trend_prompt": _relative_path(run_root, inputs_dir / "trend_prompt.txt"),
+            "table_csv": _relative_path(run_root, inputs_dir / "trend_evidence_table.csv"),
+            "image": _relative_path(run_root, inputs_dir / "trend_evidence_plot.png"),
+            "context_output": _relative_path(run_root, outputs_dir / "context_output.txt"),
+            "trend_output": _relative_path(run_root, outputs_dir / "trend_output.txt"),
+            "hyperparameters": _relative_path(run_root, requests_dir / "hyperparameters.json"),
+            "context_trace": _relative_path(run_root, outputs_dir / "context_trace.json"),
+            "trend_trace": _relative_path(run_root, outputs_dir / "trend_trace.json"),
+        },
+        "context_prompt_text": _read_optional_text(inputs_dir / "context_prompt.txt"),
+        "documentation_text": _read_optional_text(inputs_dir / "documentation.txt"),
+        "parameters_text": _read_optional_text(inputs_dir / "parameters.txt"),
+        "trend_prompt_text": _read_optional_text(inputs_dir / "trend_prompt.txt"),
+        "table_csv_text": _read_optional_text(inputs_dir / "trend_evidence_table.csv"),
+        "context_output_text": _read_optional_text(outputs_dir / "context_output.txt"),
+        "trend_output_text": _read_optional_text(outputs_dir / "trend_output.txt"),
+        "hyperparameters_text": _read_optional_text(requests_dir / "hyperparameters.json"),
+        "trends": [],
+    }
+
+
+def _build_full_case_payload(*, run_root: Path, report: dict[str, Any], case_dir: Path) -> dict[str, Any]:
+    case_summary = _read_optional_json(case_dir / "00_case_summary.json")
+    inputs_dir = case_dir / "01_inputs"
+    context_dir = case_dir / "02_context"
+    trends_root = case_dir / "03_trends"
+    trend_entries = []
+    for trend_dir in sorted(path for path in trends_root.iterdir() if path.is_dir()):
+        trend_entries.append(
+            {
+                "plot_id": trend_dir.name,
+                "trend_prompt_path": _relative_path(run_root, trend_dir / "trend_prompt.txt"),
+                "trend_prompt_text": _read_optional_text(trend_dir / "trend_prompt.txt"),
+                "trend_output_path": _relative_path(run_root, trend_dir / "trend_output.txt"),
+                "trend_output_text": _read_optional_text(trend_dir / "trend_output.txt"),
+                "table_csv_path": _relative_path(run_root, trend_dir / "trend_evidence_table.csv"),
+                "table_csv_text": _read_optional_text(trend_dir / "trend_evidence_table.csv"),
+                "image_path": _relative_path(run_root, trend_dir / "trend_evidence_plot.png"),
+                "trend_trace_path": _relative_path(run_root, trend_dir / "trend_trace.json"),
+                "error_text": _read_optional_text(trend_dir / "error.txt"),
+            }
+        )
+    success = not (context_dir / "error.txt").exists() and all(not item["error_text"] for item in trend_entries)
+    return {
+        "case_id": case_summary.get("case_id", case_dir.name),
+        "abm": case_summary.get("abm", ""),
+        "evidence_mode": case_summary.get("evidence_mode", ""),
+        "prompt_variant": case_summary.get("prompt_variant", ""),
+        "model": case_summary.get("model", ""),
+        "resumed_from_existing": _lookup_resumed_flag(
+            report=report,
+            case_id=case_summary.get("case_id", case_dir.name),
+        ),
+        "success": success,
+        "error_text": _read_optional_text(context_dir / "error.txt"),
+        "paths": {
+            "case_dir": _relative_path(run_root, case_dir),
+            "context_prompt": _relative_path(run_root, inputs_dir / "context_prompt.txt"),
+            "documentation": _relative_path(run_root, inputs_dir / "documentation.txt"),
+            "parameters": _relative_path(run_root, inputs_dir / "parameters.txt"),
+            "context_output": _relative_path(run_root, context_dir / "context_output.txt"),
+            "context_trace": _relative_path(run_root, context_dir / "context_trace.json"),
+            "review_csv": _relative_path(run_root, case_dir / "review.csv"),
+            "validation_state": _relative_path(run_root, case_dir / "validation_state.json"),
+        },
+        "context_prompt_text": _read_optional_text(inputs_dir / "context_prompt.txt"),
+        "documentation_text": _read_optional_text(inputs_dir / "documentation.txt"),
+        "parameters_text": _read_optional_text(inputs_dir / "parameters.txt"),
+        "trend_prompt_text": "",
+        "table_csv_text": "",
+        "context_output_text": _read_optional_text(context_dir / "context_output.txt"),
+        "trend_output_text": "",
+        "hyperparameters_text": "",
+        "trends": trend_entries,
     }
 
 
@@ -434,18 +504,35 @@ def _render_html(payload: dict[str, Any]) -> str:
             ${textCard("Documentation", item.paths.documentation, item.documentation_text)}
             ${textCard("Context Prompt", item.paths.context_prompt, item.context_prompt_text)}
             ${textCard("Context Output", item.paths.context_output, item.context_output_text)}
-            ${textCard("Trend Prompt", item.paths.trend_prompt, item.trend_prompt_text)}
-            ${textCard("Trend Output", item.paths.trend_output, item.trend_output_text)}
-            ${textCard("Hyperparameters", item.paths.hyperparameters, item.hyperparameters_text)}
-            ${textCard("Evidence Table", item.paths.table_csv, item.table_csv_text)}
+            ${item.trends && item.trends.length
+              ? textCard("Validation State", item.paths.validation_state, "")
+              : textCard("Trend Prompt", item.paths.trend_prompt, item.trend_prompt_text)}
+            ${item.trends && item.trends.length
+              ? textCard("Case Review CSV", item.paths.review_csv, "")
+              : textCard("Trend Output", item.paths.trend_output, item.trend_output_text)}
+            ${item.trends && item.trends.length
+              ? ""
+              : textCard("Hyperparameters", item.paths.hyperparameters, item.hyperparameters_text)}
+            ${item.trends && item.trends.length
+              ? ""
+              : textCard("Evidence Table", item.paths.table_csv, item.table_csv_text)}
           </div>
           <div class="detail-grid">
-            ${imageCard("Evidence Plot", item.paths.image)}
-            ${linkCard("Trace Files", [
-              ["context trace", item.paths.context_trace],
-              ["trend trace", item.paths.trend_trace]
-            ])}
+            ${item.trends && item.trends.length
+              ? textCard("Trace Files", item.paths.context_trace, "")
+              : imageCard("Evidence Plot", item.paths.image)}
+            ${item.trends && item.trends.length
+              ? linkCard("Case Files", [
+                  ["context trace", item.paths.context_trace],
+                  ["review csv", item.paths.review_csv],
+                  ["validation state", item.paths.validation_state]
+                ])
+              : linkCard("Trace Files", [
+                  ["context trace", item.paths.context_trace],
+                  ["trend trace", item.paths.trend_trace]
+                ])}
           </div>
+          ${item.trends && item.trends.length ? renderTrendSections(item.trends) : ""}
         </div>
       `;
     }}
@@ -492,6 +579,32 @@ def _render_html(payload: dict[str, Any]) -> str:
         <div class="card">
           <span class="label">${escapeHtml(label)}</span>
           ${items || '<div class="empty">not present</div>'}
+        </div>
+      `;
+    }}
+
+    function renderTrendSections(trends) {{
+      return `
+        <div class="grid">
+          ${trends.map((trend) => `
+            <div class="card">
+              <span class="label">${escapeHtml(trend.plot_id)}</span>
+              ${
+                trend.error_text
+                  ? `<div class="meta" style="color: var(--bad);">${escapeHtml(trend.error_text)}</div>`
+                  : ""
+              }
+              <div class="detail-grid">
+                ${textCard("Trend Prompt", trend.trend_prompt_path, trend.trend_prompt_text)}
+                ${textCard("Trend Output", trend.trend_output_path, trend.trend_output_text)}
+                ${textCard("Evidence Table", trend.table_csv_path, trend.table_csv_text)}
+                ${imageCard("Evidence Plot", trend.image_path)}
+              </div>
+              <div class="meta" style="margin-top: 10px;">
+                ${trend.trend_trace_path ? `<a href="${escapeHtmlAttr(trend.trend_trace_path)}">trend trace</a>` : ""}
+              </div>
+            </div>
+          `).join("")}
         </div>
       `;
     }}

@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from distill_abm.run_viewer import resolve_run_root
+
 
 @dataclass(frozen=True)
 class LocalQwenCaseSnapshot:
@@ -45,14 +47,15 @@ class LocalQwenMonitorSnapshot:
 
 def collect_local_qwen_monitor_snapshot(output_root: Path) -> LocalQwenMonitorSnapshot:
     """Collect the current smoke or tuning progress from the output directory."""
-    trials_root = output_root / "trials"
+    resolved_root = resolve_run_root(output_root)
+    trials_root = resolved_root / "trials"
     if trials_root.exists():
-        return _collect_tuning_snapshot(output_root, trials_root)
+        return _collect_tuning_snapshot(resolved_root, trials_root)
 
-    cases_root = output_root / "cases"
+    cases_root = resolved_root / "cases"
     if not cases_root.exists():
         return LocalQwenMonitorSnapshot(
-            output_root=output_root,
+            output_root=resolved_root,
             exists=False,
             mode="smoke",
             total_cases=0,
@@ -70,7 +73,7 @@ def collect_local_qwen_monitor_snapshot(output_root: Path) -> LocalQwenMonitorSn
     completed_cases = sum(1 for case in case_snapshots if case.status == "completed")
     failed_cases = sum(1 for case in case_snapshots if case.status == "failed")
     return LocalQwenMonitorSnapshot(
-        output_root=output_root,
+        output_root=resolved_root,
         exists=True,
         mode="smoke",
         total_cases=len(case_snapshots),
@@ -135,6 +138,25 @@ def stream_local_qwen_monitor(
 
 
 def _collect_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
+    if (case_dir / "03_outputs").exists():
+        return _collect_sample_case_snapshot(case_dir)
+    if (case_dir / "03_trends").exists():
+        return _collect_full_case_snapshot(case_dir)
+    return LocalQwenCaseSnapshot(
+        case_id=case_dir.name,
+        status="pending",
+        label=case_dir.name,
+        num_ctx=None,
+        max_tokens=None,
+        context_prompt_length=None,
+        trend_prompt_length=None,
+        context_total_tokens=None,
+        trend_total_tokens=None,
+        error=None,
+    )
+
+
+def _collect_sample_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
     requests_dir = case_dir / "02_requests"
     outputs_dir = case_dir / "03_outputs"
     context_request = _read_json(requests_dir / "context_request.json")
@@ -168,6 +190,52 @@ def _collect_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
         context_total_tokens=_extract_total_tokens(context_trace),
         trend_total_tokens=_extract_total_tokens(trend_trace),
         error=error_text,
+    )
+
+
+def _collect_full_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
+    context_dir = case_dir / "02_context"
+    trends_root = case_dir / "03_trends"
+    trend_dirs = sorted(path for path in trends_root.iterdir() if path.is_dir())
+    context_request = _read_json(context_dir / "context_request.json")
+    context_trace = _read_json(context_dir / "context_trace.json")
+    context_error = _read_text(context_dir / "error.txt")
+    trend_requests = [_read_json(path / "trend_request.json") for path in trend_dirs]
+    trend_traces = [_read_json(path / "trend_trace.json") for path in trend_dirs]
+    trend_errors = {path.name: _read_text(path / "error.txt") for path in trend_dirs}
+    failed_trends = [name for name, error in trend_errors.items() if error]
+    completed_trends = [trace for trace in trend_traces if trace is not None]
+    started_trends = [
+        directory
+        for directory, request, trace in zip(trend_dirs, trend_requests, trend_traces, strict=False)
+        if request is not None or trace is not None
+    ]
+    if context_error or failed_trends:
+        status = "failed"
+    elif context_trace is not None and len(completed_trends) == len(trend_dirs) and trend_dirs:
+        status = "completed"
+    elif context_request is not None or started_trends:
+        status = "running"
+    else:
+        status = "pending"
+
+    representative_request = (
+        next((request for request in trend_requests if request is not None), None) or context_request
+    )
+    error = context_error
+    if not error and failed_trends:
+        error = f"failed_trends={','.join(failed_trends)}"
+    return LocalQwenCaseSnapshot(
+        case_id=case_dir.name,
+        status=status,
+        label=case_dir.name,
+        num_ctx=_extract_num_ctx(representative_request),
+        max_tokens=_extract_max_tokens(representative_request),
+        context_prompt_length=_extract_prompt_length(context_request),
+        trend_prompt_length=_max_or_none([_extract_prompt_length(request) for request in trend_requests]),
+        context_total_tokens=_extract_total_tokens(context_trace),
+        trend_total_tokens=_max_or_none([_extract_total_tokens(trace) for trace in trend_traces]),
+        error=error,
     )
 
 

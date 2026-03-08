@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Literal, cast
 
 import typer
 
@@ -22,6 +22,7 @@ from distill_abm.cli_actions import (
     execute_run_command,
     execute_smoke_doe_command,
     execute_smoke_full_case_command,
+    execute_smoke_full_case_matrix_command,
     execute_smoke_ingest_command,
     execute_smoke_local_qwen_command,
     execute_smoke_qwen_command,
@@ -54,6 +55,7 @@ from distill_abm.llm.factory import create_adapter
 from distill_abm.pipeline.doe_smoke import (
     run_doe_smoke_suite,
 )
+from distill_abm.pipeline.full_case_matrix_smoke import run_full_case_matrix_smoke
 from distill_abm.pipeline.full_case_smoke import run_full_case_smoke
 from distill_abm.pipeline.local_qwen_sample_smoke import run_local_qwen_sample_smoke
 from distill_abm.pipeline.local_qwen_tuning import run_local_qwen_tuning
@@ -699,6 +701,93 @@ def smoke_full_case(
     )
 
 
+@app.command("smoke-full-case-matrix")
+def smoke_full_case_matrix(
+    abm: Annotated[str, typer.Option(help="ABM config name in configs/abms/<name>.yaml")] = "grazing",
+    models_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ABM model files for asset discovery."),
+    ] = Path("data"),
+    ingest_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ingest smoke outputs."),
+    ] = Path("results/ingest_smoke_latest"),
+    viz_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing visualization smoke outputs."),
+    ] = Path("results/viz_smoke_latest"),
+    models_path: Annotated[
+        Path,
+        typer.Option(exists=True, help="Model registry YAML path."),
+    ] = Path("configs/models.yaml"),
+    model_id: Annotated[
+        str,
+        typer.Option(help="OpenRouter model alias from configs/models.yaml."),
+    ] = "nemotron_nano_12b_v2_vl_free",
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for full-case matrix smoke artifacts."),
+    ] = Path("results/nemotron_abm_smoke_latest"),
+    evidence_mode: Annotated[
+        list[str] | None,
+        typer.Option("--evidence-mode", help="Evidence modes to include. Repeat for multiple."),
+    ] = None,
+    prompt_variant: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--prompt-variant",
+            help="Prompt variants to include. Repeat for multiple. Defaults to all eight legacy variants.",
+        ),
+    ] = None,
+    repetition: Annotated[
+        list[int] | None,
+        typer.Option("--repetition", help="Repetitions to include. Repeat for multiple. Defaults to 1, 2, 3."),
+    ] = None,
+    max_tokens: Annotated[
+        int,
+        typer.Option(help="Maximum output token budget for each call in the full-case matrix smoke."),
+    ] = 32768,
+    resume: Annotated[
+        bool,
+        typer.Option("--resume/--no-resume", help="Reuse accepted cases and rerun only failed or missing ones."),
+    ] = True,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Run one ABM across evidence, prompt, and repetition combinations with one context plus all trends per case."""
+    execute_smoke_full_case_matrix_command(
+        abm=abm,
+        models_root=models_root,
+        ingest_root=ingest_root,
+        viz_root=viz_root,
+        models_path=models_path,
+        model_id=model_id,
+        output_root=output_root,
+        evidence_modes=tuple(cast(EvidenceMode, item) for item in (evidence_mode or ("plot", "table", "plot+table"))),
+        prompt_variants=tuple(
+            prompt_variant
+            or (
+                "none",
+                "role",
+                "insights",
+                "example",
+                "role+example",
+                "role+insights",
+                "insights+example",
+                "all_three",
+            )
+        ),
+        repetitions=tuple(repetition or (1, 2, 3)),
+        max_tokens=max_tokens,
+        resume=resume,
+        json_output=json_output,
+        resolve_model_from_registry=resolve_model_from_registry,
+        resolve_model_path=resolve_abm_model_path,
+        create_adapter_fn=create_adapter,
+        load_abm_config_fn=load_abm_config,
+        run_full_case_matrix_smoke_fn=run_full_case_matrix_smoke,
+    )
+
+
 @app.command("monitor-local-qwen")
 def monitor_local_qwen(
     output_root: Annotated[
@@ -719,6 +808,34 @@ def monitor_local_qwen(
     ] = False,
 ) -> None:
     """Show a compact live dashboard for the local-Qwen smoke run."""
+    execute_monitor_local_qwen_command(
+        output_root=output_root,
+        watch=watch,
+        interval_seconds=interval_seconds,
+        json_output=json_output,
+    )
+
+
+@app.command("monitor-run")
+def monitor_run(
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory containing a case-based smoke run or a latest_run.txt pointer."),
+    ] = Path("results/nemotron_abm_smoke_latest"),
+    watch: Annotated[
+        bool,
+        typer.Option(help="Continuously refresh the dashboard until the run reaches a terminal state."),
+    ] = False,
+    interval_seconds: Annotated[
+        float,
+        typer.Option("--interval-seconds", help="Polling interval for --watch mode."),
+    ] = 2.0,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Print structured JSON instead of the dashboard."),
+    ] = False,
+) -> None:
+    """Show a compact live dashboard for any case-based smoke run."""
     execute_monitor_local_qwen_command(
         output_root=output_root,
         watch=watch,

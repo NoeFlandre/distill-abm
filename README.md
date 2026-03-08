@@ -159,6 +159,10 @@ Monitor a local-Qwen smoke run live:
 
 ```bash
 uv run distill-abm monitor-local-qwen --watch --interval-seconds 2
+
+uv run distill-abm monitor-run \
+  --output-root results/nemotron_abm_smoke_latest \
+  --watch --interval-seconds 2
 ```
 
 DOE smoke notes:
@@ -213,8 +217,9 @@ Agent-oriented CLI additions:
 - `smoke-doe` provides a structured pre-LLM view of the full DOE matrix and writes grouped shared artifacts plus compact case/request indexes that can be reviewed without opening thousands of files.
 - `smoke-local-qwen` runs a small stratified sample with the configured smoke model and writes one self-contained folder per sampled case plus a review CSV with exact prompt text, evidence paths, hyperparameters, outputs, and a minimalist static `review.html` viewer.
 - `smoke-local-qwen` supports `--resume` and reuses only successful case artifacts; failed or incomplete cases are rerun.
-- `render-run-viewer` builds the same minimalist static HTML viewer for any existing case-based run directory, or for the latest run when you point it at a root containing `latest_run.txt`.
-- `monitor-local-qwen` renders a compact live dashboard for either a local-Qwen smoke directory or a local-Qwen tuning directory, including current case or trial, configured `num_ctx`, `max_tokens`, prompt lengths, and observed token usage.
+- `smoke-full-case-matrix` runs one ABM across evidence modes, prompt variants, and repetitions, with one context prompt plus all ordered trend prompts per case. It uses the same run separation, resume behavior, `run.log.jsonl`, and `review.html` reviewer surface as the sampled smoke.
+- `render-run-viewer` builds the same minimalist static HTML viewer for any existing case-based run directory, including both one-trend sampled smokes and full-case multi-trend runs, or for the latest run when you point it at a root containing `latest_run.txt`.
+- `monitor-local-qwen` and `monitor-run` render the same compact live dashboard for case-based smoke runs, including current case or trial, configured `num_ctx`, `max_tokens`, prompt lengths, and observed token usage.
 - `tune-local-qwen` runs local-Qwen context-window and token-budget ablations by evidence mode and writes compact recommendations for the smallest successful `num_ctx` together with the smallest successful `max_tokens` budget observed for that mode.
 - `tune-local-qwen` supports `--resume` and reuses only successful trial artifacts; failed or incomplete trials are rerun.
 - `health-check` performs a lightweight read-only validation of configured ABMs, model-registry resolution, expected ingest/viz artifact roots, and optionally local Ollama model availability.

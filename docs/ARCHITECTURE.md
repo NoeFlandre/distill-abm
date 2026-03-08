@@ -29,10 +29,13 @@
 - Exposes `smoke-full-case` for one real full-case pass across all ordered trend prompts for a selected ABM and prompt variant.
   - `smoke-full-case` materializes one context run plus the full ordered set of trend calls for the selected case.
   - It writes reviewer-oriented inputs, prompts, raw outputs, traces, and a review CSV under one self-contained case directory.
+- Exposes `smoke-full-case-matrix` for one ABM-wide real-inference sweep across evidence modes, prompt variants, and repetitions.
+  - Each matrix case runs one context prompt plus the full ordered trend set for that ABM.
+  - The matrix runner uses run-separated roots under `runs/run_*`, reuses accepted prior cases on resume, emits a root `run.log.jsonl`, and renders the same static `review.html` viewer as the sampled smoke.
 - Exposes `smoke-summarizers` for reviewer-friendly summarizer smoke runs on validated full-case bundles.
   - `smoke-summarizers` reuses manually validated context/trend outputs and runs the local summarization stack over the combined bundle text.
   - It writes per-mode summaries, metadata, a review CSV, and a validated-source manifest for inspection.
-- Exposes `monitor-local-qwen` for a compact live dashboard over either a local-Qwen smoke output directory or a local-Qwen tuning output directory.
+- Exposes `monitor-local-qwen` and `monitor-run` for a compact live dashboard over case-based smoke output directories and local-Qwen tuning output directories.
   - The monitor surfaces current case status, configured `num_ctx`, configured `max_tokens`, prompt lengths, observed token totals, and recent errors.
 - Exposes `tune-local-qwen` for local runtime-limit ablations by evidence mode.
   - `tune-local-qwen` runs the same prompt/evidence path as `smoke-local-qwen`, but sweeps candidate `num_ctx` and `max_tokens` values to find the smallest successful runtime budget for `plot`, `table`, and `plot+table`.

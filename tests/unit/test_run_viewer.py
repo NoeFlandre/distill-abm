@@ -74,3 +74,43 @@ def test_render_run_viewer_writes_minimal_review_html(tmp_path: Path) -> None:
     assert 'ctx out' in html
     assert 'trend out' in html
     assert 'trend_evidence_plot.png' in html
+
+
+def test_render_run_viewer_writes_full_case_trend_sections(tmp_path: Path) -> None:
+    run_root = tmp_path / 'runs' / 'run_1'
+    case_root = run_root / 'cases' / '01_case'
+    (case_root / '01_inputs').mkdir(parents=True)
+    (case_root / '02_context').mkdir(parents=True)
+    (case_root / '03_trends' / 'plot_01').mkdir(parents=True)
+    (tmp_path / 'latest_run.txt').write_text(str(run_root), encoding='utf-8')
+    (run_root / 'smoke_full_case_matrix_report.json').write_text(
+        '{"success": true, "failed_case_ids": [], "cases": [{"case_id": "01_case", "abm": "grazing", '
+        '"evidence_mode": "table", "prompt_variant": "role", "model": "m", "resumed_from_existing": false, '
+        '"success": true, "error": null}]}',
+        encoding='utf-8',
+    )
+    (run_root / 'run.log.jsonl').write_text('{"message":"x"}\n', encoding='utf-8')
+    (case_root / '00_case_summary.json').write_text(
+        '{"case_id":"01_case","abm":"grazing","evidence_mode":"table","prompt_variant":"role","model":"m"}',
+        encoding='utf-8',
+    )
+    (case_root / '01_inputs' / 'context_prompt.txt').write_text('ctx prompt', encoding='utf-8')
+    (case_root / '01_inputs' / 'documentation.txt').write_text('docs body', encoding='utf-8')
+    (case_root / '01_inputs' / 'parameters.txt').write_text('params body', encoding='utf-8')
+    (case_root / '02_context' / 'context_output.txt').write_text('ctx out', encoding='utf-8')
+    (case_root / '02_context' / 'context_trace.json').write_text('{}', encoding='utf-8')
+    (case_root / '03_trends' / 'plot_01' / 'trend_prompt.txt').write_text('trend prompt', encoding='utf-8')
+    (case_root / '03_trends' / 'plot_01' / 'trend_output.txt').write_text('trend out', encoding='utf-8')
+    (case_root / '03_trends' / 'plot_01' / 'trend_trace.json').write_text('{}', encoding='utf-8')
+    (case_root / '03_trends' / 'plot_01' / 'trend_evidence_table.csv').write_text(
+        'tick,metric\n0,1\n',
+        encoding='utf-8',
+    )
+
+    html_path = render_run_viewer(tmp_path)
+
+    html = html_path.read_text(encoding='utf-8')
+    assert 'trend prompt' in html
+    assert 'trend out' in html
+    assert 'plot_01' in html
+    assert 'tick,metric' in html
