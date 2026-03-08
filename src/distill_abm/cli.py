@@ -18,6 +18,7 @@ from distill_abm.cli_actions import (
     execute_ingest_netlogo_command,
     execute_ingest_netlogo_suite_command,
     execute_monitor_local_qwen_command,
+    execute_render_run_viewer_command,
     execute_run_command,
     execute_smoke_doe_command,
     execute_smoke_full_case_command,
@@ -84,6 +85,7 @@ __all__ = [
     "ingest_netlogo_suite",
     "main",
     "monitor_local_qwen",
+    "render_run_viewer",
     "run",
     "smoke_doe",
     "smoke_full_case",
@@ -584,6 +586,26 @@ def smoke_local_qwen(
         create_adapter_fn=create_adapter,
         run_local_qwen_sample_smoke_fn=run_local_qwen_sample_smoke,
         load_abm_config_fn=load_abm_config,
+    )
+
+
+@app.command("render-run-viewer")
+def render_run_viewer(
+    run_root: Annotated[
+        Path,
+        typer.Option(help="Concrete run directory, or a root containing latest_run.txt."),
+    ],
+    output_path: Annotated[
+        Path | None,
+        typer.Option(help="Optional explicit output HTML path. Defaults to <run-root>/review.html."),
+    ] = None,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Render a minimalist static HTML reviewer for a case-based run directory."""
+    execute_render_run_viewer_command(
+        run_root=run_root,
+        output_path=output_path,
+        json_output=json_output,
     )
 
 

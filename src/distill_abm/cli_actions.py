@@ -56,6 +56,7 @@ from distill_abm.pipeline.local_qwen_sample_smoke import LocalQwenCaseInput
 from distill_abm.pipeline.local_qwen_tuning import LocalQwenTuningResult
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode
 from distill_abm.pipeline.smoke import SmokeSuiteInputs
+from distill_abm.run_viewer import render_run_viewer
 
 LOCAL_QWEN_TIMEOUT_SECONDS = 900.0
 
@@ -623,7 +624,10 @@ def execute_smoke_local_qwen_command(
         report_json_path=result.report_json_path,
         report_markdown_path=result.report_markdown_path,
         failed_items=result.failed_case_ids,
-        nested_artifacts={"request_review_csv": result.review_csv_path},
+        nested_artifacts={
+            "request_review_csv": result.review_csv_path,
+            "viewer_html": result.viewer_html_path,
+        },
     )
     emit_smoke_command_result(
         command_result=command_result,
@@ -632,6 +636,19 @@ def execute_smoke_local_qwen_command(
         json_label="sampled llm smoke report (json)",
         failure_label="sampled llm smoke failed",
     )
+
+
+def execute_render_run_viewer_command(
+    *,
+    run_root: Path,
+    output_path: Path | None,
+    json_output: bool,
+) -> None:
+    viewer_path = render_run_viewer(run_root=run_root, output_path=output_path)
+    if json_output:
+        typer.echo(json.dumps({"run_root": str(run_root), "viewer_html_path": str(viewer_path)}, indent=2))
+        return
+    typer.echo(f"viewer: {viewer_path}")
 
 
 def execute_monitor_local_qwen_command(

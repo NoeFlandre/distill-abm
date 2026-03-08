@@ -21,6 +21,7 @@ from distill_abm.pipeline.doe_smoke_prompts import (
     build_raw_table_csv,
 )
 from distill_abm.pipeline.helpers import encode_image, invoke_adapter_with_trace
+from distill_abm.run_viewer import render_run_viewer
 from distill_abm.structured_logging import attach_json_log_file
 from distill_abm.utils import detect_placeholder_signals
 
@@ -94,6 +95,7 @@ class LocalQwenSampleSmokeResult(BaseModel):
     report_markdown_path: Path
     review_csv_path: Path
     run_log_path: Path
+    viewer_html_path: Path
     success: bool
     failed_case_ids: list[str] = Field(default_factory=list)
     cases: list[LocalQwenSampleCaseResult] = Field(default_factory=list)
@@ -358,6 +360,7 @@ def run_local_qwen_sample_smoke(
         report_markdown_path=report_markdown_path,
         review_csv_path=review_csv_path,
         run_log_path=run_log_path,
+        viewer_html_path=run_root / "review.html",
         run_id=run_id,
         success=not failed_case_ids,
         failed_case_ids=failed_case_ids,
@@ -365,6 +368,9 @@ def run_local_qwen_sample_smoke(
     )
     _write_json(report_json_path, result.model_dump(mode="json"))
     _write_text(report_markdown_path, _render_report(result))
+    viewer_html_path = render_run_viewer(run_root)
+    result.viewer_html_path = viewer_html_path
+    _write_json(report_json_path, result.model_dump(mode="json"))
     _write_text(output_root / "latest_report_path.txt", str(report_json_path))
     return result
 
@@ -707,6 +713,7 @@ def _render_report(result: LocalQwenSampleSmokeResult) -> str:
         f"- case_count: `{len(result.cases)}`",
         f"- failed_case_count: `{len(result.failed_case_ids)}`",
         f"- run_log_path: `{result.run_log_path}`",
+        f"- viewer_html_path: `{result.viewer_html_path}`",
         f"- review_csv_path: `{result.review_csv_path}`",
         "",
         "| case_id | abm | evidence_mode | prompt_variant | success |",

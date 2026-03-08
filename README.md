@@ -211,8 +211,9 @@ Agent-oriented CLI additions:
 - `smoke-ingest-netlogo` supports `--require-stage` so callers can assert that specific stage checks are present.
 - `smoke-viz` provides stage-filtering and `--require-stage` for the generated simulation CSV and each ordered plot image.
 - `smoke-doe` provides a structured pre-LLM view of the full DOE matrix and writes grouped shared artifacts plus compact case/request indexes that can be reviewed without opening thousands of files.
-- `smoke-local-qwen` runs a small stratified sample with the local `qwen3_5_local` Ollama model and writes one self-contained folder per sampled case plus a review CSV with exact prompt text, evidence paths, hyperparameters, and outputs.
+- `smoke-local-qwen` runs a small stratified sample with the configured smoke model and writes one self-contained folder per sampled case plus a review CSV with exact prompt text, evidence paths, hyperparameters, outputs, and a minimalist static `review.html` viewer.
 - `smoke-local-qwen` supports `--resume` and reuses only successful case artifacts; failed or incomplete cases are rerun.
+- `render-run-viewer` builds the same minimalist static HTML viewer for any existing case-based run directory, or for the latest run when you point it at a root containing `latest_run.txt`.
 - `monitor-local-qwen` renders a compact live dashboard for either a local-Qwen smoke directory or a local-Qwen tuning directory, including current case or trial, configured `num_ctx`, `max_tokens`, prompt lengths, and observed token usage.
 - `tune-local-qwen` runs local-Qwen context-window and token-budget ablations by evidence mode and writes compact recommendations for the smallest successful `num_ctx` together with the smallest successful `max_tokens` budget observed for that mode.
 - `tune-local-qwen` supports `--resume` and reuses only successful trial artifacts; failed or incomplete trials are rerun.

@@ -36,6 +36,7 @@ def test_cli_smoke_local_qwen_invokes_sample_smoke(tmp_path: Path, monkeypatch) 
             report_json_path=Path(output_root) / "report.json",
             report_markdown_path=Path(output_root) / "report.md",
             review_csv_path=Path(output_root) / "review.csv",
+            viewer_html_path=Path(output_root) / "review.html",
             failed_case_ids=[],
         )
 
@@ -80,6 +81,7 @@ def test_cli_smoke_local_qwen_invokes_sample_smoke(tmp_path: Path, monkeypatch) 
     assert captured["ollama_num_ctx"] == 4096
     assert captured["ollama_num_ctx_by_mode"] == {"plot": 4096, "table": 4096, "plot+table": 8192}
     assert adapter_calls["timeout_seconds"] == 900.0
+    assert "review.html" in result.output
 
 
 def test_cli_smoke_local_qwen_accepts_openrouter_model_alias(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -106,6 +108,7 @@ models:
             report_json_path=Path(output_root) / "report.json",
             report_markdown_path=Path(output_root) / "report.md",
             review_csv_path=Path(output_root) / "review.csv",
+            viewer_html_path=Path(output_root) / "review.html",
             failed_case_ids=[],
         )
 
@@ -143,3 +146,38 @@ models:
     assert adapter_calls["provider"] == "openrouter"
     assert adapter_calls["model"] == "nvidia/nemotron-nano-12b-v2-vl:free"
     assert adapter_calls["timeout_seconds"] == 900.0
+
+
+def test_cli_render_run_viewer_writes_html(tmp_path: Path) -> None:
+    run_root = tmp_path / "run"
+    case_root = run_root / "cases" / "01_case"
+    (case_root / "01_inputs").mkdir(parents=True)
+    (case_root / "02_requests").mkdir(parents=True)
+    (case_root / "03_outputs").mkdir(parents=True)
+    (run_root / "smoke_local_qwen_report.json").write_text(
+        (
+            '{"success": true, "failed_case_ids": [], "cases": '
+            '[{"case_id": "01_case", "abm": "fauna", "evidence_mode": "plot", '
+            '"prompt_variant": "none", "model": "m", "resumed_from_existing": false, '
+            '"success": true, "error": null}]}'
+        ),
+        encoding="utf-8",
+    )
+    (run_root / "run.log.jsonl").write_text('{"message":"x"}\n', encoding="utf-8")
+    (case_root / "00_case_summary.json").write_text(
+        """{"case_id":"01_case","abm":"fauna","evidence_mode":"plot","prompt_variant":"none","model":"m"}""",
+        encoding="utf-8",
+    )
+    (case_root / "01_inputs" / "context_prompt.txt").write_text("ctx", encoding="utf-8")
+    (case_root / "01_inputs" / "documentation.txt").write_text("docs", encoding="utf-8")
+    (case_root / "01_inputs" / "parameters.txt").write_text("params", encoding="utf-8")
+    (case_root / "01_inputs" / "trend_prompt.txt").write_text("trend", encoding="utf-8")
+    (case_root / "03_outputs" / "context_output.txt").write_text("ctx out", encoding="utf-8")
+    (case_root / "03_outputs" / "trend_output.txt").write_text("trend out", encoding="utf-8")
+    (case_root / "03_outputs" / "context_trace.json").write_text("{}", encoding="utf-8")
+    (case_root / "03_outputs" / "trend_trace.json").write_text("{}", encoding="utf-8")
+
+    result = runner.invoke(app, ["render-run-viewer", "--run-root", str(run_root)])
+
+    assert result.exit_code == 0
+    assert (run_root / "review.html").exists()
