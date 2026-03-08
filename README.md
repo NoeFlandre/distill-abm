@@ -203,6 +203,7 @@ This command is the current repository entrypoint for non-LLM local verification
 Repo workflow notes:
 
 - See `docs/AGENT_WORKFLOW.md` for the repository-specific agent workflow, verification order, and evidence expectations.
+- See `docs/AGENT_BACKLOG.md` for the current prioritized backlog of agent-friendly quality improvements that remain after the present refactors.
 - See `docs/MANUAL_VALIDATION.md` for the current evidence-style manual verification record covering the pre-LLM workflow surfaces.
 
 Agent-oriented CLI additions:
