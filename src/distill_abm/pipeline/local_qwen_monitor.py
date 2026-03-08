@@ -233,23 +233,40 @@ def stream_local_qwen_monitor(
     console = Console()
     refresh_count = 0
     view_state = MonitorViewState()
+    snapshot = collect_local_qwen_monitor_snapshot(output_root)
+    last_snapshot_at = time.monotonic()
     with _MonitorKeyboardReader() as keyboard_reader:
         with Live(console=console, refresh_per_second=4, screen=clear_screen, transient=False) as live:
             while True:
-                snapshot = collect_local_qwen_monitor_snapshot(output_root)
-                view_state = view_state_for_snapshot(view_state=view_state, snapshot=snapshot)
                 key = keyboard_reader()
                 if key == "quit":
                     return
                 if key is not None:
                     view_state = apply_monitor_keypress(view_state, key, total_cases=len(snapshot.cases))
+                now = time.monotonic()
+                if next_snapshot_due(
+                    last_snapshot_at=last_snapshot_at,
+                    now=now,
+                    interval_seconds=interval_seconds,
+                ) == 0.0:
+                    snapshot = collect_local_qwen_monitor_snapshot(output_root)
+                    last_snapshot_at = now
+                    refresh_count += 1
+                    view_state = view_state_for_snapshot(view_state=view_state, snapshot=snapshot)
                 live.update(render_local_qwen_monitor_rich_with_state(snapshot=snapshot, state=view_state))
-                refresh_count += 1
                 if max_refreshes is not None and refresh_count >= max_refreshes:
                     return
                 if snapshot.terminal and exit_when_terminal:
                     return
-                time.sleep(interval_seconds)
+                sleep_for = min(
+                    next_snapshot_due(
+                        last_snapshot_at=last_snapshot_at,
+                        now=time.monotonic(),
+                        interval_seconds=interval_seconds,
+                    ),
+                    0.05,
+                )
+                time.sleep(sleep_for)
 
 
 def visible_monitor_cases(
@@ -261,6 +278,16 @@ def visible_monitor_cases(
     start = max(state.scroll_offset, 0)
     end = max(start + state.visible_rows, start)
     return cases[start:end]
+
+
+def next_snapshot_due(*, last_snapshot_at: float, now: float, interval_seconds: float) -> float:
+    """Return seconds remaining until the next filesystem snapshot refresh is due."""
+    if interval_seconds <= 0:
+        return 0.0
+    elapsed = now - last_snapshot_at
+    if elapsed >= interval_seconds:
+        return 0.0
+    return interval_seconds - elapsed
 
 
 def view_state_for_snapshot(
