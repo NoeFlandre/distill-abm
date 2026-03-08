@@ -166,6 +166,71 @@ def test_run_full_case_smoke_resume_reuses_context_and_accepted_trends(tmp_path:
     assert row_by_plot["2"]["validation_status"] == "accepted"
 
 
+def test_run_full_case_smoke_resume_reruns_invalid_accepted_trend_output(tmp_path: Path) -> None:
+    csv_path = tmp_path / "simulation.csv"
+    csv_path.write_text("tick;metric one;metric two\n0;1;2\n1;3;4\n", encoding="utf-8")
+    parameters_path = tmp_path / "parameters.txt"
+    parameters_path.write_text("parameter narrative", encoding="utf-8")
+    documentation_path = tmp_path / "documentation.txt"
+    documentation_path.write_text("documentation body", encoding="utf-8")
+    plot_one = tmp_path / "1.png"
+    plot_one.write_bytes(b"plot-one")
+    plot_two = tmp_path / "2.png"
+    plot_two.write_bytes(b"plot-two")
+    case_input = FullCaseSmokeInput(
+        abm="grazing",
+        csv_path=csv_path,
+        parameters_path=parameters_path,
+        documentation_path=documentation_path,
+        plots=(
+            FullCasePlotInput(
+                plot_index=1,
+                reporter_pattern="metric one",
+                plot_description="First plot",
+                plot_path=plot_one,
+            ),
+            FullCasePlotInput(
+                plot_index=2,
+                reporter_pattern="metric two",
+                plot_description="Second plot",
+                plot_path=plot_two,
+            ),
+        ),
+    )
+    output_root = tmp_path / "out"
+    first = run_full_case_smoke(
+        case_input=case_input,
+        adapter=_FakeAdapter(),
+        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        output_root=output_root,
+        evidence_mode="table",
+        prompt_variant="role",
+        max_tokens=128,
+        resume_existing=True,
+    )
+    assert first.success is True
+
+    case_dir = output_root / "cases" / "01_grazing_role_table_full_case"
+    trend_dir = case_dir / "03_trends" / "plot_02"
+    (trend_dir / "trend_output.txt").write_text("The analysis is currently unavailable.", encoding="utf-8")
+
+    second_adapter = _FakeAdapter()
+    resumed = run_full_case_smoke(
+        case_input=case_input,
+        adapter=second_adapter,
+        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        output_root=output_root,
+        evidence_mode="table",
+        prompt_variant="role",
+        max_tokens=128,
+        resume_existing=True,
+    )
+
+    assert resumed.success is True
+    assert second_adapter._calls == 1
+    assert (trend_dir / "trend_output.txt").read_text(encoding="utf-8") == "response-1"
+
+
 def test_build_full_case_matrix_case_specs_covers_all_combinations() -> None:
     specs = build_full_case_matrix_case_specs(
         abm="grazing",

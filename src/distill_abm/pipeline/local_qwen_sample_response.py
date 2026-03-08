@@ -64,6 +64,21 @@ def is_generic_unavailable_response(text: str) -> bool:
     )
 
 
+def validate_structured_smoke_text_content(text: str) -> str:
+    """Validate persisted structured smoke output text before reuse."""
+    final_text = text.strip()
+    if not final_text:
+        raise ValueError("structured smoke output contained an empty response_text")
+    if len(final_text) > MAX_STRUCTURED_SMOKE_RESPONSE_CHARS:
+        raise ValueError(
+            "structured smoke output is pathologically large"
+            f" ({len(final_text)} chars > {MAX_STRUCTURED_SMOKE_RESPONSE_CHARS})"
+        )
+    if is_generic_unavailable_response(final_text):
+        raise ValueError("generic unavailable response detected in structured smoke output")
+    return final_text
+
+
 def parse_structured_smoke_text(*, raw_text: str, trace: Mapping[str, object], prompt: str) -> str:
     """Parse and validate the final structured smoke text from a provider trace."""
     response_block = trace.get("response")
@@ -103,28 +118,14 @@ def parse_structured_smoke_text(*, raw_text: str, trace: Mapping[str, object], p
             trace=trace,
             prompt=prompt,
         )
-    final_text = parsed.response_text.strip()
-    if not final_text:
+    try:
+        final_text = validate_structured_smoke_text_content(parsed.response_text)
+    except ValueError as exc:
         raise StructuredSmokeResponseError(
-            "structured smoke output contained an empty response_text",
+            str(exc),
             trace=trace,
             prompt=prompt,
-        )
-    if len(final_text) > MAX_STRUCTURED_SMOKE_RESPONSE_CHARS:
-        raise StructuredSmokeResponseError(
-            (
-                "structured smoke output is pathologically large"
-                f" ({len(final_text)} chars > {MAX_STRUCTURED_SMOKE_RESPONSE_CHARS})"
-            ),
-            trace=trace,
-            prompt=prompt,
-        )
-    if is_generic_unavailable_response(final_text):
-        raise StructuredSmokeResponseError(
-            "generic unavailable response detected in structured smoke output",
-            trace=trace,
-            prompt=prompt,
-        )
+        ) from exc
     if isinstance(response_block, dict):
         response_block["parsed_response"] = parsed.model_dump(mode="json")
     return final_text
