@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from distill_abm.run_viewer import resolve_run_root
+from distill_abm.pipeline.run_artifact_contracts import resolve_run_root
 
 
 @dataclass(frozen=True)

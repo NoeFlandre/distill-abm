@@ -3,7 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from textwrap import dedent
 
-from distill_abm.run_viewer import render_run_viewer, resolve_run_root
+from distill_abm.pipeline.run_artifact_contracts import resolve_run_root
+from distill_abm.run_viewer import render_run_viewer
 
 
 def _build_sample_run(root: Path) -> Path:
