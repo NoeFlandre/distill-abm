@@ -25,6 +25,7 @@ def test_cli_smoke_quantitative_invokes_runner(tmp_path: Path, monkeypatch) -> N
             report_markdown_path=run_root / "report.md",
             review_csv_path=run_root / "review.csv",
             quantitative_rows_path=run_root / "quantitative_rows.csv",
+            structured_results_path=run_root / "structured_results.csv",
             anova_csv_path=run_root / "anova_pvalues.csv",
             factorial_csv_path=run_root / "factorial_contributions.csv",
             optimal_csv_path=run_root / "best_scores.csv",

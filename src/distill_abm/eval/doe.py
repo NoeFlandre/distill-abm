@@ -36,14 +36,20 @@ def _candidate_factor_columns(df: pd.DataFrame, max_unique: int) -> list[str]:
 
 
 def _identify_factors(df: pd.DataFrame, candidates: list[str], max_unique: int) -> list[str]:
-    known_patterns = [{"Yes", "No"}, {"BART", "BERT"}, {"GPT", "Claude", "DeepSeek"}]
+    known_patterns = [
+        {"Yes", "No"},
+        {"BART", "BERT"},
+        {"none", "bart", "bert", "t5", "longformer_ext"},
+        {"plot", "table", "plot+table"},
+        {"GPT", "Claude", "DeepSeek"},
+    ]
     factors: list[str] = []
     seen: set[str] = set()
     for column in candidates:
         unique_values = set(df[column].dropna().astype(str).unique())
         known = any(unique_values == pattern for pattern in known_patterns)
         is_categorical = isinstance(df[column].dtype, pd.CategoricalDtype)
-        is_object = df[column].dtype == "object" or is_categorical
+        is_object = pd.api.types.is_object_dtype(df[column]) or is_categorical
         low_cardinality = is_object and df[column].nunique(dropna=True) <= max_unique
         if (known or low_cardinality) and column not in seen:
             factors.append(column)

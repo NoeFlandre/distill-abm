@@ -4,7 +4,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from distill_abm.eval.reference_scores import ReferenceScores, score_summaries_csv_batch
+from distill_abm.eval.reference_scores import (
+    ReferenceScores,
+    score_summaries_csv_batch,
+    score_summary_columns_csv_batch,
+)
 
 
 def test_score_summaries_csv_batch_writes_metric_columns(tmp_path: Path) -> None:
@@ -76,3 +80,52 @@ def test_score_summaries_csv_batch_requires_summary_columns(tmp_path: Path) -> N
         assert "Summary (BERT) Reduced" in str(exc)
     else:
         raise AssertionError("expected ValueError for missing summary columns")
+
+
+def test_score_summary_columns_csv_batch_supports_all_current_summarizer_labels(tmp_path: Path) -> None:
+    input_csv = tmp_path / "in.csv"
+    output_csv = tmp_path / "out.csv"
+    pd.DataFrame(
+        [
+            {
+                "Summary (None) Reduced": "none one",
+                "Summary (BART) Reduced": "bart one",
+                "Summary (BERT) Reduced": "bert one",
+                "Summary (T5) Reduced": "t5 one",
+                "Summary (LongFormerExt) Reduced": "longformer one",
+            }
+        ]
+    ).to_csv(input_csv, index=False)
+
+    def fake_scores(ground_truth: str, summary: str) -> ReferenceScores:
+        _ = ground_truth
+        base = float(len(summary.split()))
+        return ReferenceScores(
+            bleu=base,
+            meteor=base + 1.0,
+            rouge1=base + 2.0,
+            rouge2=base + 3.0,
+            rouge_l=base + 4.0,
+            flesch_reading_ease=base + 5.0,
+        )
+
+    result = score_summary_columns_csv_batch(
+        input_csv=input_csv,
+        output_csv=output_csv,
+        ground_truth_text="ground truth",
+        summary_columns={
+            "none": "Summary (None) Reduced",
+            "bart": "Summary (BART) Reduced",
+            "bert": "Summary (BERT) Reduced",
+            "t5": "Summary (T5) Reduced",
+            "longformer_ext": "Summary (LongFormerExt) Reduced",
+        },
+        score_fn=fake_scores,
+    )
+
+    assert result["BLEU (none)"].tolist() == [2.0]
+    assert result["BLEU (bart)"].tolist() == [2.0]
+    assert result["BLEU (bert)"].tolist() == [2.0]
+    assert result["BLEU (t5)"].tolist() == [2.0]
+    assert result["BLEU (longformer_ext)"].tolist() == [2.0]
+    assert output_csv.exists() is True

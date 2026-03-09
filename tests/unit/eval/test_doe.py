@@ -40,3 +40,17 @@ def test_identify_factors_preserves_column_order() -> None:
     )
     factors, _ = identify_factors_and_metrics(frame)
     assert factors == ["LLM", "Role", "Example"]
+
+
+def test_identify_factors_supports_current_summarizers_and_evidence_modes() -> None:
+    frame = pd.DataFrame(
+        {
+            "Summary": ["none", "bart", "bert", "t5", "longformer_ext"],
+            "Evidence": ["plot", "table", "plot+table", "plot", "table"],
+            "Role": ["Yes", "No", "Yes", "No", "Yes"],
+            "BLEU": [0.1, 0.2, 0.3, 0.4, 0.5],
+        }
+    )
+    factors, metrics = identify_factors_and_metrics(frame)
+    assert factors == ["Summary", "Evidence", "Role"]
+    assert metrics == ["BLEU"]

@@ -1,8 +1,17 @@
-"""Lexical metric helpers with graceful dependency fallbacks."""
+"""Lexical metric helpers with graceful dependency fallbacks.
+
+The default lexical metric path intentionally matches the legacy scoring
+notebooks:
+- tokenization via ``str.split()``
+- BLEU with NLTK smoothing method4
+- METEOR with tokenized inputs
+- ROUGE-1/2/L with stemming
+- Flesch Reading Ease on the candidate summary text
+"""
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -86,28 +95,38 @@ def score_summaries_csv_batch(
     score_fn: Callable[[str, str], ReferenceScores] | None = None,
 ) -> pd.DataFrame:
     """Run lexical scoring for BART and BERT summary columns."""
+    return score_summary_columns_csv_batch(
+        input_csv=input_csv,
+        output_csv=output_csv,
+        ground_truth_text=ground_truth_text,
+        summary_columns={"BART": bart_column, "BERT": bert_column},
+        score_fn=score_fn,
+    )
+
+
+def score_summary_columns_csv_batch(
+    input_csv: Path,
+    output_csv: Path,
+    ground_truth_text: str,
+    summary_columns: Mapping[str, str],
+    score_fn: Callable[[str, str], ReferenceScores] | None = None,
+) -> pd.DataFrame:
+    """Run notebook-equivalent lexical scoring for an arbitrary set of summary columns."""
     frame = pd.read_csv(input_csv)
-    missing = [column for column in [bart_column, bert_column] if column not in frame.columns]
+    missing = [column for column in summary_columns.values() if column not in frame.columns]
     if missing:
         raise ValueError(f"missing summary columns: {', '.join(missing)}")
 
     scorer = score_fn or compute_scores
-    (
-        frame["BLEU (BART)"],
-        frame["METEOR (BART)"],
-        frame["ROUGE-1 (BART)"],
-        frame["ROUGE-2 (BART)"],
-        frame["ROUGE-L (BART)"],
-        frame["Flesch Reading Ease (BART)"],
-    ) = _score_column(frame, bart_column, ground_truth_text, scorer)
-    (
-        frame["BLEU (BERT)"],
-        frame["METEOR (BERT)"],
-        frame["ROUGE-1 (BERT)"],
-        frame["ROUGE-2 (BERT)"],
-        frame["ROUGE-L (BERT)"],
-        frame["Flesch Reading Ease (BERT)"],
-    ) = _score_column(frame, bert_column, ground_truth_text, scorer)
+    for label, column in summary_columns.items():
+        (
+            frame[f"BLEU ({label})"],
+            frame[f"METEOR ({label})"],
+            frame[f"ROUGE-1 ({label})"],
+            frame[f"ROUGE-2 ({label})"],
+            frame[f"ROUGE-L ({label})"],
+            frame[f"Flesch Reading Ease ({label})"],
+        ) = _score_column(frame, column, ground_truth_text, scorer)
 
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     frame.to_csv(output_csv, index=False)
