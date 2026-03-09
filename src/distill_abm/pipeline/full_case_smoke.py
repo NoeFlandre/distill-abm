@@ -96,7 +96,7 @@ class _TrendExecutionResult(BaseModel):
     error: str | None = None
 
 
-MAX_PARALLEL_TRENDS = 4
+MAX_PARALLEL_TRENDS = 6
 
 
 def run_full_case_smoke(

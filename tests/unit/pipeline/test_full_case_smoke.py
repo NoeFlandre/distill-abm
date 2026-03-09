@@ -547,6 +547,61 @@ def test_run_full_case_matrix_smoke_executes_case_trends_concurrently(tmp_path: 
     assert adapter.max_active >= 2
 
 
+def test_run_full_case_matrix_smoke_executes_cases_concurrently(tmp_path: Path) -> None:
+    csv_path = tmp_path / "simulation.csv"
+    csv_path.write_text("tick;metric one;metric two\n0;1;2\n1;3;4\n", encoding="utf-8")
+    parameters_path = tmp_path / "parameters.txt"
+    parameters_path.write_text("parameter narrative", encoding="utf-8")
+    documentation_path = tmp_path / "documentation.txt"
+    documentation_path.write_text("documentation body", encoding="utf-8")
+    plot_one = tmp_path / "1.png"
+    plot_one.write_bytes(b"plot-one")
+    plot_two = tmp_path / "2.png"
+    plot_two.write_bytes(b"plot-two")
+    adapter = _ConcurrentAdapter()
+
+    result = run_full_case_matrix_smoke(
+        case_input=FullCaseSmokeInput(
+            abm="grazing",
+            csv_path=csv_path,
+            parameters_path=parameters_path,
+            documentation_path=documentation_path,
+            plots=(
+                FullCasePlotInput(
+                    plot_index=1,
+                    reporter_pattern="metric one",
+                    plot_description="First plot",
+                    plot_path=plot_one,
+                ),
+            ),
+        ),
+        adapter=adapter,
+        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        output_root=tmp_path / "out",
+        cases=(
+            FullCaseMatrixCaseSpec(
+                case_id="01_grazing_none_plot_rep1",
+                abm="grazing",
+                evidence_mode="plot",
+                prompt_variant="none",
+                repetition=1,
+            ),
+            FullCaseMatrixCaseSpec(
+                case_id="02_grazing_role_plot_rep1",
+                abm="grazing",
+                evidence_mode="plot",
+                prompt_variant="role",
+                repetition=1,
+            ),
+        ),
+        max_tokens=128,
+        resume_existing=True,
+    )
+
+    assert result.success is True
+    assert adapter.max_active >= 2
+
+
 def test_compute_matrix_retry_wait_seconds_uses_transient_failures() -> None:
     wait_seconds = compute_matrix_retry_wait_seconds(
         [

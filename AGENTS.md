@@ -136,6 +136,13 @@ Capture solutions so the team compounds knowledge:
 - Reusable scripts, proof-of-concept repos, TIL notes, demo pages, build scripts, research memos
 - **Working examples > vague claims.** "Here's a working example" beats "it should be possible."
 
+### Repository Memory
+
+- **Smoke workflows are pipeline audits, not side experiments.** New smoke runs should reuse the core pipeline contracts: run-separated outputs, resumability, logging, review artifacts, and the same prompt/evidence/report logic used by the implementation they audit.
+- **Context reuse is expected whenever prompts are identical.** In the current DOE/full-case setup, context variation is much smaller than trend variation: context effectively changes by ABM and `role` on/off; `example` and `insights` are trend-only. Cache and reuse context outputs by the fully rendered prompt, not by loose labels.
+- **Keep primary scoring stable and add secondary references additively.** The primary author ground truth remains the main score contract. Optional modeler references belong in `experiment_settings.modeler_ground_truth` and should add parallel score blocks/columns/metadata, not replace the primary scores.
+- **Be careful with integration tests that touch scoring.** If the goal is reference scoring or metadata/report wiring, prefer `full_text_only` unless the test is explicitly about summarizers. This avoids accidentally invoking heavy summarizer/model dependencies and keeps the test focused.
+
 ---
 
 ## Writing Policy
