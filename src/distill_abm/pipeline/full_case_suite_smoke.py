@@ -22,6 +22,7 @@ from distill_abm.structured_logging import attach_json_log_file, get_logger, log
 
 LOGGER = get_logger(__name__)
 DEFAULT_MAX_ABM_ATTEMPTS = 3
+SUITE_PROGRESS_FILENAME = "suite_progress.json"
 
 
 class FullCaseSuiteAbmResult(BaseModel):
@@ -54,6 +55,42 @@ class FullCaseSuiteSmokeResult(BaseModel):
     success: bool
     failed_abms: list[str] = Field(default_factory=list)
     abms: list[FullCaseSuiteAbmResult] = Field(default_factory=list)
+
+
+class FullCaseSuiteProgressAbm(BaseModel):
+    """Live progress snapshot for one ABM inside a suite run."""
+
+    abm: str
+    status: str
+    attempt: int | None = None
+    planned_case_count: int
+    failed_case_count: int = 0
+    run_root: Path | None = None
+    run_log_path: Path | None = None
+    review_html_path: Path | None = None
+    report_json_path: Path | None = None
+    last_error: str | None = None
+
+
+class FullCaseSuiteProgress(BaseModel):
+    """Stable suite-level progress contract for live monitoring and HTML refresh."""
+
+    run_id: str
+    run_root: Path
+    output_root: Path
+    model: str
+    started_at_utc: str
+    finished_at_utc: str | None = None
+    status: str
+    current_abm: str | None = None
+    current_attempt: int | None = None
+    total_abms: int
+    completed_abm_count: int
+    failed_abm_count: int
+    planned_case_count: int
+    failed_case_count: int
+    remaining_abms: list[str] = Field(default_factory=list)
+    abms: list[FullCaseSuiteProgressAbm] = Field(default_factory=list)
 
 
 def _validate_suite_inputs(
@@ -93,6 +130,7 @@ def run_full_case_suite_smoke(
     run_root.mkdir(parents=True, exist_ok=True)
     _write_text(latest_run_pointer_path(output_root), str(run_root))
     log_path = attach_json_log_file(run_log_path(run_root))
+    progress_path = output_root / SUITE_PROGRESS_FILENAME
     log_event(
         LOGGER,
         "full_case_suite_start",
@@ -102,7 +140,31 @@ def run_full_case_suite_smoke(
     )
 
     abm_results_by_name: dict[str, FullCaseSuiteAbmResult] = {}
+    progress_by_name = {
+        abm: FullCaseSuiteProgressAbm(
+            abm=abm,
+            status="pending",
+            planned_case_count=len(cases_by_abm[abm]),
+        )
+        for abm in abm_inputs
+    }
     remaining_abms = list(abm_inputs)
+    _write_suite_progress(
+        output_root=output_root,
+        progress_path=progress_path,
+        progress=_build_suite_progress(
+            run_id=run_id,
+            run_root=run_root,
+            output_root=output_root,
+            model=model,
+            started_at=started_at,
+            status="running",
+            current_abm=None,
+            current_attempt=None,
+            remaining_abms=remaining_abms,
+            progress_by_name=progress_by_name,
+        ),
+    )
     for attempt in range(1, max(max_abm_attempts, 1) + 1):
         next_remaining: list[str] = []
         transient_failure_seen = False
@@ -110,6 +172,25 @@ def run_full_case_suite_smoke(
             case_input = abm_inputs[abm]
             abm_output_root = output_root / "abms" / abm
             case_specs = cases_by_abm[abm]
+            progress_by_name[abm] = progress_by_name[abm].model_copy(
+                update={"status": "running", "attempt": attempt, "last_error": None}
+            )
+            _write_suite_progress(
+                output_root=output_root,
+                progress_path=progress_path,
+                progress=_build_suite_progress(
+                    run_id=run_id,
+                    run_root=run_root,
+                    output_root=output_root,
+                    model=model,
+                    started_at=started_at,
+                    status="running",
+                    current_abm=abm,
+                    current_attempt=attempt,
+                    remaining_abms=remaining_abms,
+                    progress_by_name=progress_by_name,
+                ),
+            )
             log_event(
                 LOGGER,
                 "full_case_suite_abm_start",
@@ -166,7 +247,31 @@ def run_full_case_suite_smoke(
                 if is_transient_provider_error(error_text) and attempt < max_abm_attempts:
                     next_remaining.append(abm)
                     transient_failure_seen = True
+                progress_by_name[abm] = progress_by_name[abm].model_copy(
+                    update={
+                        "status": "retrying" if abm in next_remaining else "failed",
+                        "attempt": attempt,
+                        "failed_case_count": len(abm_result.failed_case_ids),
+                        "run_root": abm_result.run_root,
+                        "run_log_path": run_log_path(abm_result.run_root),
+                        "review_html_path": abm_result.review_html_path,
+                        "report_json_path": abm_result.report_json_path,
+                        "last_error": error_text,
+                    }
+                )
             abm_results_by_name[abm] = abm_result
+            if abm_result.success:
+                progress_by_name[abm] = progress_by_name[abm].model_copy(
+                    update={
+                        "status": "completed",
+                        "attempt": attempt,
+                        "failed_case_count": len(abm_result.failed_case_ids),
+                        "run_root": abm_result.run_root,
+                        "run_log_path": run_log_path(abm_result.run_root),
+                        "review_html_path": abm_result.review_html_path,
+                        "report_json_path": abm_result.report_json_path,
+                    }
+                )
             log_event(
                 LOGGER,
                 "full_case_suite_abm_complete",
@@ -175,6 +280,22 @@ def run_full_case_suite_smoke(
                 failed_case_count=len(abm_result.failed_case_ids),
                 run_root=str(abm_result.run_root),
                 attempt=attempt,
+            )
+            _write_suite_progress(
+                output_root=output_root,
+                progress_path=progress_path,
+                progress=_build_suite_progress(
+                    run_id=run_id,
+                    run_root=run_root,
+                    output_root=output_root,
+                    model=model,
+                    started_at=started_at,
+                    status="running",
+                    current_abm=abm,
+                    current_attempt=attempt,
+                    remaining_abms=next_remaining or [item for item in remaining_abms if item != abm],
+                    progress_by_name=progress_by_name,
+                ),
             )
         if not next_remaining:
             break
@@ -185,6 +306,22 @@ def run_full_case_suite_smoke(
                 wait_seconds=CIRCUIT_BREAKER_OPEN_SECONDS,
                 remaining_abms=next_remaining,
                 next_attempt=attempt + 1,
+            )
+            _write_suite_progress(
+                output_root=output_root,
+                progress_path=progress_path,
+                progress=_build_suite_progress(
+                    run_id=run_id,
+                    run_root=run_root,
+                    output_root=output_root,
+                    model=model,
+                    started_at=started_at,
+                    status="waiting_to_retry",
+                    current_abm=None,
+                    current_attempt=attempt + 1,
+                    remaining_abms=next_remaining,
+                    progress_by_name=progress_by_name,
+                ),
             )
             time.sleep(CIRCUIT_BREAKER_OPEN_SECONDS)
         remaining_abms = next_remaining
@@ -225,6 +362,24 @@ def run_full_case_suite_smoke(
     _write_text(result.report_markdown_path, _render_report(result))
     _write_summary_csv(result.review_csv_path, summary_rows)
     _write_text(result.review_html_path, _render_html(result))
+    _write_text(output_root / "review.html", _render_live_html())
+    _write_suite_progress(
+        output_root=output_root,
+        progress_path=progress_path,
+        progress=_build_suite_progress(
+            run_id=run_id,
+            run_root=run_root,
+            output_root=output_root,
+            model=model,
+            started_at=started_at,
+            status="completed" if result.success else "failed",
+            current_abm=None,
+            current_attempt=None,
+            remaining_abms=[],
+            progress_by_name=progress_by_name,
+            finished_at=finished_at,
+        ),
+    )
     log_event(
         LOGGER,
         "full_case_suite_complete",
@@ -336,4 +491,153 @@ def _render_html(result: FullCaseSuiteSmokeResult) -> str:
         "</style></head><body>"
         f'<header><h1>Mistral Generation Dashboard</h1><p class="subtle">Run {result.run_id}</p></header>'
         f"{summary_cards}<main>{cards}</main></body></html>"
+    )
+
+
+def _build_suite_progress(
+    *,
+    run_id: str,
+    run_root: Path,
+    output_root: Path,
+    model: str,
+    started_at: datetime,
+    status: str,
+    current_abm: str | None,
+    current_attempt: int | None,
+    remaining_abms: list[str],
+    progress_by_name: dict[str, FullCaseSuiteProgressAbm],
+    finished_at: datetime | None = None,
+) -> FullCaseSuiteProgress:
+    abm_progress = [progress_by_name[abm] for abm in progress_by_name]
+    completed_abm_count = sum(1 for item in abm_progress if item.status == "completed")
+    failed_abm_count = sum(1 for item in abm_progress if item.status == "failed")
+    planned_case_count = sum(item.planned_case_count for item in abm_progress)
+    failed_case_count = sum(item.failed_case_count for item in abm_progress)
+    return FullCaseSuiteProgress(
+        run_id=run_id,
+        run_root=run_root,
+        output_root=output_root,
+        model=model,
+        started_at_utc=started_at.isoformat(),
+        finished_at_utc=finished_at.isoformat() if finished_at is not None else None,
+        status=status,
+        current_abm=current_abm,
+        current_attempt=current_attempt,
+        total_abms=len(abm_progress),
+        completed_abm_count=completed_abm_count,
+        failed_abm_count=failed_abm_count,
+        planned_case_count=planned_case_count,
+        failed_case_count=failed_case_count,
+        remaining_abms=list(remaining_abms),
+        abms=abm_progress,
+    )
+
+
+def _write_suite_progress(*, output_root: Path, progress_path: Path, progress: FullCaseSuiteProgress) -> None:
+    _write_json(progress_path, progress.model_dump(mode="json"))
+    _write_text(output_root / "review.html", _render_live_html())
+
+
+def _render_live_html() -> str:
+    style_rules = [
+        (
+            "body{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"
+            "'Segoe UI',sans-serif;margin:0;background:#f5f3ef;color:#171717}"
+        ),
+        "header{padding:28px 32px 12px 32px}",
+        "h1{margin:0 0 6px 0;font-size:28px}",
+        ".subtle{color:#5f5a53;font-size:14px}",
+        (
+            ".summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));"
+            "gap:12px;padding:0 32px 20px 32px}"
+        ),
+        (
+            ".summary-card,.abm-card{background:#fff;border:1px solid #ddd6cc;"
+            "border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}"
+        ),
+        ".summary-card{padding:16px 18px}",
+        ".summary-card h2{margin:0 0 8px 0;font-size:13px;color:#6b6358;text-transform:uppercase;letter-spacing:.04em}",
+        ".summary-card p{margin:0;font-size:24px}",
+        "main{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:0 32px 32px 32px}",
+        ".abm-card{padding:18px}",
+        ".abm-card h2{margin:0 0 8px 0;font-size:20px}",
+        ".status{font-size:12px;padding:4px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}",
+        ".status.ok{background:#e8f7ea;color:#1f6a32}",
+        ".status.bad{background:#fdebec;color:#9b2335}",
+        ".status.running{background:#fff4d8;color:#8a5a00}",
+        ".status.waiting{background:#e8f0ff;color:#1d4ed8}",
+        ".status.pending{background:#efefef;color:#555}",
+        "dl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 14px 0}",
+        "dt{font-size:12px;color:#6b6358;text-transform:uppercase;letter-spacing:.04em}",
+        "dd{margin:4px 0 0 0;font-size:18px}",
+        ".links{display:flex;gap:14px;flex-wrap:wrap;margin:0}",
+        ".links a{color:#0d5bd7;text-decoration:none}",
+        ".links a:hover{text-decoration:underline}",
+        ".error{color:#9b2335;font-size:13px;margin-top:12px;white-space:pre-wrap}",
+        ".dim{color:#6b6358}",
+    ]
+    script_lines = [
+        "async function load(){",
+        "const res=await fetch('./suite_progress.json?ts='+Date.now(),{cache:'no-store'});",
+        "if(!res.ok){throw new Error('progress unavailable');}",
+        "const data=await res.json();",
+        (
+            "const statusClass=(s)=>s==='completed'?'ok':"
+            "(s==='failed'?'bad':(s==='running'?'running':"
+            "(s==='waiting_to_retry'?'waiting':'pending')));"
+        ),
+        "document.getElementById('summary').innerHTML=[",
+        "`<article class=\"summary-card\"><h2>Run</h2><p>${data.run_id}</p></article>`,",
+        "`<article class=\"summary-card\"><h2>Status</h2><p>${data.status}</p></article>`,",
+        "`<article class=\"summary-card\"><h2>Current ABM</h2><p>${data.current_abm ?? '-'}</p></article>`,",
+        "`<article class=\"summary-card\"><h2>Attempt</h2><p>${data.current_attempt ?? '-'}</p></article>`,",
+        (
+            "`<article class=\"summary-card\"><h2>Completed ABMs</h2>"
+            "<p>${data.completed_abm_count}/${data.total_abms}</p></article>`,"
+        ),
+        "`<article class=\"summary-card\"><h2>Failed cases</h2><p>${data.failed_case_count}</p></article>`",
+        "].join('');",
+        "document.getElementById('abms').innerHTML=data.abms.map(item=>{",
+        "const reviewer=item.review_html_path ? `<a href=\"${item.review_html_path}\">reviewer</a>` : '';",
+        "const report=item.report_json_path ? `<a href=\"${item.report_json_path}\">report</a>` : '';",
+        "const log=item.run_log_path ? `<a href=\"${item.run_log_path}\">log</a>` : '';",
+        "const error=item.last_error ? `<p class=\"error\">${item.last_error}</p>` : '';",
+        (
+            "return `<article class=\"abm-card\"><header style=\"display:flex;"
+            "justify-content:space-between;align-items:center\"><h2>${item.abm}</h2>"
+            "<span class=\"status ${statusClass(item.status)}\">${item.status}</span></header>"
+            "<dl><div><dt>Planned cases</dt><dd>${item.planned_case_count}</dd></div>"
+            "<div><dt>Failed cases</dt><dd>${item.failed_case_count}</dd></div>"
+            "<div><dt>Attempt</dt><dd>${item.attempt ?? '-'}</dd></div>"
+            "<div><dt>Run root</dt><dd class=\"dim\">${item.run_root ?? '-'}</dd></div></dl>"
+            "<p class=\"links\">${reviewer}${report}${log}</p>${error}</article>`;"
+        ),
+        "}).join('');",
+        "}",
+        "load().catch(err=>{",
+        (
+            "document.getElementById('summary').innerHTML="
+            "`<article class=\"summary-card\"><h2>Status</h2><p>waiting</p></article>"
+            "<article class=\"summary-card\"><h2>Message</h2><p class=\"dim\">${err.message}</p></article>`;"
+        ),
+        "});",
+        "setInterval(load,3000);",
+    ]
+    return "".join(
+        [
+            '<!doctype html><html><head><meta charset="utf-8"><title>Mistral Generation Dashboard</title>',
+            '<meta name="viewport" content="width=device-width, initial-scale=1">',
+            "<style>",
+            "".join(style_rules),
+            "</style></head><body>",
+            (
+                '<header><h1>Mistral Generation Dashboard</h1><p class="subtle">'
+                "This page refreshes automatically while the suite is running."
+                "</p></header>"
+            ),
+            '<section id="summary" class="summary-grid"></section><main id="abms"></main>',
+            "<script>",
+            "".join(script_lines),
+            "</script></body></html>",
+        ]
     )

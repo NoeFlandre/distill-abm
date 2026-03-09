@@ -186,6 +186,37 @@ def test_collect_local_qwen_monitor_snapshot_uses_validation_state_for_full_case
     assert snapshot.cases[0].status == "completed"
 
 
+def test_collect_local_qwen_monitor_snapshot_reads_suite_progress(tmp_path: Path) -> None:
+    (tmp_path / "suite_progress.json").write_text(
+        json.dumps(
+            {
+                "run_id": "run_1",
+                "status": "running",
+                "current_abm": "fauna",
+                "total_abms": 3,
+                "completed_abm_count": 1,
+                "failed_abm_count": 0,
+                "abms": [
+                    {"abm": "fauna", "status": "running", "last_error": None},
+                    {"abm": "grazing", "status": "pending", "last_error": None},
+                    {"abm": "milk_consumption", "status": "pending", "last_error": "waiting"},
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    snapshot = collect_local_qwen_monitor_snapshot(tmp_path)
+
+    assert snapshot.exists is True
+    assert snapshot.mode == "suite"
+    assert snapshot.total_cases == 3
+    assert snapshot.completed_cases == 1
+    assert snapshot.failed_cases == 0
+    assert snapshot.running_case_id == "fauna"
+    assert snapshot.cases[2].error == "waiting"
+
+
 def test_render_local_qwen_monitor_rich_includes_summary_and_failures() -> None:
     snapshot = LocalQwenMonitorSnapshot(
         output_root=Path("results/run"),
