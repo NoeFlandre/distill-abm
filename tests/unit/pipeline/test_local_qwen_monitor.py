@@ -151,6 +151,9 @@ def test_collect_local_qwen_monitor_snapshot_resolves_latest_run_and_full_case_l
     assert case.trend_prompt_length == 900
     assert case.context_total_tokens == 111
     assert case.trend_total_tokens == 222
+    assert case.progress_detail == "done"
+    assert case.completed_steps == 2
+    assert case.total_steps == 2
 
 
 def test_collect_local_qwen_monitor_snapshot_uses_validation_state_for_full_case_status(tmp_path: Path) -> None:
@@ -184,6 +187,41 @@ def test_collect_local_qwen_monitor_snapshot_uses_validation_state_for_full_case
 
     assert snapshot.total_cases == 1
     assert snapshot.cases[0].status == "completed"
+
+
+def test_collect_local_qwen_monitor_snapshot_reports_running_full_case_detail(tmp_path: Path) -> None:
+    run_root = tmp_path / "runs" / "run_1"
+    (tmp_path / "latest_run.txt").write_text(str(run_root), encoding="utf-8")
+    case_dir = run_root / "cases" / "01_case"
+    context_dir = case_dir / "02_context"
+    trend_dir = case_dir / "03_trends" / "plot_01"
+    context_dir.mkdir(parents=True, exist_ok=True)
+    trend_dir.mkdir(parents=True, exist_ok=True)
+    (context_dir / "context_trace.json").write_text(
+        json.dumps({"response": {"usage": {"total_tokens": 111}}}),
+        encoding="utf-8",
+    )
+    (trend_dir / "trend_request.json").write_text(
+        json.dumps({"max_tokens": 2048, "prompt_length": 900, "metadata": {"ollama_num_ctx": 0}}),
+        encoding="utf-8",
+    )
+    (case_dir / "validation_state.json").write_text(
+        json.dumps(
+            {
+                "context": {"status": "accepted", "error": None},
+                "trends": {},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    snapshot = collect_local_qwen_monitor_snapshot(tmp_path)
+
+    case = snapshot.cases[0]
+    assert case.status == "running"
+    assert case.progress_detail == "trend plot_01"
+    assert case.completed_steps == 1
+    assert case.total_steps == 2
 
 
 def test_collect_local_qwen_monitor_snapshot_reads_suite_progress(tmp_path: Path) -> None:

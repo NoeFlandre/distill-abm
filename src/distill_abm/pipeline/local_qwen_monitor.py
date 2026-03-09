@@ -36,6 +36,9 @@ class LocalQwenCaseSnapshot:
     context_total_tokens: int | None
     trend_total_tokens: int | None
     error: str | None
+    progress_detail: str | None = None
+    completed_steps: int | None = None
+    total_steps: int | None = None
 
 
 @dataclass(frozen=True)
@@ -404,6 +407,9 @@ def _collect_sample_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
         context_total_tokens=_extract_total_tokens(context_trace),
         trend_total_tokens=_extract_total_tokens(trend_trace),
         error=error_text,
+        progress_detail="trend" if trend_request is not None else ("context" if context_request is not None else None),
+        completed_steps=1 if trend_trace is not None else (0 if context_trace is None else 1),
+        total_steps=2,
     )
 
 
@@ -421,6 +427,7 @@ def _collect_full_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
     failed_trends = _failed_trends_from_validation_state(validation_state, trend_dirs)
     accepted_trends = _accepted_trend_count_from_validation_state(validation_state)
     completed_trends = [trace for trace in trend_traces if trace is not None]
+    completed_trend_count = max(accepted_trends, len(completed_trends))
     any_started_trend = any(
         (trend_dir / "trend_request.json").exists() or (trend_dir / "trend_trace.json").exists()
         for trend_dir in trend_dirs
@@ -443,6 +450,24 @@ def _collect_full_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
     error = context_error
     if not error and failed_trends:
         error = f"failed_trends={','.join(failed_trends)}"
+    progress_detail: str | None = None
+    if status == "running":
+        if context_request is not None and context_trace is None and not any_started_trend:
+            progress_detail = "context"
+        else:
+            active_trend = next(
+                (
+                    trend_dir.name
+                    for trend_dir, trend_trace in zip(trend_dirs, trend_traces, strict=False)
+                    if (trend_dir / "trend_request.json").exists() and trend_trace is None
+                ),
+                None,
+            )
+            progress_detail = f"trend {active_trend}" if active_trend is not None else "trend"
+    elif status == "completed":
+        progress_detail = "done"
+    elif status == "failed" and failed_trends:
+        progress_detail = f"failed trend {failed_trends[0]}"
     return LocalQwenCaseSnapshot(
         case_id=case_dir.name,
         status=status,
@@ -454,6 +479,9 @@ def _collect_full_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
         context_total_tokens=_extract_total_tokens(context_trace),
         trend_total_tokens=_extract_total_tokens(representative_trend_trace),
         error=error,
+        progress_detail=progress_detail,
+        completed_steps=(1 if context_accepted or context_trace is not None else 0) + completed_trend_count,
+        total_steps=1 + len(trend_dirs),
     )
 
 
@@ -725,6 +753,13 @@ def _render_selected_case_details(case: LocalQwenCaseSnapshot | None) -> Rendera
     details.add_row(
         "trend length",
         "-" if case.trend_prompt_length is None else str(case.trend_prompt_length),
+    )
+    details.add_row("progress", case.progress_detail or "-")
+    details.add_row(
+        "steps",
+        "-"
+        if case.completed_steps is None or case.total_steps is None
+        else f"{case.completed_steps}/{case.total_steps}",
     )
     details.add_row("error", case.error or "-")
     return details
