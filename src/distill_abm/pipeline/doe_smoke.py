@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
@@ -205,6 +206,8 @@ def run_doe_smoke_suite(
             prompt_variants=prompt_variants,
             evidence_modes=evidence_modes,
             output_root=run_root,
+            logger=logger,
+            run_id=run_id,
             shared_context_paths=shared_context_paths,
             shared_plot_prompt_paths=shared_plot_prompt_paths,
         )
@@ -561,6 +564,8 @@ def _materialize_shared_abm_bundle(
     prompt_variants: tuple[DoESmokePromptVariant, ...],
     evidence_modes: tuple[Literal["plot", "table", "plot+table"], ...],
     output_root: Path,
+    logger: logging.Logger,
+    run_id: str,
     shared_context_paths: dict[tuple[str, str], Path],
     shared_plot_prompt_paths: dict[tuple[str, str, str, int], Path],
 ) -> DoESmokeSharedAbmResult:
@@ -584,9 +589,28 @@ def _materialize_shared_abm_bundle(
     shutil.copy2(abm_input.csv_path, copied_csv_path)
     shutil.copy2(abm_input.parameters_path, copied_parameters_path)
     shutil.copy2(abm_input.documentation_path, copied_documentation_path)
+    log_event(
+        logger,
+        "doe_smoke_shared_inputs_ready",
+        run_id=run_id,
+        abm=abm_input.abm,
+        csv_path=str(copied_csv_path),
+        parameters_path=str(copied_parameters_path),
+        documentation_path=str(copied_documentation_path),
+        row_count=len(frame),
+        column_count=len(frame.columns),
+    )
     if len(abm_input.plots) <= 0:
         stage_errors.append("no plot definitions configured")
     for plot_input in abm_input.plots:
+        log_event(
+            logger,
+            "doe_smoke_shared_plot_start",
+            run_id=run_id,
+            abm=abm_input.abm,
+            plot_index=plot_input.plot_index,
+            reporter_pattern=plot_input.reporter_pattern,
+        )
         if not plot_input.plot_path.exists() or plot_input.plot_path.stat().st_size <= 0:
             stage_errors.append(f"plot {plot_input.plot_index} missing or empty: {plot_input.plot_path}")
         else:
@@ -633,8 +657,32 @@ def _materialize_shared_abm_bundle(
         )
         if detect_placeholder_signals(plot_input.plot_description):
             stage_errors.append(f"plot {plot_input.plot_index} description contains placeholder-like text")
+        log_event(
+            logger,
+            "doe_smoke_shared_plot_complete",
+            run_id=run_id,
+            abm=abm_input.abm,
+            plot_index=plot_input.plot_index,
+            table_path=str(table_path),
+            series_path=str(
+                _shared_table_series_path(
+                    output_root=output_root,
+                    abm=abm_input.abm,
+                    plot_index=plot_input.plot_index,
+                )
+            ),
+            has_stage_errors=bool(stage_errors),
+        )
 
     for prompt_variant in prompt_variants:
+        log_event(
+            logger,
+            "doe_smoke_shared_prompt_variant_start",
+            run_id=run_id,
+            abm=abm_input.abm,
+            prompt_variant=prompt_variant.variant_id,
+            evidence_modes=list(evidence_modes),
+        )
         enabled = set(prompt_variant.enabled_style_features)
         context_prompt = _build_legacy_doe_context_prompt(
             abm=abm_input.abm,
@@ -682,6 +730,14 @@ def _materialize_shared_abm_bundle(
                 shared_plot_prompt_paths[
                     (abm_input.abm, prompt_variant.variant_id, evidence_mode, plot_input.plot_index)
                 ] = trend_prompt_path
+        log_event(
+            logger,
+            "doe_smoke_shared_prompt_variant_complete",
+            run_id=run_id,
+            abm=abm_input.abm,
+            prompt_variant=prompt_variant.variant_id,
+            trend_prompt_count=len(abm_input.plots) * len(evidence_modes),
+        )
 
     artifact_index_path = shared_dir / "artifact_index.json"
     artifact_index_path.write_text(
