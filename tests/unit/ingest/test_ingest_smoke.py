@@ -58,6 +58,9 @@ def test_run_ingest_smoke_suite_writes_stage_level_report(tmp_path: Path) -> Non
     )
 
     assert result.success is True
+    assert result.run_root.parent == tmp_path / "ingest-smoke" / "runs"
+    assert result.run_log_path.exists()
+    assert (tmp_path / "ingest-smoke" / "latest_run.txt").exists()
     assert result.report_json_path.exists()
     assert result.report_markdown_path.exists()
     assert len(result.abms) == 3
@@ -98,4 +101,5 @@ def test_code_stage_allows_todo_comments_in_real_code(tmp_path: Path) -> None:
     )
 
     assert result.success is True
+    assert result.run_log_path.exists()
     assert result.abms[0].stage_results[0].status == "ok"

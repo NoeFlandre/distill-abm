@@ -226,6 +226,7 @@ Agent-oriented CLI additions:
 - `smoke-ingest-netlogo` supports `--require-stage` so callers can assert that specific stage checks are present.
 - `smoke-viz` provides stage-filtering and `--require-stage` for the generated simulation CSV and each ordered plot image.
 - `smoke-doe` provides a structured pre-LLM view of the full DOE matrix and writes grouped shared artifacts plus compact case/request indexes that can be reviewed without opening thousands of files.
+- `smoke-ingest-netlogo`, `smoke-viz`, and `smoke-doe` now follow the same audit contract as the later smokes: each invocation writes into `runs/run_<timestamp>/`, updates `latest_run.txt`, and emits a qualitative root `run.log.jsonl`.
 - `smoke-local-qwen` is the legacy command name for the sampled real-inference smoke. It now runs through the configured API model and writes one self-contained folder per sampled case plus a review CSV with exact prompt text, evidence paths, hyperparameters, outputs, and a minimalist static `review.html` viewer.
 - `smoke-local-qwen` supports `--resume` and reuses only successful case artifacts; failed or incomplete cases are rerun.
 - `smoke-full-case-matrix` runs one ABM across evidence modes, prompt variants, and repetitions, with one context prompt plus all ordered trend prompts per case. It uses the same run separation, resume behavior, `run.log.jsonl`, and `review.html` reviewer surface as the sampled smoke.

@@ -115,6 +115,8 @@ from distill_abm.pipeline.doe_smoke_reporting import (
 from distill_abm.pipeline.doe_smoke_reporting import (
     write_shared_global_indexes as _write_shared_global_indexes,
 )
+from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, run_log_path
+from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
 from distill_abm.utils import detect_placeholder_signals
 
 __all__ = [
@@ -151,13 +153,31 @@ def run_doe_smoke_suite(
     """Materialize the full pre-LLM DOE matrix without executing any model call."""
     started_at = datetime.now(UTC)
     output_root.mkdir(parents=True, exist_ok=True)
-    _overview_dir(output_root).mkdir(parents=True, exist_ok=True)
-    _shared_root_dir(output_root).mkdir(parents=True, exist_ok=True)
-    _shared_global_dir(output_root).mkdir(parents=True, exist_ok=True)
-    _case_index_dir(output_root).mkdir(parents=True, exist_ok=True)
+    run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
+    run_root = output_root / "runs" / run_id
+    run_root.mkdir(parents=True, exist_ok=True)
+    latest_run_pointer_path(output_root).write_text(str(run_root), encoding="utf-8")
+    attached_run_log_path = attach_json_log_file(run_log_path(run_root))
+    logger = get_logger(__name__)
+    _overview_dir(run_root).mkdir(parents=True, exist_ok=True)
+    _shared_root_dir(run_root).mkdir(parents=True, exist_ok=True)
+    _shared_global_dir(run_root).mkdir(parents=True, exist_ok=True)
+    _case_index_dir(run_root).mkdir(parents=True, exist_ok=True)
     summarization_specs = summarization_specs or canonical_summarization_specs()
     prompt_variants = prompt_variants or canonical_prompt_variants()
     defaults = get_runtime_defaults().llm_request
+    log_event(
+        logger,
+        "doe_smoke_start",
+        run_id=run_id,
+        output_root=str(output_root),
+        run_root=str(run_root),
+        abm_count=len(abm_inputs),
+        model_count=len(model_specs),
+        evidence_modes=list(evidence_modes),
+        prompt_variants=[variant.variant_id for variant in prompt_variants],
+        repetitions=list(repetitions),
+    )
 
     shared_by_abm: dict[str, DoESmokeSharedAbmResult] = {}
     shared_context_paths: dict[tuple[str, str], Path] = {}
@@ -170,7 +190,7 @@ def run_doe_smoke_suite(
     request_review_rows: list[dict[str, str]] = []
 
     _write_shared_global_indexes(
-        output_root=output_root,
+        output_root=run_root,
         model_specs=model_specs,
         summarization_specs=summarization_specs,
         prompt_variants=prompt_variants,
@@ -178,14 +198,23 @@ def run_doe_smoke_suite(
     )
 
     for abm in sorted(abm_inputs):
+        log_event(logger, "doe_smoke_shared_abm_start", run_id=run_id, abm=abm)
         shared_by_abm[abm] = _materialize_shared_abm_bundle(
             abm_input=abm_inputs[abm],
             prompts=prompts,
             prompt_variants=prompt_variants,
             evidence_modes=evidence_modes,
-            output_root=output_root,
+            output_root=run_root,
             shared_context_paths=shared_context_paths,
             shared_plot_prompt_paths=shared_plot_prompt_paths,
+        )
+        log_event(
+            logger,
+            "doe_smoke_shared_abm_complete",
+            run_id=run_id,
+            abm=abm,
+            stage_errors=shared_by_abm[abm].stage_errors,
+            plot_count=shared_by_abm[abm].plot_count,
         )
 
     for abm in sorted(abm_inputs):
@@ -238,12 +267,12 @@ def run_doe_smoke_suite(
                                 ]
                                 prompt_text = prompt_path.read_text(encoding="utf-8")
                                 shared_plot_path = _shared_plot_copy_path(
-                                    output_root=output_root,
+                                    output_root=run_root,
                                     abm=abm,
                                     plot_index=plot_input.plot_index,
                                 )
                                 table_csv_path = _shared_table_path(
-                                    output_root=output_root,
+                                    output_root=run_root,
                                     abm=abm,
                                     plot_index=plot_input.plot_index,
                                 )
@@ -375,12 +404,27 @@ def run_doe_smoke_suite(
                                     "context_prompt_path": str(context_prompt_path),
                                 }
                             )
+                            log_event(
+                                logger,
+                                "doe_smoke_case_materialized",
+                                run_id=run_id,
+                                case_id=case_id,
+                                abm=abm,
+                                model_id=model_spec.model_id,
+                                evidence_mode=evidence_mode,
+                                summarization_mode=summarization.summarization_mode,
+                                prompt_variant=prompt_variant.variant_id,
+                                repetition=repetition,
+                                status=case_status,
+                                failed_plot_indices=failed_plot_indices,
+                                error_codes=error_codes,
+                            )
 
-    case_index_jsonl_path = _case_index_dir(output_root) / "cases.jsonl"
-    request_index_jsonl_path = _case_index_dir(output_root) / "requests.jsonl"
-    design_matrix_csv_path = _overview_dir(output_root) / "design_matrix.csv"
-    request_matrix_csv_path = _overview_dir(output_root) / "request_matrix.csv"
-    request_review_csv_path = _overview_dir(output_root) / "request_review.csv"
+    case_index_jsonl_path = _case_index_dir(run_root) / "cases.jsonl"
+    request_index_jsonl_path = _case_index_dir(run_root) / "requests.jsonl"
+    design_matrix_csv_path = _overview_dir(run_root) / "design_matrix.csv"
+    request_matrix_csv_path = _overview_dir(run_root) / "request_matrix.csv"
+    request_review_csv_path = _overview_dir(run_root) / "request_review.csv"
     _write_jsonl(path=case_index_jsonl_path, rows=case_records)
     _write_jsonl(path=request_index_jsonl_path, rows=[dict(row) for row in request_rows])
     _write_csv(
@@ -469,13 +513,16 @@ def run_doe_smoke_suite(
     total_trend_requests = sum(len(abm_inputs[case.abm].plots) for case in case_results)
     total_planned_requests = total_context_requests + total_trend_requests
     finished_at = datetime.now(UTC)
-    report_json_path = _overview_dir(output_root) / "doe_smoke_report.json"
-    report_markdown_path = _overview_dir(output_root) / "doe_smoke_report.md"
-    _layout_guide_path(output_root).write_text(_render_layout_guide(output_root), encoding="utf-8")
+    report_json_path = _overview_dir(run_root) / "doe_smoke_report.json"
+    report_markdown_path = _overview_dir(run_root) / "doe_smoke_report.md"
+    _layout_guide_path(run_root).write_text(_render_layout_guide(run_root), encoding="utf-8")
     result = DoESmokeSuiteResult(
         started_at_utc=started_at.isoformat(),
         finished_at_utc=finished_at.isoformat(),
         output_root=output_root,
+        run_id=run_id,
+        run_root=run_root,
+        run_log_path=attached_run_log_path,
         success=not failed_case_ids,
         total_cases=len(case_results),
         total_planned_requests=total_planned_requests,
@@ -494,6 +541,16 @@ def run_doe_smoke_suite(
     )
     report_json_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
     report_markdown_path.write_text(_render_markdown_report(result), encoding="utf-8")
+    log_event(
+        logger,
+        "doe_smoke_complete",
+        run_id=run_id,
+        success=result.success,
+        total_cases=result.total_cases,
+        failed_case_ids=failed_case_ids,
+        report_json_path=str(report_json_path),
+        report_markdown_path=str(report_markdown_path),
+    )
     return result
 
 

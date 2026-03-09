@@ -310,7 +310,12 @@ def _rolling_mann_kendall(*, values: np.ndarray, compression_tier: int) -> dict[
         segment = values[start : start + window]
         if len(segment) < 3:
             continue
-        result = mk.original_test(segment)
+        if np.unique(segment).size < 2:
+            continue
+        try:
+            result = mk.original_test(segment)
+        except Exception:
+            continue
         rows.append(
             {
                 "start_index": int(start),

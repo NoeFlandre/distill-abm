@@ -142,6 +142,9 @@ class DoESmokeSuiteResult(BaseModel):
     started_at_utc: str
     finished_at_utc: str
     output_root: Path
+    run_id: str
+    run_root: Path
+    run_log_path: Path
     success: bool
     total_cases: int
     total_planned_requests: int

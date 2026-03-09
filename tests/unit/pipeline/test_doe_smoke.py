@@ -92,6 +92,9 @@ def test_run_doe_smoke_suite_writes_grouped_shared_and_case_artifacts(tmp_path: 
     )
 
     assert result.success is True
+    assert result.run_root.parent == tmp_path / "doe-smoke" / "runs"
+    assert result.run_log_path.exists()
+    assert (tmp_path / "doe-smoke" / "latest_run.txt").exists()
     assert result.total_cases == 1
     assert result.total_planned_requests == 3
     assert result.design_matrix_csv_path.exists()
@@ -101,7 +104,7 @@ def test_run_doe_smoke_suite_writes_grouped_shared_and_case_artifacts(tmp_path: 
     assert result.request_index_jsonl_path.exists()
     assert result.design_matrix_csv_path.parent.name == "00_overview"
     assert result.abm_shared["milk_consumption"].shared_dir.exists()
-    assert result.abm_shared["milk_consumption"].shared_dir == tmp_path / "doe-smoke" / "10_shared" / "milk_consumption"
+    assert result.abm_shared["milk_consumption"].shared_dir == result.run_root / "10_shared" / "milk_consumption"
     assert (result.abm_shared["milk_consumption"].shared_dir / "01_inputs" / "simulation.csv").exists()
     assert (result.abm_shared["milk_consumption"].shared_dir / "02_evidence" / "plots" / "plot_1.png").exists()
     assert (result.abm_shared["milk_consumption"].shared_dir / "02_evidence" / "tables" / "plot_1.txt").exists()
@@ -150,6 +153,8 @@ def test_run_doe_smoke_suite_uses_legacy_style_prompt_composition_and_statistica
         ),
         repetitions=(1,),
     )
+
+    assert result.run_log_path.exists()
 
     context_prompt = (
         result.abm_shared["milk_consumption"].shared_dir / "03_prompts" / "context" / "role+insights.txt"
