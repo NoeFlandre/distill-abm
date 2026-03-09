@@ -104,7 +104,7 @@ class _ConcurrentAdapter(LLMAdapter):
 
 
 def test_resolve_parallel_trend_workers_reduces_for_mistral() -> None:
-    assert resolve_parallel_trend_workers("mistral") == 3
+    assert resolve_parallel_trend_workers("mistral") == 1
     assert resolve_parallel_trend_workers("openrouter") == 6
 
 

@@ -116,7 +116,7 @@ def resolve_parallel_case_workers(provider: str) -> int:
     """Return a provider-aware matrix case worker count."""
 
     if provider.strip().lower() == "mistral":
-        return 2
+        return 1
     return MAX_PARALLEL_CASES
 
 

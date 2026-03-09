@@ -103,7 +103,7 @@ def resolve_parallel_trend_workers(provider: str) -> int:
     """Return a provider-aware trend worker count."""
 
     if provider.strip().lower() == "mistral":
-        return 3
+        return 1
     return MAX_PARALLEL_TRENDS
 
 
