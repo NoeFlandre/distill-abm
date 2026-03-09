@@ -129,16 +129,8 @@ def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkey
     assert result.report_markdown_path.exists()
     assert result.review_csv_path.exists()
     assert result.review_html_path.exists()
-    assert (tmp_path / "suite" / "review.html").exists()
     assert (tmp_path / "suite" / "suite_progress.json").exists()
     assert "Mistral Generation Dashboard" in result.review_html_path.read_text(encoding="utf-8")
-    root_review = (tmp_path / "suite" / "review.html").read_text(encoding="utf-8")
-    assert 'http-equiv="refresh"' in root_review
-    assert "fauna" in root_review
-    assert "Current case" in root_review
-    assert "Current work" in root_review
-    assert "trend plot_07" in root_review
-    assert "Completed cases" in root_review
     assert "Planned cases" in result.report_markdown_path.read_text(encoding="utf-8")
 
 

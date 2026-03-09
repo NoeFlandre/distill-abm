@@ -32,9 +32,8 @@ Debug-only model note:
 - The all-ABMs generation audit run is exposed through `smoke-full-case-suite`.
 - `smoke-full-case-suite` writes a stable suite root with:
   - `suite_progress.json`
-  - a top-level `review.html` that auto-refreshes from the persisted progress state while the run is live and works when opened directly from disk
   - one nested matrix run per ABM under `abms/<abm>/runs/`
-  - one stable `abms/<abm>/current/` view with the latest reviewer, report, CSV, and log for that ABM
+  - one stable `abms/<abm>/current/` view with the latest report, CSV, and log for that ABM
 - Mistral suite execution is paced and worker-limited specifically for its API budget, so the scheduler stays below the provider request ceiling instead of overscheduling pointlessly.
 
 ## Summarizers
@@ -241,7 +240,7 @@ Agent-oriented CLI additions:
 - `smoke-full-case-matrix` runs one ABM across evidence modes, prompt variants, and repetitions, with one context prompt plus all ordered trend prompts per case. It uses the same run separation, resume behavior, `run.log.jsonl`, and `review.html` reviewer surface as the sampled smoke.
 - `render-run-viewer` builds the same minimalist static HTML viewer for any existing case-based run directory, including both one-trend sampled smokes and full-case multi-trend runs, or for the latest run when you point it at a root containing `latest_run.txt`.
 - `monitor-local-qwen` and `monitor-run` render the same compact live dashboard for case-based smoke runs, including current case or trial, configured `num_ctx`, `max_tokens`, prompt lengths, and observed token usage.
-- For all-ABM suite runs, `monitor-run` now reads the suite root directly and uses `suite_progress.json` so you can monitor the whole run from one place.
+- For all-ABM suite runs, `monitor-run` now reads the suite root directly and uses `suite_progress.json` plus the nested ABM run state so you can monitor the whole run from one place in the terminal.
 - `health-check` performs a lightweight read-only validation of configured ABMs, model-registry resolution, and expected ingest/viz artifact roots.
 - `ingest-netlogo` and `ingest-netlogo-suite` now write stable artifact manifests.
 - Read-only inspection commands are available for agent loops:

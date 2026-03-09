@@ -113,34 +113,25 @@ def collect_local_qwen_monitor_snapshot(output_root: Path) -> LocalQwenMonitorSn
 def render_local_qwen_monitor(snapshot: LocalQwenMonitorSnapshot) -> str:
     """Render a compact text dashboard for the smoke or tuning status."""
     title = "Run monitor" if snapshot.mode == "suite" else f"Local Qwen {snapshot.mode}"
+    progress_label = "ABMs" if snapshot.mode == "suite" else ("Trials" if snapshot.mode == "tuning" else "Cases")
+    running_case = next((case for case in snapshot.cases if case.case_id == snapshot.running_case_id), None)
     lines = [
         f"{title}: {snapshot.output_root}",
         (
-            f"{'Trials' if snapshot.mode == 'tuning' else ('ABMs' if snapshot.mode == 'suite' else 'Cases')}: "
-            f"{snapshot.completed_cases} completed / "
-            f"{snapshot.failed_cases} failed / "
-            f"{snapshot.total_cases} discovered"
+            f"{progress_label}: {snapshot.completed_cases} completed / "
+            f"{snapshot.failed_cases} failed / {snapshot.total_cases} discovered"
         ),
         f"Running: {snapshot.running_case_id or '-'}",
+        f"Current work: {running_case.progress_detail if running_case and running_case.progress_detail else '-'}",
         "",
-        "Status  Item                                   num_ctx  max_tok  ctx_tok  tr_tok  ctx_len  tr_len",
-        "------  -------------------------------------  -------  -------  -------  ------  -------  ------",
+        "Status  Item                                   Work / progress",
+        "------  -------------------------------------  --------------------------------------------",
     ]
     for case in snapshot.cases:
-        lines.append(
-            "  ".join(
-                [
-                    f"{case.status:<6}",
-                    f"{(case.label or case.case_id):<37}",
-                    _fmt(case.num_ctx, 7),
-                    _fmt(case.max_tokens, 7),
-                    _fmt(case.context_total_tokens, 7),
-                    _fmt(case.trend_total_tokens, 6),
-                    _fmt(case.context_prompt_length, 7),
-                    _fmt(case.trend_prompt_length, 6),
-                ]
-            )
-        )
+        progress_text = case.progress_detail or "-"
+        if case.completed_steps is not None and case.total_steps is not None:
+            progress_text = f"{progress_text} [{case.completed_steps}/{case.total_steps}]"
+        lines.append(f"{case.status:<6}  {(case.label or case.case_id):<37}  {progress_text}")
         if case.error:
             lines.append(f"        error: {case.error}")
     return "\n".join(lines)
@@ -167,30 +158,30 @@ def render_local_qwen_monitor_rich_with_state(
         f"{snapshot.completed_cases} completed / {snapshot.failed_cases} failed / {snapshot.total_cases} discovered",
     )
     summary.add_row("Running", snapshot.running_case_id or "-")
+    active_case = next((case for case in snapshot.cases if case.case_id == snapshot.running_case_id), None)
+    summary.add_row("Current work", active_case.progress_detail if active_case and active_case.progress_detail else "-")
     summary.add_row("Terminal", "yes" if snapshot.terminal else "no")
 
     cases_table = Table(expand=True, box=None, show_header=True)
     cases_table.add_column("Status", style="bold")
     cases_table.add_column("Item", overflow="fold", ratio=3)
-    cases_table.add_column("num_ctx", justify="right")
-    cases_table.add_column("max_tok", justify="right")
-    cases_table.add_column("ctx_tok", justify="right")
-    cases_table.add_column("tr_tok", justify="right")
-    cases_table.add_column("ctx_len", justify="right")
-    cases_table.add_column("tr_len", justify="right")
+    cases_table.add_column("Work", overflow="fold", ratio=3)
+    cases_table.add_column("Done", justify="right")
     visible_cases = visible_monitor_cases(cases=snapshot.cases, state=state)
     for row_index, case in enumerate(visible_cases):
         absolute_index = state.scroll_offset + row_index
         selected = absolute_index == state.selected_index
+        progress_text = case.progress_detail or "-"
+        done_text = (
+            "-"
+            if case.completed_steps is None or case.total_steps is None
+            else f"{case.completed_steps}/{case.total_steps}"
+        )
         cases_table.add_row(
             _style_status(case.status, selected=selected),
             _selected_label(case.label or case.case_id, selected=selected),
-            _fmt(case.num_ctx, 7).strip(),
-            _fmt(case.max_tokens, 7).strip(),
-            _fmt(case.context_total_tokens, 7).strip(),
-            _fmt(case.trend_total_tokens, 6).strip(),
-            _fmt(case.context_prompt_length, 7).strip(),
-            _fmt(case.trend_prompt_length, 6).strip(),
+            progress_text,
+            done_text,
             style=_row_style(case.status, selected=selected),
         )
 
@@ -520,6 +511,48 @@ def _collect_suite_snapshot(output_root: Path, payload: dict[str, Any]) -> Local
         if not isinstance(label, str) or not isinstance(status, str):
             continue
         error = item.get("last_error")
+        abm_output_root = output_root / "abms" / label
+        nested_snapshot = _try_collect_nested_suite_abm_snapshot(abm_output_root)
+        if nested_snapshot is not None:
+            running_case = next(
+                (case for case in nested_snapshot.cases if case.case_id == nested_snapshot.running_case_id),
+                None,
+            )
+            case_snapshots.append(
+                LocalQwenCaseSnapshot(
+                    case_id=label,
+                    status=(
+                        nested_snapshot.cases[0].status
+                        if len(nested_snapshot.cases) == 1
+                        else (
+                            "failed"
+                            if nested_snapshot.failed_cases
+                            else (
+                                "completed"
+                                if nested_snapshot.completed_cases == nested_snapshot.total_cases
+                                else "running"
+                            )
+                        )
+                    ),
+                    label=label,
+                    num_ctx=running_case.num_ctx if running_case is not None else None,
+                    max_tokens=running_case.max_tokens if running_case is not None else None,
+                    context_prompt_length=running_case.context_prompt_length if running_case is not None else None,
+                    trend_prompt_length=running_case.trend_prompt_length if running_case is not None else None,
+                    context_total_tokens=running_case.context_total_tokens if running_case is not None else None,
+                    trend_total_tokens=running_case.trend_total_tokens if running_case is not None else None,
+                    error=(error if isinstance(error, str) else None)
+                    or (running_case.error if running_case is not None else None),
+                    progress_detail=(
+                        f"{nested_snapshot.running_case_id}: {running_case.progress_detail}"
+                        if running_case is not None and nested_snapshot.running_case_id is not None
+                        else None
+                    ),
+                    completed_steps=nested_snapshot.completed_cases,
+                    total_steps=nested_snapshot.total_cases,
+                )
+            )
+            continue
         case_snapshots.append(
             LocalQwenCaseSnapshot(
                 case_id=label,
@@ -548,6 +581,15 @@ def _collect_suite_snapshot(output_root: Path, payload: dict[str, Any]) -> Local
         running_case_id=running_case_id if isinstance(running_case_id, str) else None,
         cases=tuple(case_snapshots),
     )
+
+
+def _try_collect_nested_suite_abm_snapshot(output_root: Path) -> LocalQwenMonitorSnapshot | None:
+    if not output_root.exists():
+        return None
+    try:
+        return collect_local_qwen_monitor_snapshot(output_root)
+    except Exception:
+        return None
 
 
 def _collect_trial_snapshot(trial_dir: Path) -> LocalQwenCaseSnapshot:
