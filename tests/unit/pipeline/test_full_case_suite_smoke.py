@@ -99,7 +99,10 @@ def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkey
     assert result.report_markdown_path.exists()
     assert result.review_csv_path.exists()
     assert result.review_html_path.exists()
+    assert (tmp_path / "suite" / "review.html").exists()
+    assert (tmp_path / "suite" / "suite_progress.json").exists()
     assert "Mistral Generation Dashboard" in result.review_html_path.read_text(encoding="utf-8")
+    assert "setInterval(load,3000);" in (tmp_path / "suite" / "review.html").read_text(encoding="utf-8")
     assert "Planned cases" in result.report_markdown_path.read_text(encoding="utf-8")
 
 

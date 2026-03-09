@@ -149,6 +149,7 @@ Capture solutions so the team compounds knowledge:
 - **Keep the LLM runtime API-only.** Production models are `moonshotai/kimi-k2.5`, `google/gemini-3.1-pro-preview`, and OpenRouter `qwen/qwen3.5-27b`. `nvidia/nemotron-nano-12b-v2-vl:free` and `mistral-medium-latest` are debug-only. Do not reintroduce local-model runtime paths unless a task explicitly asks for them.
 - **Provider-specific scheduling belongs in the shared runners.** If a provider has a clear request budget, encode pacing and worker limits in the shared smoke/runtime runners rather than in one-off scripts or ad hoc shell throttling.
 - **Long-running smoke suites should ship a simple HTML dashboard.** Logs and CSVs remain the source of truth, but top-level all-ABM smoke suites should also expose a small static dashboard for quick operator review during and after the run.
+- **Long-running smoke suites should expose one stable root-level progress contract while they are running.** Prefer a root `suite_progress.json` plus a top-level `review.html` that refreshes from it, so humans can monitor the suite from one place without drilling into nested ABM run roots.
 
 ---
 

@@ -67,6 +67,9 @@ class MonitorViewState:
 
 def collect_local_qwen_monitor_snapshot(output_root: Path) -> LocalQwenMonitorSnapshot:
     """Collect the current smoke or tuning progress from the output directory."""
+    suite_progress = _read_json(output_root / "suite_progress.json")
+    if suite_progress is not None:
+        return _collect_suite_snapshot(output_root, suite_progress)
     resolved_root = resolve_run_root(output_root)
     trials_root = resolved_root / "trials"
     if trials_root.exists():
@@ -106,10 +109,11 @@ def collect_local_qwen_monitor_snapshot(output_root: Path) -> LocalQwenMonitorSn
 
 def render_local_qwen_monitor(snapshot: LocalQwenMonitorSnapshot) -> str:
     """Render a compact text dashboard for the smoke or tuning status."""
+    title = "Run monitor" if snapshot.mode == "suite" else f"Local Qwen {snapshot.mode}"
     lines = [
-        f"Local Qwen {snapshot.mode}: {snapshot.output_root}",
+        f"{title}: {snapshot.output_root}",
         (
-            f"{'Trials' if snapshot.mode == 'tuning' else 'Cases'}: "
+            f"{'Trials' if snapshot.mode == 'tuning' else ('ABMs' if snapshot.mode == 'suite' else 'Cases')}: "
             f"{snapshot.completed_cases} completed / "
             f"{snapshot.failed_cases} failed / "
             f"{snapshot.total_cases} discovered"
@@ -472,6 +476,49 @@ def _collect_tuning_snapshot(output_root: Path, trials_root: Path) -> LocalQwenM
         failed_cases=failed_cases,
         running_case_id=running_case_id,
         cases=tuple(trial_snapshots),
+    )
+
+
+def _collect_suite_snapshot(output_root: Path, payload: dict[str, Any]) -> LocalQwenMonitorSnapshot:
+    abm_payloads = payload.get("abms")
+    if not isinstance(abm_payloads, list):
+        abm_payloads = []
+    case_snapshots: list[LocalQwenCaseSnapshot] = []
+    for item in abm_payloads:
+        if not isinstance(item, dict):
+            continue
+        label = item.get("abm")
+        status = item.get("status")
+        if not isinstance(label, str) or not isinstance(status, str):
+            continue
+        error = item.get("last_error")
+        case_snapshots.append(
+            LocalQwenCaseSnapshot(
+                case_id=label,
+                status=status,
+                label=label,
+                num_ctx=None,
+                max_tokens=None,
+                context_prompt_length=None,
+                trend_prompt_length=None,
+                context_total_tokens=None,
+                trend_total_tokens=None,
+                error=error if isinstance(error, str) else None,
+            )
+        )
+    total_abms = payload.get("total_abms")
+    completed_abm_count = payload.get("completed_abm_count")
+    failed_abm_count = payload.get("failed_abm_count")
+    running_case_id = payload.get("current_abm")
+    return LocalQwenMonitorSnapshot(
+        output_root=output_root,
+        exists=True,
+        mode="suite",
+        total_cases=total_abms if isinstance(total_abms, int) else len(case_snapshots),
+        completed_cases=completed_abm_count if isinstance(completed_abm_count, int) else 0,
+        failed_cases=failed_abm_count if isinstance(failed_abm_count, int) else 0,
+        running_case_id=running_case_id if isinstance(running_case_id, str) else None,
+        cases=tuple(case_snapshots),
     )
 
 
