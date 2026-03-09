@@ -22,6 +22,7 @@ class _Adapter(LLMAdapter):
 
 
 def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    monkeypatch.setenv("MISTRAL_API_KEY", "debug-token")
     recorded_abms: list[str] = []
 
     def fake_run_full_case_matrix_smoke(**kwargs):  # type: ignore[no-untyped-def]
@@ -137,6 +138,7 @@ def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkey
 def test_run_full_case_suite_smoke_marks_abm_failure_without_crashing(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    monkeypatch.setenv("MISTRAL_API_KEY", "debug-token")
     def fake_run_full_case_matrix_smoke(**kwargs):  # type: ignore[no-untyped-def]
         case_input = kwargs["case_input"]
         if case_input.abm == "grazing":
@@ -250,6 +252,7 @@ def test_run_full_case_suite_smoke_rejects_missing_case_specs(tmp_path: Path) ->
 def test_run_full_case_suite_smoke_retries_transient_abm_failure(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    monkeypatch.setenv("MISTRAL_API_KEY", "debug-token")
     call_counts: dict[str, int] = {"fauna": 0}
     sleep_calls: list[float] = []
 
@@ -320,3 +323,98 @@ def test_run_full_case_suite_smoke_retries_transient_abm_failure(
     assert result.success is True
     assert call_counts["fauna"] == 2
     assert sleep_calls == [60.0]
+
+
+def test_run_full_case_suite_smoke_rejects_missing_provider_credentials(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("MISTRAL_API_KEY", raising=False)
+    suite_input = {
+        "fauna": FullCaseSmokeInput(
+            abm="fauna",
+            csv_path=tmp_path / "fauna.csv",
+            parameters_path=tmp_path / "fauna_params.txt",
+            documentation_path=tmp_path / "fauna_docs.txt",
+            plots=(),
+        ),
+    }
+    for path in [
+        suite_input["fauna"].csv_path,
+        suite_input["fauna"].parameters_path,
+        suite_input["fauna"].documentation_path,
+    ]:
+        path.write_text("x", encoding="utf-8")
+    cases_by_abm = cast(
+        dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
+        {
+            "fauna": (
+                FullCaseMatrixCaseSpec(
+                    case_id="01_fauna_none_plot_rep1",
+                    abm="fauna",
+                    evidence_mode="plot",
+                    prompt_variant="none",
+                    repetition=1,
+                ),
+            )
+        },
+    )
+
+    with pytest.raises(ValueError, match="mistral api key missing"):
+        run_full_case_suite_smoke(
+            abm_inputs=suite_input,
+            cases_by_abm=cases_by_abm,
+            adapter=_Adapter(),
+            model="mistral-medium-latest",
+            output_root=tmp_path / "suite",
+        )
+
+
+def test_run_full_case_suite_smoke_rejects_duplicate_active_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("MISTRAL_API_KEY", "debug-token")
+    suite_root = tmp_path / "suite"
+    suite_root.mkdir(parents=True, exist_ok=True)
+    (suite_root / ".active_run_lock.json").write_text(
+        '{"pid": 1, "run_id": "run_existing", "run_root": "/tmp/existing"}',
+        encoding="utf-8",
+    )
+
+    suite_input = {
+        "fauna": FullCaseSmokeInput(
+            abm="fauna",
+            csv_path=tmp_path / "fauna.csv",
+            parameters_path=tmp_path / "fauna_params.txt",
+            documentation_path=tmp_path / "fauna_docs.txt",
+            plots=(),
+        ),
+    }
+    for path in [
+        suite_input["fauna"].csv_path,
+        suite_input["fauna"].parameters_path,
+        suite_input["fauna"].documentation_path,
+    ]:
+        path.write_text("x", encoding="utf-8")
+    cases_by_abm = cast(
+        dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
+        {
+            "fauna": (
+                FullCaseMatrixCaseSpec(
+                    case_id="01_fauna_none_plot_rep1",
+                    abm="fauna",
+                    evidence_mode="plot",
+                    prompt_variant="none",
+                    repetition=1,
+                ),
+            )
+        },
+    )
+
+    with pytest.raises(RuntimeError, match="another run is already active"):
+        run_full_case_suite_smoke(
+            abm_inputs=suite_input,
+            cases_by_abm=cases_by_abm,
+            adapter=_Adapter(),
+            model="mistral-medium-latest",
+            output_root=suite_root,
+        )
