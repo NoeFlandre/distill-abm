@@ -11,6 +11,8 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from distill_abm.ingest.netlogo_workflow import run_ingest_workflow
+from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, run_log_path
+from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
 from distill_abm.utils import detect_placeholder_signals
 
 IngestSmokeStatus = Literal["ok", "failed"]
@@ -70,6 +72,9 @@ class IngestSmokeSuiteResult(BaseModel):
     started_at_utc: str
     finished_at_utc: str
     output_root: Path
+    run_id: str
+    run_root: Path
+    run_log_path: Path
     success: bool
     failed_abms: list[str] = Field(default_factory=list)
     selected_stage_ids: list[str] = Field(default_factory=list)
@@ -134,12 +139,28 @@ def run_ingest_smoke_suite(
     """Run ingestion workflow for each ABM and report artifact-level smoke outcomes."""
     started_at = datetime.now(UTC)
     output_root.mkdir(parents=True, exist_ok=True)
+    run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
+    run_root = output_root / "runs" / run_id
+    run_root.mkdir(parents=True, exist_ok=True)
+    latest_run_pointer_path(output_root).write_text(str(run_root), encoding="utf-8")
+    attached_run_log_path = attach_json_log_file(run_log_path(run_root))
+    logger = get_logger(__name__)
     selected_stages = _select_stages(stage_ids)
+    log_event(
+        logger,
+        "ingest_smoke_start",
+        run_id=run_id,
+        output_root=str(output_root),
+        run_root=str(run_root),
+        abm_count=len(abm_models),
+        selected_stage_ids=[stage.stage_id for stage in selected_stages],
+    )
 
     abm_results: list[IngestSmokeAbmResult] = []
     failed_abms: list[str] = []
     for abm, model_path in sorted(abm_models.items()):
-        output_dir = output_root / abm
+        output_dir = run_root / abm
+        log_event(logger, "ingest_smoke_abm_start", run_id=run_id, abm=abm, model_path=str(model_path))
         try:
             artifact_paths = run_ingest_workflow(model_path=model_path, experiment_parameters={}, output_dir=output_dir)
             artifact_index_path = output_dir / "ingest_artifact_index.json"
@@ -154,6 +175,14 @@ def run_ingest_smoke_suite(
             status: IngestSmokeStatus = "failed" if any(item.status == "failed" for item in stage_results) else "ok"
             if status == "failed":
                 failed_abms.append(abm)
+            log_event(
+                logger,
+                "ingest_smoke_abm_complete",
+                run_id=run_id,
+                abm=abm,
+                status=status,
+                failed_stage_ids=[item.stage.stage_id for item in stage_results if item.status == "failed"],
+            )
             abm_results.append(
                 IngestSmokeAbmResult(
                     abm=abm,
@@ -166,6 +195,14 @@ def run_ingest_smoke_suite(
             )
         except Exception as exc:
             failed_abms.append(abm)
+            log_event(
+                logger,
+                "ingest_smoke_abm_failure",
+                level=40,
+                run_id=run_id,
+                abm=abm,
+                error=str(exc),
+            )
             abm_results.append(
                 IngestSmokeAbmResult(
                     abm=abm,
@@ -178,12 +215,15 @@ def run_ingest_smoke_suite(
             )
 
     finished_at = datetime.now(UTC)
-    report_json_path = output_root / "ingest_smoke_report.json"
-    report_markdown_path = output_root / "ingest_smoke_report.md"
+    report_json_path = run_root / "ingest_smoke_report.json"
+    report_markdown_path = run_root / "ingest_smoke_report.md"
     result = IngestSmokeSuiteResult(
         started_at_utc=started_at.isoformat(),
         finished_at_utc=finished_at.isoformat(),
         output_root=output_root,
+        run_id=run_id,
+        run_root=run_root,
+        run_log_path=attached_run_log_path,
         success=not failed_abms,
         failed_abms=failed_abms,
         selected_stage_ids=[stage.stage_id for stage in selected_stages],
@@ -193,6 +233,15 @@ def run_ingest_smoke_suite(
     )
     report_json_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
     report_markdown_path.write_text(_render_markdown_report(result), encoding="utf-8")
+    log_event(
+        logger,
+        "ingest_smoke_complete",
+        run_id=run_id,
+        success=result.success,
+        failed_abms=failed_abms,
+        report_json_path=str(report_json_path),
+        report_markdown_path=str(report_markdown_path),
+    )
     return result
 
 

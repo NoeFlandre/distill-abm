@@ -4,9 +4,14 @@ from pathlib import Path
 
 from distill_abm.pipeline.run_artifact_contracts import (
     CASE_SUMMARY_FILENAME,
+    DOE_SMOKE_REPORT_FILENAME,
+    INGEST_SMOKE_REPORT_FILENAME,
     RUN_LOG_FILENAME,
     VALIDATION_STATE_FILENAME,
+    VIZ_SMOKE_REPORT_FILENAME,
     case_summary_path,
+    doe_smoke_report_path,
+    ingest_smoke_report_path,
     latest_report_pointer_path,
     latest_run_pointer_path,
     resolve_run_root,
@@ -15,6 +20,7 @@ from distill_abm.pipeline.run_artifact_contracts import (
     sampled_smoke_report_path,
     validation_state_path,
     viewer_html_path,
+    viz_smoke_report_path,
 )
 
 
@@ -35,6 +41,9 @@ def test_run_artifact_contracts_build_standard_paths(tmp_path: Path) -> None:
     assert run_log_path(run_root) == run_root / "run.log.jsonl"
     assert viewer_html_path(run_root) == run_root / "review.html"
     assert sampled_smoke_report_path(run_root) == run_root / "smoke_local_qwen_report.json"
+    assert ingest_smoke_report_path(run_root) == run_root / INGEST_SMOKE_REPORT_FILENAME
+    assert viz_smoke_report_path(run_root) == run_root / VIZ_SMOKE_REPORT_FILENAME
+    assert doe_smoke_report_path(run_root) == run_root / DOE_SMOKE_REPORT_FILENAME
     assert case_summary_path(case_dir) == case_dir / "00_case_summary.json"
     assert validation_state_path(case_dir) == case_dir / "validation_state.json"
 

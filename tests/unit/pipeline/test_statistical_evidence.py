@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pandas as pd
+import pytest
 
 from distill_abm.pipeline.statistical_evidence import (
     build_statistical_evidence,
@@ -70,3 +73,42 @@ def test_render_evidence_artifacts_writes_text_json_and_series_csv(tmp_path: Pat
     assert summary_path.read_text(encoding="utf-8") == evidence.summary_text
     assert json.loads(payload_path.read_text(encoding="utf-8"))["matched_columns"] == ["metric-a"]
     assert "metric-a" in series_path.read_text(encoding="utf-8")
+
+
+def test_build_statistical_evidence_skips_degenerate_mann_kendall_windows() -> None:
+    frame = pd.DataFrame(
+        {
+            "[step]": list(range(20)),
+            "metric-a": [5.0] * 20,
+        }
+    )
+
+    evidence = build_statistical_evidence(frame=frame, reporter_pattern="metric-a")
+
+    rolling = evidence.summary_payload["series"][0]["rolling_mann_kendall"]
+    assert rolling["status"] == "ok"
+    assert isinstance(rolling["windows"], list)
+
+
+def test_build_statistical_evidence_handles_mann_kendall_runtime_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    frame = pd.DataFrame(
+        {
+            "[step]": list(range(20)),
+            "metric-a": [float(index) for index in range(20)],
+        }
+    )
+
+    class FakeMk:
+        @staticmethod
+        def original_test(_segment):  # type: ignore[no-untyped-def]
+            raise RuntimeError("boom")
+
+    monkeypatch.setitem(sys.modules, "pymannkendall", SimpleNamespace(original_test=FakeMk.original_test))
+
+    evidence = build_statistical_evidence(frame=frame, reporter_pattern="metric-a")
+
+    rolling = evidence.summary_payload["series"][0]["rolling_mann_kendall"]
+    assert rolling["status"] == "ok"
+    assert rolling["windows"] == []

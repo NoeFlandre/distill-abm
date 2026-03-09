@@ -16,6 +16,7 @@
 - Exposes `smoke-viz` for artifact-focused verification of the NetLogo-to-CSV-to-plot workflow that runs before any LLM inference.
   - `smoke-viz` is production fallback-first: it preserves repo-local reference CSVs and plot images under `data/*/legacy/` and records whether each ABM artifact bundle was produced from a live simulation or from fallback reference artifacts.
   - Milk model input CSVs and grazing `.nls` include files are now stored inside the repository so the NetLogo launch path no longer depends on the temporary notebook workspace.
+  - It now uses the same run-separated scaffolding as the later smokes: `runs/run_*`, `latest_run.txt`, and root `run.log.jsonl`.
 - Exposes `smoke-doe` for pre-LLM inspection of the smoke matrix.
   - `smoke-doe` resolves the full benchmark DOE matrix over ABMs, candidate models, evidence modes, summarization settings, prompt variants, and repetitions.
   - It groups global DOE factors under `results/doe_smoke_latest/10_shared/global/`, shared ABM artifacts under `results/doe_smoke_latest/10_shared/<abm>/`, and compact case/request indexes under `results/doe_smoke_latest/20_case_index/`.
@@ -23,6 +24,7 @@
   - `table` evidence is a statistical dump derived only from the plot-relevant simulation series, not a raw CSV slice.
   - It is strictly pre-LLM: model availability is not preflighted and cannot cause DOE smoke failure.
   - The command is intended to debug wrong input artifacts, wrong prompts, wrong model settings, and placeholder leakage before any model call is made.
+  - It now emits a root `run.log.jsonl` and writes all artifacts under a concrete run directory instead of directly into the stage root.
 - Exposes `smoke-local-qwen` for a minimal real-inference verification pass against the configured debug model over API.
   - `smoke-local-qwen` resolves the latest ingest and visualization smoke artifacts for each ABM, samples a small stratified subset of evidence/prompt combinations, and runs one context plus one trend inference per sampled case.
   - It writes self-contained case folders with the exact prompt text passed to the model, copied image/table evidence, request hyperparameters, and raw outputs so a human can inspect whether the local execution path is coherent before a full run.

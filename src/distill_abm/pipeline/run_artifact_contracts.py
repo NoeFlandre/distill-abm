@@ -12,6 +12,9 @@ LATEST_REPORT_POINTER_FILENAME = "latest_report_path.txt"
 VIEWER_HTML_FILENAME = "review.html"
 SAMPLED_SMOKE_REPORT_FILENAME = "smoke_local_qwen_report.json"
 FULL_CASE_MATRIX_REPORT_FILENAME = "smoke_full_case_matrix_report.json"
+INGEST_SMOKE_REPORT_FILENAME = "ingest_smoke_report.json"
+VIZ_SMOKE_REPORT_FILENAME = "viz_smoke_report.json"
+DOE_SMOKE_REPORT_FILENAME = "doe_smoke_report.json"
 
 
 def runs_root_path(output_root: Path) -> Path:
@@ -40,6 +43,18 @@ def sampled_smoke_report_path(run_root: Path) -> Path:
 
 def full_case_matrix_report_path(run_root: Path) -> Path:
     return run_root / FULL_CASE_MATRIX_REPORT_FILENAME
+
+
+def ingest_smoke_report_path(run_root: Path) -> Path:
+    return run_root / INGEST_SMOKE_REPORT_FILENAME
+
+
+def viz_smoke_report_path(run_root: Path) -> Path:
+    return run_root / VIZ_SMOKE_REPORT_FILENAME
+
+
+def doe_smoke_report_path(run_root: Path) -> Path:
+    return run_root / DOE_SMOKE_REPORT_FILENAME
 
 
 def case_summary_path(case_dir: Path) -> Path:

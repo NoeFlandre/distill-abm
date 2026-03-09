@@ -124,6 +124,9 @@ def test_run_viz_smoke_suite_writes_stage_level_report(tmp_path: Path) -> None:
     )
 
     assert result.success is True
+    assert result.run_root.parent == tmp_path / "viz-smoke" / "runs"
+    assert result.run_log_path.exists()
+    assert (tmp_path / "viz-smoke" / "latest_run.txt").exists()
     assert result.report_json_path.exists()
     assert result.report_markdown_path.exists()
     assert len(result.abms) == 1
@@ -134,11 +137,11 @@ def test_run_viz_smoke_suite_writes_stage_level_report(tmp_path: Path) -> None:
         "plot-1",
         "plot-2",
     ]
-    csv_path = tmp_path / "viz-smoke" / "milk_consumption" / "simulation.csv"
+    csv_path = result.run_root / "milk_consumption" / "simulation.csv"
     frame = pd.read_csv(csv_path, sep=";")
     assert list(frame.columns) == ["mean-incum", "mean-alt", "tick", "mean-incum.1", "mean-alt.1", "tick.1"]
-    assert (tmp_path / "viz-smoke" / "milk_consumption" / "plots" / "1.png").exists()
-    assert (tmp_path / "viz-smoke" / "milk_consumption" / "plots" / "2.png").exists()
+    assert (result.run_root / "milk_consumption" / "plots" / "1.png").exists()
+    assert (result.run_root / "milk_consumption" / "plots" / "2.png").exists()
 
 
 def test_run_viz_smoke_suite_records_simulation_exceptions_and_continues(tmp_path: Path) -> None:
@@ -222,11 +225,12 @@ def test_run_viz_smoke_suite_uses_fallback_artifacts_when_configured(tmp_path: P
     )
 
     assert result.success is True
+    assert result.run_log_path.exists()
     assert result.abms[0].artifact_source == "fallback"
-    assert (tmp_path / "viz-smoke" / "milk_consumption" / "simulation.csv").read_text(encoding="utf-8") == (
+    assert (result.run_root / "milk_consumption" / "simulation.csv").read_text(encoding="utf-8") == (
         "mean-incum;tick\n1;0\n2;1\n"
     )
-    assert (tmp_path / "viz-smoke" / "milk_consumption" / "plots" / "1.png").read_bytes() == b"plot-one"
+    assert (result.run_root / "milk_consumption" / "plots" / "1.png").read_bytes() == b"plot-one"
 
 
 def test_run_viz_smoke_suite_respects_always_fallback_mode(tmp_path: Path) -> None:
@@ -269,6 +273,6 @@ def test_run_viz_smoke_suite_respects_always_fallback_mode(tmp_path: Path) -> No
 
     assert result.success is True
     assert result.abms[0].artifact_source == "fallback"
-    assert (tmp_path / "viz-smoke" / "milk_consumption" / "simulation.csv").read_text(encoding="utf-8") == (
+    assert (result.run_root / "milk_consumption" / "simulation.csv").read_text(encoding="utf-8") == (
         "mean-incum;tick\n9;0\n"
     )
