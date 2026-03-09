@@ -214,3 +214,78 @@ def test_run_full_case_suite_smoke_rejects_missing_case_specs(tmp_path: Path) ->
         assert "missing case specs for ABM" in str(exc)
     else:
         raise AssertionError("expected ValueError")
+
+
+def test_run_full_case_suite_smoke_retries_transient_abm_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    call_counts: dict[str, int] = {"fauna": 0}
+    sleep_calls: list[float] = []
+
+    def fake_run_full_case_matrix_smoke(**kwargs):  # type: ignore[no-untyped-def]
+        case_input = kwargs["case_input"]
+        call_counts[case_input.abm] = call_counts.get(case_input.abm, 0) + 1
+        if case_input.abm == "fauna" and call_counts[case_input.abm] == 1:
+            raise RuntimeError("circuit open for mistral:mistral-medium-latest; retry after 12.0s")
+        output_root = kwargs["output_root"]
+        run_root = output_root / "runs" / f"run_{call_counts[case_input.abm]}"
+        run_root.mkdir(parents=True, exist_ok=True)
+        (output_root / "latest_run.txt").write_text(str(run_root), encoding="utf-8")
+        return SimpleNamespace(
+            success=True,
+            report_json_path=run_root / "report.json",
+            report_markdown_path=run_root / "report.md",
+            review_csv_path=run_root / "review.csv",
+            viewer_html_path=run_root / "review.html",
+            failed_case_ids=[],
+        )
+
+    monkeypatch.setattr(
+        "distill_abm.pipeline.full_case_suite_smoke.run_full_case_matrix_smoke",
+        fake_run_full_case_matrix_smoke,
+    )
+    monkeypatch.setattr("distill_abm.pipeline.full_case_suite_smoke.time.sleep", sleep_calls.append)
+
+    suite_input = {
+        "fauna": FullCaseSmokeInput(
+            abm="fauna",
+            csv_path=tmp_path / "fauna.csv",
+            parameters_path=tmp_path / "fauna_params.txt",
+            documentation_path=tmp_path / "fauna_docs.txt",
+            plots=(),
+        ),
+    }
+    for path in [
+        suite_input["fauna"].csv_path,
+        suite_input["fauna"].parameters_path,
+        suite_input["fauna"].documentation_path,
+    ]:
+        path.write_text("x", encoding="utf-8")
+
+    cases_by_abm = cast(
+        dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
+        {
+            "fauna": (
+                FullCaseMatrixCaseSpec(
+                    case_id="01_fauna_none_plot_rep1",
+                    abm="fauna",
+                    evidence_mode="plot",
+                    prompt_variant="none",
+                    repetition=1,
+                ),
+            )
+        },
+    )
+
+    result = run_full_case_suite_smoke(
+        abm_inputs=suite_input,
+        cases_by_abm=cases_by_abm,
+        adapter=_Adapter(),
+        model="mistral-medium-latest",
+        output_root=tmp_path / "suite",
+        max_abm_attempts=2,
+    )
+
+    assert result.success is True
+    assert call_counts["fauna"] == 2
+    assert sleep_calls == [60.0]
