@@ -623,38 +623,49 @@ def _materialize_shared_abm_bundle(
             abm=abm_input.abm,
             plot_index=plot_input.plot_index,
         )
-        table_summary = _build_raw_table_csv(frame=frame, reporter_pattern=plot_input.reporter_pattern)
-        table_path.write_text(table_summary, encoding="utf-8")
-        _shared_table_series_path(
-            output_root=output_root,
-            abm=abm_input.abm,
-            plot_index=plot_input.plot_index,
-        ).write_text(
-            _build_selected_series_csv(frame=frame, reporter_pattern=plot_input.reporter_pattern),
-            encoding="utf-8",
-        )
-        _shared_table_payload_path(
-            output_root=output_root,
-            abm=abm_input.abm,
-            plot_index=plot_input.plot_index,
-        ).write_text(
-            json.dumps(
-                {
-                    "reporter_pattern": plot_input.reporter_pattern,
-                    "summary_path": str(table_path),
-                    "series_path": str(
-                        _shared_table_series_path(
-                            output_root=output_root,
-                            abm=abm_input.abm,
-                            plot_index=plot_input.plot_index,
-                        )
-                    ),
-                },
-                indent=2,
-                sort_keys=True,
-            ),
-            encoding="utf-8",
-        )
+        try:
+            table_summary = _build_raw_table_csv(frame=frame, reporter_pattern=plot_input.reporter_pattern)
+            table_path.write_text(table_summary, encoding="utf-8")
+            series_path = _shared_table_series_path(
+                output_root=output_root,
+                abm=abm_input.abm,
+                plot_index=plot_input.plot_index,
+            )
+            series_path.write_text(
+                _build_selected_series_csv(frame=frame, reporter_pattern=plot_input.reporter_pattern),
+                encoding="utf-8",
+            )
+            _shared_table_payload_path(
+                output_root=output_root,
+                abm=abm_input.abm,
+                plot_index=plot_input.plot_index,
+            ).write_text(
+                json.dumps(
+                    {
+                        "reporter_pattern": plot_input.reporter_pattern,
+                        "summary_path": str(table_path),
+                        "series_path": str(series_path),
+                    },
+                    indent=2,
+                    sort_keys=True,
+                ),
+                encoding="utf-8",
+            )
+        except Exception as exc:
+            stage_errors.append(
+                f"plot {plot_input.plot_index} statistical evidence failed: {plot_input.reporter_pattern}: {exc}"
+            )
+            log_event(
+                logger,
+                "doe_smoke_shared_plot_failure",
+                level=40,
+                run_id=run_id,
+                abm=abm_input.abm,
+                plot_index=plot_input.plot_index,
+                reporter_pattern=plot_input.reporter_pattern,
+                error=str(exc),
+            )
+            continue
         if detect_placeholder_signals(plot_input.plot_description):
             stage_errors.append(f"plot {plot_input.plot_index} description contains placeholder-like text")
         log_event(
