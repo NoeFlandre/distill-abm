@@ -25,6 +25,7 @@ from distill_abm.cli_actions import (
     execute_smoke_full_case_matrix_command,
     execute_smoke_ingest_command,
     execute_smoke_local_qwen_command,
+    execute_smoke_quantitative_command,
     execute_smoke_qwen_command,
     execute_smoke_summarizers_command,
     execute_smoke_viz_command,
@@ -72,6 +73,7 @@ from distill_abm.pipeline.full_case_matrix_smoke import run_full_case_matrix_smo
 from distill_abm.pipeline.full_case_smoke import run_full_case_smoke
 from distill_abm.pipeline.local_qwen_sample_smoke import run_local_qwen_sample_smoke
 from distill_abm.pipeline.local_qwen_tuning import run_local_qwen_tuning
+from distill_abm.pipeline.quantitative_smoke import run_quantitative_smoke
 from distill_abm.pipeline.run import EvidenceMode, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
     run_qwen_smoke_suite,
@@ -104,6 +106,7 @@ __all__ = [
     "smoke_full_case",
     "smoke_ingest_netlogo",
     "smoke_local_qwen",
+    "smoke_quantitative",
     "smoke_qwen",
     "smoke_summarizers",
     "smoke_viz",
@@ -650,6 +653,35 @@ def smoke_summarizers(
         resume=resume,
         json_output=json_output,
         run_summarizer_smoke_fn=run_summarizer_smoke,
+    )
+
+
+@app.command("smoke-quantitative")
+def smoke_quantitative(
+    source_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing a completed summarizer smoke run."),
+    ] = Path("results/summarizer_smoke_latest"),
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for quantitative smoke artifacts."),
+    ] = Path("results/quantitative_smoke_latest"),
+    resume: Annotated[
+        bool,
+        typer.Option(
+            "--resume/--no-resume",
+            help="Reuse valid scored records and rerun only failed or missing quantitative rows.",
+        ),
+    ] = True,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Score completed summarizer outputs and build quantitative DOE analysis tables."""
+    execute_smoke_quantitative_command(
+        source_root=source_root,
+        output_root=output_root,
+        resume=resume,
+        json_output=json_output,
+        run_quantitative_smoke_fn=run_quantitative_smoke,
     )
 
 

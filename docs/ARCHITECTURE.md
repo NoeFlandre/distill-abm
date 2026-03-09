@@ -35,6 +35,9 @@
 - Exposes `smoke-summarizers` for reviewer-friendly summarizer smoke runs on validated full-case bundles.
   - `smoke-summarizers` reuses manually validated context/trend outputs and runs the local summarization stack over the combined bundle text.
   - It writes per-mode summaries, metadata, a review CSV, and a validated-source manifest for inspection.
+- Exposes `smoke-quantitative` for post-summarization quantitative audit runs.
+  - `smoke-quantitative` consumes a completed summarizer smoke run, reuses its saved summaries, scores each `(case, summarizer)` pair against the configured author reference, and computes one-way ANOVA plus factorial contribution tables.
+  - It writes machine-readable CSVs together with paper-oriented Markdown/LaTeX tables under the same run-separated, resumable contract.
 - Exposes `monitor-local-qwen` and `monitor-run` for a compact live dashboard over case-based smoke output directories and local-Qwen tuning output directories.
   - The monitor surfaces current case status, configured `num_ctx`, configured `max_tokens`, prompt lengths, observed token totals, and recent errors.
 - Exposes `tune-local-qwen` for local runtime-limit ablations by evidence mode.
