@@ -51,6 +51,7 @@ from distill_abm.cli_support import (
     discover_configured_abms,
     parse_summarizers,
     resolve_abm_model_path,
+    resolve_additional_scoring_reference_paths,
     resolve_model_from_registry,
     resolve_scoring_reference_path,
     resolve_viz_smoke_specs,
@@ -82,6 +83,7 @@ app = typer.Typer(help="Run ABM distillation workflows.")
 
 # Backward-compatible helper aliases kept for tests and local call sites.
 _resolve_scoring_reference_path = resolve_scoring_reference_path
+_resolve_additional_scoring_reference_paths = resolve_additional_scoring_reference_paths
 _resolve_viz_smoke_specs = resolve_viz_smoke_specs
 _select_smoke_cases = select_smoke_cases
 _parse_summarizers = parse_summarizers
@@ -202,6 +204,7 @@ def run(
         resolve_model_from_registry=resolve_model_from_registry,
         parse_summarizers=_parse_summarizers,
         resolve_scoring_reference_path=_resolve_scoring_reference_path,
+        resolve_additional_scoring_reference_paths=_resolve_additional_scoring_reference_paths,
         create_adapter_fn=create_adapter,
         run_pipeline_fn=run_pipeline,
         load_abm_config_fn=load_abm_config,
@@ -443,6 +446,7 @@ def smoke_qwen(
         select_smoke_cases=_select_smoke_cases,
         parse_summarizers=_parse_summarizers,
         resolve_scoring_reference_path=_resolve_scoring_reference_path,
+        resolve_additional_scoring_reference_paths=_resolve_additional_scoring_reference_paths,
         create_adapter_fn=create_adapter,
         run_qwen_smoke_suite_fn=run_qwen_smoke_suite,
         load_abm_config_fn=load_abm_config,
@@ -1175,6 +1179,7 @@ def describe_abm(
         models_root=models_root,
         json_output=json_output,
         resolve_scoring_reference_path=_resolve_scoring_reference_path,
+        resolve_additional_scoring_reference_paths=_resolve_additional_scoring_reference_paths,
         load_abm_config_fn=load_abm_config,
     )
 

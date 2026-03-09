@@ -1,5 +1,6 @@
 """Pipeline orchestration from CSV ingestion to scored report export."""
 
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal
 
@@ -41,6 +42,7 @@ class PipelineInputs(BaseModel):
     allow_summary_fallback: bool = False
     enabled_style_features: tuple[str, ...] | None = None
     scoring_reference_path: Path | None = None
+    additional_scoring_reference_paths: dict[str, Path] = Field(default_factory=dict)
     resume_existing: bool = False
 
 
@@ -163,6 +165,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         inputs=inputs,
         context=context,
     )
+    additional_scoring_references = _resolve_additional_scoring_references(inputs=inputs)
     trend_full, trend_summary = _summarize_report_text(
         text=trend_raw,
         text_source_mode=inputs.text_source_mode,
@@ -189,6 +192,12 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     summary_scores = (
         score_summary(reference=scoring_reference_text, candidate=trend_summary) if trend_summary is not None else None
     )
+    additional_reference_scores = _score_additional_references(
+        references=additional_scoring_references,
+        selected_candidate=report_trend,
+        full_candidate=trend_full,
+        summary_candidate=trend_summary,
+    )
 
     include_extended = trend_summary is not None
     report_csv = _write_report(
@@ -199,6 +208,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         selected_scores=selected_scores,
         full_scores=full_scores,
         summary_scores=summary_scores,
+        additional_reference_scores=additional_reference_scores,
         include_extended_columns=include_extended,
     )
 
@@ -223,6 +233,8 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         scoring_reference_text=scoring_reference_text,
         scoring_reference_source=scoring_reference_source,
         scoring_reference_path=scoring_reference_path,
+        additional_scoring_references=additional_scoring_references,
+        additional_reference_scores=additional_reference_scores,
         include_extended=include_extended,
         include_pattern=inputs.metric_pattern,
         evidence_mode=resolved_evidence_mode,
@@ -316,6 +328,7 @@ def _write_report(
     full_scores: SummaryScores | None = None,
     summary_scores: SummaryScores | None = None,
     include_extended_columns: bool = False,
+    additional_reference_scores: Mapping[str, Mapping[str, SummaryScores | None]] | None = None,
 ) -> Path:
     return helpers.write_report(
         output_dir=output_dir,
@@ -325,6 +338,7 @@ def _write_report(
         scores=selected_scores,
         full_scores=full_scores,
         summary_scores=summary_scores,
+        additional_reference_scores=additional_reference_scores,
         include_extended_columns=include_extended_columns,
     )
 
@@ -404,3 +418,33 @@ def _resolve_scoring_reference(inputs: PipelineInputs, context: str) -> tuple[st
     if not reference_text:
         raise ValueError(f"scoring reference file is empty: {inputs.scoring_reference_path}")
     return reference_text, "human_ground_truth_file", inputs.scoring_reference_path
+
+
+def _resolve_additional_scoring_references(inputs: PipelineInputs) -> dict[str, tuple[str, str, Path]]:
+    references: dict[str, tuple[str, str, Path]] = {}
+    for reference_name, reference_path in sorted(inputs.additional_scoring_reference_paths.items()):
+        reference_text = reference_path.read_text(encoding="utf-8").strip()
+        if not reference_text:
+            raise ValueError(f"additional scoring reference file is empty: {reference_path}")
+        references[reference_name] = (reference_text, "human_ground_truth_file", reference_path)
+    return references
+
+
+def _score_additional_references(
+    references: Mapping[str, tuple[str, str, Path]],
+    selected_candidate: str,
+    full_candidate: str,
+    summary_candidate: str | None,
+) -> dict[str, dict[str, SummaryScores | None]]:
+    scored_references: dict[str, dict[str, SummaryScores | None]] = {}
+    for reference_name, (reference_text, _reference_source, _reference_path) in references.items():
+        scored_references[reference_name] = {
+            "selected_scores": score_summary(reference=reference_text, candidate=selected_candidate),
+            "full_scores": score_summary(reference=reference_text, candidate=full_candidate),
+            "summary_scores": (
+                score_summary(reference=reference_text, candidate=summary_candidate)
+                if summary_candidate is not None
+                else None
+            ),
+        }
+    return scored_references

@@ -140,6 +140,7 @@ class SmokeSuiteInputs(BaseModel):
     text_source_mode: TextSourceMode = "summary_only"
     evidence_mode: EvidenceMode = "plot+table"
     scoring_reference_path: Path | None = None
+    additional_scoring_reference_paths: dict[str, Path] = Field(default_factory=dict)
 
 
 class SmokeSuiteResult(BaseModel):

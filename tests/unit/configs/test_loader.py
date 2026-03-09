@@ -121,6 +121,8 @@ ground_truth:
   fauna: /tmp/fauna.txt
   grazing: /tmp/grazing.txt
   milk_consumption: /tmp/milk.txt
+modeler_ground_truth:
+  milk_consumption: /tmp/milk-modeler.txt
 qualitative_example_text_dir: /tmp/examples
 human_reference_dir: /tmp/human-reference
 """,
@@ -131,6 +133,8 @@ human_reference_dir: /tmp/human-reference
     assert settings.ground_truth.fauna == "/tmp/fauna.txt"
     assert settings.ground_truth.grazing == "/tmp/grazing.txt"
     assert settings.ground_truth.milk_consumption == "/tmp/milk.txt"
+    assert settings.modeler_ground_truth is not None
+    assert settings.modeler_ground_truth.milk_consumption == "/tmp/milk-modeler.txt"
     assert settings.qualitative_example_text_dir == "/tmp/examples"
     assert settings.human_reference_dir == "/tmp/human-reference"
 

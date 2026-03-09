@@ -94,6 +94,7 @@ def execute_run_command(
     resolve_model_from_registry: Callable[[Path, str], tuple[str, str]],
     parse_summarizers: Callable[..., tuple[SummarizerId, ...]],
     resolve_scoring_reference_path: Callable[[str], Path],
+    resolve_additional_scoring_reference_paths: Callable[[str], dict[str, Path]],
     create_adapter_fn: Callable[[str, str], Any],
     run_pipeline_fn: Callable[..., Any],
     load_abm_config_fn: Callable[[Path], Any],
@@ -105,6 +106,7 @@ def execute_run_command(
     validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
 
     scoring_reference_path: Path | None = None
+    additional_scoring_reference_paths: dict[str, Path] = {}
     if abm:
         abm_config = load_abm_config_for_cli(abm=abm, load_abm_config_fn=load_abm_config_fn)
         metric_pattern, metric_description, plot_description = apply_abm_metric_defaults(
@@ -114,6 +116,7 @@ def execute_run_command(
             plot_description=plot_description,
         )
         scoring_reference_path = resolve_scoring_reference_path(abm)
+        additional_scoring_reference_paths = resolve_additional_scoring_reference_paths(abm)
 
     adapter: Any = _create_local_ollama_adapter(
         create_adapter_fn=create_adapter_fn,
@@ -136,6 +139,7 @@ def execute_run_command(
             allow_summary_fallback=allow_summary_fallback,
             summarizers=parse_summarizers(summarizer, fallback=default_summarizers),
             scoring_reference_path=scoring_reference_path,
+            additional_scoring_reference_paths=additional_scoring_reference_paths,
         ),
         prompts=prompts,
         adapter=adapter,
@@ -352,6 +356,7 @@ def execute_smoke_qwen_command(
     select_smoke_cases: Callable[..., Any],
     parse_summarizers: Callable[..., tuple[SummarizerId, ...]],
     resolve_scoring_reference_path: Callable[[str], Path],
+    resolve_additional_scoring_reference_paths: Callable[[str], dict[str, Path]],
     create_adapter_fn: Callable[[str, str], Any],
     run_qwen_smoke_suite_fn: Callable[..., Any],
     load_abm_config_fn: Callable[[Path], Any],
@@ -361,6 +366,7 @@ def execute_smoke_qwen_command(
     prompts: Any = load_prompts_config_fn(prompts_path)
     sweep_plot_descriptions: list[str] | None = None
     scoring_reference_path: Path | None = None
+    additional_scoring_reference_paths: dict[str, Path] = {}
     if abm:
         abm_config = load_abm_config_for_cli(abm=abm, load_abm_config_fn=load_abm_config_fn)
         metric_pattern, metric_description, plot_description = apply_abm_metric_defaults(
@@ -371,6 +377,7 @@ def execute_smoke_qwen_command(
         )
         sweep_plot_descriptions = list(abm_config.plot_descriptions)
         scoring_reference_path = resolve_scoring_reference_path(abm)
+        additional_scoring_reference_paths = resolve_additional_scoring_reference_paths(abm)
     selected_cases: Any = select_smoke_cases(case_ids=case_id, max_cases=max_cases, profile=profile)
     adapter: Any = _create_local_ollama_adapter(
         create_adapter_fn=create_adapter_fn,
@@ -394,6 +401,7 @@ def execute_smoke_qwen_command(
             text_source_mode=text_source_mode,
             evidence_mode=evidence_mode,
             scoring_reference_path=scoring_reference_path,
+            additional_scoring_reference_paths=additional_scoring_reference_paths,
         ),
         prompts=prompts,
         adapter=adapter,
@@ -1118,6 +1126,7 @@ def execute_describe_abm_command(
     models_root: Path,
     json_output: bool,
     resolve_scoring_reference_path: Callable[[str], Path],
+    resolve_additional_scoring_reference_paths: Callable[[str], dict[str, Path]],
     load_abm_config_fn: Callable[[Path], Any],
 ) -> None:
     config_path = Path("configs/abms") / f"{abm}.yaml"
@@ -1136,6 +1145,9 @@ def execute_describe_abm_command(
         scoring_reference_path=(
             resolve_scoring_reference_path(abm) if abm in {"fauna", "grazing", "milk_consumption"} else None
         ),
+        additional_scoring_reference_paths=(
+            resolve_additional_scoring_reference_paths(abm) if abm in {"fauna", "grazing", "milk_consumption"} else {}
+        ),
         metric_pattern=abm_config.metric_pattern,
         metric_description=abm_config.metric_description,
         plot_descriptions=list(abm_config.plot_descriptions),
@@ -1150,6 +1162,8 @@ def execute_describe_abm_command(
         typer.echo(f"experiment parameters: {result.experiment_parameters_path}")
     if result.scoring_reference_path is not None:
         typer.echo(f"scoring reference: {result.scoring_reference_path}")
+    if result.additional_scoring_reference_paths:
+        typer.echo(f"additional scoring references: {result.additional_scoring_reference_paths}")
 
 
 def execute_describe_ingest_artifacts_command(*, root: Path, json_output: bool) -> None:

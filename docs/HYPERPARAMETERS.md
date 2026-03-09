@@ -43,3 +43,11 @@
 | `fauna` | `configs/ground_truth/fauna_scoring_ground_truth.txt` |
 | `grazing` | `configs/ground_truth/grazing_scoring_ground_truth.txt` |
 | `milk_consumption` | `configs/ground_truth/milk_scoring_ground_truth.txt` |
+
+## Optional Modeler Ground Truth Mapping (`configs/experiment_settings.yaml`)
+
+These references are scored in addition to the primary author reference when present.
+
+| ABM | Modeler Ground Truth File |
+|---|---|
+| `milk_consumption` | `configs/ground_truth/milk_modeler_ground_truth.txt` |
