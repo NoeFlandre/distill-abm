@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import os
 import shutil
 import time
 from datetime import UTC, datetime
@@ -19,7 +20,12 @@ from distill_abm.pipeline.full_case_matrix_smoke import (
 from distill_abm.pipeline.full_case_smoke import FullCaseSmokeInput
 from distill_abm.pipeline.local_qwen_monitor import collect_local_qwen_monitor_snapshot
 from distill_abm.pipeline.local_qwen_sample_smoke import _write_json, _write_text
-from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, run_log_path
+from distill_abm.pipeline.run_artifact_contracts import (
+    acquire_active_run_lock,
+    latest_run_pointer_path,
+    release_active_run_lock,
+    run_log_path,
+)
 from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
 
 LOGGER = get_logger(__name__)
@@ -116,6 +122,15 @@ def _validate_suite_inputs(
             raise ValueError(f"ABM input key '{abm}' does not match case input '{case_input.abm}'")
 
 
+def _validate_adapter_environment(*, adapter: LLMAdapter) -> None:
+    """Fail early when the provider credentials required for this suite are missing."""
+    provider = getattr(adapter, "provider", "")
+    if provider == "mistral" and not os.getenv("MISTRAL_API_KEY"):
+        raise ValueError("mistral api key missing: set MISTRAL_API_KEY")
+    if provider == "openrouter" and not os.getenv("OPENROUTER_API_KEY"):
+        raise ValueError("openrouter api key missing: set OPENROUTER_API_KEY")
+
+
 def run_full_case_suite_smoke(
     *,
     abm_inputs: dict[str, FullCaseSmokeInput],
@@ -133,10 +148,12 @@ def run_full_case_suite_smoke(
 
     started_at = datetime.now(UTC)
     _validate_suite_inputs(abm_inputs=abm_inputs, cases_by_abm=cases_by_abm)
+    _validate_adapter_environment(adapter=adapter)
     output_root.mkdir(parents=True, exist_ok=True)
     run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
     run_root = output_root / "runs" / run_id
     run_root.mkdir(parents=True, exist_ok=True)
+    acquire_active_run_lock(output_root=output_root, run_id=run_id, run_root=run_root)
     _write_text(latest_run_pointer_path(output_root), str(run_root))
     log_path = attach_json_log_file(run_log_path(run_root))
     progress_path = output_root / SUITE_PROGRESS_FILENAME
@@ -148,254 +165,257 @@ def run_full_case_suite_smoke(
         run_root=str(run_root),
     )
 
-    abm_results_by_name: dict[str, FullCaseSuiteAbmResult] = {}
-    progress_by_name = {
-        abm: FullCaseSuiteProgressAbm(
-            abm=abm,
-            status="pending",
-            planned_case_count=len(cases_by_abm[abm]),
-        )
-        for abm in abm_inputs
-    }
-    remaining_abms = list(abm_inputs)
-    _write_suite_progress(
-        output_root=output_root,
-        progress_path=progress_path,
-        progress=_build_suite_progress(
-            run_id=run_id,
-            run_root=run_root,
-            output_root=output_root,
-            model=model,
-            started_at=started_at,
-            status="running",
-            current_abm=None,
-            current_attempt=None,
-            remaining_abms=remaining_abms,
-            progress_by_name=progress_by_name,
-        ),
-    )
-    for attempt in range(1, max(max_abm_attempts, 1) + 1):
-        next_remaining: list[str] = []
-        transient_failure_seen = False
-        for abm in remaining_abms:
-            case_input = abm_inputs[abm]
-            abm_output_root = output_root / "abms" / abm
-            case_specs = cases_by_abm[abm]
-            progress_by_name[abm] = progress_by_name[abm].model_copy(
-                update={"status": "running", "attempt": attempt, "last_error": None}
-            )
-            _write_suite_progress(
-                output_root=output_root,
-                progress_path=progress_path,
-                progress=_build_suite_progress(
-                    run_id=run_id,
-                    run_root=run_root,
-                    output_root=output_root,
-                    model=model,
-                    started_at=started_at,
-                    status="running",
-                    current_abm=abm,
-                    current_attempt=attempt,
-                    remaining_abms=remaining_abms,
-                    progress_by_name=progress_by_name,
-                ),
-            )
-            log_event(
-                LOGGER,
-                "full_case_suite_abm_start",
+    try:
+        abm_results_by_name: dict[str, FullCaseSuiteAbmResult] = {}
+        progress_by_name = {
+            abm: FullCaseSuiteProgressAbm(
                 abm=abm,
-                case_count=len(case_specs),
-                output_root=str(abm_output_root),
-                attempt=attempt,
+                status="pending",
+                planned_case_count=len(cases_by_abm[abm]),
             )
-            try:
-                matrix_result = run_full_case_matrix_smoke(
-                    case_input=case_input,
-                    adapter=adapter,
-                    model=model,
-                    output_root=abm_output_root,
-                    cases=case_specs,
-                    max_tokens=max_tokens,
-                    max_retries=max_retries,
-                    retry_backoff_seconds=retry_backoff_seconds,
-                    resume_existing=resume_existing,
+            for abm in abm_inputs
+        }
+        remaining_abms = list(abm_inputs)
+        _write_suite_progress(
+            output_root=output_root,
+            progress_path=progress_path,
+            progress=_build_suite_progress(
+                run_id=run_id,
+                run_root=run_root,
+                output_root=output_root,
+                model=model,
+                started_at=started_at,
+                status="running",
+                current_abm=None,
+                current_attempt=None,
+                remaining_abms=remaining_abms,
+                progress_by_name=progress_by_name,
+            ),
+        )
+        for attempt in range(1, max(max_abm_attempts, 1) + 1):
+            next_remaining: list[str] = []
+            transient_failure_seen = False
+            for abm in remaining_abms:
+                case_input = abm_inputs[abm]
+                abm_output_root = output_root / "abms" / abm
+                case_specs = cases_by_abm[abm]
+                progress_by_name[abm] = progress_by_name[abm].model_copy(
+                    update={"status": "running", "attempt": attempt, "last_error": None}
                 )
-                latest_abm_run = Path((abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip())
-                abm_result = FullCaseSuiteAbmResult(
-                    abm=abm,
-                    success=matrix_result.success,
-                    run_root=latest_abm_run,
-                    report_json_path=matrix_result.report_json_path,
-                    report_markdown_path=matrix_result.report_markdown_path,
-                    review_csv_path=matrix_result.review_csv_path,
-                    review_html_path=matrix_result.viewer_html_path,
-                    planned_case_count=len(case_specs),
-                    failed_case_ids=list(matrix_result.failed_case_ids),
-                )
-            except Exception as exc:
-                error_text = str(exc)
-                abm_result = FullCaseSuiteAbmResult(
-                    abm=abm,
-                    success=False,
-                    run_root=abm_output_root,
-                    report_json_path=abm_output_root / "smoke_full_case_matrix_report.json",
-                    report_markdown_path=abm_output_root / "smoke_full_case_matrix_report.md",
-                    review_csv_path=abm_output_root / "request_review.csv",
-                    review_html_path=abm_output_root / "review.html",
-                    planned_case_count=len(case_specs),
-                    failed_case_ids=["abm_runner_failed"],
+                _write_suite_progress(
+                    output_root=output_root,
+                    progress_path=progress_path,
+                    progress=_build_suite_progress(
+                        run_id=run_id,
+                        run_root=run_root,
+                        output_root=output_root,
+                        model=model,
+                        started_at=started_at,
+                        status="running",
+                        current_abm=abm,
+                        current_attempt=attempt,
+                        remaining_abms=remaining_abms,
+                        progress_by_name=progress_by_name,
+                    ),
                 )
                 log_event(
                     LOGGER,
-                    "full_case_suite_abm_failed",
+                    "full_case_suite_abm_start",
                     abm=abm,
-                    error=error_text,
+                    case_count=len(case_specs),
                     output_root=str(abm_output_root),
                     attempt=attempt,
                 )
-                if is_transient_provider_error(error_text) and attempt < max_abm_attempts:
-                    next_remaining.append(abm)
-                    transient_failure_seen = True
-                progress_by_name[abm] = progress_by_name[abm].model_copy(
-                    update={
-                        "status": "retrying" if abm in next_remaining else "failed",
-                        "attempt": attempt,
-                        "failed_case_count": len(abm_result.failed_case_ids),
-                        "run_root": abm_result.run_root,
-                        "run_log_path": run_log_path(abm_result.run_root),
-                        "review_html_path": abm_result.review_html_path,
-                        "report_json_path": abm_result.report_json_path,
-                        "last_error": error_text,
-                    }
+                try:
+                    matrix_result = run_full_case_matrix_smoke(
+                        case_input=case_input,
+                        adapter=adapter,
+                        model=model,
+                        output_root=abm_output_root,
+                        cases=case_specs,
+                        max_tokens=max_tokens,
+                        max_retries=max_retries,
+                        retry_backoff_seconds=retry_backoff_seconds,
+                        resume_existing=resume_existing,
+                    )
+                    latest_abm_run = Path((abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip())
+                    abm_result = FullCaseSuiteAbmResult(
+                        abm=abm,
+                        success=matrix_result.success,
+                        run_root=latest_abm_run,
+                        report_json_path=matrix_result.report_json_path,
+                        report_markdown_path=matrix_result.report_markdown_path,
+                        review_csv_path=matrix_result.review_csv_path,
+                        review_html_path=matrix_result.viewer_html_path,
+                        planned_case_count=len(case_specs),
+                        failed_case_ids=list(matrix_result.failed_case_ids),
+                    )
+                except Exception as exc:
+                    error_text = str(exc)
+                    abm_result = FullCaseSuiteAbmResult(
+                        abm=abm,
+                        success=False,
+                        run_root=abm_output_root,
+                        report_json_path=abm_output_root / "smoke_full_case_matrix_report.json",
+                        report_markdown_path=abm_output_root / "smoke_full_case_matrix_report.md",
+                        review_csv_path=abm_output_root / "request_review.csv",
+                        review_html_path=abm_output_root / "review.html",
+                        planned_case_count=len(case_specs),
+                        failed_case_ids=["abm_runner_failed"],
+                    )
+                    log_event(
+                        LOGGER,
+                        "full_case_suite_abm_failed",
+                        abm=abm,
+                        error=error_text,
+                        output_root=str(abm_output_root),
+                        attempt=attempt,
+                    )
+                    if is_transient_provider_error(error_text) and attempt < max_abm_attempts:
+                        next_remaining.append(abm)
+                        transient_failure_seen = True
+                    progress_by_name[abm] = progress_by_name[abm].model_copy(
+                        update={
+                            "status": "retrying" if abm in next_remaining else "failed",
+                            "attempt": attempt,
+                            "failed_case_count": len(abm_result.failed_case_ids),
+                            "run_root": abm_result.run_root,
+                            "run_log_path": run_log_path(abm_result.run_root),
+                            "review_html_path": abm_result.review_html_path,
+                            "report_json_path": abm_result.report_json_path,
+                            "last_error": error_text,
+                        }
+                    )
+                abm_results_by_name[abm] = abm_result
+                if abm_result.success:
+                    progress_by_name[abm] = progress_by_name[abm].model_copy(
+                        update={
+                            "status": "completed",
+                            "attempt": attempt,
+                            "failed_case_count": len(abm_result.failed_case_ids),
+                            "run_root": abm_result.run_root,
+                            "run_log_path": run_log_path(abm_result.run_root),
+                            "review_html_path": abm_result.review_html_path,
+                            "report_json_path": abm_result.report_json_path,
+                        }
+                    )
+                log_event(
+                    LOGGER,
+                    "full_case_suite_abm_complete",
+                    abm=abm,
+                    success=abm_result.success,
+                    failed_case_count=len(abm_result.failed_case_ids),
+                    run_root=str(abm_result.run_root),
+                    attempt=attempt,
                 )
-            abm_results_by_name[abm] = abm_result
-            if abm_result.success:
-                progress_by_name[abm] = progress_by_name[abm].model_copy(
-                    update={
-                        "status": "completed",
-                        "attempt": attempt,
-                        "failed_case_count": len(abm_result.failed_case_ids),
-                        "run_root": abm_result.run_root,
-                        "run_log_path": run_log_path(abm_result.run_root),
-                        "review_html_path": abm_result.review_html_path,
-                        "report_json_path": abm_result.report_json_path,
-                    }
+                _write_suite_progress(
+                    output_root=output_root,
+                    progress_path=progress_path,
+                    progress=_build_suite_progress(
+                        run_id=run_id,
+                        run_root=run_root,
+                        output_root=output_root,
+                        model=model,
+                        started_at=started_at,
+                        status="running",
+                        current_abm=abm,
+                        current_attempt=attempt,
+                        remaining_abms=next_remaining or [item for item in remaining_abms if item != abm],
+                        progress_by_name=progress_by_name,
+                    ),
                 )
-            log_event(
-                LOGGER,
-                "full_case_suite_abm_complete",
-                abm=abm,
-                success=abm_result.success,
-                failed_case_count=len(abm_result.failed_case_ids),
-                run_root=str(abm_result.run_root),
-                attempt=attempt,
-            )
-            _write_suite_progress(
-                output_root=output_root,
-                progress_path=progress_path,
-                progress=_build_suite_progress(
-                    run_id=run_id,
-                    run_root=run_root,
-                    output_root=output_root,
-                    model=model,
-                    started_at=started_at,
-                    status="running",
-                    current_abm=abm,
-                    current_attempt=attempt,
-                    remaining_abms=next_remaining or [item for item in remaining_abms if item != abm],
-                    progress_by_name=progress_by_name,
-                ),
-            )
-        if not next_remaining:
-            break
-        if transient_failure_seen:
-            log_event(
-                LOGGER,
-                "full_case_suite_retry_wait",
-                wait_seconds=CIRCUIT_BREAKER_OPEN_SECONDS,
-                remaining_abms=next_remaining,
-                next_attempt=attempt + 1,
-            )
-            _write_suite_progress(
-                output_root=output_root,
-                progress_path=progress_path,
-                progress=_build_suite_progress(
-                    run_id=run_id,
-                    run_root=run_root,
-                    output_root=output_root,
-                    model=model,
-                    started_at=started_at,
-                    status="waiting_to_retry",
-                    current_abm=None,
-                    current_attempt=attempt + 1,
+            if not next_remaining:
+                break
+            if transient_failure_seen:
+                log_event(
+                    LOGGER,
+                    "full_case_suite_retry_wait",
+                    wait_seconds=CIRCUIT_BREAKER_OPEN_SECONDS,
                     remaining_abms=next_remaining,
-                    progress_by_name=progress_by_name,
-                ),
-            )
-            time.sleep(CIRCUIT_BREAKER_OPEN_SECONDS)
-        remaining_abms = next_remaining
+                    next_attempt=attempt + 1,
+                )
+                _write_suite_progress(
+                    output_root=output_root,
+                    progress_path=progress_path,
+                    progress=_build_suite_progress(
+                        run_id=run_id,
+                        run_root=run_root,
+                        output_root=output_root,
+                        model=model,
+                        started_at=started_at,
+                        status="waiting_to_retry",
+                        current_abm=None,
+                        current_attempt=attempt + 1,
+                        remaining_abms=next_remaining,
+                        progress_by_name=progress_by_name,
+                    ),
+                )
+                time.sleep(CIRCUIT_BREAKER_OPEN_SECONDS)
+            remaining_abms = next_remaining
 
-    abm_results = [abm_results_by_name[abm] for abm in abm_inputs]
-    summary_rows = [
-        {
-            "abm": abm_result.abm,
-            "success": str(abm_result.success).lower(),
-            "planned_case_count": str(abm_result.planned_case_count),
-            "failed_case_count": str(len(abm_result.failed_case_ids)),
-            "run_root": str(abm_result.run_root),
-            "run_log_path": str(run_log_path(abm_result.run_root)),
-            "report_json_path": str(abm_result.report_json_path),
-            "review_csv_path": str(abm_result.review_csv_path),
-            "review_html_path": str(abm_result.review_html_path),
-        }
-        for abm_result in abm_results
-    ]
+        abm_results = [abm_results_by_name[abm] for abm in abm_inputs]
+        summary_rows = [
+            {
+                "abm": abm_result.abm,
+                "success": str(abm_result.success).lower(),
+                "planned_case_count": str(abm_result.planned_case_count),
+                "failed_case_count": str(len(abm_result.failed_case_ids)),
+                "run_root": str(abm_result.run_root),
+                "run_log_path": str(run_log_path(abm_result.run_root)),
+                "report_json_path": str(abm_result.report_json_path),
+                "review_csv_path": str(abm_result.review_csv_path),
+                "review_html_path": str(abm_result.review_html_path),
+            }
+            for abm_result in abm_results
+        ]
 
-    finished_at = datetime.now(UTC)
-    result = FullCaseSuiteSmokeResult(
-        started_at_utc=started_at.isoformat(),
-        finished_at_utc=finished_at.isoformat(),
-        output_root=output_root,
-        run_id=run_id,
-        run_root=run_root,
-        run_log_path=log_path,
-        report_json_path=run_root / "smoke_full_case_suite_report.json",
-        report_markdown_path=run_root / "smoke_full_case_suite_report.md",
-        review_csv_path=run_root / "review.csv",
-        review_html_path=run_root / "review.html",
-        success=all(item.success for item in abm_results),
-        failed_abms=[item.abm for item in abm_results if not item.success],
-        abms=abm_results,
-    )
-    _write_json(result.report_json_path, result.model_dump(mode="json"))
-    _write_text(result.report_markdown_path, _render_report(result))
-    _write_summary_csv(result.review_csv_path, summary_rows)
-    _write_text(result.review_html_path, _render_html(result))
-    _write_suite_progress(
-        output_root=output_root,
-        progress_path=progress_path,
-        progress=_build_suite_progress(
+        finished_at = datetime.now(UTC)
+        result = FullCaseSuiteSmokeResult(
+            started_at_utc=started_at.isoformat(),
+            finished_at_utc=finished_at.isoformat(),
+            output_root=output_root,
             run_id=run_id,
             run_root=run_root,
+            run_log_path=log_path,
+            report_json_path=run_root / "smoke_full_case_suite_report.json",
+            report_markdown_path=run_root / "smoke_full_case_suite_report.md",
+            review_csv_path=run_root / "review.csv",
+            review_html_path=run_root / "review.html",
+            success=all(item.success for item in abm_results),
+            failed_abms=[item.abm for item in abm_results if not item.success],
+            abms=abm_results,
+        )
+        _write_json(result.report_json_path, result.model_dump(mode="json"))
+        _write_text(result.report_markdown_path, _render_report(result))
+        _write_summary_csv(result.review_csv_path, summary_rows)
+        _write_text(result.review_html_path, _render_html(result))
+        _write_suite_progress(
             output_root=output_root,
-            model=model,
-            started_at=started_at,
-            status="completed" if result.success else "failed",
-            current_abm=None,
-            current_attempt=None,
-            remaining_abms=[],
-            progress_by_name=progress_by_name,
-            finished_at=finished_at,
-        ),
-    )
-    log_event(
-        LOGGER,
-        "full_case_suite_complete",
-        success=result.success,
-        failed_abms=result.failed_abms,
-        run_root=str(run_root),
-    )
-    return result
+            progress_path=progress_path,
+            progress=_build_suite_progress(
+                run_id=run_id,
+                run_root=run_root,
+                output_root=output_root,
+                model=model,
+                started_at=started_at,
+                status="completed" if result.success else "failed",
+                current_abm=None,
+                current_attempt=None,
+                remaining_abms=[],
+                progress_by_name=progress_by_name,
+                finished_at=finished_at,
+            ),
+        )
+        log_event(
+            LOGGER,
+            "full_case_suite_complete",
+            success=result.success,
+            failed_abms=result.failed_abms,
+            run_root=str(run_root),
+        )
+        return result
+    finally:
+        release_active_run_lock(output_root=output_root, run_id=run_id)
 
 
 def _write_summary_csv(path: Path, rows: list[dict[str, str]]) -> None:
