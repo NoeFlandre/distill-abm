@@ -31,6 +31,7 @@ from distill_abm.pipeline.full_case_smoke import (
     _record_context_review_row,
     _record_trend_review_row,
     _validate_full_case_inputs,
+    resolve_parallel_trend_workers,
 )
 from distill_abm.pipeline.helpers import encode_image
 from distill_abm.pipeline.local_qwen_sample_response import (
@@ -111,6 +112,14 @@ MAX_PARALLEL_TRENDS = 6
 MAX_PARALLEL_CASES = 3
 
 
+def resolve_parallel_case_workers(provider: str) -> int:
+    """Return a provider-aware matrix case worker count."""
+
+    if provider.strip().lower() == "mistral":
+        return 2
+    return MAX_PARALLEL_CASES
+
+
 class _MatrixTrendExecutionResult(BaseModel):
     plot_input: FullCasePlotInput
     trend_dir: Path
@@ -178,7 +187,8 @@ def run_full_case_matrix_smoke(
     remaining_cases = list(cases)
     for _attempt in range(1, max(max_case_attempts, 1) + 1):
         next_remaining: list[FullCaseMatrixCaseSpec] = []
-        with ThreadPoolExecutor(max_workers=min(MAX_PARALLEL_CASES, len(remaining_cases))) as executor:
+        max_case_workers = min(resolve_parallel_case_workers(adapter.provider), len(remaining_cases))
+        with ThreadPoolExecutor(max_workers=max_case_workers) as executor:
             future_to_case: dict[Future[FullCaseMatrixCaseResult], FullCaseMatrixCaseSpec] = {}
             for case in remaining_cases:
                 case_dir = run_root / "cases" / case.case_id
@@ -405,7 +415,8 @@ def _run_full_case_matrix_case(
 
     trend_results_by_index: dict[int, _MatrixTrendExecutionResult] = {}
     if pending_plots:
-        with ThreadPoolExecutor(max_workers=min(MAX_PARALLEL_TRENDS, len(pending_plots))) as executor:
+        max_trend_workers = min(resolve_parallel_trend_workers(adapter.provider), len(pending_plots))
+        with ThreadPoolExecutor(max_workers=max_trend_workers) as executor:
             future_to_plot: dict[Future[_MatrixTrendExecutionResult], int] = {
                 executor.submit(
                     _execute_matrix_trend,

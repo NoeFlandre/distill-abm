@@ -147,6 +147,8 @@ Capture solutions so the team compounds knowledge:
 - **`table` means plot-relevant statistical evidence.** The non-plot evidence mode should be computed only from the simulation columns relevant to the target trend description, plus an optional step/time column. Do not dump unrelated simulation columns into prompts.
 - **Bound heavy statistical routines on repeated-simulation series.** If one reporter pattern matches many replicate series, keep the selected slice for auditability but run the expensive signal analyses on a representative aggregate series (currently the tick-wise mean) so DOE and other audit runs stay fast and finish reliably.
 - **Keep the LLM runtime API-only.** Production models are `moonshotai/kimi-k2.5`, `google/gemini-3.1-pro-preview`, and OpenRouter `qwen/qwen3.5-27b`. `nvidia/nemotron-nano-12b-v2-vl:free` and `mistral-medium-latest` are debug-only. Do not reintroduce local-model runtime paths unless a task explicitly asks for them.
+- **Provider-specific scheduling belongs in the shared runners.** If a provider has a clear request budget, encode pacing and worker limits in the shared smoke/runtime runners rather than in one-off scripts or ad hoc shell throttling.
+- **Long-running smoke suites should ship a simple HTML dashboard.** Logs and CSVs remain the source of truth, but top-level all-ABM smoke suites should also expose a small static dashboard for quick operator review during and after the run.
 
 ---
 

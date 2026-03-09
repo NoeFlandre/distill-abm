@@ -53,8 +53,10 @@ from distill_abm.pipeline.doe_smoke import (
     canonical_summarization_specs,
 )
 from distill_abm.pipeline.full_case_matrix_smoke import (
+    FullCaseMatrixCaseSpec,
     build_full_case_matrix_case_specs,
 )
+from distill_abm.pipeline.full_case_smoke import FullCaseSmokeInput
 from distill_abm.pipeline.local_qwen_monitor import (
     collect_local_qwen_monitor_snapshot,
     render_local_qwen_monitor,
@@ -858,6 +860,85 @@ def execute_smoke_full_case_matrix_command(
         markdown_label="full case matrix smoke report (markdown)",
         json_label="full case matrix smoke report (json)",
         failure_label="full case matrix smoke failed",
+    )
+
+
+def execute_smoke_full_case_suite_command(
+    *,
+    models_root: Path,
+    ingest_root: Path,
+    viz_root: Path,
+    models_path: Path,
+    model_id: str,
+    output_root: Path,
+    evidence_modes: tuple[EvidenceMode, ...],
+    prompt_variants: tuple[str, ...],
+    repetitions: tuple[int, ...],
+    max_tokens: int,
+    resume: bool,
+    json_output: bool,
+    allow_debug_model: bool,
+    resolve_model_from_registry: Callable[[Path, str], tuple[str, str]],
+    resolve_model_path: Callable[[str, Path], Path],
+    create_adapter_fn: Callable[[str, str], Any],
+    load_abm_config_fn: Callable[[Path], Any],
+    validate_model_policy: Callable[..., None],
+    run_full_case_suite_smoke_fn: Callable[..., Any],
+) -> None:
+    provider, model = resolve_model_from_registry(models_path, model_id)
+    validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
+
+    abm_inputs: dict[str, FullCaseSmokeInput] = {}
+    cases_by_abm: dict[str, tuple[FullCaseMatrixCaseSpec, ...]] = {}
+    for abm in ("fauna", "grazing", "milk_consumption"):
+        abm_config = load_abm_config_for_cli(abm=abm, load_abm_config_fn=load_abm_config_fn)
+        _ = resolve_model_path(abm, models_root)
+        case_input = build_full_case_smoke_input(
+            abm=abm,
+            abm_config=abm_config,
+            ingest_root=ingest_root,
+            viz_root=viz_root,
+        )
+        abm_inputs[abm] = case_input
+        cases_by_abm[abm] = build_full_case_matrix_case_specs(
+            abm=abm,
+            evidence_modes=evidence_modes,
+            prompt_variants=prompt_variants,
+            repetitions=repetitions,
+        )
+
+    adapter: Any = _create_runtime_adapter(
+        create_adapter_fn=create_adapter_fn,
+        provider=provider,
+        model=model,
+        timeout_seconds=DEFAULT_LLM_TIMEOUT_SECONDS,
+    )
+    result = run_full_case_suite_smoke_fn(
+        abm_inputs=abm_inputs,
+        cases_by_abm=cases_by_abm,
+        adapter=adapter,
+        model=model,
+        output_root=output_root,
+        max_tokens=max_tokens,
+        resume_existing=resume,
+    )
+    command_result = SmokeCommandResult(
+        command="smoke-full-case-suite",
+        success=result.success,
+        report_json_path=result.report_json_path,
+        report_markdown_path=result.report_markdown_path,
+        failed_items=result.failed_abms,
+        nested_artifacts={
+            "review_csv": result.review_csv_path,
+            "review_html": result.review_html_path,
+        },
+    )
+    emit_smoke_command_result(
+        command_result=command_result,
+        json_output=json_output,
+        markdown_label="full case suite smoke report (markdown)",
+        json_label="full case suite smoke report (json)",
+        failure_label="full case suite smoke failed",
     )
 
 

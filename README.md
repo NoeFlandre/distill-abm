@@ -29,6 +29,9 @@ Debug-only model note:
 - It is not part of the benchmark model policy.
 - Use it only with `--allow-debug-model` and `MISTRAL_API_KEY` set.
 - Mistral debug requests use `temperature=0.2`; other providers remain at `1.0` unless explicitly overridden.
+- The all-ABMs generation audit run is exposed through `smoke-full-case-suite`.
+- `smoke-full-case-suite` writes a suite-level `review.html` dashboard plus one nested matrix run per ABM.
+- Mistral suite execution is paced and worker-limited specifically for its API budget, so the scheduler stays below the provider request ceiling instead of overscheduling pointlessly.
 
 ## Summarizers
 First-class summarizers:

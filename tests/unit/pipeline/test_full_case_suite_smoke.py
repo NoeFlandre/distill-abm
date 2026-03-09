@@ -1,0 +1,101 @@
+from __future__ import annotations
+
+from pathlib import Path
+from types import SimpleNamespace
+from typing import cast
+
+from distill_abm.llm.adapters.base import LLMAdapter
+from distill_abm.pipeline.full_case_matrix_smoke import FullCaseMatrixCaseSpec
+from distill_abm.pipeline.full_case_smoke import FullCaseSmokeInput
+from distill_abm.pipeline.full_case_suite_smoke import run_full_case_suite_smoke
+
+
+class _Adapter(LLMAdapter):
+    provider = "mistral"
+
+    def complete(self, request):  # type: ignore[no-untyped-def]
+        _ = request
+        raise AssertionError("not used in this test")
+
+
+def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    recorded_abms: list[str] = []
+
+    def fake_run_full_case_matrix_smoke(**kwargs):  # type: ignore[no-untyped-def]
+        output_root = kwargs["output_root"]
+        run_root = output_root / "runs" / "run_1"
+        run_root.mkdir(parents=True, exist_ok=True)
+        (output_root / "latest_run.txt").write_text(str(run_root), encoding="utf-8")
+        recorded_abms.append(kwargs["case_input"].abm)
+        return SimpleNamespace(
+            success=True,
+            report_json_path=run_root / "report.json",
+            report_markdown_path=run_root / "report.md",
+            review_csv_path=run_root / "review.csv",
+            viewer_html_path=run_root / "review.html",
+            failed_case_ids=[],
+        )
+
+    monkeypatch.setattr(
+        "distill_abm.pipeline.full_case_suite_smoke.run_full_case_matrix_smoke",
+        fake_run_full_case_matrix_smoke,
+    )
+
+    suite_input = {
+        "fauna": FullCaseSmokeInput(
+            abm="fauna",
+            csv_path=tmp_path / "fauna.csv",
+            parameters_path=tmp_path / "fauna_params.txt",
+            documentation_path=tmp_path / "fauna_docs.txt",
+            plots=(),
+        ),
+        "grazing": FullCaseSmokeInput(
+            abm="grazing",
+            csv_path=tmp_path / "grazing.csv",
+            parameters_path=tmp_path / "grazing_params.txt",
+            documentation_path=tmp_path / "grazing_docs.txt",
+            plots=(),
+        ),
+    }
+    for path in [
+        suite_input["fauna"].csv_path,
+        suite_input["fauna"].parameters_path,
+        suite_input["fauna"].documentation_path,
+        suite_input["grazing"].csv_path,
+        suite_input["grazing"].parameters_path,
+        suite_input["grazing"].documentation_path,
+    ]:
+        path.write_text("x", encoding="utf-8")
+
+    cases_by_abm = cast(
+        dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
+        {
+        abm: (
+            FullCaseMatrixCaseSpec(
+                case_id=f"01_{abm}_none_plot_rep1",
+                abm=abm,
+                evidence_mode="plot",
+                prompt_variant="none",
+                repetition=1,
+            ),
+        )
+        for abm in suite_input
+        },
+    )
+
+    result = run_full_case_suite_smoke(
+        abm_inputs=suite_input,
+        cases_by_abm=cases_by_abm,
+        adapter=_Adapter(),
+        model="mistral-medium-latest",
+        output_root=tmp_path / "suite",
+    )
+
+    assert result.success is True
+    assert recorded_abms == ["fauna", "grazing"]
+    assert result.report_json_path.exists()
+    assert result.report_markdown_path.exists()
+    assert result.review_csv_path.exists()
+    assert result.review_html_path.exists()
+    assert "Mistral Generation Dashboard" in result.review_html_path.read_text(encoding="utf-8")
+    assert "Planned cases" in result.report_markdown_path.read_text(encoding="utf-8")
