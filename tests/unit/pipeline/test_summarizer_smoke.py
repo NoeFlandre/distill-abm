@@ -4,7 +4,11 @@ import csv
 import json
 from pathlib import Path
 
-from distill_abm.pipeline.summarizer_smoke import ValidatedSmokeBundle, run_summarizer_smoke
+from distill_abm.pipeline.summarizer_smoke import (
+    ValidatedSmokeBundle,
+    default_validated_smoke_bundles,
+    run_summarizer_smoke,
+)
 
 
 def _bundle(tmp_path: Path) -> ValidatedSmokeBundle:
@@ -39,6 +43,9 @@ def test_run_summarizer_smoke_writes_bundle_outputs(tmp_path: Path) -> None:
 
     assert result.success is True
     bundle_dir = result.bundles[0].bundle_dir
+    assert result.run_root == result.report_json_path.parent
+    assert result.run_log_path.exists() is True
+    assert (tmp_path / "smoke" / "latest_run.txt").read_text(encoding="utf-8").strip() == str(result.run_root)
     combined_input = (bundle_dir / "01_input" / "combined_input.txt").read_text(encoding="utf-8")
     assert combined_input == "Valid context output.\n\nTrend one output.\n\nTrend two output."
     assert (bundle_dir / "02_summaries" / "none.txt").read_text(encoding="utf-8") == combined_input
@@ -71,3 +78,100 @@ def test_run_summarizer_smoke_rejects_generic_unavailable_text(tmp_path: Path) -
     assert result.success is False
     assert result.failed_bundle_ids == ["bundle_one"]
     assert result.bundles[0].source_validation_error is not None
+
+
+def test_default_validated_smoke_bundles_discovers_successful_matrix_cases(tmp_path: Path) -> None:
+    run_root = tmp_path / "matrix_run"
+    cases_root = run_root / "cases"
+    success_case = cases_root / "01_grazing_none_plot_rep1"
+    failed_case = cases_root / "02_grazing_none_table_rep1"
+    for case_root in (success_case, failed_case):
+        (case_root / "02_context").mkdir(parents=True)
+        (case_root / "03_trends" / "plot_01").mkdir(parents=True)
+        (case_root / "02_context" / "context_output.txt").write_text("Valid context.", encoding="utf-8")
+        (case_root / "03_trends" / "plot_01" / "trend_output.txt").write_text("Valid trend.", encoding="utf-8")
+    report = {
+        "cases": [
+            {
+                "case_id": success_case.name,
+                "case_dir": str(success_case),
+                "abm": "grazing",
+                "success": True,
+            },
+            {
+                "case_id": failed_case.name,
+                "case_dir": str(failed_case),
+                "abm": "grazing",
+                "success": False,
+            },
+        ]
+    }
+    (run_root / "smoke_full_case_matrix_report.json").write_text(json.dumps(report), encoding="utf-8")
+
+    bundles = default_validated_smoke_bundles(run_root)
+
+    assert [bundle.case_id for bundle in bundles] == [success_case.name]
+    assert bundles[0].context_output_path == success_case / "02_context" / "context_output.txt"
+    assert bundles[0].trend_output_paths == (success_case / "03_trends" / "plot_01" / "trend_output.txt",)
+
+
+def test_run_summarizer_smoke_clears_stale_output_root(tmp_path: Path) -> None:
+    output_root = tmp_path / "smoke"
+    stale_file = output_root / "stale.txt"
+    output_root.mkdir()
+    stale_file.write_text("stale", encoding="utf-8")
+
+    result = run_summarizer_smoke(
+        source_root=tmp_path,
+        output_root=output_root,
+        validated_bundles=(_bundle(tmp_path),),
+        summarizer_fns={
+            "bart": lambda text: f"bart::{text}",
+            "bert": lambda text: f"bert::{text}",
+            "t5": lambda text: f"t5::{text}",
+            "longformer_ext": lambda text: f"longformer::{text}",
+        },
+    )
+
+    assert result.success is True
+    assert stale_file.exists() is False
+
+
+def test_run_summarizer_smoke_reuses_successful_outputs_when_resuming(tmp_path: Path) -> None:
+    output_root = tmp_path / "smoke"
+    bundle = _bundle(tmp_path)
+
+    first = run_summarizer_smoke(
+        source_root=tmp_path,
+        output_root=output_root,
+        validated_bundles=(bundle,),
+        summarizer_fns={
+            "bart": lambda text: f"bart::{text}",
+            "bert": lambda text: f"bert::{text}",
+            "t5": lambda text: f"t5::{text}",
+            "longformer_ext": lambda text: f"longformer::{text}",
+        },
+    )
+
+    assert first.success is True
+
+    def _should_not_run(_: str) -> str:
+        raise AssertionError("summarizer should not rerun when resume=True and output is already valid")
+
+    resumed = run_summarizer_smoke(
+        source_root=tmp_path,
+        output_root=output_root,
+        resume=True,
+        validated_bundles=(bundle,),
+        summarizer_fns={
+            "bart": _should_not_run,
+            "bert": _should_not_run,
+            "t5": _should_not_run,
+            "longformer_ext": _should_not_run,
+        },
+    )
+
+    assert resumed.success is True
+    assert resumed.run_root != first.run_root
+    assert all(mode.success for mode in resumed.bundles[0].modes)
+    assert {mode.duration_seconds for mode in resumed.bundles[0].modes} == {0.0}
