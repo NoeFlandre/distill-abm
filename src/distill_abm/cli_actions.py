@@ -711,6 +711,7 @@ def execute_smoke_quantitative_command(
         nested_artifacts={
             "review_csv": result.review_csv_path,
             "quantitative_rows_csv": result.quantitative_rows_path,
+            "structured_results_csv": result.structured_results_path,
             "anova_csv": result.anova_csv_path,
             "factorial_csv": result.factorial_csv_path,
             "optimal_csv": result.optimal_csv_path,

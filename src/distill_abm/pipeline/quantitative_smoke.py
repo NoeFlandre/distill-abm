@@ -105,6 +105,7 @@ class QuantitativeSmokeResult(BaseModel):
     report_markdown_path: Path
     review_csv_path: Path
     quantitative_rows_path: Path
+    structured_results_path: Path
     anova_csv_path: Path
     factorial_csv_path: Path
     optimal_csv_path: Path
@@ -207,10 +208,17 @@ def run_quantitative_smoke(
             failed_record_ids.append(record.record_id)
 
     quantitative_rows_path = run_root / "quantitative_rows.csv"
+    structured_results_path = run_root / "structured_results.csv"
     _write_csv(
         quantitative_rows_path,
         fieldnames=list(record_rows[0].keys()) if record_rows else _quantitative_row_fields(),
         rows=record_rows,
+    )
+    structured_rows = _build_structured_results_rows(record_rows)
+    _write_csv(
+        structured_results_path,
+        fieldnames=list(structured_rows[0].keys()) if structured_rows else _structured_results_fields(),
+        rows=structured_rows,
     )
 
     anova_csv_path = run_root / "anova_pvalues.csv"
@@ -258,6 +266,7 @@ def run_quantitative_smoke(
         report_markdown_path=run_root / "smoke_quantitative_report.md",
         review_csv_path=review_csv_path,
         quantitative_rows_path=quantitative_rows_path,
+        structured_results_path=structured_results_path,
         anova_csv_path=anova_csv_path,
         factorial_csv_path=factorial_csv_path,
         optimal_csv_path=optimal_csv_path,
@@ -475,6 +484,52 @@ def _review_row_fields() -> list[str]:
         "reference_family",
         "error",
     ]
+
+
+def _structured_results_fields() -> list[str]:
+    return [
+        "Case study",
+        "Summary",
+        "LLM",
+        "Role",
+        "Example",
+        "Insight",
+        "Evidence",
+        "Repetition",
+        "Output",
+        "BLEU",
+        "METEOR",
+        "ROUGE-1",
+        "ROUGE-2",
+        "ROUGE-L",
+        "Flesch Reading Ease",
+    ]
+
+
+def _build_structured_results_rows(record_rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Build the normalized factor sheet equivalent to the legacy final-sheet workflow."""
+    structured_rows: list[dict[str, str]] = []
+    for row in record_rows:
+        structured_rows.append(
+            {
+                "Case study": row["abm"],
+                "Summary": row["summarizer"],
+                "LLM": row["llm"],
+                "Role": "Yes" if row["role"] == "True" else "No",
+                "Example": "Yes" if row["example"] == "True" else "No",
+                "Insight": "Yes" if row["insights"] == "True" else "No",
+                "Evidence": row["evidence"],
+                "Repetition": row["repetition"],
+                "Output": row["summary_output_path"],
+                "BLEU": row["BLEU"],
+                "METEOR": row["METEOR"],
+                "ROUGE-1": row["R-1"],
+                "ROUGE-2": row["R-2"],
+                "ROUGE-L": row["R-L"],
+                "Flesch Reading Ease": row["Reading ease"],
+            }
+        )
+    return structured_rows
 
 
 def _write_csv(path: Path, *, fieldnames: Iterable[str], rows: list[dict[str, str]]) -> None:
@@ -767,6 +822,7 @@ def _render_markdown_report(result: QuantitativeSmokeResult) -> str:
         f"- record_count: `{result.record_count}`\n"
         f"- failed_record_count: `{len(result.failed_record_ids)}`\n"
         f"- quantitative_rows_path: `{result.quantitative_rows_path}`\n"
+        f"- structured_results_path: `{result.structured_results_path}`\n"
         f"- anova_csv_path: `{result.anova_csv_path}`\n"
         f"- factorial_csv_path: `{result.factorial_csv_path}`\n"
         f"- optimal_csv_path: `{result.optimal_csv_path}`\n"

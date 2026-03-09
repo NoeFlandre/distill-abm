@@ -42,6 +42,8 @@
   - `smoke-quantitative` consumes a completed summarizer smoke run, reuses its saved summaries, scores each `(case, summarizer)` pair against the configured author reference, and computes one-way ANOVA plus factorial contribution tables.
   - It also writes a publication-oriented “best score across dynamic prompt elements” table grouped by ABM, summarizer, and LLM.
   - It writes machine-readable CSVs together with paper-oriented Markdown/LaTeX tables under the same run-separated, resumable contract.
+  - The lexical scoring logic is intentionally aligned with the retired legacy notebooks: BLEU with NLTK `method4` smoothing, tokenized METEOR, stemmed ROUGE-1/2/L, and Flesch Reading Ease on the candidate summary text.
+  - It also emits a normalized `structured_results.csv` sheet that generalizes the old notebook “final sheet” layout to the current factors: ABM, summary mode, LLM, role, example, insight, evidence, repetition, and the six paper metrics.
 - Exposes `monitor-local-qwen` and `monitor-run` for a compact live dashboard over case-based smoke output directories.
   - The monitor surfaces current case status, configured `num_ctx`, configured `max_tokens`, prompt lengths, observed token totals, and recent errors.
 - Exposes `health-check` for lightweight operator diagnostics.

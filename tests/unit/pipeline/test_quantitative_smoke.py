@@ -9,6 +9,7 @@ import pandas as pd
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.pipeline.quantitative_smoke import (
     _build_factorial_input_frame,
+    _build_structured_results_rows,
     _derive_prompt_flags,
     _normalize_factorial_table,
     _render_anova_markdown_table,
@@ -208,6 +209,52 @@ def test_run_quantitative_smoke_writes_best_score_table(tmp_path: Path) -> None:
     assert {"ABM", "Summary", "LLM", "BLEU", "METEOR", "R-1", "R-2", "R-L", "Reading ease"} == set(rows[0].keys())
     assert {row["Summary"] for row in rows} == {"none", "bart", "bert", "t5", "longformer_ext"}
     assert {row["LLM"] for row in rows} == {"nvidia/nemotron-nano-12b-v2-vl:free"}
+
+
+def test_build_structured_results_rows_exposes_modern_factor_sheet() -> None:
+    rows = _build_structured_results_rows(
+        [
+            {
+                "case_id": "01_grazing_role_plot_plus_table_rep2",
+                "abm": "grazing",
+                "llm": "mistral-medium-latest",
+                "evidence": "plot+table",
+                "prompt": "role+insights",
+                "role": "True",
+                "insights": "True",
+                "example": "False",
+                "summarizer": "t5",
+                "repetition": "2",
+                "summary_output_path": "/tmp/out.txt",
+                "BLEU": "0.10",
+                "METEOR": "0.20",
+                "R-1": "0.30",
+                "R-2": "0.40",
+                "R-L": "0.50",
+                "Reading ease": "60.00",
+            }
+        ]
+    )
+
+    assert rows == [
+        {
+            "Case study": "grazing",
+            "Summary": "t5",
+            "LLM": "mistral-medium-latest",
+            "Role": "Yes",
+            "Example": "No",
+            "Insight": "Yes",
+            "Evidence": "plot+table",
+            "Repetition": "2",
+            "Output": "/tmp/out.txt",
+            "BLEU": "0.10",
+            "METEOR": "0.20",
+            "ROUGE-1": "0.30",
+            "ROUGE-2": "0.40",
+            "ROUGE-L": "0.50",
+            "Flesch Reading Ease": "60.00",
+        }
+    ]
 
 
 def test_best_score_table_optimizes_each_metric_independently(tmp_path: Path) -> None:
