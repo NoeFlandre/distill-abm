@@ -292,8 +292,9 @@ def _extract_ollama_model_names(payload: object) -> set[str]:
 
 def validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:
     """Enforce the supported benchmark model policy used by the CLI."""
-    _ = allow_debug_model
     key = (provider.strip().lower(), model.strip())
+    if allow_debug_model and key not in BENCHMARK_MODELS:
+        return
     if key not in BENCHMARK_MODELS:
         allowed = ", ".join(f"{p}:{m}" for p, m in sorted(BENCHMARK_MODELS))
         raise typer.BadParameter(

@@ -11,6 +11,7 @@ from distill_abm.llm.adapters.base import (
     LLMRequest,
     LLMResponse,
 )
+from distill_abm.llm.adapters.mistral_adapter import MistralAdapter
 from distill_abm.llm.adapters.ollama_adapter import OllamaAdapter
 from distill_abm.llm.adapters.openai_adapter import OpenAIAdapter
 from distill_abm.llm.adapters.openrouter_adapter import OpenRouterAdapter
@@ -94,6 +95,50 @@ def test_openrouter_adapter_success() -> None:
     assert response.raw["model"] == "google/gemini-3.1-pro-preview"
     assert response.raw["choices"][0]["finish_reason"] == "stop"
     assert response.raw["usage"]["total_tokens"] == 15
+
+
+def test_mistral_adapter_success_with_transport() -> None:
+    request = make_request().model_copy(
+        update={
+            "metadata": {
+                "structured_output_name": "structured_smoke_text",
+                "structured_output_schema": {
+                    "type": "object",
+                    "properties": {"response_text": {"type": "string"}},
+                    "required": ["response_text"],
+                },
+            }
+        }
+    )
+
+    def transport(*, api_key: str, base_url: str, payload: dict[str, object]) -> dict[str, object]:
+        assert api_key == "secret"
+        assert base_url == "https://api.mistral.ai/v1"
+        assert payload["response_format"] == {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "structured_smoke_text",
+                "schema": request.metadata["structured_output_schema"],
+            },
+        }
+        return {
+            "model": "mistral-medium-latest",
+            "choices": [{"message": {"content": '{"response_text":"ok"}'}}],
+        }
+
+    response = MistralAdapter(
+        model="mistral-medium-latest",
+        api_key="secret",
+        transport=transport,
+    ).complete(request)
+
+    assert response.provider == "mistral"
+    assert response.text == '{"response_text":"ok"}'
+
+
+def test_mistral_adapter_raises_on_missing_api_key() -> None:
+    with pytest.raises(LLMProviderError, match="mistral api key missing"):
+        MistralAdapter(model="mistral-medium-latest", api_key=None).complete(make_request())
 
 
 def test_openrouter_adapter_forwards_structured_output_metadata() -> None:

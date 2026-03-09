@@ -74,3 +74,23 @@ def test_compute_scores_falls_back_when_nltk_resources_are_missing(
     assert scores.bleu == 0.0
     assert scores.meteor == 0.0
     assert scores.rouge1 == 0.0
+
+
+def test_score_summary_preserves_reading_ease_from_reference_scores(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "distill_abm.eval.metrics.compute_scores",
+        lambda reference, candidate: reference_scores_module.ReferenceScores(
+            bleu=0.1,
+            meteor=0.2,
+            rouge1=0.3,
+            rouge2=0.4,
+            rouge_l=0.5,
+            flesch_reading_ease=42.5,
+        ),
+    )
+
+    scores = score_summary("reference", "candidate")
+
+    assert scores.flesch_reading_ease == 42.5

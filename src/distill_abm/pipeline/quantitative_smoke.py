@@ -107,10 +107,13 @@ class QuantitativeSmokeResult(BaseModel):
     quantitative_rows_path: Path
     anova_csv_path: Path
     factorial_csv_path: Path
+    optimal_csv_path: Path
     anova_table_markdown_path: Path
     anova_table_latex_path: Path
     factorial_table_markdown_path: Path
     factorial_table_latex_path: Path
+    optimal_table_markdown_path: Path
+    optimal_table_latex_path: Path
     run_log_path: Path
     success: bool
     failed_record_ids: list[str] = Field(default_factory=list)
@@ -212,10 +215,13 @@ def run_quantitative_smoke(
 
     anova_csv_path = run_root / "anova_pvalues.csv"
     factorial_csv_path = run_root / "factorial_contributions.csv"
+    optimal_csv_path = run_root / "best_scores.csv"
     anova_table_markdown_path = run_root / "anova_table.md"
     anova_table_latex_path = run_root / "anova_table.tex"
     factorial_table_markdown_path = run_root / "factorial_table.md"
     factorial_table_latex_path = run_root / "factorial_table.tex"
+    optimal_table_markdown_path = run_root / "best_scores_table.md"
+    optimal_table_latex_path = run_root / "best_scores_table.tex"
     review_csv_path = run_root / "review.csv"
     _write_csv(
         review_csv_path,
@@ -237,6 +243,10 @@ def run_quantitative_smoke(
     normalized_factorial.to_csv(factorial_csv_path, index=False, float_format="%.2f")
     factorial_table_markdown_path.write_text(_render_factorial_markdown_table(normalized_factorial), encoding="utf-8")
     factorial_table_latex_path.write_text(_render_factorial_latex_table(normalized_factorial), encoding="utf-8")
+    optimal_rows = _build_optimal_score_rows(record_rows)
+    _write_optimal_csv(optimal_csv_path, optimal_rows)
+    optimal_table_markdown_path.write_text(_render_optimal_markdown_table(optimal_rows), encoding="utf-8")
+    optimal_table_latex_path.write_text(_render_optimal_latex_table(optimal_rows), encoding="utf-8")
 
     result = QuantitativeSmokeResult(
         started_at_utc=started_at.isoformat(),
@@ -250,10 +260,13 @@ def run_quantitative_smoke(
         quantitative_rows_path=quantitative_rows_path,
         anova_csv_path=anova_csv_path,
         factorial_csv_path=factorial_csv_path,
+        optimal_csv_path=optimal_csv_path,
         anova_table_markdown_path=anova_table_markdown_path,
         anova_table_latex_path=anova_table_latex_path,
         factorial_table_markdown_path=factorial_table_markdown_path,
         factorial_table_latex_path=factorial_table_latex_path,
+        optimal_table_markdown_path=optimal_table_markdown_path,
+        optimal_table_latex_path=optimal_table_latex_path,
         run_log_path=attached_run_log_path,
         success=not failed_record_ids,
         failed_record_ids=sorted(dict.fromkeys(failed_record_ids)),
@@ -306,6 +319,17 @@ def _build_quantitative_record_from_source_row(source_row: dict[str, str]) -> Qu
 def _load_case_metadata_from_context_output(context_output_path: Path) -> dict[str, object]:
     case_dir = context_output_path.parent.parent
     run_root = case_dir.parent.parent
+    case_summary_path = case_dir / "00_case_summary.json"
+    if case_summary_path.exists():
+        payload = json.loads(case_summary_path.read_text(encoding="utf-8"))
+        return {
+            "evidence_mode": str(payload["evidence_mode"]),
+            "prompt_variant": str(payload["prompt_variant"]),
+            "repetition": int(payload.get("repetition", 1)),
+            "model_id": str(payload.get("model_id", "")),
+            "model": str(payload.get("model", "")),
+            "run_root": run_root,
+        }
     report_path = run_root / "smoke_full_case_matrix_report.json"
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     for case in payload.get("cases", []):
@@ -546,9 +570,44 @@ def _normalize_factorial_table(frame: pd.DataFrame | None) -> pd.DataFrame:
             normalized.loc[len(normalized)] = {column: 0.0 if column != "Feature" else feature for column in columns}
     normalized = normalized[columns].copy()
     normalized["Feature"] = normalized["Feature"].astype(str)
+    for metric in METRIC_COLUMN_NAMES:
+        metric_total = float(normalized[metric].sum())
+        if metric_total > 0:
+            normalized[metric] = normalized[metric].astype(float) / metric_total * 100.0
     normalized["_order"] = normalized["Feature"].apply(_factorial_feature_sort_key)
     normalized = normalized.sort_values(["_order", "Feature"]).drop(columns=["_order"]).reset_index(drop=True)
     return normalized
+
+
+def _build_optimal_score_rows(record_rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    if not record_rows:
+        return []
+    frame = pd.DataFrame(record_rows).copy()
+    group_columns = ["abm", "summarizer", "llm"]
+    optimal_rows: list[dict[str, str]] = []
+    for group_values, group_frame in frame.groupby(group_columns, sort=True):
+        abm, summarizer, llm = group_values
+        numeric_frame = group_frame.copy()
+        for metric in METRIC_COLUMN_NAMES:
+            numeric_frame[metric] = numeric_frame[metric].astype(float)
+        optimal_rows.append(
+            {
+                "ABM": str(abm),
+                "Summary": str(summarizer),
+                "LLM": str(llm),
+                "BLEU": _format_float_cell(numeric_frame["BLEU"].max()),
+                "METEOR": _format_float_cell(numeric_frame["METEOR"].max()),
+                "R-1": _format_float_cell(numeric_frame["R-1"].max()),
+                "R-2": _format_float_cell(numeric_frame["R-2"].max()),
+                "R-L": _format_float_cell(numeric_frame["R-L"].max()),
+                "Reading ease": _format_float_cell(numeric_frame["Reading ease"].max()),
+            }
+        )
+    return optimal_rows
+
+
+def _write_optimal_csv(path: Path, rows: list[dict[str, str]]) -> None:
+    _write_csv(path, fieldnames=["ABM", "Summary", "LLM", *METRIC_COLUMN_NAMES], rows=rows)
 
 
 def _factorial_feature_sort_key(feature: str) -> int:
@@ -626,6 +685,40 @@ def _render_factorial_latex_table(frame: pd.DataFrame) -> str:
     )
 
 
+def _render_optimal_markdown_table(rows: list[dict[str, str]]) -> str:
+    header = (
+        "| ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |\n"
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+    )
+    body = [
+        "| "
+        + " | ".join([row["ABM"], row["Summary"], row["LLM"], *(row[metric] for metric in METRIC_COLUMN_NAMES)])
+        + " |"
+        for row in rows
+    ]
+    return "# Best Score Across Dynamic Prompt Elements\n\n" + "\n".join([header, *body]) + "\n"
+
+
+def _render_optimal_latex_table(rows: list[dict[str, str]]) -> str:
+    latex_rows = [
+        " \\hline\n"
+        + " {} & {} & {} & {} \\\\".format(
+            _latex_escape(row["ABM"]),
+            _latex_escape(row["Summary"]),
+            _latex_escape(row["LLM"]),
+            " & ".join(_latex_escape(row[metric]) for metric in METRIC_COLUMN_NAMES),
+        )
+        for row in rows
+    ]
+    return (
+        "\\begin{tabular}{|l|l|l|l|l|l|l|l|l|}\n\\hline\n"
+        "\\textit{\\textbf{ABM}} & \\textit{\\textbf{Summary}} & \\textit{\\textbf{LLM}}"
+        " & BLEU & METEOR & R-1 & R-2 & R-L & Reading ease \\\\\n"
+        + "\n".join(latex_rows)
+        + "\n\\hline\n\\end{tabular}\n"
+    )
+
+
 def _format_pvalue_cell(value: float | None) -> str:
     if value is None:
         return ABSENT_MARKER
@@ -652,6 +745,10 @@ def _format_contribution_cell(value: float) -> str:
     return f"**{rendered}**" if value > 5 else rendered
 
 
+def _format_float_cell(value: float | int | str) -> str:
+    return f"{float(value):.2f}"
+
+
 def _latex_format_contribution(value: float) -> str:
     rendered = f"{value:.2f}"
     return f"\\textbf{{{rendered}}}" if value > 5 else rendered
@@ -676,6 +773,7 @@ def _render_markdown_report(result: QuantitativeSmokeResult) -> str:
         f"- quantitative_rows_path: `{result.quantitative_rows_path}`\n"
         f"- anova_csv_path: `{result.anova_csv_path}`\n"
         f"- factorial_csv_path: `{result.factorial_csv_path}`\n"
+        f"- optimal_csv_path: `{result.optimal_csv_path}`\n"
     )
 
 
