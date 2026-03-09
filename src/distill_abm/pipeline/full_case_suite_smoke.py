@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import csv
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 
 from pydantic import BaseModel, Field
 
 from distill_abm.llm.adapters.base import LLMAdapter
+from distill_abm.llm.resilience import CIRCUIT_BREAKER_OPEN_SECONDS, is_transient_provider_error
 from distill_abm.pipeline.full_case_matrix_smoke import (
     FullCaseMatrixCaseSpec,
     run_full_case_matrix_smoke,
@@ -19,6 +21,7 @@ from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path,
 from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
 
 LOGGER = get_logger(__name__)
+DEFAULT_MAX_ABM_ATTEMPTS = 3
 
 
 class FullCaseSuiteAbmResult(BaseModel):
@@ -78,6 +81,7 @@ def run_full_case_suite_smoke(
     max_retries: int | None = None,
     retry_backoff_seconds: float | None = None,
     resume_existing: bool = True,
+    max_abm_attempts: int = DEFAULT_MAX_ABM_ATTEMPTS,
 ) -> FullCaseSuiteSmokeResult:
     """Run the full-case matrix smoke across all configured ABMs."""
 
@@ -97,83 +101,109 @@ def run_full_case_suite_smoke(
         run_root=str(run_root),
     )
 
-    abm_results: list[FullCaseSuiteAbmResult] = []
-    summary_rows: list[dict[str, str]] = []
-    for abm, case_input in abm_inputs.items():
-        abm_output_root = output_root / "abms" / abm
-        case_specs = cases_by_abm[abm]
-        log_event(
-            LOGGER,
-            "full_case_suite_abm_start",
-            abm=abm,
-            case_count=len(case_specs),
-            output_root=str(abm_output_root),
-        )
-        try:
-            matrix_result = run_full_case_matrix_smoke(
-                case_input=case_input,
-                adapter=adapter,
-                model=model,
-                output_root=abm_output_root,
-                cases=case_specs,
-                max_tokens=max_tokens,
-                max_retries=max_retries,
-                retry_backoff_seconds=retry_backoff_seconds,
-                resume_existing=resume_existing,
-            )
-            latest_abm_run = Path((abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip())
-            abm_result = FullCaseSuiteAbmResult(
-                abm=abm,
-                success=matrix_result.success,
-                run_root=latest_abm_run,
-                report_json_path=matrix_result.report_json_path,
-                report_markdown_path=matrix_result.report_markdown_path,
-                review_csv_path=matrix_result.review_csv_path,
-                review_html_path=matrix_result.viewer_html_path,
-                planned_case_count=len(case_specs),
-                failed_case_ids=list(matrix_result.failed_case_ids),
-            )
-        except Exception as exc:
-            abm_result = FullCaseSuiteAbmResult(
-                abm=abm,
-                success=False,
-                run_root=abm_output_root,
-                report_json_path=abm_output_root / "smoke_full_case_matrix_report.json",
-                report_markdown_path=abm_output_root / "smoke_full_case_matrix_report.md",
-                review_csv_path=abm_output_root / "request_review.csv",
-                review_html_path=abm_output_root / "review.html",
-                planned_case_count=len(case_specs),
-                failed_case_ids=["abm_runner_failed"],
-            )
+    abm_results_by_name: dict[str, FullCaseSuiteAbmResult] = {}
+    remaining_abms = list(abm_inputs)
+    for attempt in range(1, max(max_abm_attempts, 1) + 1):
+        next_remaining: list[str] = []
+        transient_failure_seen = False
+        for abm in remaining_abms:
+            case_input = abm_inputs[abm]
+            abm_output_root = output_root / "abms" / abm
+            case_specs = cases_by_abm[abm]
             log_event(
                 LOGGER,
-                "full_case_suite_abm_failed",
+                "full_case_suite_abm_start",
                 abm=abm,
-                error=str(exc),
+                case_count=len(case_specs),
                 output_root=str(abm_output_root),
+                attempt=attempt,
             )
-        abm_results.append(abm_result)
-        summary_rows.append(
-            {
-                "abm": abm,
-                "success": str(abm_result.success).lower(),
-                "planned_case_count": str(abm_result.planned_case_count),
-                "failed_case_count": str(len(abm_result.failed_case_ids)),
-                "run_root": str(abm_result.run_root),
-                "run_log_path": str(run_log_path(abm_result.run_root)),
-                "report_json_path": str(abm_result.report_json_path),
-                "review_csv_path": str(abm_result.review_csv_path),
-                "review_html_path": str(abm_result.review_html_path),
-            }
-        )
-        log_event(
-            LOGGER,
-            "full_case_suite_abm_complete",
-            abm=abm,
-            success=abm_result.success,
-            failed_case_count=len(abm_result.failed_case_ids),
-            run_root=str(abm_result.run_root),
-        )
+            try:
+                matrix_result = run_full_case_matrix_smoke(
+                    case_input=case_input,
+                    adapter=adapter,
+                    model=model,
+                    output_root=abm_output_root,
+                    cases=case_specs,
+                    max_tokens=max_tokens,
+                    max_retries=max_retries,
+                    retry_backoff_seconds=retry_backoff_seconds,
+                    resume_existing=resume_existing,
+                )
+                latest_abm_run = Path((abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip())
+                abm_result = FullCaseSuiteAbmResult(
+                    abm=abm,
+                    success=matrix_result.success,
+                    run_root=latest_abm_run,
+                    report_json_path=matrix_result.report_json_path,
+                    report_markdown_path=matrix_result.report_markdown_path,
+                    review_csv_path=matrix_result.review_csv_path,
+                    review_html_path=matrix_result.viewer_html_path,
+                    planned_case_count=len(case_specs),
+                    failed_case_ids=list(matrix_result.failed_case_ids),
+                )
+            except Exception as exc:
+                error_text = str(exc)
+                abm_result = FullCaseSuiteAbmResult(
+                    abm=abm,
+                    success=False,
+                    run_root=abm_output_root,
+                    report_json_path=abm_output_root / "smoke_full_case_matrix_report.json",
+                    report_markdown_path=abm_output_root / "smoke_full_case_matrix_report.md",
+                    review_csv_path=abm_output_root / "request_review.csv",
+                    review_html_path=abm_output_root / "review.html",
+                    planned_case_count=len(case_specs),
+                    failed_case_ids=["abm_runner_failed"],
+                )
+                log_event(
+                    LOGGER,
+                    "full_case_suite_abm_failed",
+                    abm=abm,
+                    error=error_text,
+                    output_root=str(abm_output_root),
+                    attempt=attempt,
+                )
+                if is_transient_provider_error(error_text) and attempt < max_abm_attempts:
+                    next_remaining.append(abm)
+                    transient_failure_seen = True
+            abm_results_by_name[abm] = abm_result
+            log_event(
+                LOGGER,
+                "full_case_suite_abm_complete",
+                abm=abm,
+                success=abm_result.success,
+                failed_case_count=len(abm_result.failed_case_ids),
+                run_root=str(abm_result.run_root),
+                attempt=attempt,
+            )
+        if not next_remaining:
+            break
+        if transient_failure_seen:
+            log_event(
+                LOGGER,
+                "full_case_suite_retry_wait",
+                wait_seconds=CIRCUIT_BREAKER_OPEN_SECONDS,
+                remaining_abms=next_remaining,
+                next_attempt=attempt + 1,
+            )
+            time.sleep(CIRCUIT_BREAKER_OPEN_SECONDS)
+        remaining_abms = next_remaining
+
+    abm_results = [abm_results_by_name[abm] for abm in abm_inputs]
+    summary_rows = [
+        {
+            "abm": abm_result.abm,
+            "success": str(abm_result.success).lower(),
+            "planned_case_count": str(abm_result.planned_case_count),
+            "failed_case_count": str(len(abm_result.failed_case_ids)),
+            "run_root": str(abm_result.run_root),
+            "run_log_path": str(run_log_path(abm_result.run_root)),
+            "report_json_path": str(abm_result.report_json_path),
+            "review_csv_path": str(abm_result.review_csv_path),
+            "review_html_path": str(abm_result.review_html_path),
+        }
+        for abm_result in abm_results
+    ]
 
     finished_at = datetime.now(UTC)
     result = FullCaseSuiteSmokeResult(

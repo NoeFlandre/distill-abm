@@ -17,6 +17,7 @@ TRANSIENT_ERROR_SNIPPETS = (
     "temporarily unavailable",
     "connection reset",
     "connection refused",
+    "circuit open",
     "samebatch may not be specified",
 )
 CIRCUIT_BREAKER_THRESHOLD = 3
