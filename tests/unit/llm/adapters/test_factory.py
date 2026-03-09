@@ -4,6 +4,7 @@ import pytest
 
 from distill_abm.llm.adapters.anthropic_adapter import AnthropicAdapter
 from distill_abm.llm.adapters.echo_adapter import EchoAdapter
+from distill_abm.llm.adapters.mistral_adapter import MistralAdapter
 from distill_abm.llm.adapters.ollama_adapter import OllamaAdapter
 from distill_abm.llm.adapters.openai_adapter import OpenAIAdapter
 from distill_abm.llm.adapters.openrouter_adapter import OpenRouterAdapter
@@ -65,6 +66,12 @@ def test_factory_creates_echo_adapter() -> None:
     """Test that echo provider creates EchoAdapter."""
     adapter = create_adapter(provider="echo", model="test-model")
     assert isinstance(adapter, EchoAdapter)
+
+
+def test_factory_creates_mistral_adapter() -> None:
+    """Test that mistral provider creates MistralAdapter."""
+    adapter = create_adapter(provider="mistral", model="mistral-medium-latest")
+    assert isinstance(adapter, MistralAdapter)
 
 
 def test_factory_openai_passes_client_kwarg() -> None:

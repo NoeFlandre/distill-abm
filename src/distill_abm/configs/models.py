@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import AliasChoices, BaseModel, Field
 
-ProviderName = Literal["openai", "openrouter", "anthropic", "ollama", "echo"]
+ProviderName = Literal["openai", "openrouter", "anthropic", "ollama", "mistral", "echo"]
 SummarizerId = Literal["bart", "bert", "t5", "longformer_ext"]
 RuntimeEvidenceMode = Literal["plot", "table", "plot+table"]
 RuntimeTextSourceMode = Literal["summary_only", "full_text_only"]

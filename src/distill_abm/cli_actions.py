@@ -734,6 +734,7 @@ def execute_smoke_quantitative_command(
             "quantitative_rows_csv": result.quantitative_rows_path,
             "anova_csv": result.anova_csv_path,
             "factorial_csv": result.factorial_csv_path,
+            "optimal_csv": result.optimal_csv_path,
         },
     )
     emit_smoke_command_result(

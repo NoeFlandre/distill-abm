@@ -4,10 +4,13 @@ import csv
 import json
 from pathlib import Path
 
+import pandas as pd
+
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.pipeline.quantitative_smoke import (
     _build_factorial_input_frame,
     _derive_prompt_flags,
+    _normalize_factorial_table,
     _render_anova_markdown_table,
     run_quantitative_smoke,
 )
@@ -34,6 +37,19 @@ def _build_source_roots(tmp_path: Path) -> tuple[Path, Path]:
         case_id = f"{idx:02d}_grazing_{prompt_variant}_{evidence_mode.replace('+', '_plus_')}_rep1"
         case_dir = matrix_root / "cases" / case_id
         context_output = _write_text(case_dir / "02_context" / "context_output.txt", f"context {case_id}")
+        _write_text(
+            case_dir / "00_case_summary.json",
+            json.dumps(
+                {
+                    "case_id": case_id,
+                    "abm": "grazing",
+                    "evidence_mode": evidence_mode,
+                    "prompt_variant": prompt_variant,
+                    "repetition": 1,
+                    "model": "nvidia/nemotron-nano-12b-v2-vl:free",
+                }
+            ),
+        )
         for plot_idx in range(1, 3):
             _write_text(
                 case_dir / "03_trends" / f"plot_{plot_idx:02d}" / "trend_output.txt",
@@ -165,8 +181,10 @@ def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> Non
     assert result.quantitative_rows_path.exists() is True
     assert result.anova_csv_path.exists() is True
     assert result.factorial_csv_path.exists() is True
+    assert result.optimal_csv_path.exists() is True
     assert result.anova_table_markdown_path.exists() is True
     assert result.factorial_table_markdown_path.exists() is True
+    assert result.optimal_table_markdown_path.exists() is True
     rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
     assert len(rows) == 20
     assert rows[0]["reference_family"] == "author"
@@ -175,6 +193,57 @@ def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> Non
     assert rows[0]["summarizer"]
     report = json.loads(result.report_json_path.read_text(encoding="utf-8"))
     assert report["success"] is True
+
+
+def test_run_quantitative_smoke_writes_best_score_table(tmp_path: Path) -> None:
+    summarizer_root, _matrix_root = _build_source_roots(tmp_path)
+    result = run_quantitative_smoke(
+        source_root=summarizer_root,
+        output_root=tmp_path / "quant",
+        score_summary_fn=_fake_score_summary,
+    )
+
+    rows = list(csv.DictReader(result.optimal_csv_path.open(encoding="utf-8")))
+    assert rows
+    assert {"ABM", "Summary", "LLM", "BLEU", "METEOR", "R-1", "R-2", "R-L", "Reading ease"} == set(rows[0].keys())
+    assert {row["Summary"] for row in rows} == {"none", "bart", "bert", "t5", "longformer_ext"}
+    assert {row["LLM"] for row in rows} == {"nvidia/nemotron-nano-12b-v2-vl:free"}
+
+
+def test_best_score_table_optimizes_each_metric_independently(tmp_path: Path) -> None:
+    summarizer_root, _matrix_root = _build_source_roots(tmp_path)
+
+    def fake_score(reference: str, candidate: str) -> SummaryScores:
+        _ = reference
+        score = 0.1
+        reading = 10.0
+        if "role table" in candidate:
+            score = 0.9
+        if "insights plot+table" in candidate:
+            reading = 91.0
+        return SummaryScores(
+            token_f1=score,
+            precision=score,
+            recall=score,
+            bleu=score,
+            meteor=score,
+            rouge1=score,
+            rouge2=score,
+            rouge_l=score,
+            flesch_reading_ease=reading,
+            reference_length=10,
+            candidate_length=10,
+        )
+
+    result = run_quantitative_smoke(
+        source_root=summarizer_root,
+        output_root=tmp_path / "quant",
+        score_summary_fn=fake_score,
+    )
+    rows = list(csv.DictReader(result.optimal_csv_path.open(encoding="utf-8")))
+    none_row = next(row for row in rows if row["Summary"] == "none")
+    assert none_row["BLEU"] == "0.90"
+    assert none_row["Reading ease"] == "91.00"
 
 
 def test_build_factorial_input_frame_marks_prompt_flags_as_categorical_strings() -> None:
@@ -198,6 +267,35 @@ def test_build_factorial_input_frame_marks_prompt_flags_as_categorical_strings()
     assert frame.loc[0, "Role"] == "on"
     assert frame.loc[0, "Insights"] == "off"
     assert frame.loc[0, "Example"] == "on"
+
+
+def test_normalize_factorial_table_scales_each_metric_to_full_share() -> None:
+    frame = _normalize_factorial_table(
+        pd.DataFrame(
+            [
+                {
+                    "Feature": "Summarizer",
+                    "BLEU": 30.0,
+                    "METEOR": 10.0,
+                    "R-1": 20.0,
+                    "R-2": 4.0,
+                    "R-L": 6.0,
+                    "Reading ease": 1.0,
+                },
+                {
+                    "Feature": "Evidence",
+                    "BLEU": 10.0,
+                    "METEOR": 20.0,
+                    "R-1": 5.0,
+                    "R-2": 6.0,
+                    "R-L": 4.0,
+                    "Reading ease": 3.0,
+                },
+            ]
+        )
+    )
+    for metric in ("BLEU", "METEOR", "R-1", "R-2", "R-L", "Reading ease"):
+        assert round(float(frame[metric].sum()), 6) == 100.0
 
 
 def test_run_quantitative_smoke_reuses_valid_rows_when_resuming(tmp_path: Path) -> None:

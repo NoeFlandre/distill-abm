@@ -44,3 +44,13 @@ def test_validate_benchmark_model_policy_checks_local_ollama_model() -> None:
     )
 
     checker.assert_called_once_with("qwen3.5:0.8b")
+
+
+def test_validate_benchmark_model_policy_allows_debug_model_with_flag() -> None:
+    validate_benchmark_model_policy(
+        provider="mistral",
+        model="mistral-medium-latest",
+        allow_debug_model=True,
+        benchmark_models={("openrouter", "google/gemini-3.1-pro-preview")},
+        assert_ollama_model_available=Mock(),
+    )

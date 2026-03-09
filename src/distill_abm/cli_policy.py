@@ -16,8 +16,9 @@ def validate_benchmark_model_policy(
     assert_ollama_model_available: Callable[[str], None],
 ) -> None:
     """Validate the configured benchmark model against the repository policy."""
-    _ = allow_debug_model
     key = (provider.strip().lower(), model.strip())
+    if allow_debug_model and key not in benchmark_models:
+        return
     if key not in benchmark_models:
         allowed = ", ".join(f"{item_provider}:{item_model}" for item_provider, item_model in sorted(benchmark_models))
         raise typer.BadParameter(

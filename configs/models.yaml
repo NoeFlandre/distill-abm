@@ -11,3 +11,6 @@ models:
   qwen3_5_local:
     provider: ollama
     model: qwen3.5:0.8b
+  mistral_medium_debug:
+    provider: mistral
+    model: mistral-medium-latest

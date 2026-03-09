@@ -27,6 +27,7 @@ def test_cli_smoke_quantitative_invokes_runner(tmp_path: Path, monkeypatch) -> N
             quantitative_rows_path=run_root / "quantitative_rows.csv",
             anova_csv_path=run_root / "anova_pvalues.csv",
             factorial_csv_path=run_root / "factorial_contributions.csv",
+            optimal_csv_path=run_root / "best_scores.csv",
             run_log_path=run_root / "run.log.jsonl",
             failed_record_ids=[],
         )
@@ -48,6 +49,7 @@ def test_cli_smoke_quantitative_invokes_runner(tmp_path: Path, monkeypatch) -> N
 
     assert result.exit_code == 0
     assert "quantitative_rows.csv" in result.output
+    assert "best_scores.csv" in result.output
     assert captured["source_root"] == tmp_path / "source"
     assert captured["output_root"] == tmp_path / "out"
     assert captured["resume"] is True

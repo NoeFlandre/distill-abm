@@ -10,6 +10,7 @@ Paper-aligned ABM distillation pipeline with reproducible experiment orchestrati
 3. Optionally summarize trend narratives.
 4. Score outputs with BLEU, METEOR, ROUGE-1/2/L, and Flesch.
 5. Run DOE/ANOVA analysis over experiment outputs.
+6. Produce publication-oriented summary tables from completed smoke runs.
 
 ## Benchmark Model Policy
 Benchmark runs are restricted to:
@@ -19,6 +20,11 @@ Benchmark runs are restricted to:
 3. `qwen3.5:0.8b` via local Ollama
 
 The CLI enforces this policy.
+
+Debug-only model note:
+- `mistral_medium_debug` is available for smoke/debug work only.
+- It is not part of the benchmark model policy.
+- Use it only with `--allow-debug-model` and `MISTRAL_API_KEY` set.
 
 ## Summarizers
 First-class summarizers:

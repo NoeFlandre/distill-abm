@@ -37,6 +37,7 @@
   - It writes per-mode summaries, metadata, a review CSV, and a validated-source manifest for inspection.
 - Exposes `smoke-quantitative` for post-summarization quantitative audit runs.
   - `smoke-quantitative` consumes a completed summarizer smoke run, reuses its saved summaries, scores each `(case, summarizer)` pair against the configured author reference, and computes one-way ANOVA plus factorial contribution tables.
+  - It also writes a publication-oriented “best score across dynamic prompt elements” table grouped by ABM, summarizer, and LLM.
   - It writes machine-readable CSVs together with paper-oriented Markdown/LaTeX tables under the same run-separated, resumable contract.
 - Exposes `monitor-local-qwen` and `monitor-run` for a compact live dashboard over case-based smoke output directories and local-Qwen tuning output directories.
   - The monitor surfaces current case status, configured `num_ctx`, configured `max_tokens`, prompt lengths, observed token totals, and recent errors.
@@ -48,6 +49,7 @@
   - `health-check` does not execute the pipeline.
   - It verifies configured ABMs, model-registry resolution, expected ingest/viz roots, and optional local Ollama availability for `qwen3.5:0.8b`.
 - Benchmark/debug model gating.
+- Debug-only models may be allowed through `--allow-debug-model`; this path must stay outside the benchmark model policy and remain clearly marked as non-production.
 - Model registry resolution via `configs/models.yaml`.
 - CLI-side asset discovery is read-only; model resolution and inspection commands should not rewrite the repository layout while resolving ABM assets.
 - CLI-side summarizer parsing normalizes repeated values and surrounding whitespace before validation so command-line invocations remain tolerant of minor input formatting noise.
