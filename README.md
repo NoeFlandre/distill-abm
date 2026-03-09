@@ -40,6 +40,7 @@ First-class summarizers:
 ## Core Ablation Axes
 1. Evidence mode: `plot`, `table`, `plot+table`
    - `table` means a statistical evidence dump computed from the plot-relevant simulation series only, not a raw CSV dump
+   - when a reporter pattern matches many repeated-simulation series, the detailed signal analysis is computed on their tick-wise mean so the audit path stays robust and reviewable
 2. Text source mode: `summary_only`, `full_text_only`
 
 ## Repository Layout

@@ -63,7 +63,7 @@
 
 ### `src/distill_abm/pipeline/run.py`
 - End-to-end run orchestration.
-- Prompt composition and evidence handling (`plot`, `table`, `plot+table`), where `table` means statistical evidence derived from matched plot series only.
+- Prompt composition and evidence handling (`plot`, `table`, `plot+table`), where `table` means statistical evidence derived from matched plot series only. If a reporter pattern matches many repeated-simulation series, the heavy signal analyses run on a tick-wise mean aggregate so the audit/runtime path remains bounded.
 - Text-source selection (`summary_only`, `full_text_only`).
 - Reproducibility metadata and resumable run signatures.
  - Run metadata now includes an `llm.observability` summary with per-request usage, total token counts, and explicit cost-status fields for debugging and future pricing support.

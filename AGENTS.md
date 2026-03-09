@@ -145,6 +145,7 @@ Capture solutions so the team compounds knowledge:
 - **Actively clean stale processes.** Long-running smokes, monitors, and stuck test processes can make the machine lag badly. Periodically check for stale `uv`, `pytest`, monitor, and smoke processes and stop the ones that are no longer useful. Do not leave background process cleanup as an afterthought.
 - **Change evidence semantics at the shared helper layer.** If reviewer or product guidance changes what an evidence mode means, implement it once in the core pipeline/evidence helpers so DOE, smoke workflows, and real runs stay aligned.
 - **`table` means plot-relevant statistical evidence.** The non-plot evidence mode should be computed only from the simulation columns relevant to the target trend description, plus an optional step/time column. Do not dump unrelated simulation columns into prompts.
+- **Bound heavy statistical routines on repeated-simulation series.** If one reporter pattern matches many replicate series, keep the selected slice for auditability but run the expensive signal analyses on a representative aggregate series (currently the tick-wise mean) so DOE and other audit runs stay fast and finish reliably.
 - **Keep the LLM runtime API-only.** Production models are `moonshotai/kimi-k2.5`, `google/gemini-3.1-pro-preview`, and OpenRouter `qwen/qwen3.5-27b`. `nvidia/nemotron-nano-12b-v2-vl:free` and `mistral-medium-latest` are debug-only. Do not reintroduce local-model runtime paths unless a task explicitly asks for them.
 
 ---
