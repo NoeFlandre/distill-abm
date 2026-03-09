@@ -25,7 +25,7 @@ def compute_scores(ground_truth: str, summary: str) -> ReferenceScores:
     """Compute BLEU/METEOR/ROUGE/Flesch scores."""
     try:
         return _compute_with_external_metrics(ground_truth, summary)
-    except ImportError:
+    except (ImportError, LookupError):
         return _compute_fallback_scores(ground_truth, summary)
 
 

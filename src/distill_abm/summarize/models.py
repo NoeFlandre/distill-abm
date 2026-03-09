@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Protocol
+from typing import Protocol, cast
 
 from distill_abm.summarize.reference_text import chunk_text
 
@@ -94,7 +94,7 @@ class BartSummarizerRunner:
             from transformers import pipeline
         except Exception as exc:
             raise SummarizationError(f"transformers not available: {exc}") from exc
-        self._summarizer = pipeline("summarization", model=self.model_name)
+        self._summarizer = cast(BartPipelineLike, pipeline("summarization", model=self.model_name))
         return self._summarizer
 
 
@@ -184,7 +184,7 @@ class T5SummarizerRunner:
             from transformers import pipeline
         except Exception as exc:
             raise SummarizationError(f"transformers not available: {exc}") from exc
-        self._summarizer = pipeline("summarization", model=self.model_name)
+        self._summarizer = cast(TransformerPipelineLike, pipeline("summarization", model=self.model_name))
         return self._summarizer
 
 
@@ -226,7 +226,7 @@ class LongformerExtSummarizerRunner:
             from transformers import pipeline
         except Exception as exc:
             raise SummarizationError(f"transformers not available: {exc}") from exc
-        self._summarizer = pipeline("summarization", model=self.model_name)
+        self._summarizer = cast(TransformerPipelineLike, pipeline("summarization", model=self.model_name))
         return self._summarizer
 
 

@@ -62,6 +62,27 @@ def _prompts() -> PromptsConfig:
     )
 
 
+def _fake_summary_scores(reference: str, candidate: str) -> SummaryScores:
+    return SummaryScores(
+        token_f1=0.5,
+        precision=0.5,
+        recall=0.5,
+        bleu=0.5,
+        meteor=0.5,
+        rouge1=0.5,
+        rouge2=0.5,
+        rouge_l=0.5,
+        flesch_reading_ease=50.0,
+        reference_length=1,
+        candidate_length=1,
+    )
+
+
+@pytest.fixture(autouse=True)
+def _stub_summary_scoring(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(run_module, "score_summary", _fake_summary_scores)
+
+
 def test_run_pipeline_summary_only_uses_all_requested_summarizers(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -71,6 +92,23 @@ def test_run_pipeline_summary_only_uses_all_requested_summarizers(
     monkeypatch.setattr(run_module.helpers, "summarize_with_bert", lambda text: f"bert::{text}")
     monkeypatch.setattr(run_module.helpers, "summarize_with_t5", lambda text: f"t5::{text}")
     monkeypatch.setattr(run_module.helpers, "summarize_with_longformer_ext", lambda text: f"led::{text}")
+    monkeypatch.setattr(
+        run_module,
+        "score_summary",
+        lambda reference, candidate: SummaryScores(
+            token_f1=0.5,
+            precision=0.5,
+            recall=0.5,
+            bleu=0.5,
+            meteor=0.5,
+            rouge1=0.5,
+            rouge2=0.5,
+            rouge_l=0.5,
+            flesch_reading_ease=50.0,
+            reference_length=len(reference.split()),
+            candidate_length=len(candidate.split()),
+        ),
+    )
 
     adapter = FakeAdapter()
     result = run_pipeline(
@@ -113,10 +151,26 @@ def test_run_pipeline_full_text_only_bypasses_summarizers(tmp_path: Path, monkey
     def _fail(_: str) -> str:
         raise AssertionError("summarizer should not be called for full_text_only")
 
+    def fake_score_summary(reference: str, candidate: str) -> SummaryScores:
+        return SummaryScores(
+            token_f1=0.5,
+            precision=0.5,
+            recall=0.5,
+            bleu=0.5,
+            meteor=0.5,
+            rouge1=0.5,
+            rouge2=0.5,
+            rouge_l=0.5,
+            flesch_reading_ease=50.0,
+            reference_length=1,
+            candidate_length=1,
+        )
+
     monkeypatch.setattr(run_module.helpers, "summarize_with_bart", _fail)
     monkeypatch.setattr(run_module.helpers, "summarize_with_bert", _fail)
     monkeypatch.setattr(run_module.helpers, "summarize_with_t5", _fail)
     monkeypatch.setattr(run_module.helpers, "summarize_with_longformer_ext", _fail)
+    monkeypatch.setattr(run_module, "score_summary", fake_score_summary)
 
     adapter = FakeAdapter()
     result = run_pipeline(
@@ -178,8 +232,24 @@ def test_run_pipeline_summary_only_metadata_respects_selected_summarizers(
 ) -> None:
     csv_path, parameters_path, documentation_path = _write_inputs(tmp_path)
 
+    def fake_score_summary(reference: str, candidate: str) -> SummaryScores:
+        return SummaryScores(
+            token_f1=0.5,
+            precision=0.5,
+            recall=0.5,
+            bleu=0.5,
+            meteor=0.5,
+            rouge1=0.5,
+            rouge2=0.5,
+            rouge_l=0.5,
+            flesch_reading_ease=50.0,
+            reference_length=1,
+            candidate_length=1,
+        )
+
     monkeypatch.setattr(run_module.helpers, "summarize_with_bart", lambda text: "")
     monkeypatch.setattr(run_module.helpers, "summarize_with_bert", lambda text: "bert")
+    monkeypatch.setattr(run_module, "score_summary", fake_score_summary)
 
     result = run_pipeline(
         inputs=PipelineInputs(
@@ -231,7 +301,6 @@ def test_run_pipeline_table_mode_uses_text_only_evidence(tmp_path: Path) -> None
 
     assert len(adapter.calls) == 2
     assert adapter.calls[1].image_b64 is None
-
 
 def test_run_pipeline_uses_scoring_reference_file_when_provided(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
