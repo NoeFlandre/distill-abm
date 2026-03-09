@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, cast
 
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.metrics import SummaryScores
+from distill_abm.llm.request_defaults import resolve_request_temperature
 from distill_abm.utils import detect_placeholder_signals
 
 if TYPE_CHECKING:
@@ -23,6 +24,7 @@ if TYPE_CHECKING:
 def build_run_signature(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAdapter) -> str:
     """Compute a deterministic fingerprint for a pipeline run configuration."""
     runtime_defaults = get_runtime_defaults()
+    request_temperature = resolve_request_temperature(adapter.provider)
     payload = {
         "inputs": {
             "csv_path": str(inputs.csv_path.resolve()),
@@ -56,7 +58,7 @@ def build_run_signature(inputs: PipelineInputs, prompts: PromptsConfig, adapter:
         "llm": {
             "provider": adapter.provider,
             "model": inputs.model,
-            "temperature": runtime_defaults.llm_request.temperature,
+            "temperature": request_temperature,
             "max_tokens": runtime_defaults.llm_request.max_tokens,
             "max_retries": runtime_defaults.llm_request.max_retries,
             "retry_backoff_seconds": runtime_defaults.llm_request.retry_backoff_seconds,
@@ -370,7 +372,7 @@ def _build_metadata_payload(
     debug_trace: dict[str, object],
 ) -> dict[str, object]:
     runtime_defaults = get_runtime_defaults()
-    default_temperature = runtime_defaults.llm_request.temperature
+    default_temperature = resolve_request_temperature(adapter.provider)
     default_max_tokens = runtime_defaults.llm_request.max_tokens
     default_max_retries = runtime_defaults.llm_request.max_retries
     default_retry_backoff_seconds = runtime_defaults.llm_request.retry_backoff_seconds

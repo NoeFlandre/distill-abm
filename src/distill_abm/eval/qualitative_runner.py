@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from distill_abm.configs.models import PromptsConfig
 from distill_abm.eval.qualitative import extract_coverage_score, extract_faithfulness_score
 from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMRequest
+from distill_abm.llm.request_defaults import resolve_request_temperature
 
 QualitativeMetric = Literal["coverage", "faithfulness"]
 
@@ -37,6 +38,7 @@ def evaluate_qualitative_score(
     request = LLMRequest(
         model=model,
         messages=[LLMMessage(role="user", content=prompt)],
+        temperature=resolve_request_temperature(adapter.provider),
         image_b64=_encode_image_if_present(source_image_path),
     )
     response = adapter.complete(request)

@@ -44,6 +44,22 @@ class UsageReportingAdapter(LLMAdapter):
         )
 
 
+class MistralUsageAdapter(LLMAdapter):
+    provider = "mistral"
+
+    def __init__(self) -> None:
+        self.calls: list[LLMRequest] = []
+
+    def complete(self, request: LLMRequest) -> LLMResponse:
+        self.calls.append(request)
+        return LLMResponse(
+            provider=self.provider,
+            model=request.model,
+            text=f"resp-{len(self.calls)}",
+            raw={},
+        )
+
+
 def _write_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
@@ -504,6 +520,54 @@ def test_run_pipeline_metadata_includes_run_observability_summary(
     assert observability["usage"]["total"]["total_tokens"] == 42
     assert observability["cost"]["status"] == "unpriced"
     assert observability["cost"]["estimated_total_usd"] is None
+
+
+def test_run_pipeline_uses_mistral_temperature_override_in_requests_and_metadata(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csv_path, parameters_path, documentation_path = _write_inputs(tmp_path)
+    monkeypatch.setattr(
+        run_module,
+        "score_summary",
+        lambda reference, candidate: SummaryScores(
+            token_f1=0.5,
+            precision=0.5,
+            recall=0.5,
+            bleu=0.5,
+            meteor=0.5,
+            rouge1=0.5,
+            rouge2=0.5,
+            rouge_l=0.5,
+            flesch_reading_ease=50.0,
+            reference_length=len(reference.split()),
+            candidate_length=len(candidate.split()),
+        ),
+    )
+
+    adapter = MistralUsageAdapter()
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=parameters_path,
+            documentation_path=documentation_path,
+            output_dir=tmp_path / "out",
+            model="mistral-medium-latest",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            text_source_mode="full_text_only",
+            evidence_mode="plot",
+        ),
+        prompts=_prompts(),
+        adapter=adapter,
+    )
+
+    assert adapter.calls
+    assert all(call.temperature == 0.2 for call in adapter.calls)
+    assert result.metadata_path is not None
+    metadata = json.loads(result.metadata_path.read_text(encoding="utf-8"))
+    assert metadata["llm"]["request"]["temperature"] == 0.2
+    assert metadata["llm"]["requests"]["context"]["temperature"] == 0.2
+    assert metadata["llm"]["requests"]["trend"]["temperature"] == 0.2
 
 
 def test_run_pipeline_resume_fails_on_signature_mismatch(tmp_path: Path) -> None:

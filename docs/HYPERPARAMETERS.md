@@ -9,6 +9,10 @@
 | `max_retries` | `2` |
 | `retry_backoff_seconds` | `2.0` |
 
+Provider-specific override:
+- `mistral` requests use `temperature=0.2`
+- all other providers keep the runtime default `temperature=1.0`
+
 ## Run Defaults
 
 | Parameter | Default |
