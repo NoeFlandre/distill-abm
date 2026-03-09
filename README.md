@@ -17,11 +17,14 @@ Benchmark runs are restricted to:
 
 1. `moonshotai/kimi-k2.5` via OpenRouter
 2. `google/gemini-3.1-pro-preview` via OpenRouter
-3. `qwen3.5:0.8b` via local Ollama
+3. `qwen/qwen3.5-27b` via OpenRouter
 
 The CLI enforces this policy.
 
 Debug-only model note:
+- `nemotron_nano_12b_v2_vl_free` is available for smoke/debug work only.
+- It is not part of the benchmark model policy.
+- Use it only with `--allow-debug-model`.
 - `mistral_medium_debug` is available for smoke/debug work only.
 - It is not part of the benchmark model policy.
 - Use it only with `--allow-debug-model` and `MISTRAL_API_KEY` set.
@@ -151,18 +154,7 @@ uv run distill-abm health-check \
   --json
 ```
 
-Tune local Qwen runtime limits by evidence mode:
-
-```bash
-uv run distill-abm tune-local-qwen \
-  --ingest-root results/ingest_smoke_latest \
-  --viz-root results/viz_smoke_latest \
-  --output-root results/local_qwen_tuning_latest \
-  --resume \
-  --json
-```
-
-Monitor a local-Qwen smoke run live:
+Monitor a case-based smoke run live:
 
 ```bash
 uv run distill-abm monitor-local-qwen --watch --interval-seconds 2
@@ -234,14 +226,12 @@ Agent-oriented CLI additions:
 - `smoke-ingest-netlogo` supports `--require-stage` so callers can assert that specific stage checks are present.
 - `smoke-viz` provides stage-filtering and `--require-stage` for the generated simulation CSV and each ordered plot image.
 - `smoke-doe` provides a structured pre-LLM view of the full DOE matrix and writes grouped shared artifacts plus compact case/request indexes that can be reviewed without opening thousands of files.
-- `smoke-local-qwen` runs a small stratified sample with the configured smoke model and writes one self-contained folder per sampled case plus a review CSV with exact prompt text, evidence paths, hyperparameters, outputs, and a minimalist static `review.html` viewer.
+- `smoke-local-qwen` is the legacy command name for the sampled real-inference smoke. It now runs through the configured API model and writes one self-contained folder per sampled case plus a review CSV with exact prompt text, evidence paths, hyperparameters, outputs, and a minimalist static `review.html` viewer.
 - `smoke-local-qwen` supports `--resume` and reuses only successful case artifacts; failed or incomplete cases are rerun.
 - `smoke-full-case-matrix` runs one ABM across evidence modes, prompt variants, and repetitions, with one context prompt plus all ordered trend prompts per case. It uses the same run separation, resume behavior, `run.log.jsonl`, and `review.html` reviewer surface as the sampled smoke.
 - `render-run-viewer` builds the same minimalist static HTML viewer for any existing case-based run directory, including both one-trend sampled smokes and full-case multi-trend runs, or for the latest run when you point it at a root containing `latest_run.txt`.
 - `monitor-local-qwen` and `monitor-run` render the same compact live dashboard for case-based smoke runs, including current case or trial, configured `num_ctx`, `max_tokens`, prompt lengths, and observed token usage.
-- `tune-local-qwen` runs local-Qwen context-window and token-budget ablations by evidence mode and writes compact recommendations for the smallest successful `num_ctx` together with the smallest successful `max_tokens` budget observed for that mode.
-- `tune-local-qwen` supports `--resume` and reuses only successful trial artifacts; failed or incomplete trials are rerun.
-- `health-check` performs a lightweight read-only validation of configured ABMs, model-registry resolution, expected ingest/viz artifact roots, and optionally local Ollama model availability.
+- `health-check` performs a lightweight read-only validation of configured ABMs, model-registry resolution, and expected ingest/viz artifact roots.
 - `ingest-netlogo` and `ingest-netlogo-suite` now write stable artifact manifests.
 - Read-only inspection commands are available for agent loops:
   - `uv run distill-abm describe-abm --abm grazing --json`

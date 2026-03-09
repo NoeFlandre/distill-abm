@@ -129,6 +129,6 @@ doe:
     )
     monkeypatch.setenv("DISTILL_ABM_RUNTIME_DEFAULTS_PATH", str(path))
     clear_runtime_defaults_cache()
-    request = LLMRequest(model="qwen3.5:0.8b", messages=[LLMMessage(role="user", content="hello")])
+    request = LLMRequest(model="qwen/qwen3.5-27b", messages=[LLMMessage(role="user", content="hello")])
     assert request.temperature == 0.33
     assert request.max_tokens == 345

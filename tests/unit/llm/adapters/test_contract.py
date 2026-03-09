@@ -3,7 +3,6 @@ from types import SimpleNamespace
 
 import pytest
 
-from distill_abm.llm.adapters.anthropic_adapter import AnthropicAdapter
 from distill_abm.llm.adapters.base import (
     LLMAdapter,
     LLMMessage,
@@ -12,8 +11,6 @@ from distill_abm.llm.adapters.base import (
     LLMResponse,
 )
 from distill_abm.llm.adapters.mistral_adapter import MistralAdapter
-from distill_abm.llm.adapters.ollama_adapter import OllamaAdapter
-from distill_abm.llm.adapters.openai_adapter import OpenAIAdapter
 from distill_abm.llm.adapters.openrouter_adapter import OpenRouterAdapter
 from distill_abm.llm.factory import create_adapter
 
@@ -46,14 +43,9 @@ def test_adapter_contract_returns_response() -> None:
 
 
 def test_factory_creates_known_adapter() -> None:
-    client = SimpleNamespace(
-        chat=lambda **_: {
-            "message": {"content": "ok"},
-            "model": "deepseek-r1",
-        },
-    )
-    adapter = create_adapter("ollama", model="deepseek-r1", client=client)
-    assert isinstance(adapter, OllamaAdapter)
+    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **_: None)))
+    adapter = create_adapter("openrouter", model="google/gemini-3.1-pro-preview", client=client)
+    assert isinstance(adapter, OpenRouterAdapter)
 
 
 def test_factory_creates_openrouter_adapter() -> None:
@@ -69,17 +61,6 @@ def test_factory_creates_openrouter_adapter() -> None:
     )
     adapter = create_adapter("openrouter", model="google/gemini-3.1-pro-preview", client=client)
     assert isinstance(adapter, OpenRouterAdapter)
-
-
-def test_openai_adapter_success() -> None:
-    completion = SimpleNamespace(
-        choices=[SimpleNamespace(message=SimpleNamespace(content="hello"))],
-        model="gpt-4o",
-    )
-    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **_: completion)))
-    response = OpenAIAdapter(model="gpt-4o", client=client).complete(make_request())
-    assert response.provider == "openai"
-    assert response.text == "hello"
 
 
 def test_openrouter_adapter_success() -> None:
@@ -174,219 +155,6 @@ def test_openrouter_adapter_forwards_structured_output_metadata() -> None:
             "schema": request.metadata["structured_output_schema"],
         },
     }
-
-
-def test_openai_adapter_includes_image_payload_when_present() -> None:
-    seen: dict[str, object] = {}
-
-    def _create(**payload):  # type: ignore[no-untyped-def]
-        seen.update(payload)
-        return SimpleNamespace(
-            choices=[SimpleNamespace(message=SimpleNamespace(content="hello"))],
-            model="gpt-4o",
-        )
-
-    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=_create)))
-    request = LLMRequest(
-        model="gpt-4o",
-        messages=[LLMMessage(role="user", content="hello")],
-        image_b64="abc",
-    )
-    OpenAIAdapter(model="gpt-4o", client=client).complete(request)
-    messages = seen["messages"]
-    assert isinstance(messages, list)
-    assert isinstance(messages[0]["content"], list)
-
-
-def test_anthropic_adapter_success() -> None:
-    result = SimpleNamespace(content=[SimpleNamespace(type="text", text="hello")], model="claude-3-sonnet")
-    client = SimpleNamespace(messages=SimpleNamespace(create=lambda **_: result))
-    response = AnthropicAdapter(model="claude-3-sonnet", client=client).complete(make_request())
-    assert response.provider == "anthropic"
-    assert response.text == "hello"
-
-
-def test_anthropic_adapter_includes_image_payload_when_present() -> None:
-    seen: dict[str, object] = {}
-
-    def _create(**payload):  # type: ignore[no-untyped-def]
-        seen.update(payload)
-        return SimpleNamespace(content=[SimpleNamespace(type="text", text="hello")], model="claude-3-sonnet")
-
-    client = SimpleNamespace(messages=SimpleNamespace(create=_create))
-    request = LLMRequest(
-        model="claude-3-sonnet",
-        messages=[LLMMessage(role="user", content="hello")],
-        image_b64="abc",
-    )
-    AnthropicAdapter(model="claude-3-sonnet", client=client).complete(request)
-    messages = seen["messages"]
-    assert isinstance(messages, list)
-    assert isinstance(messages[0]["content"], list)
-
-
-def test_openai_adapter_timeout_is_wrapped() -> None:
-    def _slow_create(**_: object) -> object:
-        time.sleep(0.05)
-        return SimpleNamespace(
-            choices=[SimpleNamespace(message=SimpleNamespace(content="late"))],
-            model="gpt-4o",
-        )
-
-    with pytest.raises(LLMProviderError, match="timed out"):
-        OpenAIAdapter(
-            model="gpt-4o",
-            client=SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=_slow_create))),
-            timeout_seconds=0.001,
-        ).complete(make_request())
-
-
-def test_anthropic_adapter_timeout_is_wrapped() -> None:
-    def _slow_create(**_: object) -> object:
-        time.sleep(0.05)
-        return SimpleNamespace(content=[SimpleNamespace(type="text", text="late")], model="claude-3-sonnet")
-
-    with pytest.raises(LLMProviderError, match="timed out"):
-        AnthropicAdapter(
-            model="claude-3-sonnet",
-            client=SimpleNamespace(messages=SimpleNamespace(create=_slow_create)),
-            timeout_seconds=0.001,
-        ).complete(make_request())
-
-
-def test_ollama_adapter_success() -> None:
-    client = SimpleNamespace(chat=lambda **_: {"message": {"content": "hi"}, "model": "deepseek-r1"})
-    response = OllamaAdapter(model="deepseek-r1", client=client).complete(make_request())
-    assert response.provider == "ollama"
-    assert response.text == "hi"
-
-
-def test_ollama_adapter_includes_image_payload_when_present() -> None:
-    seen: dict[str, object] = {}
-
-    def _chat(**payload):  # type: ignore[no-untyped-def]
-        seen.update(payload)
-        return {"message": {"content": "hi"}, "model": "deepseek-r1"}
-
-    request = LLMRequest(
-        model="deepseek-r1",
-        messages=[LLMMessage(role="user", content="hello")],
-        image_b64="abc",
-    )
-    OllamaAdapter(model="deepseek-r1", client=SimpleNamespace(chat=_chat)).complete(request)
-    messages = seen["messages"]
-    assert isinstance(messages, list)
-    assert isinstance(messages[0]["images"], list)
-
-
-def test_ollama_adapter_forwards_max_tokens_as_num_predict() -> None:
-    seen: dict[str, object] = {}
-
-    def _chat(**payload):  # type: ignore[no-untyped-def]
-        seen.update(payload)
-        return {"message": {"content": "hi"}, "model": "qwen3.5:0.8b"}
-
-    request = LLMRequest(
-        model="qwen3.5:0.8b",
-        messages=[LLMMessage(role="user", content="hello")],
-        max_tokens=321,
-        temperature=0.5,
-    )
-    OllamaAdapter(model="qwen3.5:0.8b", client=SimpleNamespace(chat=_chat)).complete(request)
-    options = seen["options"]
-    assert isinstance(options, dict)
-    assert options["temperature"] == 0.5
-    assert options["num_predict"] == 321
-
-
-def test_ollama_adapter_forwards_num_ctx_when_requested() -> None:
-    seen: dict[str, object] = {}
-
-    def _chat(**payload):  # type: ignore[no-untyped-def]
-        seen.update(payload)
-        return {"message": {"content": "hi"}, "model": "qwen3.5:0.8b"}
-
-    request = LLMRequest(
-        model="qwen3.5:0.8b",
-        messages=[LLMMessage(role="user", content="hello")],
-        metadata={"ollama_num_ctx": 16384},
-    )
-    OllamaAdapter(model="qwen3.5:0.8b", client=SimpleNamespace(chat=_chat)).complete(request)
-    options = seen["options"]
-    assert isinstance(options, dict)
-    assert options["num_ctx"] == 16384
-
-
-def test_ollama_adapter_forwards_structured_output_metadata() -> None:
-    seen: dict[str, object] = {}
-
-    def _chat(**payload):  # type: ignore[no-untyped-def]
-        seen.update(payload)
-        return {
-            "message": {"content": '{"response_text":"ok"}', "thinking": "hidden"},
-            "model": "qwen3.5:0.8b",
-        }
-
-    request = LLMRequest(
-        model="qwen3.5:0.8b",
-        messages=[LLMMessage(role="user", content="hello")],
-        metadata={
-            "ollama_format": {
-                "type": "object",
-                "properties": {"response_text": {"type": "string"}},
-                "required": ["response_text"],
-            },
-        },
-    )
-    response = OllamaAdapter(model="qwen3.5:0.8b", client=SimpleNamespace(chat=_chat)).complete(request)
-    assert response.text == '{"response_text":"ok"}'
-    assert "think" not in seen
-    assert seen["format"] == request.metadata["ollama_format"]
-
-
-def test_ollama_adapter_normalizes_chatresponse_objects() -> None:
-    class ChatResponse:
-        def __init__(self) -> None:
-            self.model = "qwen3.5:0.8b"
-            self.message = SimpleNamespace(content="hi-from-object")
-
-        def model_dump(self) -> dict[str, object]:
-            return {"model": self.model, "message": {"content": self.message.content}}
-
-    response = OllamaAdapter(
-        model="qwen3.5:0.8b",
-        client=SimpleNamespace(chat=lambda **_: ChatResponse()),
-    ).complete(make_request())
-    assert response.provider == "ollama"
-    assert response.text == "hi-from-object"
-    assert response.raw["message"]["content"] == "hi-from-object"
-
-
-def test_ollama_adapter_preserves_thinking_field_in_raw_message() -> None:
-    client = SimpleNamespace(
-        chat=lambda **_: {
-            "message": {"content": "final", "thinking": "chain of thought"},
-            "model": "qwen3.5:0.8b",
-        }
-    )
-    response = OllamaAdapter(model="qwen3.5:0.8b", client=client).complete(make_request())
-    assert response.text == "final"
-    assert response.raw["message"]["thinking"] == "chain of thought"
-
-
-def test_ollama_adapter_timeout_is_wrapped() -> None:
-    def _slow_chat(**_: object) -> dict[str, object]:
-        time.sleep(0.05)
-        return {"message": {"content": "late"}, "model": "qwen3.5:0.8b"}
-
-    with pytest.raises(LLMProviderError, match="timed out"):
-        OllamaAdapter(
-            model="qwen3.5:0.8b",
-            client=SimpleNamespace(chat=_slow_chat),
-            timeout_seconds=0.001,
-        ).complete(make_request())
-
-
 def test_openrouter_adapter_timeout_is_wrapped() -> None:
     def _slow_create(**_: object) -> object:
         time.sleep(0.05)
@@ -407,22 +175,6 @@ def test_openrouter_adapter_timeout_is_wrapped() -> None:
     ("adapter_cls", "client"),
     [
         (
-            OpenAIAdapter,
-            SimpleNamespace(
-                chat=SimpleNamespace(
-                    completions=SimpleNamespace(create=lambda **_: (_ for _ in ()).throw(RuntimeError("boom"))),
-                ),
-            ),
-        ),
-        (
-            AnthropicAdapter,
-            SimpleNamespace(messages=SimpleNamespace(create=lambda **_: (_ for _ in ()).throw(RuntimeError("boom")))),
-        ),
-        (
-            OllamaAdapter,
-            SimpleNamespace(chat=lambda **_: (_ for _ in ()).throw(RuntimeError("boom"))),
-        ),
-        (
             OpenRouterAdapter,
             SimpleNamespace(
                 chat=SimpleNamespace(
@@ -430,11 +182,23 @@ def test_openrouter_adapter_timeout_is_wrapped() -> None:
                 )
             ),
         ),
+        (
+            MistralAdapter,
+            SimpleNamespace(),
+        ),
     ],
 )
 def test_external_errors_are_wrapped(adapter_cls: type[LLMAdapter], client: object) -> None:
     with pytest.raises(LLMProviderError):
-        adapter_cls(model="x", client=client).complete(make_request())  # type: ignore[call-arg]
+        if adapter_cls is MistralAdapter:
+            adapter = adapter_cls(
+                model="mistral-medium-latest",
+                api_key="secret",
+                transport=lambda **_: (_ for _ in ()).throw(RuntimeError("boom")),
+            )
+            adapter.complete(make_request())  # type: ignore[call-arg]
+        else:
+            adapter_cls(model="x", client=client).complete(make_request())  # type: ignore[call-arg]
 
 
 def test_openrouter_adapter_raises_on_missing_api_key(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -476,15 +240,3 @@ def test_openrouter_adapter_raises_on_completion_failure(monkeypatch: pytest.Mon
         adapter.complete(request)
     
     assert "completion failed" in str(exc_info.value).lower()
-
-
-def test_ollama_adapter_raises_on_connection_error() -> None:
-    """Test that OllamaAdapter raises LLMProviderError on connection errors."""
-    import urllib.error
-
-    class FakeClient:
-        def chat(self, **_: object) -> None:
-            raise urllib.error.URLError("connection refused")
-
-    with pytest.raises(LLMProviderError):
-        OllamaAdapter(model="qwen3.5:0.8b", client=FakeClient()).complete(make_request())

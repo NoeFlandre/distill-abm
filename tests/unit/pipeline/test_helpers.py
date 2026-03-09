@@ -197,7 +197,7 @@ def test_invoke_adapter_with_trace_records_token_usage_when_available() -> None:
 
 def test_invoke_adapter_with_trace_preserves_raw_text_when_requested() -> None:
     class JsonAdapter(LLMAdapter):
-        provider = "ollama"
+        provider = "openrouter"
 
         def complete(self, request: LLMRequest) -> LLMResponse:
             assert request.metadata["preserve_raw_text"] is True
@@ -210,7 +210,7 @@ def test_invoke_adapter_with_trace_preserves_raw_text_when_requested() -> None:
 
     text, _trace = helpers.invoke_adapter_with_trace(
         adapter=JsonAdapter(),
-        model="qwen3.5:0.8b",
+        model="qwen/qwen3.5-27b",
         prompt="hello",
         request_metadata={"preserve_raw_text": True},
         max_retries=0,

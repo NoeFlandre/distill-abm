@@ -343,10 +343,10 @@ def test_run_doe_smoke_suite_ignores_model_runtime_preflight_for_pre_llm_design_
         prompts=prompts,
         model_specs=[
             DoESmokeModelSpec(
-                model_id="qwen3_5_local",
-                provider="ollama",
-                model="qwen3.5:0.8b",
-                preflight_error="ollama list crashed",
+                model_id="qwen3_5_27b",
+                provider="openrouter",
+                model="qwen/qwen3.5-27b",
+                preflight_error="debug preflight warning",
             )
         ],
         output_root=tmp_path / "doe-smoke",
@@ -364,5 +364,5 @@ def test_run_doe_smoke_suite_ignores_model_runtime_preflight_for_pre_llm_design_
 
     assert result.success is True
     case_record = json.loads(result.case_index_jsonl_path.read_text(encoding="utf-8").splitlines()[0])
-    assert case_record["model_id"] == "qwen3_5_local"
+    assert case_record["model_id"] == "qwen3_5_27b"
     assert result.cases[0].error_codes == []

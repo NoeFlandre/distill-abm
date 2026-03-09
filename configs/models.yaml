@@ -5,12 +5,12 @@ models:
   gemini_3_1_pro_preview:
     provider: openrouter
     model: google/gemini-3.1-pro-preview
+  qwen3_5_27b:
+    provider: openrouter
+    model: qwen/qwen3.5-27b
   nemotron_nano_12b_v2_vl_free:
     provider: openrouter
     model: nvidia/nemotron-nano-12b-v2-vl:free
-  qwen3_5_local:
-    provider: ollama
-    model: qwen3.5:0.8b
   mistral_medium_debug:
     provider: mistral
     model: mistral-medium-latest

@@ -19,7 +19,11 @@ DoESmokeErrorCode = Literal[
 ]
 DoETextSourceMode = Literal["summary_only", "full_text_only"]
 
-CANONICAL_DOE_MODEL_IDS: tuple[str, ...] = ("qwen3_5_local", "kimi_k2_5", "gemini_3_1_pro_preview")
+CANONICAL_DOE_MODEL_IDS: tuple[str, ...] = (
+    "qwen3_5_27b",
+    "kimi_k2_5",
+    "gemini_3_1_pro_preview",
+)
 CANONICAL_EVIDENCE_MODES: tuple[Literal["plot", "table", "plot+table"], ...] = ("plot", "table", "plot+table")
 CANONICAL_REPETITIONS: tuple[int, ...] = (1, 2, 3)
 

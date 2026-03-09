@@ -20,7 +20,7 @@ def test_json_log_formatter_includes_event_data() -> None:
         args=(),
         exc_info=None,
     )
-    record.event_data = {"provider": "ollama", "model": "qwen3.5:0.8b"}
+    record.event_data = {"provider": "openrouter", "model": "qwen/qwen3.5-27b"}
 
     payload = json.loads(formatter.format(record))
 
@@ -28,8 +28,8 @@ def test_json_log_formatter_includes_event_data() -> None:
     assert payload["event"] == "hello"
     assert payload["logger"] == "distill_abm.test"
     assert payload["message"] == "hello"
-    assert payload["provider"] == "ollama"
-    assert payload["model"] == "qwen3.5:0.8b"
+    assert payload["provider"] == "openrouter"
+    assert payload["model"] == "qwen/qwen3.5-27b"
 
 
 def test_attach_json_log_file_writes_json_lines(tmp_path: Path) -> None:

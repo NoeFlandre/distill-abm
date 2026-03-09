@@ -15,7 +15,7 @@ from distill_abm.pipeline.local_qwen_sample_smoke import (
 
 
 class FakeAdapter(LLMAdapter):
-    provider = "ollama"
+    provider = "openrouter"
 
     def __init__(self) -> None:
         self.requests: list[LLMRequest] = []
@@ -44,13 +44,13 @@ class FakeAdapter(LLMAdapter):
 
 
 class ThinkingOnlyAdapter(LLMAdapter):
-    provider = "ollama"
+    provider = "openrouter"
 
     def complete(self, request: LLMRequest) -> LLMResponse:
         _ = request
         return LLMResponse(
             provider=self.provider,
-            model="qwen3.5:0.8b",
+            model="qwen/qwen3.5-27b",
             text="",
             raw={
                 "message": {"content": "", "thinking": "reasoning only"},
@@ -62,13 +62,13 @@ class ThinkingOnlyAdapter(LLMAdapter):
 
 
 class TruncatedStructuredAdapter(LLMAdapter):
-    provider = "ollama"
+    provider = "openrouter"
 
     def complete(self, request: LLMRequest) -> LLMResponse:
         _ = request
         return LLMResponse(
             provider=self.provider,
-            model="qwen3.5:0.8b",
+            model="qwen/qwen3.5-27b",
             text=json.dumps({"response_text": "partial but not trustworthy"}),
             raw={
                 "message": {"content": '{"response_text":"partial but not trustworthy"}', "thinking": "reasoning"},
@@ -80,7 +80,7 @@ class TruncatedStructuredAdapter(LLMAdapter):
 
 
 class FailFirstThenCountAdapter(LLMAdapter):
-    provider = "ollama"
+    provider = "openrouter"
 
     def __init__(self) -> None:
         self.requests: list[LLMRequest] = []
@@ -90,7 +90,7 @@ class FailFirstThenCountAdapter(LLMAdapter):
         if len(self.requests) == 1:
             return LLMResponse(
                 provider=self.provider,
-                model="qwen3.5:0.8b",
+                model="qwen/qwen3.5-27b",
                 text="",
                 raw={
                     "message": {"content": "", "thinking": "reasoning only"},
@@ -101,7 +101,7 @@ class FailFirstThenCountAdapter(LLMAdapter):
             )
         return LLMResponse(
             provider=self.provider,
-            model="qwen3.5:0.8b",
+            model="qwen/qwen3.5-27b",
             text=json.dumps({"response_text": f"response-{len(self.requests)}"}),
             raw={"message": {"thinking": f"thinking-{len(self.requests)}"}},
         )
@@ -214,7 +214,7 @@ def test_run_local_qwen_sample_smoke_writes_review_friendly_case_artifacts(tmp_p
     result = run_local_qwen_sample_smoke(
         case_inputs={"milk_consumption": _write_case_input(tmp_path)},
         adapter=adapter,
-        model="qwen3.5:0.8b",
+        model="qwen/qwen3.5-27b",
         output_root=tmp_path / "smoke",
         cases=(
             LocalQwenSampleCase(
@@ -243,7 +243,7 @@ def test_run_local_qwen_sample_smoke_writes_review_friendly_case_artifacts(tmp_p
     assert (case_dir / "02_requests" / "trend_request.json").exists()
     context_trace = json.loads((case_dir / "03_outputs" / "context_trace.json").read_text(encoding="utf-8"))
     trend_trace = json.loads((case_dir / "03_outputs" / "trend_trace.json").read_text(encoding="utf-8"))
-    assert context_trace["request"]["model"] == "qwen3.5:0.8b"
+    assert context_trace["request"]["model"] == "qwen/qwen3.5-27b"
     assert context_trace["request"]["max_tokens"] == 32768
     assert context_trace["request"]["metadata"]["ollama_num_ctx"] == 131072
     assert context_trace["request"]["metadata"]["ollama_format"]["type"] == "object"
@@ -274,7 +274,7 @@ def test_run_local_qwen_sample_smoke_resume_reuses_successful_case(tmp_path: Pat
     first_result = run_local_qwen_sample_smoke(
         case_inputs={"milk_consumption": _write_case_input(tmp_path)},
         adapter=adapter,
-        model="qwen3.5:0.8b",
+        model="qwen/qwen3.5-27b",
         output_root=output_root,
         cases=(case,),
     )
@@ -283,7 +283,7 @@ def test_run_local_qwen_sample_smoke_resume_reuses_successful_case(tmp_path: Pat
     resumed = run_local_qwen_sample_smoke(
         case_inputs={"milk_consumption": _write_case_input(tmp_path)},
         adapter=resumed_adapter,
-        model="qwen3.5:0.8b",
+        model="qwen/qwen3.5-27b",
         output_root=output_root,
         cases=(case,),
         resume_existing=True,
@@ -301,7 +301,7 @@ def test_run_local_qwen_sample_smoke_preserves_partial_artifacts_on_thinking_onl
     result = run_local_qwen_sample_smoke(
         case_inputs={"milk_consumption": _write_case_input(tmp_path)},
         adapter=ThinkingOnlyAdapter(),
-        model="qwen3.5:0.8b",
+        model="qwen/qwen3.5-27b",
         output_root=tmp_path / "smoke",
         cases=(
             LocalQwenSampleCase(
@@ -327,7 +327,7 @@ def test_run_local_qwen_sample_smoke_rejects_truncated_structured_output(tmp_pat
     result = run_local_qwen_sample_smoke(
         case_inputs={"milk_consumption": _write_case_input(tmp_path)},
         adapter=TruncatedStructuredAdapter(),
-        model="qwen3.5:0.8b",
+        model="qwen/qwen3.5-27b",
         output_root=tmp_path / "smoke",
         cases=(
             LocalQwenSampleCase(
@@ -351,7 +351,7 @@ def test_run_local_qwen_sample_smoke_can_stop_after_first_failure(tmp_path: Path
     result = run_local_qwen_sample_smoke(
         case_inputs={"milk_consumption": _write_case_input(tmp_path)},
         adapter=adapter,
-        model="qwen3.5:0.8b",
+        model="qwen/qwen3.5-27b",
         output_root=tmp_path / "smoke",
         cases=(
             LocalQwenSampleCase(
@@ -430,7 +430,7 @@ def test_run_local_qwen_sample_smoke_reuses_context_outputs_for_same_abm_and_rol
     result = run_local_qwen_sample_smoke(
         case_inputs={"milk_consumption": case_input},
         adapter=adapter,
-        model="qwen3.5:0.8b",
+        model="qwen/qwen3.5-27b",
         output_root=tmp_path / "smoke",
         cases=(
             LocalQwenSampleCase(

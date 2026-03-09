@@ -40,7 +40,6 @@ def test_cli_smoke_local_qwen_invokes_sample_smoke(tmp_path: Path, monkeypatch) 
             failed_case_ids=[],
         )
 
-    monkeypatch.setattr(cli_module, "_assert_ollama_model_available", lambda _model: None)
     def fake_create_adapter(provider, model, **kwargs):  # type: ignore[no-untyped-def]
         adapter_calls.update({"provider": provider, "model": model, **kwargs})
         return object()
@@ -60,14 +59,6 @@ def test_cli_smoke_local_qwen_invokes_sample_smoke(tmp_path: Path, monkeypatch) 
             str(tmp_path / "out"),
             "--max-tokens",
             "2000",
-            "--num-ctx",
-            "4096",
-            "--plot-num-ctx",
-            "4096",
-            "--table-num-ctx",
-            "4096",
-            "--plot-table-num-ctx",
-            "8192",
             "--resume",
             "--json",
         ],
@@ -75,11 +66,11 @@ def test_cli_smoke_local_qwen_invokes_sample_smoke(tmp_path: Path, monkeypatch) 
 
     assert result.exit_code == 0
     assert "report.json" in result.output
-    assert captured["model"] == "qwen3.5:0.8b"
+    assert captured["model"] == "nvidia/nemotron-nano-12b-v2-vl:free"
     assert captured["resume_existing"] is True
     assert captured["max_tokens"] == 2000
-    assert captured["ollama_num_ctx"] == 4096
-    assert captured["ollama_num_ctx_by_mode"] == {"plot": 4096, "table": 4096, "plot+table": 8192}
+    assert captured["ollama_num_ctx"] == 0
+    assert captured["ollama_num_ctx_by_mode"] is None
     assert adapter_calls["timeout_seconds"] == 900.0
     assert "review.html" in result.output
 
@@ -112,14 +103,10 @@ models:
             failed_case_ids=[],
         )
 
-    def fail_if_ollama_checked(_model):  # type: ignore[no-untyped-def]
-        raise AssertionError("ollama availability check should not run for openrouter models")
-
     def fake_create_adapter(provider, model, **kwargs):  # type: ignore[no-untyped-def]
         adapter_calls.update({"provider": provider, "model": model, **kwargs})
         return object()
 
-    monkeypatch.setattr(cli_module, "_assert_ollama_model_available", fail_if_ollama_checked)
     monkeypatch.setattr(cli_module, "create_adapter", fake_create_adapter)
     monkeypatch.setattr(cli_module, "run_local_qwen_sample_smoke", fake_run_local_qwen_sample_smoke)
 

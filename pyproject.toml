@@ -23,8 +23,6 @@ dependencies = [
 [project.optional-dependencies]
 llm = [
   "openai>=1.40.0",
-  "anthropic>=0.34.0",
-  "ollama>=0.3.3",
   "requests>=2.32.3",
 ]
 metrics = [
@@ -97,11 +95,9 @@ packages = ["distill_abm"]
 
 [[tool.mypy.overrides]]
 module = [
-  "anthropic",
   "yaml",
   "nltk.*",
   "nbformat",
-  "ollama",
   "openai",
   "requests",
   "rouge_score",

@@ -342,14 +342,19 @@ def test_health_check_prints_json_report(tmp_path: Path, monkeypatch: pytest.Mon
     models.write_text(
         """
 models:
-  qwen3_5_local:
-    provider: ollama
-    model: qwen3.5:0.8b
+  kimi_k2_5:
+    provider: openrouter
+    model: moonshotai/kimi-k2.5
+  gemini_3_1_pro_preview:
+    provider: openrouter
+    model: google/gemini-3.1-pro-preview
+  qwen3_5_27b:
+    provider: openrouter
+    model: qwen/qwen3.5-27b
 """,
         encoding="utf-8",
     )
 
-    monkeypatch.setattr(cli_module, "_assert_ollama_model_available", lambda _model: None)
     result = runner.invoke(
         app,
         [
@@ -362,7 +367,6 @@ models:
             str(viz_root),
             "--models-path",
             str(models),
-            "--include-ollama",
             "--json",
         ],
     )
@@ -370,7 +374,7 @@ models:
     assert result.exit_code == 0
     payload = json.loads(result.output)
     assert payload["success"] is True
-    assert payload["checks"]["ollama_local_qwen"]["ok"] is True
+    assert payload["checks"]["model_registry"]["ok"] is True
 
 
 def test_cli_run_with_abm_uses_scoring_reference(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -790,13 +794,13 @@ def test_cli_smoke_doe_treats_candidate_models_as_design_factors_only(
             "--viz-root",
             str(viz_root),
             "--model-id",
-            "qwen3_5_local",
+            "qwen3_5_27b",
             "--json",
         ],
     )
 
     assert result.exit_code == 0
-    assert captured_model_specs[0].model_id == "qwen3_5_local"
+    assert captured_model_specs[0].model_id == "qwen3_5_27b"
     assert captured_model_specs[0].preflight_error is None
 
 
@@ -916,18 +920,13 @@ def test_validate_model_policy_blocks_unsupported_model() -> None:
 
 
 def test_validate_model_policy_allows_supported_benchmark_models(monkeypatch: pytest.MonkeyPatch) -> None:
-    def fake_run(cmd: list[str], check: bool, capture_output: bool, text: bool):  # type: ignore[no-untyped-def]
-        _ = (cmd, check, capture_output, text)
-        return SimpleNamespace(stdout="NAME           ID\nqwen3.5:0.8b   0\n", returncode=0)
-
-    monkeypatch.setattr("distill_abm.cli_support.subprocess.run", fake_run)
     cli_module._validate_model_policy(
         provider="openrouter", model="moonshotai/kimi-k2.5", allow_debug_model=False
     )
     cli_module._validate_model_policy(
         provider="openrouter", model="google/gemini-3.1-pro-preview", allow_debug_model=False
     )
-    cli_module._validate_model_policy(provider="ollama", model="qwen3.5:0.8b", allow_debug_model=False)
+    cli_module._validate_model_policy(provider="openrouter", model="qwen/qwen3.5-27b", allow_debug_model=False)
 
 
 def test_validate_model_policy_blocks_unsupported_benchmark_model() -> None:
@@ -943,16 +942,18 @@ def test_validate_model_policy_supported_model_is_allowed_with_flag() -> None:
     )
 
 
-def test_validate_model_policy_requires_local_ollama_model_available(monkeypatch: pytest.MonkeyPatch) -> None:
-    captured: dict[str, str] = {}
-
-    def fake_run(cmd: list[str], check: bool, capture_output: bool, text: bool):  # type: ignore[no-untyped-def]
-        captured["cmd"] = " ".join(cmd)
-        return SimpleNamespace(stdout="NAME           ID\nqwen3.5:0.8b   0\n", returncode=0)
-
-    monkeypatch.setattr("distill_abm.cli_support.subprocess.run", fake_run)
-    cli_module._validate_model_policy(provider="ollama", model="qwen3.5:0.8b", allow_debug_model=False)
-    assert captured["cmd"] == "ollama list"
+def test_validate_model_policy_allows_debug_models_only_with_flag() -> None:
+    with pytest.raises(typer.BadParameter):
+        cli_module._validate_model_policy(
+            provider="openrouter",
+            model="nvidia/nemotron-nano-12b-v2-vl:free",
+            allow_debug_model=False,
+        )
+    cli_module._validate_model_policy(
+        provider="openrouter",
+        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        allow_debug_model=True,
+    )
 
 
 def test_cli_analyze_doe_exits_on_analysis_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

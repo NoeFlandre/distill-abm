@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
-
 import typer
 
 
@@ -13,7 +11,6 @@ def validate_benchmark_model_policy(
     model: str,
     allow_debug_model: bool,
     benchmark_models: set[tuple[str, str]],
-    assert_ollama_model_available: Callable[[str], None],
 ) -> None:
     """Validate the configured benchmark model against the repository policy."""
     key = (provider.strip().lower(), model.strip())
@@ -24,5 +21,3 @@ def validate_benchmark_model_policy(
         raise typer.BadParameter(
             f"unsupported benchmark model '{provider}:{model}'. Allowed benchmark models: {allowed}."
         )
-    if key == ("ollama", "qwen3.5:0.8b"):
-        assert_ollama_model_available(model)
