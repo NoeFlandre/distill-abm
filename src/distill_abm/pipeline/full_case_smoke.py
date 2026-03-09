@@ -99,6 +99,14 @@ class _TrendExecutionResult(BaseModel):
 MAX_PARALLEL_TRENDS = 6
 
 
+def resolve_parallel_trend_workers(provider: str) -> int:
+    """Return a provider-aware trend worker count."""
+
+    if provider.strip().lower() == "mistral":
+        return 3
+    return MAX_PARALLEL_TRENDS
+
+
 def run_full_case_smoke(
     *,
     case_input: FullCaseSmokeInput,
@@ -238,7 +246,8 @@ def run_full_case_smoke(
 
     trend_results_by_index: dict[int, _TrendExecutionResult] = {}
     if pending_plots:
-        with ThreadPoolExecutor(max_workers=min(MAX_PARALLEL_TRENDS, len(pending_plots))) as executor:
+        max_workers = min(resolve_parallel_trend_workers(adapter.provider), len(pending_plots))
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_plot: dict[Future[_TrendExecutionResult], int] = {
                 executor.submit(
                     _execute_full_case_trend,

@@ -78,6 +78,16 @@
 - Materializes prompt/evidence/request bundles without executing any provider call.
 - Writes a design matrix CSV plus per-case artifact manifests for debugging smoke inputs before `pipeline.smoke` runs.
 
+### `src/distill_abm/pipeline/full_case_suite_smoke.py`
+- Orchestrates the real-inference generation smoke across all ABMs by reusing the full-case matrix core per ABM.
+- Writes one suite-level run root with:
+  - `run.log.jsonl`
+  - `review.csv`
+  - `review.html`
+  - suite report JSON/Markdown
+- Stores nested per-ABM matrix runs under `abms/<abm>/`.
+- Mistral runs are paced and worker-limited specifically for that provider so the scheduler stays aligned with the API request budget.
+
 ### `src/distill_abm/llm/*`
 - Provider-neutral adapter interface.
 - Provider-specific adapters for OpenRouter, Mistral, and Echo.

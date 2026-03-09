@@ -1,5 +1,6 @@
 import time
 from types import SimpleNamespace
+from typing import cast
 
 import pytest
 
@@ -117,6 +118,41 @@ def test_mistral_adapter_success_with_transport() -> None:
     assert response.text == '{"response_text":"ok"}'
 
 
+def test_mistral_adapter_paces_requests() -> None:
+    observed_payloads: list[dict[str, object]] = []
+    observed_sleeps: list[float] = []
+    current_time = {"value": 0.0}
+
+    def fake_time() -> float:
+        return current_time["value"]
+
+    def fake_sleep(seconds: float) -> None:
+        observed_sleeps.append(seconds)
+        current_time["value"] += seconds
+
+    def transport(*, api_key: str, base_url: str, payload: dict[str, object]) -> dict[str, object]:
+        _ = api_key, base_url
+        observed_payloads.append(payload)
+        return {
+            "model": "mistral-medium-latest",
+            "choices": [{"message": {"content": '{"response_text":"ok"}'}}],
+        }
+
+    adapter = MistralAdapter(
+        model="mistral-medium-latest",
+        api_key="secret",
+        transport=transport,
+        time_fn=fake_time,
+        sleep_fn=fake_sleep,
+    )
+
+    adapter.complete(make_request())
+    adapter.complete(make_request())
+
+    assert len(observed_payloads) == 2
+    assert observed_sleeps == [1.0]
+
+
 def test_mistral_adapter_raises_on_missing_api_key() -> None:
     with pytest.raises(LLMProviderError, match="mistral api key missing"):
         MistralAdapter(model="mistral-medium-latest", api_key=None).complete(make_request())
@@ -191,14 +227,14 @@ def test_openrouter_adapter_timeout_is_wrapped() -> None:
 def test_external_errors_are_wrapped(adapter_cls: type[LLMAdapter], client: object) -> None:
     with pytest.raises(LLMProviderError):
         if adapter_cls is MistralAdapter:
-            adapter = adapter_cls(
+            adapter = MistralAdapter(
                 model="mistral-medium-latest",
                 api_key="secret",
                 transport=lambda **_: (_ for _ in ()).throw(RuntimeError("boom")),
             )
-            adapter.complete(make_request())  # type: ignore[call-arg]
+            adapter.complete(make_request())
         else:
-            adapter_cls(model="x", client=client).complete(make_request())  # type: ignore[call-arg]
+            cast(type[OpenRouterAdapter], adapter_cls)(model="x", client=client).complete(make_request())
 
 
 def test_openrouter_adapter_raises_on_missing_api_key(monkeypatch: pytest.MonkeyPatch) -> None:

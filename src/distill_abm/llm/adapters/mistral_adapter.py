@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import os
+import threading
+import time
 from typing import Any, cast
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -16,6 +18,7 @@ from distill_abm.llm.adapters.openai_compatible_utils import (
 from distill_abm.llm.adapters.timeout_utils import run_with_timeout
 
 DEFAULT_MISTRAL_BASE_URL = "https://api.mistral.ai/v1"
+MISTRAL_MIN_REQUEST_INTERVAL_SECONDS = 1.0
 
 
 class MistralAdapter(LLMAdapter):
@@ -31,18 +34,25 @@ class MistralAdapter(LLMAdapter):
         base_url: str = DEFAULT_MISTRAL_BASE_URL,
         timeout_seconds: float = 120.0,
         transport: Any | None = None,
+        time_fn: Any | None = None,
+        sleep_fn: Any | None = None,
     ) -> None:
         self.model = model
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
         self.timeout_seconds = timeout_seconds
         self._transport = transport
+        self._time_fn = time.monotonic if time_fn is None else time_fn
+        self._sleep_fn = time.sleep if sleep_fn is None else sleep_fn
+        self._request_lock = threading.Lock()
+        self._next_request_at = 0.0
 
     def complete(self, request: LLMRequest) -> LLMResponse:
         api_key = self.api_key or os.getenv("MISTRAL_API_KEY")
         if not api_key:
             raise LLMProviderError("mistral api key missing: set MISTRAL_API_KEY")
 
+        self._wait_for_request_slot()
         payload = build_openai_compatible_payload(request)
         payload["model"] = self.model or request.model
 
@@ -63,6 +73,15 @@ class MistralAdapter(LLMAdapter):
             text=text,
             raw=raw_payload,
         )
+
+    def _wait_for_request_slot(self) -> None:
+        with self._request_lock:
+            now = float(self._time_fn())
+            wait_seconds = self._next_request_at - now
+            if wait_seconds > 0:
+                self._sleep_fn(wait_seconds)
+                now = float(self._time_fn())
+            self._next_request_at = max(now, self._next_request_at) + MISTRAL_MIN_REQUEST_INTERVAL_SECONDS
 
     def _post_chat_completion(self, *, api_key: str, payload: dict[str, Any]) -> dict[str, Any]:
         if self._transport is not None:

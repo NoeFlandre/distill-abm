@@ -23,6 +23,7 @@ from distill_abm.cli_actions import (
     execute_smoke_doe_command,
     execute_smoke_full_case_command,
     execute_smoke_full_case_matrix_command,
+    execute_smoke_full_case_suite_command,
     execute_smoke_ingest_command,
     execute_smoke_local_qwen_command,
     execute_smoke_quantitative_command,
@@ -69,6 +70,7 @@ from distill_abm.pipeline.doe_smoke import (
 )
 from distill_abm.pipeline.full_case_matrix_smoke import run_full_case_matrix_smoke
 from distill_abm.pipeline.full_case_smoke import run_full_case_smoke
+from distill_abm.pipeline.full_case_suite_smoke import run_full_case_suite_smoke
 from distill_abm.pipeline.local_qwen_sample_smoke import run_local_qwen_sample_smoke
 from distill_abm.pipeline.quantitative_smoke import run_quantitative_smoke
 from distill_abm.pipeline.run import EvidenceMode, TextSourceMode, run_pipeline
@@ -816,6 +818,100 @@ def smoke_full_case_matrix(
         create_adapter_fn=create_adapter,
         load_abm_config_fn=load_abm_config,
         run_full_case_matrix_smoke_fn=run_full_case_matrix_smoke,
+    )
+
+
+@app.command("smoke-full-case-suite")
+def smoke_full_case_suite(
+    models_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ABM model files for asset discovery."),
+    ] = Path("data"),
+    ingest_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ingest smoke outputs."),
+    ] = Path("results/ingest_smoke_latest"),
+    viz_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing visualization smoke outputs."),
+    ] = Path("results/viz_smoke_latest"),
+    models_path: Annotated[
+        Path,
+        typer.Option(exists=True, help="Model registry YAML path."),
+    ] = Path("configs/models.yaml"),
+    model_id: Annotated[
+        str,
+        typer.Option(help="Model registry alias to use for the real-inference suite."),
+    ] = "mistral_medium_debug",
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for full-case suite smoke artifacts."),
+    ] = Path("results/full_case_suite_smoke_latest"),
+    evidence_mode: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--evidence-mode",
+            help=(
+                "Evidence modes to include. Repeat for multiple. "
+                f"Defaults to {', '.join(DEFAULT_FULL_CASE_MATRIX_EVIDENCE_MODES)}."
+            ),
+        ),
+    ] = None,
+    prompt_variant: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--prompt-variant",
+            help=(
+                "Prompt variants to include. Repeat for multiple. "
+                f"Defaults to {', '.join(DEFAULT_FULL_CASE_MATRIX_PROMPT_VARIANTS)}."
+            ),
+        ),
+    ] = None,
+    repetition: Annotated[
+        list[int] | None,
+        typer.Option(
+            "--repetition",
+            help=(
+                "Repetitions to include. Repeat for multiple. "
+                f"Defaults to {', '.join(str(item) for item in DEFAULT_FULL_CASE_MATRIX_REPETITIONS)}."
+            ),
+        ),
+    ] = None,
+    max_tokens: Annotated[
+        int,
+        typer.Option(help="Maximum output token budget for each call in the full-case suite smoke."),
+    ] = 32768,
+    resume: Annotated[
+        bool,
+        typer.Option("--resume/--no-resume", help="Reuse accepted cases and rerun only failed or missing ones."),
+    ] = True,
+    allow_debug_model: Annotated[
+        bool,
+        typer.Option("--allow-debug-model/--no-allow-debug-model", help="Allow a debug-only model id for this smoke."),
+    ] = False,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Run the full inference smoke across all ABMs with one context plus all trends per case."""
+    execute_smoke_full_case_suite_command(
+        models_root=models_root,
+        ingest_root=ingest_root,
+        viz_root=viz_root,
+        models_path=models_path,
+        model_id=model_id,
+        output_root=output_root,
+        evidence_modes=resolve_full_case_matrix_evidence_modes(evidence_mode),
+        prompt_variants=resolve_full_case_matrix_prompt_variants(prompt_variant),
+        repetitions=resolve_full_case_matrix_repetitions(repetition),
+        max_tokens=max_tokens,
+        resume=resume,
+        json_output=json_output,
+        allow_debug_model=allow_debug_model,
+        resolve_model_from_registry=resolve_model_from_registry,
+        resolve_model_path=lambda abm, models_root: resolve_abm_model_path(abm=abm, models_root=models_root),
+        create_adapter_fn=create_adapter,
+        load_abm_config_fn=load_abm_config,
+        validate_model_policy=_validate_model_policy,
+        run_full_case_suite_smoke_fn=run_full_case_suite_smoke,
     )
 
 

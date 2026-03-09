@@ -1,0 +1,275 @@
+"""Run one generation smoke across all ABMs using the full-case matrix core."""
+
+from __future__ import annotations
+
+import csv
+from datetime import UTC, datetime
+from pathlib import Path
+
+from pydantic import BaseModel, Field
+
+from distill_abm.llm.adapters.base import LLMAdapter
+from distill_abm.pipeline.full_case_matrix_smoke import (
+    FullCaseMatrixCaseSpec,
+    run_full_case_matrix_smoke,
+)
+from distill_abm.pipeline.full_case_smoke import FullCaseSmokeInput
+from distill_abm.pipeline.local_qwen_sample_smoke import _write_json, _write_text
+from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, run_log_path
+from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
+
+LOGGER = get_logger(__name__)
+
+
+class FullCaseSuiteAbmResult(BaseModel):
+    """One ABM result inside the all-ABMs generation smoke."""
+
+    abm: str
+    success: bool
+    run_root: Path
+    report_json_path: Path
+    report_markdown_path: Path
+    review_csv_path: Path
+    review_html_path: Path
+    planned_case_count: int
+    failed_case_ids: list[str] = Field(default_factory=list)
+
+
+class FullCaseSuiteSmokeResult(BaseModel):
+    """Top-level result for the all-ABMs generation smoke."""
+
+    started_at_utc: str
+    finished_at_utc: str
+    output_root: Path
+    run_id: str
+    run_root: Path
+    run_log_path: Path
+    report_json_path: Path
+    report_markdown_path: Path
+    review_csv_path: Path
+    review_html_path: Path
+    success: bool
+    failed_abms: list[str] = Field(default_factory=list)
+    abms: list[FullCaseSuiteAbmResult] = Field(default_factory=list)
+
+
+def run_full_case_suite_smoke(
+    *,
+    abm_inputs: dict[str, FullCaseSmokeInput],
+    cases_by_abm: dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
+    adapter: LLMAdapter,
+    model: str,
+    output_root: Path,
+    max_tokens: int = 32768,
+    max_retries: int | None = None,
+    retry_backoff_seconds: float | None = None,
+    resume_existing: bool = True,
+) -> FullCaseSuiteSmokeResult:
+    """Run the full-case matrix smoke across all configured ABMs."""
+
+    started_at = datetime.now(UTC)
+    output_root.mkdir(parents=True, exist_ok=True)
+    run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
+    run_root = output_root / "runs" / run_id
+    run_root.mkdir(parents=True, exist_ok=True)
+    _write_text(latest_run_pointer_path(output_root), str(run_root))
+    log_path = attach_json_log_file(run_log_path(run_root))
+    log_event(
+        LOGGER,
+        "full_case_suite_start",
+        model=model,
+        abm_count=len(abm_inputs),
+        run_root=str(run_root),
+    )
+
+    abm_results: list[FullCaseSuiteAbmResult] = []
+    summary_rows: list[dict[str, str]] = []
+    for abm, case_input in abm_inputs.items():
+        abm_output_root = output_root / "abms" / abm
+        log_event(
+            LOGGER,
+            "full_case_suite_abm_start",
+            abm=abm,
+            case_count=len(cases_by_abm[abm]),
+            output_root=str(abm_output_root),
+        )
+        matrix_result = run_full_case_matrix_smoke(
+            case_input=case_input,
+            adapter=adapter,
+            model=model,
+            output_root=abm_output_root,
+            cases=cases_by_abm[abm],
+            max_tokens=max_tokens,
+            max_retries=max_retries,
+            retry_backoff_seconds=retry_backoff_seconds,
+            resume_existing=resume_existing,
+        )
+        latest_abm_run = Path((abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip())
+        abm_result = FullCaseSuiteAbmResult(
+            abm=abm,
+            success=matrix_result.success,
+            run_root=latest_abm_run,
+            report_json_path=matrix_result.report_json_path,
+            report_markdown_path=matrix_result.report_markdown_path,
+            review_csv_path=matrix_result.review_csv_path,
+            review_html_path=matrix_result.viewer_html_path,
+            planned_case_count=len(cases_by_abm[abm]),
+            failed_case_ids=list(matrix_result.failed_case_ids),
+        )
+        abm_results.append(abm_result)
+        summary_rows.append(
+            {
+                "abm": abm,
+                "success": str(abm_result.success).lower(),
+                "planned_case_count": str(abm_result.planned_case_count),
+                "failed_case_count": str(len(abm_result.failed_case_ids)),
+                "run_root": str(abm_result.run_root),
+                "run_log_path": str(run_log_path(abm_result.run_root)),
+                "report_json_path": str(abm_result.report_json_path),
+                "review_csv_path": str(abm_result.review_csv_path),
+                "review_html_path": str(abm_result.review_html_path),
+            }
+        )
+        log_event(
+            LOGGER,
+            "full_case_suite_abm_complete",
+            abm=abm,
+            success=abm_result.success,
+            failed_case_count=len(abm_result.failed_case_ids),
+            run_root=str(abm_result.run_root),
+        )
+
+    finished_at = datetime.now(UTC)
+    result = FullCaseSuiteSmokeResult(
+        started_at_utc=started_at.isoformat(),
+        finished_at_utc=finished_at.isoformat(),
+        output_root=output_root,
+        run_id=run_id,
+        run_root=run_root,
+        run_log_path=log_path,
+        report_json_path=run_root / "smoke_full_case_suite_report.json",
+        report_markdown_path=run_root / "smoke_full_case_suite_report.md",
+        review_csv_path=run_root / "review.csv",
+        review_html_path=run_root / "review.html",
+        success=all(item.success for item in abm_results),
+        failed_abms=[item.abm for item in abm_results if not item.success],
+        abms=abm_results,
+    )
+    _write_json(result.report_json_path, result.model_dump(mode="json"))
+    _write_text(result.report_markdown_path, _render_report(result))
+    _write_summary_csv(result.review_csv_path, summary_rows)
+    _write_text(result.review_html_path, _render_html(result))
+    log_event(
+        LOGGER,
+        "full_case_suite_complete",
+        success=result.success,
+        failed_abms=result.failed_abms,
+        run_root=str(run_root),
+    )
+    return result
+
+
+def _write_summary_csv(path: Path, rows: list[dict[str, str]]) -> None:
+    fieldnames = [
+        "abm",
+        "success",
+        "planned_case_count",
+        "failed_case_count",
+        "run_root",
+        "run_log_path",
+        "report_json_path",
+        "review_csv_path",
+        "review_html_path",
+    ]
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def _render_report(result: FullCaseSuiteSmokeResult) -> str:
+    lines = [
+        "# Full-Case Suite Smoke",
+        "",
+        f"- success: `{str(result.success).lower()}`",
+        f"- failed ABMs: `{', '.join(result.failed_abms) if result.failed_abms else 'none'}`",
+        "",
+        "| ABM | Success | Planned cases | Failed cases | Review HTML |",
+        "| --- | --- | --- | --- | --- |",
+    ]
+    for item in result.abms:
+        failed_case_count = len(item.failed_case_ids)
+        lines.append(
+            "| "
+            f"{item.abm} | "
+            f"{str(item.success).lower()} | "
+            f"{item.planned_case_count} | "
+            f"{failed_case_count} | "
+            f"{item.review_html_path} |"
+        )
+    return "\n".join(lines)
+
+
+def _render_html(result: FullCaseSuiteSmokeResult) -> str:
+    total_abms = len(result.abms)
+    total_cases = sum(item.planned_case_count for item in result.abms)
+    total_failed_cases = sum(len(item.failed_case_ids) for item in result.abms)
+    cards = "\n".join(
+        (
+            "<article class=\"case-card\">"
+            f"<header><h2>{item.abm}</h2><span class=\"status {'ok' if item.success else 'bad'}\">"
+            f"{'success' if item.success else 'failed'}</span></header>"
+            f"<dl><div><dt>Planned cases</dt><dd>{item.planned_case_count}</dd></div>"
+            f"<div><dt>Failed cases</dt><dd>{len(item.failed_case_ids)}</dd></div></dl>"
+            f"<p class=\"links\"><a href=\"{item.review_html_path}\">reviewer</a>"
+            f"<a href=\"{item.report_markdown_path}\">report</a>"
+            f"<a href=\"{run_log_path(item.run_root)}\">log</a></p>"
+            "</article>"
+        )
+        for item in result.abms
+    )
+    summary_cards = (
+        f"<section class=\"summary-grid\">"
+        f"<article class=\"summary-card\"><h2>Run</h2><p>{result.run_id}</p></article>"
+        f"<article class=\"summary-card\"><h2>ABMs</h2><p>{total_abms}</p></article>"
+        f"<article class=\"summary-card\"><h2>Planned cases</h2><p>{total_cases}</p></article>"
+        f"<article class=\"summary-card\"><h2>Failed cases</h2><p>{total_failed_cases}</p></article>"
+        f"<article class=\"summary-card\"><h2>Status</h2><p>{'success' if result.success else 'failed'}</p></article>"
+        "</section>"
+    )
+    cards = "\n".join(
+        line for line in [cards] if line
+    )
+    return (
+        "<!doctype html><html><head><meta charset=\"utf-8\"><title>Mistral Generation Dashboard</title>"
+        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+        "<style>"
+        "body{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"
+        "margin:0;background:#f5f3ef;color:#171717}"
+        "header{padding:28px 32px 12px 32px}"
+        "h1{margin:0 0 6px 0;font-size:28px}"
+        ".subtle{color:#5f5a53;font-size:14px}"
+        ".summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));"
+        "gap:12px;padding:0 32px 20px 32px}"
+        ".summary-card,.case-card{background:#fff;border:1px solid #ddd6cc;"
+        "border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}"
+        ".summary-card{padding:16px 18px}"
+        ".summary-card h2{margin:0 0 8px 0;font-size:13px;color:#6b6358;text-transform:uppercase;letter-spacing:.04em}"
+        ".summary-card p{margin:0;font-size:24px}"
+        "main{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:0 32px 32px 32px}"
+        ".case-card{padding:18px}"
+        ".case-card header{display:flex;justify-content:space-between;align-items:center;padding:0;margin:0 0 14px 0}"
+        ".case-card h2{margin:0;font-size:20px}"
+        ".status{font-size:12px;padding:4px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}"
+        ".status.ok{background:#e8f7ea;color:#1f6a32}"
+        ".status.bad{background:#fdebec;color:#9b2335}"
+        "dl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 14px 0}"
+        "dt{font-size:12px;color:#6b6358;text-transform:uppercase;letter-spacing:.04em}"
+        "dd{margin:4px 0 0 0;font-size:18px}"
+        ".links{display:flex;gap:14px;flex-wrap:wrap;margin:0}"
+        "a{color:#0d5bd7;text-decoration:none}"
+        "a:hover{text-decoration:underline}"
+        "</style></head><body>"
+        f"<header><h1>Mistral Generation Dashboard</h1><p class=\"subtle\">Run {result.run_id}</p></header>"
+        f"{summary_cards}<main>{cards}</main></body></html>"
+    )

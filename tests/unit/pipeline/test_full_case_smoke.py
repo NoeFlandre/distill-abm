@@ -18,6 +18,7 @@ from distill_abm.pipeline.full_case_matrix_smoke import (
 from distill_abm.pipeline.full_case_smoke import (
     FullCasePlotInput,
     FullCaseSmokeInput,
+    resolve_parallel_trend_workers,
     run_full_case_smoke,
 )
 
@@ -100,6 +101,11 @@ class _ConcurrentAdapter(LLMAdapter):
                 "choices": [{"message": {"content": f'{{"response_text":"response-{call_number}"}}'}}],
             },
         )
+
+
+def test_resolve_parallel_trend_workers_reduces_for_mistral() -> None:
+    assert resolve_parallel_trend_workers("mistral") == 3
+    assert resolve_parallel_trend_workers("openrouter") == 6
 
 
 def test_run_full_case_smoke_writes_context_and_all_trends(tmp_path: Path) -> None:
