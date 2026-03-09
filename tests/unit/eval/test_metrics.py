@@ -1,3 +1,6 @@
+import pytest
+
+from distill_abm.eval import reference_scores as reference_scores_module
 from distill_abm.eval.metrics import score_summary
 
 
@@ -55,3 +58,19 @@ def test_score_summary_case_insensitive() -> None:
     """Test that scoring is case-insensitive."""
     scores = score_summary("THE CAT", "the cat")
     assert scores.token_f1 == 1.0
+
+
+def test_compute_scores_falls_back_when_nltk_resources_are_missing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        reference_scores_module,
+        "_compute_with_external_metrics",
+        lambda ground_truth, summary: (_ for _ in ()).throw(LookupError("wordnet missing")),
+    )
+
+    scores = reference_scores_module.compute_scores("abc", "def")
+
+    assert scores.bleu == 0.0
+    assert scores.meteor == 0.0
+    assert scores.rouge1 == 0.0

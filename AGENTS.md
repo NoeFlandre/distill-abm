@@ -142,6 +142,7 @@ Capture solutions so the team compounds knowledge:
 - **Context reuse is expected whenever prompts are identical.** In the current DOE/full-case setup, context variation is much smaller than trend variation: context effectively changes by ABM and `role` on/off; `example` and `insights` are trend-only. Cache and reuse context outputs by the fully rendered prompt, not by loose labels.
 - **Keep primary scoring stable and add secondary references additively.** The primary author ground truth remains the main score contract. Optional modeler references belong in `experiment_settings.modeler_ground_truth` and should add parallel score blocks/columns/metadata, not replace the primary scores.
 - **Be careful with integration tests that touch scoring.** If the goal is reference scoring or metadata/report wiring, prefer `full_text_only` unless the test is explicitly about summarizers. This avoids accidentally invoking heavy summarizer/model dependencies and keeps the test focused.
+- **Actively clean stale processes.** Long-running smokes, monitors, and stuck test processes can make the machine lag badly. Periodically check for stale `uv`, `pytest`, monitor, and smoke processes and stop the ones that are no longer useful. Do not leave background process cleanup as an afterthought.
 
 ---
 
