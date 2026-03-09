@@ -70,7 +70,6 @@ class FullCaseSuiteProgressAbm(BaseModel):
     failed_case_count: int = 0
     run_root: Path | None = None
     run_log_path: Path | None = None
-    review_html_path: Path | None = None
     report_json_path: Path | None = None
     running_case_id: str | None = None
     running_case_status: str | None = None
@@ -571,7 +570,6 @@ def _refresh_progress_abm_snapshot(
         update={
             "run_root": stable_paths["run_root"],
             "run_log_path": stable_paths["run_log_path"],
-            "review_html_path": stable_paths["review_html_path"],
             "report_json_path": stable_paths["report_json_path"],
             "completed_case_count": snapshot.completed_cases,
             "failed_case_count": snapshot.failed_cases,
@@ -588,14 +586,12 @@ def _sync_stable_abm_current_view(*, abm_output_root: Path, run_root: Path) -> d
     stable_paths = {
         "run_root": run_root,
         "run_log_path": current_root / "run.log.jsonl",
-        "review_html_path": current_root / "review.html",
         "report_json_path": current_root / "smoke_full_case_matrix_report.json",
         "report_markdown_path": current_root / "smoke_full_case_matrix_report.md",
         "review_csv_path": current_root / "request_review.csv",
     }
     source_paths = {
         "run_log_path": run_log_path(run_root),
-        "review_html_path": run_root / "review.html",
         "report_json_path": run_root / "smoke_full_case_matrix_report.json",
         "report_markdown_path": run_root / "smoke_full_case_matrix_report.md",
         "review_csv_path": run_root / "request_review.csv",
@@ -610,133 +606,3 @@ def _sync_stable_abm_current_view(*, abm_output_root: Path, run_root: Path) -> d
 
 def _write_suite_progress(*, output_root: Path, progress_path: Path, progress: FullCaseSuiteProgress) -> None:
     _write_json(progress_path, progress.model_dump(mode="json"))
-    _write_text(output_root / "review.html", _render_live_html(progress))
-
-
-def _render_live_html(progress: FullCaseSuiteProgress) -> str:
-    style_rules = [
-        (
-            "body{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"
-            "'Segoe UI',sans-serif;margin:0;background:#f5f3ef;color:#171717}"
-        ),
-        "header{padding:28px 32px 12px 32px}",
-        "h1{margin:0 0 6px 0;font-size:28px}",
-        ".subtle{color:#5f5a53;font-size:14px}",
-        (
-            ".summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));"
-            "gap:12px;padding:0 32px 20px 32px}"
-        ),
-        (
-            ".summary-card,.abm-card{background:#fff;border:1px solid #ddd6cc;"
-            "border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}"
-        ),
-        ".summary-card{padding:16px 18px}",
-        ".summary-card h2{margin:0 0 8px 0;font-size:13px;color:#6b6358;text-transform:uppercase;letter-spacing:.04em}",
-        ".summary-card p{margin:0;font-size:24px}",
-        "main{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:0 32px 32px 32px}",
-        ".abm-card{padding:18px}",
-        ".abm-card h2{margin:0 0 8px 0;font-size:20px}",
-        ".status{font-size:12px;padding:4px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}",
-        ".status.ok{background:#e8f7ea;color:#1f6a32}",
-        ".status.bad{background:#fdebec;color:#9b2335}",
-        ".status.running{background:#fff4d8;color:#8a5a00}",
-        ".status.waiting{background:#e8f0ff;color:#1d4ed8}",
-        ".status.pending{background:#efefef;color:#555}",
-        "dl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 14px 0}",
-        "dt{font-size:12px;color:#6b6358;text-transform:uppercase;letter-spacing:.04em}",
-        "dd{margin:4px 0 0 0;font-size:18px}",
-        ".links{display:flex;gap:14px;flex-wrap:wrap;margin:0}",
-        ".links a{color:#0d5bd7;text-decoration:none}",
-        ".links a:hover{text-decoration:underline}",
-        ".error{color:#9b2335;font-size:13px;margin-top:12px;white-space:pre-wrap}",
-        ".dim{color:#6b6358}",
-    ]
-    def status_class(status: str) -> str:
-        if status == "completed":
-            return "ok"
-        if status == "failed":
-            return "bad"
-        if status == "running":
-            return "running"
-        if status == "waiting_to_retry":
-            return "waiting"
-        return "pending"
-
-    summary_cards = [
-        ("Run", progress.run_id),
-        ("Status", progress.status),
-        ("Current ABM", progress.current_abm or "-"),
-        ("Current case", progress.current_case_id or "-"),
-        ("Case status", progress.current_case_status or "-"),
-        ("Current work", progress.current_case_detail or "-"),
-        ("Attempt", "-" if progress.current_attempt is None else str(progress.current_attempt)),
-        ("Completed ABMs", f"{progress.completed_abm_count}/{progress.total_abms}"),
-        ("Completed cases", f"{progress.completed_case_count}/{progress.planned_case_count}"),
-        ("Failed cases", str(progress.failed_case_count)),
-    ]
-    summary_html = "".join(
-        f'<article class="summary-card"><h2>{title}</h2><p>{value}</p></article>'
-        for title, value in summary_cards
-    )
-    abm_cards: list[str] = []
-    for item in progress.abms:
-        links: list[str] = []
-        if item.review_html_path is not None:
-            links.append(f'<a href="{item.review_html_path}">reviewer</a>')
-        if item.report_json_path is not None:
-            links.append(f'<a href="{item.report_json_path}">report</a>')
-        if item.run_log_path is not None:
-            links.append(f'<a href="{item.run_log_path}">log</a>')
-        abm_cards.append(
-            "".join(
-                [
-                    '<article class="abm-card">',
-                    '<header style="display:flex;justify-content:space-between;align-items:center">',
-                    f"<h2>{item.abm}</h2>",
-                    f'<span class="status {status_class(item.status)}">{item.status}</span>',
-                    "</header>",
-                    "<dl>",
-                    f"<div><dt>Planned cases</dt><dd>{item.planned_case_count}</dd></div>",
-                    f"<div><dt>Completed cases</dt><dd>{item.completed_case_count}</dd></div>",
-                    f"<div><dt>Failed cases</dt><dd>{item.failed_case_count}</dd></div>",
-                    f"<div><dt>Attempt</dt><dd>{item.attempt if item.attempt is not None else '-'}</dd></div>",
-                    (
-                        '<div><dt>Current case</dt><dd class="dim">'
-                        f'{item.running_case_id if item.running_case_id is not None else "-"}'
-                        "</dd></div>"
-                    ),
-                    (
-                        '<div><dt>Current work</dt><dd class="dim">'
-                        f'{item.running_case_detail if item.running_case_detail is not None else "-"}'
-                        "</dd></div>"
-                    ),
-                    (
-                        '<div><dt>Run root</dt><dd class="dim">'
-                        f'{item.run_root if item.run_root is not None else "-"}'
-                        "</dd></div>"
-                    ),
-                    "</dl>",
-                    f'<p class="links">{"".join(links)}</p>',
-                    f'<p class="error">{item.last_error}</p>' if item.last_error else "",
-                    "</article>",
-                ]
-            )
-        )
-    return "".join(
-        [
-            '<!doctype html><html><head><meta charset="utf-8"><title>Mistral Generation Dashboard</title>',
-            '<meta name="viewport" content="width=device-width, initial-scale=1">',
-            '<meta http-equiv="refresh" content="3">',
-            "<style>",
-            "".join(style_rules),
-            "</style></head><body>",
-            (
-                '<header><h1>Mistral Generation Dashboard</h1><p class="subtle">'
-                "This page refreshes automatically while the suite is running."
-                "</p></header>"
-            ),
-            f'<section class="summary-grid">{summary_html}</section>',
-            f'<main>{"".join(abm_cards)}</main>',
-            "</body></html>",
-        ]
-    )
