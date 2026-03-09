@@ -200,7 +200,7 @@ def render_layout_guide(output_root: Path) -> str:
         "## 10_shared/<abm>\n\n"
         "- `01_inputs/`: copied simulation CSV, parameters narrative, final documentation\n"
         "- `02_evidence/plots/`: copied plot images used by the DOE smoke\n"
-        "- `02_evidence/tables/`: full raw simulation CSV subsets matched to each plot\n"
+        "- `02_evidence/tables/`: statistical evidence text, JSON payloads, and reduced source series per plot\n"
         "- `03_prompts/context/`: shared context prompts by prompt variant\n"
         "- `03_prompts/trend/<evidence_mode>/<prompt_variant>/`: per-plot trend prompts\n\n"
         "## 20_case_index\n\n"

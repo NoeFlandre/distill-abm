@@ -17,6 +17,7 @@ from distill_abm.pipeline.run_state import (
     _load_resumable_pipeline_result,
     _write_run_metadata,
 )
+from distill_abm.pipeline.statistical_evidence import build_statistical_evidence
 from distill_abm.viz.plots import MetricPlotBundle, plot_metric_bundles
 
 EvidenceMode = Literal["plot", "table", "plot+table"]
@@ -129,8 +130,9 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
     )[0]
 
     resolved_evidence_mode = _resolve_evidence_mode(inputs.evidence_mode)
+    statistical_evidence = build_statistical_evidence(frame=frame, reporter_pattern=inputs.metric_pattern)
     stats_table = helpers.build_stats_table(frame=frame, include_pattern=inputs.metric_pattern)
-    stats_table_csv = helpers.build_stats_csv(stats_table)
+    stats_table_csv = statistical_evidence.summary_text
     stats_table_csv_path = _write_stats_table_csv(output_dir=inputs.output_dir, stats_table_csv=stats_table_csv)
     stats_image_path = _write_stats_image_if_needed(
         stats_table=stats_table,
@@ -250,6 +252,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
             "column_count": len(frame.columns),
             "columns": [str(column) for column in frame.columns],
             "matched_metric_columns": matched_metric_columns,
+            "table_evidence_columns": statistical_evidence.matched_columns,
         },
     )
 

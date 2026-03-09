@@ -43,4 +43,9 @@
 ## DL-009
 - Date: 2026-03-07
 - Decision: Freeze the validated pre-LLM DOE smoke workflow unless a task explicitly requests changes.
-- Rationale: the current DOE smoke path has been manually validated as the review surface for the full pre-LLM experiment design, including grouped shared artifacts, exact context/trend prompt materialization, context-placeholder handoff semantics, evidence-mode-specific prompt wording, raw table evidence extraction from plot-relevant simulation columns, compact request/case indexes, and the request-review CSV used to verify prompt-to-evidence pairing. This path should not be modified casually once validated.
+- Rationale: the current DOE smoke path has been manually validated as the review surface for the full pre-LLM experiment design, including grouped shared artifacts, exact context/trend prompt materialization, context-placeholder handoff semantics, evidence-mode-specific prompt wording, plot-relevant statistical table evidence, compact request/case indexes, and the request-review CSV used to verify prompt-to-evidence pairing. This path should not be modified casually once validated.
+
+## DL-010
+- Date: 2026-03-09
+- Decision: Preserve the public evidence labels `plot`, `table`, and `plot+table`, but redefine `table` as statistical evidence derived only from the plot-relevant simulation series.
+- Rationale: reviewer guidance explicitly asks for statistical summaries rather than raw CSV dumps. This must be implemented at the shared helper/core pipeline layer so DOE, smoke workflows, and real runs all use the same evidence semantics.

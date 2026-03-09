@@ -71,13 +71,14 @@ def test_build_trend_prompt_includes_optional_stats_csv_and_plot_description() -
         context="context",
         plot_description="Line A",
         evidence_mode="table",
-        stats_table_csv="time_step,mean,std,min,max,median\n0,1.0,0.1,0.8,1.2,1.0\n",
+        stats_table_csv="Statistical evidence for simulation series matching `coverage`.\n",
         enabled={"example"},
     )
     assert prompt.startswith("Trend coverage context")
     assert "\n\nEXAMPLE" in prompt
     assert "INSIGHTS" not in prompt
-    assert "time_step,mean,std,min,max,median" in prompt
+    assert "Statistical summary of the relevant simulation output:" in prompt
+    assert "Statistical evidence for simulation series matching `coverage`." in prompt
 
 
 def test_invoke_adapter_retries_transient_provider_errors() -> None:

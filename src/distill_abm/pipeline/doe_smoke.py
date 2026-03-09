@@ -48,6 +48,12 @@ from distill_abm.pipeline.doe_smoke_layout import (
     shared_table_path as _shared_table_path,
 )
 from distill_abm.pipeline.doe_smoke_layout import (
+    shared_table_payload_path as _shared_table_payload_path,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
+    shared_table_series_path as _shared_table_series_path,
+)
+from distill_abm.pipeline.doe_smoke_layout import (
     shared_tables_dir as _shared_tables_dir,
 )
 from distill_abm.pipeline.doe_smoke_layout import (
@@ -81,6 +87,9 @@ from distill_abm.pipeline.doe_smoke_prompts import (
 )
 from distill_abm.pipeline.doe_smoke_prompts import (
     build_raw_table_csv as _build_raw_table_csv,
+)
+from distill_abm.pipeline.doe_smoke_prompts import (
+    build_selected_series_csv as _build_selected_series_csv,
 )
 from distill_abm.pipeline.doe_smoke_reporting import (
     render_layout_guide as _render_layout_guide,
@@ -533,8 +542,36 @@ def _materialize_shared_abm_bundle(
             abm=abm_input.abm,
             plot_index=plot_input.plot_index,
         )
-        table_path.write_text(
-            _build_raw_table_csv(frame=frame, reporter_pattern=plot_input.reporter_pattern),
+        table_summary = _build_raw_table_csv(frame=frame, reporter_pattern=plot_input.reporter_pattern)
+        table_path.write_text(table_summary, encoding="utf-8")
+        _shared_table_series_path(
+            output_root=output_root,
+            abm=abm_input.abm,
+            plot_index=plot_input.plot_index,
+        ).write_text(
+            _build_selected_series_csv(frame=frame, reporter_pattern=plot_input.reporter_pattern),
+            encoding="utf-8",
+        )
+        _shared_table_payload_path(
+            output_root=output_root,
+            abm=abm_input.abm,
+            plot_index=plot_input.plot_index,
+        ).write_text(
+            json.dumps(
+                {
+                    "reporter_pattern": plot_input.reporter_pattern,
+                    "summary_path": str(table_path),
+                    "series_path": str(
+                        _shared_table_series_path(
+                            output_root=output_root,
+                            abm=abm_input.abm,
+                            plot_index=plot_input.plot_index,
+                        )
+                    ),
+                },
+                indent=2,
+                sort_keys=True,
+            ),
             encoding="utf-8",
         )
         if detect_placeholder_signals(plot_input.plot_description):
@@ -601,7 +638,7 @@ def _materialize_shared_abm_bundle(
                 "copied_documentation_path": str(copied_documentation_path),
                 "plot_count": len(abm_input.plots),
                 "source_viz_artifact_source": abm_input.source_viz_artifact_source,
-                "table_evidence_format": "full raw simulation CSV subset for each plot reporter pattern",
+                "table_evidence_format": "statistical evidence derived from the plot-relevant simulation series only",
             },
             indent=2,
             sort_keys=True,
@@ -648,7 +685,7 @@ def _validate_plot_request(
         if table_csv_path is None or not table_csv_path.exists():
             return "failed", "missing_or_empty_artifact", "table evidence missing"
         table_text = table_csv_path.read_text(encoding="utf-8", errors="replace")
-        if "unmatched metric pattern" in table_text:
+        if "No simulation series matched the requested metric pattern." in table_text:
             return "failed", "unmatched_metric_pattern", "metric pattern did not match any simulation CSV columns"
         if not table_text.strip():
             return "failed", "missing_or_empty_artifact", f"table evidence empty: {table_csv_path}"

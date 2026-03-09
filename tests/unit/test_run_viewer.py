@@ -103,8 +103,8 @@ def test_render_run_viewer_writes_full_case_trend_sections(tmp_path: Path) -> No
     (case_root / '03_trends' / 'plot_01' / 'trend_prompt.txt').write_text('trend prompt', encoding='utf-8')
     (case_root / '03_trends' / 'plot_01' / 'trend_output.txt').write_text('trend out', encoding='utf-8')
     (case_root / '03_trends' / 'plot_01' / 'trend_trace.json').write_text('{}', encoding='utf-8')
-    (case_root / '03_trends' / 'plot_01' / 'trend_evidence_table.csv').write_text(
-        'tick,metric\n0,1\n',
+    (case_root / '03_trends' / 'plot_01' / 'trend_evidence_table.txt').write_text(
+        'Statistical evidence for simulation series matching `metric`.\n',
         encoding='utf-8',
     )
 
@@ -114,4 +114,4 @@ def test_render_run_viewer_writes_full_case_trend_sections(tmp_path: Path) -> No
     assert 'trend prompt' in html
     assert 'trend out' in html
     assert 'plot_01' in html
-    assert 'tick,metric' in html
+    assert 'Statistical evidence for simulation series matching `metric`.' in html

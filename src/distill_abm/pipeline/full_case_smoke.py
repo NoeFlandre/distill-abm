@@ -16,7 +16,6 @@ from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline.doe_smoke_prompts import (
     build_legacy_doe_context_prompt,
     build_legacy_doe_trend_prompt,
-    build_raw_table_csv,
 )
 from distill_abm.pipeline.helpers import encode_image
 from distill_abm.pipeline.local_qwen_sample_response import (
@@ -31,6 +30,7 @@ from distill_abm.pipeline.local_qwen_sample_smoke import (
     _write_text,
 )
 from distill_abm.pipeline.run_artifact_contracts import case_summary_path, validation_state_path
+from distill_abm.pipeline.statistical_evidence import build_statistical_evidence, render_evidence_artifacts
 
 EvidenceMode = Literal["plot", "table", "plot+table"]
 
@@ -428,12 +428,21 @@ def _build_trend_table_csv(
     evidence_mode: EvidenceMode,
     plot_input: FullCasePlotInput,
     trend_dir: Path,
+    compression_tier: int = 0,
 ) -> str:
     if evidence_mode not in {"table", "plot+table"}:
         return ""
-    table_csv = build_raw_table_csv(frame=frame, reporter_pattern=plot_input.reporter_pattern)
-    _write_text(trend_dir / "trend_evidence_table.csv", table_csv)
-    return table_csv
+    evidence = build_statistical_evidence(
+        frame=frame,
+        reporter_pattern=plot_input.reporter_pattern,
+        compression_tier=compression_tier,
+    )
+    summary_path, _payload_path, _series_path = render_evidence_artifacts(
+        evidence=evidence,
+        output_dir=trend_dir,
+        stem="trend_evidence_table",
+    )
+    return summary_path.read_text(encoding="utf-8")
 
 
 def _validate_full_case_inputs(case_input: FullCaseSmokeInput) -> None:
@@ -549,7 +558,7 @@ def _record_trend_review_row(
     error: str,
     validation_status: str,
 ) -> None:
-    table_path = trend_dir / "trend_evidence_table.csv"
+    table_path = trend_dir / "trend_evidence_table.txt"
     trend_output_path = trend_dir / "trend_output.txt"
     review_rows.append(
         {

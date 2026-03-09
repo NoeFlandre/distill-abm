@@ -104,7 +104,7 @@ def test_run_doe_smoke_suite_writes_grouped_shared_and_case_artifacts(tmp_path: 
     assert result.abm_shared["milk_consumption"].shared_dir == tmp_path / "doe-smoke" / "10_shared" / "milk_consumption"
     assert (result.abm_shared["milk_consumption"].shared_dir / "01_inputs" / "simulation.csv").exists()
     assert (result.abm_shared["milk_consumption"].shared_dir / "02_evidence" / "plots" / "plot_1.png").exists()
-    assert (result.abm_shared["milk_consumption"].shared_dir / "02_evidence" / "tables" / "plot_1.csv").exists()
+    assert (result.abm_shared["milk_consumption"].shared_dir / "02_evidence" / "tables" / "plot_1.txt").exists()
     assert (result.abm_shared["milk_consumption"].shared_dir / "03_prompts" / "context" / "none.txt").exists()
     case = result.cases[0]
     assert case.error_codes == []
@@ -122,7 +122,9 @@ def test_run_doe_smoke_suite_writes_grouped_shared_and_case_artifacts(tmp_path: 
     assert "Your goal is to explain an agent-based model." in first_review
 
 
-def test_run_doe_smoke_suite_uses_legacy_style_prompt_composition_and_raw_table_evidence(tmp_path: Path) -> None:
+def test_run_doe_smoke_suite_uses_legacy_style_prompt_composition_and_statistical_table_evidence(
+    tmp_path: Path,
+) -> None:
     prompts = PromptsConfig(
         context_prompt="Context prompt\n{parameters}\n{documentation}",
         trend_prompt="Trend prompt\nMetric description: {description}\nContext: {context}",
@@ -173,14 +175,18 @@ def test_run_doe_smoke_suite_uses_legacy_style_prompt_composition_and_raw_table_
         in trend_prompt
     )
     assert "The data table represents the average weekly consumption of whole milk per agent." in trend_prompt
-    assert "Relevant simulation columns (CSV):" in trend_prompt
-    assert "metric-a" in trend_prompt
-    assert "[step]" in trend_prompt
+    assert "Statistical summary of the relevant simulation output:" in trend_prompt
+    assert "Series: metric-a" in trend_prompt
+    assert "rolling Mann-Kendall:" in trend_prompt
 
-    raw_table = (
-        result.abm_shared["milk_consumption"].shared_dir / "02_evidence" / "tables" / "plot_1.csv"
+    table_summary = (
+        result.abm_shared["milk_consumption"].shared_dir / "02_evidence" / "tables" / "plot_1.txt"
     ).read_text(encoding="utf-8")
-    assert raw_table == "[step],metric-a\n0,10.0\n1,12.0\n2,11.5\n"
+    assert "Statistical evidence for simulation series matching `metric-a`." in table_summary
+    series_csv = (
+        result.abm_shared["milk_consumption"].shared_dir / "02_evidence" / "tables" / "plot_1_series.csv"
+    ).read_text(encoding="utf-8")
+    assert series_csv == "[step],metric-a\n0,10.0\n1,12.0\n2,11.5\n"
 
 
 def test_run_doe_smoke_suite_adapts_plot_and_table_prompt_wording_to_combined_evidence(tmp_path: Path) -> None:
@@ -300,7 +306,7 @@ def test_run_doe_smoke_suite_records_unmatched_plot_reporter_without_crashing(tm
     )
     assert failed_request["status"] == "failed"
     assert failed_request["error_code"] == "unmatched_metric_pattern"
-    assert failed_request["table_csv_path"].endswith("plot_2.csv")
+    assert failed_request["table_csv_path"].endswith("plot_2.txt")
     assert result.cases[0].error_codes == ["unmatched_metric_pattern"]
 
 

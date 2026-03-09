@@ -20,6 +20,7 @@
   - `smoke-doe` resolves the full benchmark DOE matrix over ABMs, candidate models, evidence modes, summarization settings, prompt variants, and repetitions.
   - It groups global DOE factors under `results/doe_smoke_latest/10_shared/global/`, shared ABM artifacts under `results/doe_smoke_latest/10_shared/<abm>/`, and compact case/request indexes under `results/doe_smoke_latest/20_case_index/`.
   - It writes the exact context prompt, the exact trend prompt for each plot, per-request hyperparameters, image/table evidence paths, and unresolved context placeholders that define the pre-LLM boundary.
+  - `table` evidence is a statistical dump derived only from the plot-relevant simulation series, not a raw CSV slice.
   - It is strictly pre-LLM: model availability is not preflighted and cannot cause DOE smoke failure.
   - The command is intended to debug wrong input artifacts, wrong prompts, wrong model settings, and placeholder leakage before any model call is made.
 - Exposes `smoke-local-qwen` for a minimal real-inference verification pass against the local Ollama Qwen model.
@@ -64,7 +65,7 @@
 
 ### `src/distill_abm/pipeline/run.py`
 - End-to-end run orchestration.
-- Prompt composition and evidence handling (`plot`, `table`, `plot+table`).
+- Prompt composition and evidence handling (`plot`, `table`, `plot+table`), where `table` means statistical evidence derived from matched plot series only.
 - Text-source selection (`summary_only`, `full_text_only`).
 - Reproducibility metadata and resumable run signatures.
  - Run metadata now includes an `llm.observability` summary with per-request usage, total token counts, and explicit cost-status fields for debugging and future pricing support.

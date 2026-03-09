@@ -237,7 +237,7 @@ def test_run_local_qwen_sample_smoke_writes_review_friendly_case_artifacts(tmp_p
     assert (case_dir / "03_outputs" / "trend_output.txt").read_text(encoding="utf-8") == "response-2"
     assert (case_dir / "03_outputs" / "trend_thinking.txt").read_text(encoding="utf-8") == "thinking-2"
     assert (case_dir / "01_inputs" / "trend_evidence_plot.png").exists()
-    assert not (case_dir / "01_inputs" / "trend_evidence_table.csv").exists()
+    assert not (case_dir / "01_inputs" / "trend_evidence_table.txt").exists()
     assert (case_dir / "02_requests" / "hyperparameters.json").exists()
     assert (case_dir / "02_requests" / "context_request.json").exists()
     assert (case_dir / "02_requests" / "trend_request.json").exists()
@@ -376,7 +376,7 @@ def test_run_local_qwen_sample_smoke_can_stop_after_first_failure(tmp_path: Path
     assert len(adapter.requests) == 1
 
 
-def test_run_local_qwen_sample_smoke_downsamples_table_when_prompt_too_large(tmp_path: Path) -> None:
+def test_run_local_qwen_sample_smoke_compresses_statistical_table_when_prompt_too_large(tmp_path: Path) -> None:
     adapter = ContextOverflowThenSuccessAdapter()
     result = run_local_qwen_sample_smoke(
         case_inputs={"milk_consumption": _write_case_input(tmp_path)},
@@ -397,8 +397,8 @@ def test_run_local_qwen_sample_smoke_downsamples_table_when_prompt_too_large(tmp
     assert result.success is True
     assert len(adapter.requests) == 3
     assert adapter.requests[2].metadata["table_downsample_stride"] == 2
-    table_csv = (result.cases[0].case_dir / "01_inputs" / "trend_evidence_table.csv").read_text(encoding="utf-8")
-    assert "1;11.0" not in table_csv
+    table_text = (result.cases[0].case_dir / "01_inputs" / "trend_evidence_table.txt").read_text(encoding="utf-8")
+    assert "Statistical evidence for simulation series matching `metric-a`." in table_text
 
 
 def test_run_local_qwen_sample_smoke_flags_generic_unavailable_output_as_failure(tmp_path: Path) -> None:

@@ -143,6 +143,8 @@ Capture solutions so the team compounds knowledge:
 - **Keep primary scoring stable and add secondary references additively.** The primary author ground truth remains the main score contract. Optional modeler references belong in `experiment_settings.modeler_ground_truth` and should add parallel score blocks/columns/metadata, not replace the primary scores.
 - **Be careful with integration tests that touch scoring.** If the goal is reference scoring or metadata/report wiring, prefer `full_text_only` unless the test is explicitly about summarizers. This avoids accidentally invoking heavy summarizer/model dependencies and keeps the test focused.
 - **Actively clean stale processes.** Long-running smokes, monitors, and stuck test processes can make the machine lag badly. Periodically check for stale `uv`, `pytest`, monitor, and smoke processes and stop the ones that are no longer useful. Do not leave background process cleanup as an afterthought.
+- **Change evidence semantics at the shared helper layer.** If reviewer or product guidance changes what an evidence mode means, implement it once in the core pipeline/evidence helpers so DOE, smoke workflows, and real runs stay aligned.
+- **`table` means plot-relevant statistical evidence.** The non-plot evidence mode should be computed only from the simulation columns relevant to the target trend description, plus an optional step/time column. Do not dump unrelated simulation columns into prompts.
 
 ---
 

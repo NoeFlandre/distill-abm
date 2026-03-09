@@ -6,7 +6,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from distill_abm.ingest.csv_ingest import matching_columns
+from distill_abm.pipeline.statistical_evidence import (
+    build_statistical_evidence,
+    select_plot_relevant_frame,
+)
 
 CONTEXT_PLACEHOLDER = "<<context_response_from_context_llm>>"
 LEGACY_EXAMPLE_TEXT = (
@@ -105,25 +108,20 @@ def build_legacy_doe_trend_prompt(
             )
         )
     if evidence_mode in {"table", "plot+table"}:
-        parts.append(f"Relevant simulation columns (CSV):\n{table_csv}")
+        parts.append(f"Statistical summary of the relevant simulation output:\n{table_csv}")
     return "\n\n".join(parts)
 
 
 def build_raw_table_csv(*, frame: pd.DataFrame, reporter_pattern: str) -> str:
-    columns = [str(column) for column in frame.columns]
-    matched = matching_columns(columns, include_pattern=reporter_pattern)
-    if not matched:
-        return "unmatched metric pattern\n"
-    leading_column = preferred_time_column(columns)
-    selected = [leading_column, *matched] if leading_column is not None else matched
-    return frame[selected].to_csv(index=False)
+    """Backward-compatible entrypoint that now returns statistical evidence text."""
+    return build_statistical_evidence(frame=frame, reporter_pattern=reporter_pattern).summary_text
 
 
-def preferred_time_column(columns: list[str]) -> str | None:
-    for candidate in ("[step]", "time_step", "step"):
-        if candidate in columns:
-            return candidate
-    return None
+def build_selected_series_csv(*, frame: pd.DataFrame, reporter_pattern: str) -> str:
+    selected, _time_column = select_plot_relevant_frame(frame=frame, reporter_pattern=reporter_pattern)
+    if selected.empty:
+        return ""
+    return selected.to_csv(index=False)
 
 
 def legacy_trend_prompt_for_evidence_mode(evidence_mode: str) -> str:

@@ -36,6 +36,7 @@ First-class summarizers:
 
 ## Core Ablation Axes
 1. Evidence mode: `plot`, `table`, `plot+table`
+   - `table` means a statistical evidence dump computed from the plot-relevant simulation series only, not a raw CSV dump
 2. Text source mode: `summary_only`, `full_text_only`
 
 ## Repository Layout
@@ -178,6 +179,7 @@ DOE smoke notes:
 - It treats candidate models as design factors only, so local model availability does not affect DOE smoke success or failure.
 - It groups shared DOE factors under `results/doe_smoke_latest/10_shared/global/`, shared ABM artifacts under `results/doe_smoke_latest/10_shared/<abm>/`, and compact case/request indexes under `results/doe_smoke_latest/20_case_index/`.
 - It writes the exact context prompt, the exact trend prompt for each plot, the per-request model and hyperparameter settings, the exact image/table evidence paths, and the unresolved context placeholder that would still exist before the first LLM call.
+- Table evidence is generated from the matched plot series only and includes descriptive statistics, extrema, inflection points, rolling Mann-Kendall, change points, and oscillation summaries.
 - It uses the latest ingest and visualization smoke outputs as the default pre-LLM inputs, so the report makes it easy to catch wrong documentation, wrong parameter narrative, wrong simulation CSV, wrong evidence image, wrong prompt composition, wrong model choice, or placeholder leakage before any model execution.
 - It writes `design_matrix.csv`, `request_matrix.csv`, `cases.jsonl`, `requests.jsonl`, and a grouped markdown/json report under `results/doe_smoke_latest/`.
 
