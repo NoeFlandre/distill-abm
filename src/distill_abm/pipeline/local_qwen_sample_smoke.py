@@ -18,7 +18,6 @@ from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError
 from distill_abm.pipeline.doe_smoke_prompts import (
     build_legacy_doe_context_prompt,
     build_legacy_doe_trend_prompt,
-    build_raw_table_csv,
 )
 from distill_abm.pipeline.helpers import encode_image, invoke_adapter_with_trace
 from distill_abm.pipeline.local_qwen_sample_artifacts import (
@@ -46,6 +45,7 @@ from distill_abm.pipeline.run_artifact_contracts import (
 from distill_abm.pipeline.run_artifact_contracts import (
     viewer_html_path as viewer_html_contract_path,
 )
+from distill_abm.pipeline.statistical_evidence import build_statistical_evidence, render_evidence_artifacts
 from distill_abm.run_viewer import render_run_viewer
 from distill_abm.structured_logging import attach_json_log_file
 from distill_abm.utils import detect_placeholder_signals
@@ -351,8 +351,8 @@ def run_local_qwen_sample_smoke(
                     "trend_prompt_text": (inputs_dir / "trend_prompt.txt").read_text(encoding="utf-8"),
                     "image_path": str(image_path or ""),
                     "table_csv_path": str(
-                        (inputs_dir / "trend_evidence_table.csv")
-                        if (inputs_dir / "trend_evidence_table.csv").exists()
+                        (inputs_dir / "trend_evidence_table.txt")
+                        if (inputs_dir / "trend_evidence_table.txt").exists()
                         else ""
                     ),
                     "parameters_path": str(inputs_dir / "parameters.txt"),
@@ -455,16 +455,17 @@ def _build_case_table_for_stride(
     if case.evidence_mode not in {"table", "plot+table"}:
         return ""
     frame = pd.read_csv(input_bundle.csv_path, sep=";")
-    if stride > 1:
-        step_column = next((str(column) for column in frame.columns if str(column).strip() == "[step]"), None)
-        if step_column is not None:
-            frame = frame[frame[step_column] % stride == 0]
-        else:
-            frame = frame.iloc[::stride]
-    table_csv = build_raw_table_csv(frame=frame, reporter_pattern=input_bundle.reporter_pattern)
-    table_path = inputs_dir / "trend_evidence_table.csv"
-    _write_text(table_path, table_csv)
-    return table_csv
+    evidence = build_statistical_evidence(
+        frame=frame,
+        reporter_pattern=input_bundle.reporter_pattern,
+        compression_tier=max(stride - 1, 0),
+    )
+    summary_path, _payload_path, _series_path = render_evidence_artifacts(
+        evidence=evidence,
+        output_dir=inputs_dir,
+        stem="trend_evidence_table",
+    )
+    return summary_path.read_text(encoding="utf-8")
 
 
 

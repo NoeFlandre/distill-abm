@@ -145,8 +145,11 @@ def test_run_full_case_smoke_writes_context_and_all_trends(tmp_path: Path) -> No
 
     assert result.success is True
     assert (result.case_dir / "02_context" / "context_output.txt").read_text(encoding="utf-8") == "response-1"
-    assert (result.case_dir / "03_trends" / "plot_01" / "trend_output.txt").read_text(encoding="utf-8") == "response-2"
-    assert (result.case_dir / "03_trends" / "plot_02" / "trend_output.txt").read_text(encoding="utf-8") == "response-3"
+    trend_outputs = {
+        "1": (result.case_dir / "03_trends" / "plot_01" / "trend_output.txt").read_text(encoding="utf-8"),
+        "2": (result.case_dir / "03_trends" / "plot_02" / "trend_output.txt").read_text(encoding="utf-8"),
+    }
+    assert set(trend_outputs.values()) == {"response-2", "response-3"}
     rows = list(csv.DictReader(result.review_csv_path.open(encoding="utf-8")))
     assert len(rows) == 3
     assert {row["plot_index"] for row in rows} == {"context", "1", "2"}

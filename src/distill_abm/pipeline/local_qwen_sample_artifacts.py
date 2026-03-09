@@ -70,7 +70,7 @@ def build_review_row_from_existing(case_dir: Path) -> dict[str, str]:
     summary_path = case_dir / CASE_SUMMARY_FILENAME
     summary_payload = json.loads(summary_path.read_text(encoding="utf-8"))
     image_path = inputs_dir / "trend_evidence_plot.png"
-    table_path = inputs_dir / "trend_evidence_table.csv"
+    table_path = inputs_dir / "trend_evidence_table.txt"
     return {
         "case_id": str(summary_payload["case_id"]),
         "abm": str(summary_payload["abm"]),

@@ -66,7 +66,15 @@ def shared_plot_copy_path(*, output_root: Path, abm: str, plot_index: int) -> Pa
 
 
 def shared_table_path(*, output_root: Path, abm: str, plot_index: int) -> Path:
-    return shared_tables_dir(output_root=output_root, abm=abm) / f"plot_{plot_index}.csv"
+    return shared_tables_dir(output_root=output_root, abm=abm) / f"plot_{plot_index}.txt"
+
+
+def shared_table_series_path(*, output_root: Path, abm: str, plot_index: int) -> Path:
+    return shared_tables_dir(output_root=output_root, abm=abm) / f"plot_{plot_index}_series.csv"
+
+
+def shared_table_payload_path(*, output_root: Path, abm: str, plot_index: int) -> Path:
+    return shared_tables_dir(output_root=output_root, abm=abm) / f"plot_{plot_index}.json"
 
 
 def layout_guide_path(output_root: Path) -> Path:

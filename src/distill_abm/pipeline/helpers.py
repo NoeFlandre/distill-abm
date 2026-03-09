@@ -18,6 +18,7 @@ from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMProviderError, LLMRequest
 from distill_abm.llm.resilience import ensure_circuit_closed, record_failure, record_success
+from distill_abm.pipeline.statistical_evidence import build_statistical_evidence
 from distill_abm.structured_logging import get_logger, log_event
 from distill_abm.summarize.models import (
     summarize_with_bart,
@@ -93,7 +94,7 @@ def build_trend_prompt(
 
     resolved_mode = resolve_evidence_mode(evidence_mode)
     if resolved_mode in {"table", "plot+table"}:
-        parts.append(f"Stats table (CSV):\n{stats_table_csv}")
+        parts.append(f"Statistical summary of the relevant simulation output:\n{stats_table_csv}")
 
     return "\n\n".join(parts)
 
@@ -372,6 +373,15 @@ def build_stats_csv(stats_table: pd.DataFrame) -> str:
     columns = ["time_step", "mean", "std", "min", "max", "median"]
     table = stats_table[columns]
     return table.to_csv(index=False, lineterminator="\n")
+
+
+def build_statistical_table_evidence(*, frame: pd.DataFrame, reporter_pattern: str, compression_tier: int = 0) -> str:
+    """Render statistical evidence text from the plot-relevant simulation slice only."""
+    return build_statistical_evidence(
+        frame=frame,
+        reporter_pattern=reporter_pattern,
+        compression_tier=compression_tier,
+    ).summary_text
 
 
 def write_stats_image_if_needed(

@@ -675,18 +675,12 @@ def _build_trend_table_csv_for_stride(
 ) -> str:
     if evidence_mode not in {"table", "plot+table"}:
         return ""
-    stride_frame = frame
-    if stride > 1:
-        step_column = next((str(column) for column in frame.columns if str(column).strip() == "[step]"), None)
-        if step_column is not None:
-            stride_frame = frame[frame[step_column] % stride == 0]
-        else:
-            stride_frame = frame.iloc[::stride]
     return _build_trend_table_csv(
-        frame=stride_frame,
+        frame=frame,
         evidence_mode=evidence_mode,
         plot_input=plot_input,
         trend_dir=trend_dir,
+        compression_tier=max(stride - 1, 0),
     )
 
 
