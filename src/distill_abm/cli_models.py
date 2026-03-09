@@ -121,11 +121,7 @@ class HealthCheckResult(BaseModel):
 
 def build_artifact_descriptors(paths: Mapping[str, Path | None]) -> dict[str, ArtifactDescriptor]:
     """Describe a set of artifact paths with stable metadata."""
-    return {
-        key: describe_artifact(path)
-        for key, path in paths.items()
-        if path is not None
-    }
+    return {key: describe_artifact(path) for key, path in paths.items() if path is not None}
 
 
 def describe_artifact(path: Path) -> ArtifactDescriptor:

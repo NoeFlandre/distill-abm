@@ -469,7 +469,6 @@ def _build_case_table_for_stride(
     return summary_path.read_text(encoding="utf-8")
 
 
-
 def _invoke_structured_smoke_text(
     *,
     adapter: LLMAdapter,

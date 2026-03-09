@@ -274,7 +274,7 @@ def test_build_case_response_rows_serializes_complete_metadata_path(tmp_path: Pa
 
     assert len(rows) == 2
     assert rows[0]["text_source_mode"] == "summary_only"
-    assert rows[0]["summarizers"] == '[\"t5\"]'
+    assert rows[0]["summarizers"] == '["t5"]'
 
 
 def test_build_case_response_rows_returns_fallback_row_for_invalid_metadata(tmp_path: Path) -> None:

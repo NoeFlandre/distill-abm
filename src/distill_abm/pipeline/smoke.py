@@ -166,8 +166,11 @@ _write_prompt_artifacts = smoke_helpers._write_prompt_artifacts
 _run_case_qualitative = smoke_helpers._run_case_qualitative
 _run_doe_if_requested = smoke_helpers._run_doe_if_requested
 _run_sweep_if_requested = smoke_helpers._run_sweep_if_requested
+
+
 def _ensure_case_response_bundles(case_result: SmokeCaseResult, inputs: SmokeSuiteInputs) -> None:
     return smoke_helpers._ensure_case_response_bundles(case_result=case_result, smoke_inputs=inputs)
+
 
 _build_case_response_rows = smoke_helpers._build_case_response_rows
 _extract_metadata_blocks = smoke_helpers._extract_metadata_blocks

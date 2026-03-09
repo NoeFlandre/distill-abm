@@ -32,7 +32,8 @@ def test_encode_image_returns_base64_string(tmp_path: Path) -> None:
     # Smallest valid PNG-like byte sequence for testing
     data = b"\x89PNG\r\n\x1a\n"
     image_file.write_bytes(data)
-    
+
     encoded = helpers.encode_image(image_file)
     import base64
+
     assert encoded == base64.b64encode(data).decode("utf-8")

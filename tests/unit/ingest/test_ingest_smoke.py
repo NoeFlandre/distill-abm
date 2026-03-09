@@ -69,9 +69,7 @@ def test_run_ingest_smoke_suite_writes_stage_level_report(tmp_path: Path) -> Non
     payload = json.loads(result.report_json_path.read_text(encoding="utf-8"))
     fauna = next(item for item in payload["abms"] if item["abm"] == "fauna")
     documentation_stage = next(
-        stage
-        for stage in fauna["stage_results"]
-        if stage["stage"]["stage_id"] == "documentation"
+        stage for stage in fauna["stage_results"] if stage["stage"]["stage_id"] == "documentation"
     )
     assert documentation_stage["status"] == "ok"
     assert documentation_stage["artifact"]["exists"] is True

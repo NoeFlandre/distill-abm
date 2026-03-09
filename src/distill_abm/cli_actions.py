@@ -552,9 +552,7 @@ def execute_smoke_local_qwen_command(
     requested = sorted(set(abms)) if abms else list(discover_abms())
     provider, model = resolve_model_from_registry(models_path, model_id)
     if provider not in {"openrouter", "mistral"}:
-        raise typer.BadParameter(
-            f"model id '{model_id}' must resolve to an API-backed model for smoke-local-qwen."
-        )
+        raise typer.BadParameter(f"model id '{model_id}' must resolve to an API-backed model for smoke-local-qwen.")
     if max_tokens <= 0:
         raise typer.BadParameter("--max-tokens must be positive")
 
@@ -1226,9 +1224,7 @@ def execute_describe_run_command(*, output_dir: Path, json_output: bool) -> None
     frame_summary = as_dict(debug_trace.get("frame_summary"))
     matched_metric_columns_raw = frame_summary.get("matched_metric_columns", [])
     available_artifacts = {
-        key: Path(value)
-        for key, value in artifacts_payload.items()
-        if isinstance(value, str) and value
+        key: Path(value) for key, value in artifacts_payload.items() if isinstance(value, str) and value
     }
     result = DescribeRunResult(
         output_dir=output_dir,

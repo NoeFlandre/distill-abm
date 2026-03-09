@@ -192,12 +192,7 @@ def test_run_ingest_workflow_end_to_end(tmp_path: Path) -> None:
 def test_run_ingest_workflow_uses_reference_narrative_when_available(tmp_path: Path) -> None:
     model_path = tmp_path / "model.nlogo"
     model_path.write_text(
-        "globals [a b]\n"
-        "to go\n"
-        "end\n"
-        "@#$#@#$#@\n"
-        "## WHAT IS IT?\n\nDoc text\n"
-        "@#$#@#$#@\n",
+        "globals [a b]\n" "to go\n" "end\n" "@#$#@#$#@\n" "## WHAT IS IT?\n\nDoc text\n" "@#$#@#$#@\n",
         encoding="utf-8",
     )
     reference = tmp_path / "reference_narrative.txt"
@@ -216,26 +211,27 @@ def test_run_ingest_workflow_uses_reference_narrative_when_available(tmp_path: P
 def test_default_link_factory_raises_when_pynetlogo_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that _default_link_factory raises RuntimeError when pynetlogo cannot be imported."""
     import sys
-    
+
     # Temporarily hide pynetlogo by removing it from sys.modules if present
     original_modules = dict(sys.modules)
-    if 'pynetlogo' in sys.modules:
-        del sys.modules['pynetlogo']
-    
+    if "pynetlogo" in sys.modules:
+        del sys.modules["pynetlogo"]
+
     # Mock the import to fail
     def mock_import(name: str, *args: object, **kwargs: object) -> object:
-        if name == 'pynetlogo' or name.startswith('pynetlogo'):
+        if name == "pynetlogo" or name.startswith("pynetlogo"):
             raise ImportError("simulated pynetlogo not available")
         return original_modules.get(name)
-    
+
     monkeypatch.setattr("builtins.__import__", mock_import)
-    
+
     from distill_abm.ingest.netlogo_workflow import _default_link_factory
-    
+
     with pytest.raises(RuntimeError) as exc_info:
         _default_link_factory(netlogo_home="/fake/path")
-    
+
     assert "pynetlogo" in str(exc_info.value).lower()
+
 
 def test_resolve_jvm_path_prefers_modern_macos_jvm_when_available(
     monkeypatch: pytest.MonkeyPatch,
@@ -246,10 +242,7 @@ def test_resolve_jvm_path_prefers_modern_macos_jvm_when_available(
         lambda: "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server/libjvm.dylib",
     )
 
-    assert (
-        _resolve_jvm_path()
-        == "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server/libjvm.dylib"
-    )
+    assert _resolve_jvm_path() == "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/lib/server/libjvm.dylib"
 
 
 def test_resolve_jvm_path_returns_none_outside_macos(monkeypatch: pytest.MonkeyPatch) -> None:

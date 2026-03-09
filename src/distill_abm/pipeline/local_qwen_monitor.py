@@ -244,11 +244,14 @@ def stream_local_qwen_monitor(
                 if key is not None:
                     view_state = apply_monitor_keypress(view_state, key, total_cases=len(snapshot.cases))
                 now = time.monotonic()
-                if next_snapshot_due(
-                    last_snapshot_at=last_snapshot_at,
-                    now=now,
-                    interval_seconds=interval_seconds,
-                ) == 0.0:
+                if (
+                    next_snapshot_due(
+                        last_snapshot_at=last_snapshot_at,
+                        now=now,
+                        interval_seconds=interval_seconds,
+                    )
+                    == 0.0
+                ):
                     snapshot = collect_local_qwen_monitor_snapshot(output_root)
                     last_snapshot_at = now
                     refresh_count += 1
@@ -421,9 +424,8 @@ def _collect_full_case_snapshot(case_dir: Path) -> LocalQwenCaseSnapshot:
     context_accepted = _validation_context_status(validation_state) == "accepted"
     if context_error or failed_trends:
         status = "failed"
-    elif (
-        (context_accepted and accepted_trends == len(trend_dirs) and trend_dirs)
-        or (context_trace is not None and len(completed_trends) == len(trend_dirs) and trend_dirs)
+    elif (context_accepted and accepted_trends == len(trend_dirs) and trend_dirs) or (
+        context_trace is not None and len(completed_trends) == len(trend_dirs) and trend_dirs
     ):
         status = "completed"
     elif context_request is not None or any_started_trend:
@@ -475,10 +477,14 @@ def _collect_tuning_snapshot(output_root: Path, trials_root: Path) -> LocalQwenM
 
 def _collect_trial_snapshot(trial_dir: Path) -> LocalQwenCaseSnapshot:
     cases_root = trial_dir / "cases"
-    case_snapshots = [
-        _collect_case_snapshot(case_dir)
-        for case_dir in sorted(path for path in cases_root.iterdir() if path.is_dir())
-    ] if cases_root.exists() else []
+    case_snapshots = (
+        [
+            _collect_case_snapshot(case_dir)
+            for case_dir in sorted(path for path in cases_root.iterdir() if path.is_dir())
+        ]
+        if cases_root.exists()
+        else []
+    )
 
     if any(case.status == "failed" for case in case_snapshots):
         status = "failed"
@@ -589,11 +595,7 @@ def _accepted_trend_count_from_validation_state(validation_state: dict[str, Any]
     trends = validation_state.get("trends")
     if not isinstance(trends, dict):
         return 0
-    return sum(
-        1
-        for payload in trends.values()
-        if isinstance(payload, dict) and payload.get("status") == "accepted"
-    )
+    return sum(1 for payload in trends.values() if isinstance(payload, dict) and payload.get("status") == "accepted")
 
 
 def _failed_trends_from_validation_state(validation_state: dict[str, Any] | None, trend_dirs: list[Path]) -> list[str]:

@@ -920,9 +920,7 @@ def test_validate_model_policy_blocks_unsupported_model() -> None:
 
 
 def test_validate_model_policy_allows_supported_benchmark_models(monkeypatch: pytest.MonkeyPatch) -> None:
-    cli_module._validate_model_policy(
-        provider="openrouter", model="moonshotai/kimi-k2.5", allow_debug_model=False
-    )
+    cli_module._validate_model_policy(provider="openrouter", model="moonshotai/kimi-k2.5", allow_debug_model=False)
     cli_module._validate_model_policy(
         provider="openrouter", model="google/gemini-3.1-pro-preview", allow_debug_model=False
     )

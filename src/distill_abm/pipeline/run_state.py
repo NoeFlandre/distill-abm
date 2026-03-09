@@ -518,9 +518,7 @@ def _build_metadata_payload(
         },
         "outputs": {
             "summary_csv_path": str(
-                (output_dir / "combinations_report.csv")
-                if (output_dir / "combinations_report.csv").exists()
-                else ""
+                (output_dir / "combinations_report.csv") if (output_dir / "combinations_report.csv").exists() else ""
             ),
             "stats_table_csv_written": stats_table_csv_path.exists(),
         },

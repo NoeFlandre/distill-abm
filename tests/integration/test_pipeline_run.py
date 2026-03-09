@@ -318,6 +318,7 @@ def test_run_pipeline_table_mode_uses_text_only_evidence(tmp_path: Path) -> None
     assert len(adapter.calls) == 2
     assert adapter.calls[1].image_b64 is None
 
+
 def test_run_pipeline_uses_scoring_reference_file_when_provided(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -726,9 +727,7 @@ def test_run_pipeline_resume_handles_malformed_metadata(tmp_path: Path) -> None:
     assert result.report_csv.exists()
 
 
-def test_run_pipeline_writes_detailed_debug_trace_artifacts(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_run_pipeline_writes_detailed_debug_trace_artifacts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
     parameters_path = tmp_path / "params.txt"

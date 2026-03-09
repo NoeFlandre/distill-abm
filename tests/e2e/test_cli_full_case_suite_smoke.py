@@ -16,12 +16,7 @@ def test_cli_smoke_full_case_suite_invokes_runner(tmp_path: Path, monkeypatch) -
     captured: dict[str, object] = {}
     models_path = tmp_path / "models.yaml"
     models_path.write_text(
-        (
-            "models:\n"
-            "  mistral_medium_debug:\n"
-            "    provider: mistral\n"
-            "    model: mistral-medium-latest\n"
-        ),
+        ("models:\n" "  mistral_medium_debug:\n" "    provider: mistral\n" "    model: mistral-medium-latest\n"),
         encoding="utf-8",
     )
 

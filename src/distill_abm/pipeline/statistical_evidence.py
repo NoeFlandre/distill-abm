@@ -427,10 +427,7 @@ def _detect_change_points(*, values: np.ndarray, index_values: np.ndarray, compr
         return []
     try:
         algo = rpt.Pelt(model="rbf").fit(reduced_values.reshape(-1, 1))
-        result = [
-            int(reduced_indices[min(point, len(reduced_indices) - 1)])
-            for point in algo.predict(pen=10)
-        ]
+        result = [int(reduced_indices[min(point, len(reduced_indices) - 1)]) for point in algo.predict(pen=10)]
     except Exception:
         return []
     limit = max(DEFAULT_MAX_CHANGEPOINTS - (compression_tier * 2), 3)

@@ -23,7 +23,7 @@ def test_load_simulation_csv_raises_on_error(tmp_path: Path) -> None:
     # but providing a non-existent path or a completely broken file is more reliable.
     with pytest.raises(IngestError) as exc_info:
         load_simulation_csv(tmp_path / "nonexistent.csv")
-    
+
     assert "failed to load csv" in str(exc_info.value).lower()
 
 

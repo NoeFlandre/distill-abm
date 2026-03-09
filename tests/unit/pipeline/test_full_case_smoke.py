@@ -58,7 +58,7 @@ class _FlakyTrendAdapter(LLMAdapter):
         if self._calls == 2:
             text = (
                 '{"response_text":"The analysis is currently unavailable. '
-                'The requested information cannot be retrieved or interpreted at this time. '
+                "The requested information cannot be retrieved or interpreted at this time. "
                 'Please try again later or consult additional resources for further details."}'
             )
         else:
@@ -434,8 +434,7 @@ def test_run_full_case_matrix_smoke_reuses_identical_context_across_cases(tmp_pa
     assert len(result.cases) == 2
     assert adapter._calls == 3
     context_outputs = [
-        (case.case_dir / "02_context" / "context_output.txt").read_text(encoding="utf-8")
-        for case in result.cases
+        (case.case_dir / "02_context" / "context_output.txt").read_text(encoding="utf-8") for case in result.cases
     ]
     assert context_outputs == ["response-1", "response-1"]
     assert result.cases[0].resumed_from_existing is False
@@ -488,9 +487,7 @@ def test_run_full_case_matrix_smoke_retries_failed_case_in_same_invocation(tmp_p
     assert result.success is True
     assert adapter._calls == 3
     assert result.failed_case_ids == []
-    trend_output = (result.cases[0].case_dir / "03_trends" / "plot_01" / "trend_output.txt").read_text(
-        encoding="utf-8"
-    )
+    trend_output = (result.cases[0].case_dir / "03_trends" / "plot_01" / "trend_output.txt").read_text(encoding="utf-8")
     assert trend_output == "response-3"
 
 
