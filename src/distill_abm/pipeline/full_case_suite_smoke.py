@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import shutil
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -16,6 +17,7 @@ from distill_abm.pipeline.full_case_matrix_smoke import (
     run_full_case_matrix_smoke,
 )
 from distill_abm.pipeline.full_case_smoke import FullCaseSmokeInput
+from distill_abm.pipeline.local_qwen_monitor import collect_local_qwen_monitor_snapshot
 from distill_abm.pipeline.local_qwen_sample_smoke import _write_json, _write_text
 from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, run_log_path
 from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
@@ -64,11 +66,15 @@ class FullCaseSuiteProgressAbm(BaseModel):
     status: str
     attempt: int | None = None
     planned_case_count: int
+    completed_case_count: int = 0
     failed_case_count: int = 0
     run_root: Path | None = None
     run_log_path: Path | None = None
     review_html_path: Path | None = None
     report_json_path: Path | None = None
+    running_case_id: str | None = None
+    running_case_status: str | None = None
+    running_case_detail: str | None = None
     last_error: str | None = None
 
 
@@ -88,7 +94,11 @@ class FullCaseSuiteProgress(BaseModel):
     completed_abm_count: int
     failed_abm_count: int
     planned_case_count: int
+    completed_case_count: int
     failed_case_count: int
+    current_case_id: str | None = None
+    current_case_status: str | None = None
+    current_case_detail: str | None = None
     remaining_abms: list[str] = Field(default_factory=list)
     abms: list[FullCaseSuiteProgressAbm] = Field(default_factory=list)
 
@@ -507,11 +517,16 @@ def _build_suite_progress(
     progress_by_name: dict[str, FullCaseSuiteProgressAbm],
     finished_at: datetime | None = None,
 ) -> FullCaseSuiteProgress:
-    abm_progress = [progress_by_name[abm] for abm in progress_by_name]
+    abm_progress = [
+        _refresh_progress_abm_snapshot(output_root=output_root, progress=progress_by_name[abm])
+        for abm in progress_by_name
+    ]
     completed_abm_count = sum(1 for item in abm_progress if item.status == "completed")
     failed_abm_count = sum(1 for item in abm_progress if item.status == "failed")
     planned_case_count = sum(item.planned_case_count for item in abm_progress)
+    completed_case_count = sum(item.completed_case_count for item in abm_progress)
     failed_case_count = sum(item.failed_case_count for item in abm_progress)
+    current_abm_progress = next((item for item in abm_progress if item.abm == current_abm), None)
     return FullCaseSuiteProgress(
         run_id=run_id,
         run_root=run_root,
@@ -526,10 +541,71 @@ def _build_suite_progress(
         completed_abm_count=completed_abm_count,
         failed_abm_count=failed_abm_count,
         planned_case_count=planned_case_count,
+        completed_case_count=completed_case_count,
         failed_case_count=failed_case_count,
+        current_case_id=current_abm_progress.running_case_id if current_abm_progress is not None else None,
+        current_case_status=current_abm_progress.running_case_status if current_abm_progress is not None else None,
+        current_case_detail=current_abm_progress.running_case_detail if current_abm_progress is not None else None,
         remaining_abms=list(remaining_abms),
         abms=abm_progress,
     )
+
+
+def _refresh_progress_abm_snapshot(
+    *,
+    output_root: Path,
+    progress: FullCaseSuiteProgressAbm,
+) -> FullCaseSuiteProgressAbm:
+    abm_output_root = output_root / "abms" / progress.abm
+    if not abm_output_root.exists():
+        return progress
+    try:
+        snapshot = collect_local_qwen_monitor_snapshot(abm_output_root)
+    except Exception:
+        return progress
+    if not snapshot.exists:
+        return progress
+    stable_paths = _sync_stable_abm_current_view(abm_output_root=abm_output_root, run_root=snapshot.output_root)
+    running_case = next((case for case in snapshot.cases if case.case_id == snapshot.running_case_id), None)
+    return progress.model_copy(
+        update={
+            "run_root": stable_paths["run_root"],
+            "run_log_path": stable_paths["run_log_path"],
+            "review_html_path": stable_paths["review_html_path"],
+            "report_json_path": stable_paths["report_json_path"],
+            "completed_case_count": snapshot.completed_cases,
+            "failed_case_count": snapshot.failed_cases,
+            "running_case_id": snapshot.running_case_id,
+            "running_case_status": running_case.status if running_case is not None else None,
+            "running_case_detail": running_case.progress_detail if running_case is not None else None,
+        }
+    )
+
+
+def _sync_stable_abm_current_view(*, abm_output_root: Path, run_root: Path) -> dict[str, Path]:
+    current_root = abm_output_root / "current"
+    current_root.mkdir(parents=True, exist_ok=True)
+    stable_paths = {
+        "run_root": run_root,
+        "run_log_path": current_root / "run.log.jsonl",
+        "review_html_path": current_root / "review.html",
+        "report_json_path": current_root / "smoke_full_case_matrix_report.json",
+        "report_markdown_path": current_root / "smoke_full_case_matrix_report.md",
+        "review_csv_path": current_root / "request_review.csv",
+    }
+    source_paths = {
+        "run_log_path": run_log_path(run_root),
+        "review_html_path": run_root / "review.html",
+        "report_json_path": run_root / "smoke_full_case_matrix_report.json",
+        "report_markdown_path": run_root / "smoke_full_case_matrix_report.md",
+        "review_csv_path": run_root / "request_review.csv",
+    }
+    for key, source_path in source_paths.items():
+        destination_path = stable_paths[key]
+        if source_path.exists():
+            shutil.copy2(source_path, destination_path)
+    _write_text(abm_output_root / "latest_run.txt", str(run_root))
+    return stable_paths
 
 
 def _write_suite_progress(*, output_root: Path, progress_path: Path, progress: FullCaseSuiteProgress) -> None:
@@ -590,8 +666,12 @@ def _render_live_html(progress: FullCaseSuiteProgress) -> str:
         ("Run", progress.run_id),
         ("Status", progress.status),
         ("Current ABM", progress.current_abm or "-"),
+        ("Current case", progress.current_case_id or "-"),
+        ("Case status", progress.current_case_status or "-"),
+        ("Current work", progress.current_case_detail or "-"),
         ("Attempt", "-" if progress.current_attempt is None else str(progress.current_attempt)),
         ("Completed ABMs", f"{progress.completed_abm_count}/{progress.total_abms}"),
+        ("Completed cases", f"{progress.completed_case_count}/{progress.planned_case_count}"),
         ("Failed cases", str(progress.failed_case_count)),
     ]
     summary_html = "".join(
@@ -617,8 +697,19 @@ def _render_live_html(progress: FullCaseSuiteProgress) -> str:
                     "</header>",
                     "<dl>",
                     f"<div><dt>Planned cases</dt><dd>{item.planned_case_count}</dd></div>",
+                    f"<div><dt>Completed cases</dt><dd>{item.completed_case_count}</dd></div>",
                     f"<div><dt>Failed cases</dt><dd>{item.failed_case_count}</dd></div>",
                     f"<div><dt>Attempt</dt><dd>{item.attempt if item.attempt is not None else '-'}</dd></div>",
+                    (
+                        '<div><dt>Current case</dt><dd class="dim">'
+                        f'{item.running_case_id if item.running_case_id is not None else "-"}'
+                        "</dd></div>"
+                    ),
+                    (
+                        '<div><dt>Current work</dt><dd class="dim">'
+                        f'{item.running_case_detail if item.running_case_detail is not None else "-"}'
+                        "</dd></div>"
+                    ),
                     (
                         '<div><dt>Run root</dt><dd class="dim">'
                         f'{item.run_root if item.run_root is not None else "-"}'

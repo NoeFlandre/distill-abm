@@ -34,6 +34,7 @@ Debug-only model note:
   - `suite_progress.json`
   - a top-level `review.html` that auto-refreshes from the persisted progress state while the run is live and works when opened directly from disk
   - one nested matrix run per ABM under `abms/<abm>/runs/`
+  - one stable `abms/<abm>/current/` view with the latest reviewer, report, CSV, and log for that ABM
 - Mistral suite execution is paced and worker-limited specifically for its API budget, so the scheduler stays below the provider request ceiling instead of overscheduling pointlessly.
 
 ## Summarizers

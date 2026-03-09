@@ -10,6 +10,7 @@ from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline.full_case_matrix_smoke import FullCaseMatrixCaseSpec
 from distill_abm.pipeline.full_case_smoke import FullCaseSmokeInput
 from distill_abm.pipeline.full_case_suite_smoke import run_full_case_suite_smoke
+from distill_abm.pipeline.local_qwen_monitor import LocalQwenCaseSnapshot, LocalQwenMonitorSnapshot
 
 
 class _Adapter(LLMAdapter):
@@ -41,6 +42,35 @@ def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkey
     monkeypatch.setattr(
         "distill_abm.pipeline.full_case_suite_smoke.run_full_case_matrix_smoke",
         fake_run_full_case_matrix_smoke,
+    )
+    monkeypatch.setattr(
+        "distill_abm.pipeline.full_case_suite_smoke.collect_local_qwen_monitor_snapshot",
+        lambda output_root: LocalQwenMonitorSnapshot(
+            output_root=output_root / "runs" / "run_1",
+            exists=True,
+            mode="smoke",
+            total_cases=1,
+            completed_cases=1,
+            failed_cases=0,
+            running_case_id="01_fauna_none_plot_rep1",
+            cases=(
+                LocalQwenCaseSnapshot(
+                    case_id="01_fauna_none_plot_rep1",
+                    status="running",
+                    label="01_fauna_none_plot_rep1",
+                    num_ctx=None,
+                    max_tokens=None,
+                    context_prompt_length=None,
+                    trend_prompt_length=None,
+                    context_total_tokens=None,
+                    trend_total_tokens=None,
+                    error=None,
+                    progress_detail="trend plot_07",
+                    completed_steps=5,
+                    total_steps=11,
+                ),
+            ),
+        ),
     )
 
     suite_input = {
@@ -105,6 +135,10 @@ def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkey
     root_review = (tmp_path / "suite" / "review.html").read_text(encoding="utf-8")
     assert 'http-equiv="refresh"' in root_review
     assert "fauna" in root_review
+    assert "Current case" in root_review
+    assert "Current work" in root_review
+    assert "trend plot_07" in root_review
+    assert "Completed cases" in root_review
     assert "Planned cases" in result.report_markdown_path.read_text(encoding="utf-8")
 
 
