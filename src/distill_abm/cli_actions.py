@@ -60,12 +60,11 @@ from distill_abm.pipeline.local_qwen_monitor import (
     render_local_qwen_monitor,
     stream_local_qwen_monitor,
 )
-from distill_abm.pipeline.local_qwen_tuning import LocalQwenTuningResult
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode
 from distill_abm.pipeline.smoke import SmokeSuiteInputs
 from distill_abm.run_viewer import render_run_viewer
 
-LOCAL_QWEN_TIMEOUT_SECONDS = 900.0
+DEFAULT_LLM_TIMEOUT_SECONDS = 900.0
 
 
 def execute_run_command(
@@ -118,11 +117,11 @@ def execute_run_command(
         scoring_reference_path = resolve_scoring_reference_path(abm)
         additional_scoring_reference_paths = resolve_additional_scoring_reference_paths(abm)
 
-    adapter: Any = _create_local_ollama_adapter(
+    adapter: Any = _create_runtime_adapter(
         create_adapter_fn=create_adapter_fn,
         provider=provider,
         model=model,
-        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+        timeout_seconds=DEFAULT_LLM_TIMEOUT_SECONDS,
     )
     result: Any = run_pipeline_fn(
         inputs=PipelineInputs(
@@ -307,11 +306,11 @@ def execute_evaluate_qualitative_command(
 ) -> None:
     validate_model_policy(provider=provider, model=model, allow_debug_model=allow_debug_model)
     prompts: Any = load_prompts_config_fn(prompts_path)
-    adapter: Any = _create_local_ollama_adapter(
+    adapter: Any = _create_runtime_adapter(
         create_adapter_fn=create_adapter_fn,
         provider=provider,
         model=model,
-        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+        timeout_seconds=DEFAULT_LLM_TIMEOUT_SECONDS,
     )
     result: Any = evaluate_qualitative_score_fn(
         summary=summary_text,
@@ -379,11 +378,11 @@ def execute_smoke_qwen_command(
         scoring_reference_path = resolve_scoring_reference_path(abm)
         additional_scoring_reference_paths = resolve_additional_scoring_reference_paths(abm)
     selected_cases: Any = select_smoke_cases(case_ids=case_id, max_cases=max_cases, profile=profile)
-    adapter: Any = _create_local_ollama_adapter(
+    adapter: Any = _create_runtime_adapter(
         create_adapter_fn=create_adapter_fn,
         provider=provider,
         model=model,
-        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+        timeout_seconds=DEFAULT_LLM_TIMEOUT_SECONDS,
     )
     result: Any = run_qwen_smoke_suite_fn(
         inputs=SmokeSuiteInputs(
@@ -539,39 +538,23 @@ def execute_smoke_local_qwen_command(
     model_id: str,
     output_root: Path,
     max_tokens: int,
-    num_ctx: int,
-    plot_num_ctx: int | None,
-    table_num_ctx: int | None,
-    plot_table_num_ctx: int | None,
     resume: bool,
     json_output: bool,
     discover_abms: Callable[[], tuple[str, ...]],
     resolve_model_from_registry: Callable[[Path, str], tuple[str, str]],
     resolve_model_path: Callable[..., Path],
-    assert_ollama_model_available: Callable[[str], None],
     create_adapter_fn: Callable[[str, str], Any],
     run_local_qwen_sample_smoke_fn: Callable[..., Any],
     load_abm_config_fn: Callable[[Path], Any],
 ) -> None:
     requested = sorted(set(abms)) if abms else list(discover_abms())
     provider, model = resolve_model_from_registry(models_path, model_id)
-    if provider not in {"ollama", "openrouter"}:
+    if provider not in {"openrouter", "mistral"}:
         raise typer.BadParameter(
-            f"model id '{model_id}' must resolve to an ollama or openrouter model for smoke-local-qwen."
+            f"model id '{model_id}' must resolve to an API-backed model for smoke-local-qwen."
         )
-    if provider == "ollama":
-        assert_ollama_model_available(model)
     if max_tokens <= 0:
         raise typer.BadParameter("--max-tokens must be positive")
-    if num_ctx <= 0:
-        raise typer.BadParameter("--num-ctx must be positive")
-    for label, value in (
-        ("--plot-num-ctx", plot_num_ctx),
-        ("--table-num-ctx", table_num_ctx),
-        ("--plot-table-num-ctx", plot_table_num_ctx),
-    ):
-        if value is not None and value <= 0:
-            raise typer.BadParameter(f"{label} must be positive")
 
     case_inputs = {}
     for abm in requested:
@@ -584,11 +567,11 @@ def execute_smoke_local_qwen_command(
             viz_root=viz_root,
         )
 
-    adapter: Any = _create_local_ollama_adapter(
+    adapter: Any = _create_runtime_adapter(
         create_adapter_fn=create_adapter_fn,
         provider=provider,
         model=model,
-        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+        timeout_seconds=DEFAULT_LLM_TIMEOUT_SECONDS,
     )
     result: Any = run_local_qwen_sample_smoke_fn(
         case_inputs=case_inputs,
@@ -596,12 +579,8 @@ def execute_smoke_local_qwen_command(
         model=model,
         output_root=output_root,
         max_tokens=max_tokens,
-        ollama_num_ctx=num_ctx,
-        ollama_num_ctx_by_mode={
-            "plot": plot_num_ctx or num_ctx,
-            "table": table_num_ctx or num_ctx,
-            "plot+table": plot_table_num_ctx or num_ctx,
-        },
+        ollama_num_ctx=0,
+        ollama_num_ctx_by_mode=None,
         resume_existing=resume,
     )
     command_result = SmokeCommandResult(
@@ -777,11 +756,11 @@ def execute_smoke_full_case_command(
         ingest_root=ingest_root,
         viz_root=viz_root,
     )
-    adapter: Any = _create_local_ollama_adapter(
+    adapter: Any = _create_runtime_adapter(
         create_adapter_fn=create_adapter_fn,
         provider=provider,
         model=model,
-        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+        timeout_seconds=DEFAULT_LLM_TIMEOUT_SECONDS,
     )
     result: Any = run_full_case_smoke_fn(
         case_input=case_input,
@@ -844,11 +823,11 @@ def execute_smoke_full_case_matrix_command(
         ingest_root=ingest_root,
         viz_root=viz_root,
     )
-    adapter: Any = _create_local_ollama_adapter(
+    adapter: Any = _create_runtime_adapter(
         create_adapter_fn=create_adapter_fn,
         provider=provider,
         model=model,
-        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
+        timeout_seconds=DEFAULT_LLM_TIMEOUT_SECONDS,
     )
     cases = build_full_case_matrix_case_specs(
         abm=abm,
@@ -879,83 +858,6 @@ def execute_smoke_full_case_matrix_command(
         markdown_label="full case matrix smoke report (markdown)",
         json_label="full case matrix smoke report (json)",
         failure_label="full case matrix smoke failed",
-    )
-
-
-def execute_tune_local_qwen_command(
-    *,
-    abms: list[str] | None,
-    models_root: Path,
-    ingest_root: Path,
-    viz_root: Path,
-    models_path: Path,
-    model_id: str,
-    output_root: Path,
-    num_ctx_candidates: list[int] | None,
-    max_tokens_candidates: list[int] | None,
-    resume: bool,
-    json_output: bool,
-    discover_abms: Callable[[], tuple[str, ...]],
-    resolve_model_from_registry: Callable[[Path, str], tuple[str, str]],
-    resolve_model_path: Callable[..., Path],
-    assert_ollama_model_available: Callable[[str], None],
-    create_adapter_fn: Callable[[str, str], Any],
-    run_local_qwen_tuning_fn: Callable[..., LocalQwenTuningResult],
-    load_abm_config_fn: Callable[[Path], Any],
-) -> None:
-    requested = sorted(set(abms)) if abms else list(discover_abms())
-    provider, model = resolve_model_from_registry(models_path, model_id)
-    if provider != "ollama":
-        raise typer.BadParameter(f"model id '{model_id}' must resolve to an ollama model for tune-local-qwen.")
-    assert_ollama_model_available(model)
-    resolved_num_ctx_candidates = tuple(sorted(set(num_ctx_candidates or [8192, 16384, 32768, 65536, 131072])))
-    resolved_max_tokens_candidates = tuple(sorted(set(max_tokens_candidates or [1024, 2048, 4096, 8192, 16384])))
-    if any(item <= 0 for item in resolved_max_tokens_candidates):
-        raise typer.BadParameter("--max-tokens values must be positive")
-    case_inputs = {}
-    for abm in requested:
-        abm_config = load_abm_config_for_cli(abm=abm, load_abm_config_fn=load_abm_config_fn)
-        _ = resolve_model_path(abm=abm, models_root=models_root)
-        case_inputs[abm] = build_local_qwen_case_input(
-            abm=abm,
-            abm_config=abm_config,
-            ingest_root=ingest_root,
-            viz_root=viz_root,
-        )
-
-    adapter: Any = _create_local_ollama_adapter(
-        create_adapter_fn=create_adapter_fn,
-        provider=provider,
-        model=model,
-        timeout_seconds=LOCAL_QWEN_TIMEOUT_SECONDS,
-    )
-    result = run_local_qwen_tuning_fn(
-        case_inputs=case_inputs,
-        adapter=adapter,
-        model=model,
-        output_root=output_root,
-        num_ctx_candidates=resolved_num_ctx_candidates,
-        max_tokens_candidates=resolved_max_tokens_candidates,
-        resume_existing=resume,
-    )
-    command_result = SmokeCommandResult(
-        command="tune-local-qwen",
-        success=result.success,
-        report_json_path=result.report_json_path,
-        report_markdown_path=result.report_markdown_path,
-        failed_items=[
-            recommendation.evidence_mode
-            for recommendation in result.recommendations
-            if not recommendation.based_on_successful_trial
-        ],
-        nested_artifacts={"trials_csv": result.trials_csv_path},
-    )
-    emit_smoke_command_result(
-        command_result=command_result,
-        json_output=json_output,
-        markdown_label="local qwen tuning report (markdown)",
-        json_label="local qwen tuning report (json)",
-        failure_label="local qwen tuning failed",
     )
 
 
@@ -997,7 +899,7 @@ def execute_smoke_ingest_command(
     )
 
 
-def _create_local_ollama_adapter(
+def _create_runtime_adapter(
     *,
     create_adapter_fn: Callable[..., Any],
     provider: str,
@@ -1094,13 +996,11 @@ def execute_health_check_command(
     models_root: Path,
     ingest_root: Path,
     viz_root: Path,
-    include_ollama: bool,
     json_output: bool,
     discover_abms: Callable[[], tuple[str, ...]],
     resolve_model_path: Callable[..., Path],
     resolve_model_from_registry: Callable[[Path, str], tuple[str, str]],
     models_path: Path,
-    assert_ollama_model_available: Callable[[str], None],
     load_abm_config_fn: Callable[[Path], Any],
 ) -> None:
     checks: dict[str, HealthCheckItem] = {}
@@ -1108,8 +1008,12 @@ def execute_health_check_command(
     checks["configured_abms"] = HealthCheckItem(ok=bool(requested), detail=", ".join(requested))
 
     try:
-        provider, model = resolve_model_from_registry(models_path, "qwen3_5_local")
-        checks["model_registry"] = HealthCheckItem(ok=True, detail=f"qwen3_5_local -> {provider}:{model}")
+        entries = {
+            alias: resolve_model_from_registry(models_path, alias)
+            for alias in ("kimi_k2_5", "gemini_3_1_pro_preview", "qwen3_5_27b")
+        }
+        detail = ", ".join(f"{alias} -> {provider}:{model}" for alias, (provider, model) in entries.items())
+        checks["model_registry"] = HealthCheckItem(ok=True, detail=detail)
     except Exception as exc:
         checks["model_registry"] = HealthCheckItem(ok=False, detail=str(exc))
 
@@ -1134,13 +1038,6 @@ def execute_health_check_command(
         ok=viz_root.exists(),
         detail=str(viz_root),
     )
-
-    if include_ollama:
-        try:
-            assert_ollama_model_available("qwen3.5:0.8b")
-            checks["ollama_local_qwen"] = HealthCheckItem(ok=True, detail="qwen3.5:0.8b available")
-        except Exception as exc:
-            checks["ollama_local_qwen"] = HealthCheckItem(ok=False, detail=str(exc))
 
     success = all(item.ok for item in checks.values())
     result = HealthCheckResult(success=success, checks=checks)

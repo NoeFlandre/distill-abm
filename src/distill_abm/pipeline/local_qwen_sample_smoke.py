@@ -245,6 +245,7 @@ def run_local_qwen_sample_smoke(
                 _write_json(
                     requests_dir / "context_request.json",
                     _build_request_preview(
+                        provider=adapter.provider,
                         model=model,
                         prompt_with_schema=context_prompt,
                         image_attached=False,
@@ -504,6 +505,7 @@ def _invoke_structured_smoke_text(
 
 def _build_request_preview(
     *,
+    provider: str,
     model: str,
     prompt_with_schema: str,
     image_attached: bool,
@@ -516,7 +518,7 @@ def _build_request_preview(
     prompt_signature = hashlib.sha256(prompt_with_schema.encode("utf-8")).hexdigest()
     defaults = get_runtime_defaults().llm_request
     return {
-        "provider": "ollama",
+        "provider": provider,
         "model": model,
         "temperature": 1.0,
         "max_tokens": max_tokens,
@@ -663,6 +665,7 @@ def _run_trend_with_fitting_table(
         _write_json(
             requests_dir / "trend_request.json",
             _build_request_preview(
+                provider=adapter.provider,
                 model=model,
                 prompt_with_schema=trend_prompt,
                 image_attached=image_b64 is not None,
@@ -700,6 +703,7 @@ def _run_trend_with_fitting_table(
                 str(exc),
                 trace={
                     "request": _build_request_preview(
+                        provider=adapter.provider,
                         model=model,
                         prompt_with_schema=trend_prompt,
                         image_attached=image_b64 is not None,

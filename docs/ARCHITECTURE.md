@@ -23,7 +23,7 @@
   - `table` evidence is a statistical dump derived only from the plot-relevant simulation series, not a raw CSV slice.
   - It is strictly pre-LLM: model availability is not preflighted and cannot cause DOE smoke failure.
   - The command is intended to debug wrong input artifacts, wrong prompts, wrong model settings, and placeholder leakage before any model call is made.
-- Exposes `smoke-local-qwen` for a minimal real-inference verification pass against the local Ollama Qwen model.
+- Exposes `smoke-local-qwen` for a minimal real-inference verification pass against the configured debug model over API.
   - `smoke-local-qwen` resolves the latest ingest and visualization smoke artifacts for each ABM, samples a small stratified subset of evidence/prompt combinations, and runs one context plus one trend inference per sampled case.
   - It writes self-contained case folders with the exact prompt text passed to the model, copied image/table evidence, request hyperparameters, and raw outputs so a human can inspect whether the local execution path is coherent before a full run.
   - `smoke-local-qwen` supports `--resume` and reuses only successful case artifacts; failed or incomplete cases are rerun.
@@ -40,15 +40,11 @@
   - `smoke-quantitative` consumes a completed summarizer smoke run, reuses its saved summaries, scores each `(case, summarizer)` pair against the configured author reference, and computes one-way ANOVA plus factorial contribution tables.
   - It also writes a publication-oriented “best score across dynamic prompt elements” table grouped by ABM, summarizer, and LLM.
   - It writes machine-readable CSVs together with paper-oriented Markdown/LaTeX tables under the same run-separated, resumable contract.
-- Exposes `monitor-local-qwen` and `monitor-run` for a compact live dashboard over case-based smoke output directories and local-Qwen tuning output directories.
+- Exposes `monitor-local-qwen` and `monitor-run` for a compact live dashboard over case-based smoke output directories.
   - The monitor surfaces current case status, configured `num_ctx`, configured `max_tokens`, prompt lengths, observed token totals, and recent errors.
-- Exposes `tune-local-qwen` for local runtime-limit ablations by evidence mode.
-  - `tune-local-qwen` runs the same prompt/evidence path as `smoke-local-qwen`, but sweeps candidate `num_ctx` and `max_tokens` values to find the smallest successful runtime budget for `plot`, `table`, and `plot+table`.
-  - It also records observed token usage and derives a practical `max_tokens` recommendation from successful trials.
-  - `tune-local-qwen` supports `--resume` and reuses only successful trial artifacts; failed or incomplete trials are rerun.
 - Exposes `health-check` for lightweight operator diagnostics.
   - `health-check` does not execute the pipeline.
-  - It verifies configured ABMs, model-registry resolution, expected ingest/viz roots, and optional local Ollama availability for `qwen3.5:0.8b`.
+  - It verifies configured ABMs, model-registry resolution, and expected ingest/viz roots.
 - Benchmark/debug model gating.
 - Debug-only models may be allowed through `--allow-debug-model`; this path must stay outside the benchmark model policy and remain clearly marked as non-production.
 - Model registry resolution via `configs/models.yaml`.
@@ -82,7 +78,7 @@
 
 ### `src/distill_abm/llm/*`
 - Provider-neutral adapter interface.
-- Provider-specific adapters for OpenRouter, Ollama, OpenAI, Anthropic, and Echo.
+- Provider-specific adapters for OpenRouter, Mistral, and Echo.
 
 ### `src/distill_abm/summarize/*`
 - Summarizer runners: BART, BERT, T5, LongformerExt.

@@ -2,8 +2,8 @@
 
 ## DL-001
 - Date: 2026-03-04
-- Decision: Restrict the supported LLM roster to `qwen3.5:0.8b`, `moonshotai/kimi-k2.5`, and `google/gemini-3.1-pro-preview`.
-- Rationale: these are the only models used in the benchmark and debugging workflows; legacy Janus and Qwen-VL debug paths should not remain in the codebase because they create stale configuration and review ambiguity.
+- Decision: Restrict the benchmark model roster to `qwen/qwen3.5-27b`, `moonshotai/kimi-k2.5`, and `google/gemini-3.1-pro-preview`, with `nvidia/nemotron-nano-12b-v2-vl:free` and `mistral-medium-latest` kept as debug-only models.
+- Rationale: benchmark and debug workflows should share the same API-only runtime shape while keeping production-vs-debug model policy explicit. Legacy local-model, Janus, and Qwen-VL paths create stale configuration and review ambiguity.
 
 ## DL-002
 - Date: 2026-03-04

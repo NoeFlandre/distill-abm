@@ -25,7 +25,9 @@
 |---|---|---|
 | `kimi_k2_5` | `openrouter` | `moonshotai/kimi-k2.5` |
 | `gemini_3_1_pro_preview` | `openrouter` | `google/gemini-3.1-pro-preview` |
-| `qwen3_5_local` | `ollama` | `qwen3.5:0.8b` |
+| `qwen3_5_27b` | `openrouter` | `qwen/qwen3.5-27b` |
+| `nemotron_nano_12b_v2_vl_free` | `openrouter` | `nvidia/nemotron-nano-12b-v2-vl:free` |
+| `mistral_medium_debug` | `mistral` | `mistral-medium-latest` |
 
 ## Summarizer Runtimes
 

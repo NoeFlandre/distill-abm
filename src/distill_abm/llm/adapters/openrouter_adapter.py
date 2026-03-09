@@ -6,7 +6,11 @@ import os
 from typing import Any
 
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError, LLMRequest, LLMResponse
-from distill_abm.llm.adapters.openai_adapter import _build_payload, _extract_completion_text, _normalize_completion
+from distill_abm.llm.adapters.openai_compatible_utils import (
+    build_openai_compatible_payload,
+    extract_openai_compatible_completion_text,
+    normalize_openai_compatible_completion,
+)
 from distill_abm.llm.adapters.timeout_utils import run_with_timeout
 
 DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
@@ -36,15 +40,15 @@ class OpenRouterAdapter(LLMAdapter):
         self.timeout_seconds = timeout_seconds
 
     def complete(self, request: LLMRequest) -> LLMResponse:
-        payload = _build_payload(request)
+        payload = build_openai_compatible_payload(request)
         payload["model"] = self.model or request.model
         completion = run_with_timeout(
             timeout_seconds=self.timeout_seconds,
             label="openrouter completion",
             fn=lambda: self._client_for_request().chat.completions.create(**payload),
         )
-        normalized = _normalize_completion(completion)
-        text = _extract_completion_text(normalized)
+        normalized = normalize_openai_compatible_completion(completion)
+        text = extract_openai_compatible_completion_text(normalized)
         model = str(normalized.get("model", request.model))
         normalized.setdefault("provider", "openrouter")
         return LLMResponse(provider=self.provider, model=model, text=text, raw=normalized)

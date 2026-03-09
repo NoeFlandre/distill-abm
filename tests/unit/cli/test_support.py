@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-import subprocess
-import sys
 from pathlib import Path
-from types import SimpleNamespace
-from unittest.mock import Mock
 
 import pytest
 import typer
 
 from distill_abm.cli_support import (
-    assert_ollama_model_available,
     discover_configured_abms,
     load_experiment_parameters,
     parse_summarizers,
@@ -127,43 +122,6 @@ def test_resolve_viz_smoke_specs_rejects_missing_netlogo_viz_config(
         resolve_viz_smoke_specs(requested_abms=["fauna"], models_root=tmp_path)
 
 
-def test_assert_ollama_model_available_rejects_missing_model(monkeypatch: pytest.MonkeyPatch) -> None:
-    class FakeClient:
-        def list(self) -> dict[str, object]:
-            return {"models": [{"model": "other"}]}
-
-        def show(self, _model: str) -> dict[str, object]:
-            raise RuntimeError("missing")
-
-    monkeypatch.setitem(sys.modules, "ollama", SimpleNamespace(Client=lambda: FakeClient()))
-    completed = subprocess.CompletedProcess(
-        args=["ollama", "list"],
-        returncode=0,
-        stdout="NAME ID SIZE\nother latest 1GB\n",
-    )
-    monkeypatch.setattr("distill_abm.cli_support.subprocess.run", lambda *args, **kwargs: completed)
-
-    with pytest.raises(typer.BadParameter, match="required local model"):
-        assert_ollama_model_available("qwen3.5:0.8b")
-
-
-def test_assert_ollama_model_available_uses_python_client_when_available(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    class FakeClient:
-        def list(self) -> dict[str, object]:
-            return {"models": [{"model": "qwen3.5:0.8b"}]}
-
-    monkeypatch.setitem(sys.modules, "ollama", SimpleNamespace(Client=lambda: FakeClient()))
-
-    def fail_subprocess(*args, **kwargs):  # type: ignore[no-untyped-def]
-        raise AssertionError("subprocess fallback should not be used")
-
-    monkeypatch.setattr("distill_abm.cli_support.subprocess.run", fail_subprocess)
-
-    assert_ollama_model_available("qwen3.5:0.8b")
-
-
 def test_validate_model_policy_allows_supported_benchmark_model_with_flag() -> None:
     validate_model_policy(
         provider="openrouter",
@@ -172,10 +130,9 @@ def test_validate_model_policy_allows_supported_benchmark_model_with_flag() -> N
     )
 
 
-def test_validate_model_policy_requires_local_ollama_model(monkeypatch: pytest.MonkeyPatch) -> None:
-    called = Mock()
-    monkeypatch.setattr("distill_abm.cli_support.assert_ollama_model_available", called)
-
-    validate_model_policy(provider="ollama", model="qwen3.5:0.8b", allow_debug_model=False)
-
-    called.assert_called_once_with("qwen3.5:0.8b")
+def test_validate_model_policy_allows_debug_only_api_model_with_flag() -> None:
+    validate_model_policy(
+        provider="openrouter",
+        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        allow_debug_model=True,
+    )

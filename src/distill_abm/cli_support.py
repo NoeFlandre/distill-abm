@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import subprocess
 from pathlib import Path
 from typing import Literal, cast
 
@@ -19,7 +18,7 @@ from distill_abm.viz.viz_smoke import VizSmokeSpec
 BENCHMARK_MODELS: set[tuple[str, str]] = {
     ("openrouter", "moonshotai/kimi-k2.5"),
     ("openrouter", "google/gemini-3.1-pro-preview"),
-    ("ollama", "qwen3.5:0.8b"),
+    ("openrouter", "qwen/qwen3.5-27b"),
 }
 SUPPORTED_SUMMARIZERS: tuple[SummarizerId, ...] = ("bart", "bert", "t5", "longformer_ext")
 
@@ -233,63 +232,6 @@ def resolve_additional_scoring_reference_paths(abm: str) -> dict[str, Path]:
         return {}
     return {"modeler_ground_truth": Path(resolved)}
 
-
-def assert_ollama_model_available(model: str) -> None:
-    """Verify that a required local Ollama model is available."""
-    client_error: Exception | None = None
-    try:
-        import ollama
-
-        client = ollama.Client()
-        listed = client.list()
-        listed_names = _extract_ollama_model_names(listed)
-        if model in listed_names:
-            return
-        client.show(model)
-        return
-    except Exception as exc:  # pragma: no cover - environment dependent
-        client_error = exc
-
-    try:
-        completed = subprocess.run(
-            ["ollama", "list"],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-    except Exception as exc:  # pragma: no cover - environment dependent
-        if client_error is not None:
-            raise typer.BadParameter(
-                f"failed to verify local model '{model}' via Ollama client ({client_error}) "
-                f"and via 'ollama list' ({exc})"
-            ) from exc
-        raise typer.BadParameter(f"failed to run 'ollama list' to verify local model '{model}': {exc}") from exc
-
-    lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
-    if not any(line.split()[0] == model for line in lines[1:] if line.split()):
-        raise typer.BadParameter(
-            f"required local model '{model}' not found in 'ollama list'. Pull it before benchmark runs."
-        )
-
-
-def _extract_ollama_model_names(payload: object) -> set[str]:
-    """Extract model names from the Ollama Python client's list payload."""
-    if not isinstance(payload, dict):
-        return set()
-    models = payload.get("models")
-    if not isinstance(models, list):
-        return set()
-    names: set[str] = set()
-    for item in models:
-        if not isinstance(item, dict):
-            continue
-        for key in ("model", "name"):
-            value = item.get(key)
-            if isinstance(value, str) and value.strip():
-                names.add(value.strip())
-    return names
-
-
 def validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:
     """Enforce the supported benchmark model policy used by the CLI."""
     key = (provider.strip().lower(), model.strip())
@@ -300,9 +242,6 @@ def validate_model_policy(provider: str, model: str, allow_debug_model: bool) ->
         raise typer.BadParameter(
             f"unsupported benchmark model '{provider}:{model}'. Allowed benchmark models: {allowed}."
         )
-
-    if key == ("ollama", "qwen3.5:0.8b"):
-        assert_ollama_model_available(model)
 
 
 def select_smoke_cases(

@@ -29,7 +29,6 @@ from distill_abm.cli_actions import (
     execute_smoke_qwen_command,
     execute_smoke_summarizers_command,
     execute_smoke_viz_command,
-    execute_tune_local_qwen_command,
     execute_validate_workspace_command,
 )
 from distill_abm.cli_defaults import (
@@ -48,7 +47,6 @@ from distill_abm.cli_policy import validate_benchmark_model_policy
 from distill_abm.cli_quality_gate import QualityGateScope, resolve_quality_gate_selection
 from distill_abm.cli_support import (
     BENCHMARK_MODELS,
-    assert_ollama_model_available,
     discover_configured_abms,
     parse_summarizers,
     resolve_abm_model_path,
@@ -72,7 +70,6 @@ from distill_abm.pipeline.doe_smoke import (
 from distill_abm.pipeline.full_case_matrix_smoke import run_full_case_matrix_smoke
 from distill_abm.pipeline.full_case_smoke import run_full_case_smoke
 from distill_abm.pipeline.local_qwen_sample_smoke import run_local_qwen_sample_smoke
-from distill_abm.pipeline.local_qwen_tuning import run_local_qwen_tuning
 from distill_abm.pipeline.quantitative_smoke import run_quantitative_smoke
 from distill_abm.pipeline.run import EvidenceMode, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
@@ -110,7 +107,6 @@ __all__ = [
     "smoke_qwen",
     "smoke_summarizers",
     "smoke_viz",
-    "tune_local_qwen",
     "validate_workspace",
 ]
 
@@ -550,31 +546,15 @@ def smoke_local_qwen(
     model_id: Annotated[
         str,
         typer.Option(help="Model alias from configs/models.yaml."),
-    ] = "qwen3_5_local",
+    ] = "nemotron_nano_12b_v2_vl_free",
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for the sampled local-Qwen smoke artifacts."),
     ] = Path("results/local_qwen_smoke_latest"),
     max_tokens: Annotated[
         int,
-        typer.Option(help="Override max output tokens for the sampled local-Qwen smoke."),
+        typer.Option(help="Override max output tokens for the sampled LLM smoke."),
     ] = 10000,
-    num_ctx: Annotated[
-        int,
-        typer.Option(help="Override Ollama num_ctx for the sampled local-Qwen smoke."),
-    ] = 32768,
-    plot_num_ctx: Annotated[
-        int | None,
-        typer.Option(help="Override Ollama num_ctx for plot-only smoke cases."),
-    ] = None,
-    table_num_ctx: Annotated[
-        int | None,
-        typer.Option(help="Override Ollama num_ctx for table-only smoke cases."),
-    ] = None,
-    plot_table_num_ctx: Annotated[
-        int | None,
-        typer.Option(help="Override Ollama num_ctx for plot+table smoke cases."),
-    ] = None,
     resume: Annotated[
         bool,
         typer.Option("--resume/--no-resume", help="Reuse successful local-Qwen smoke cases and rerun failed ones."),
@@ -591,16 +571,11 @@ def smoke_local_qwen(
         model_id=model_id,
         output_root=output_root,
         max_tokens=max_tokens,
-        num_ctx=num_ctx,
-        plot_num_ctx=plot_num_ctx,
-        table_num_ctx=table_num_ctx,
-        plot_table_num_ctx=plot_table_num_ctx,
         resume=resume,
         json_output=json_output,
         discover_abms=discover_configured_abms,
         resolve_model_from_registry=resolve_model_from_registry,
         resolve_model_path=resolve_abm_model_path,
-        assert_ollama_model_available=_assert_ollama_model_available,
         create_adapter_fn=create_adapter,
         run_local_qwen_sample_smoke_fn=run_local_qwen_sample_smoke,
         load_abm_config_fn=load_abm_config,
@@ -915,83 +890,6 @@ def monitor_run(
         json_output=json_output,
     )
 
-
-@app.command("tune-local-qwen")
-def tune_local_qwen(
-    abms: Annotated[
-        list[str] | None,
-        typer.Option(
-            "--abm",
-            help="ABM names to inspect. Repeat for multiple. Defaults to all configured ABMs.",
-        ),
-    ] = None,
-    models_root: Annotated[
-        Path,
-        typer.Option(help="Root directory containing ABM model files for asset discovery."),
-    ] = Path("data"),
-    ingest_root: Annotated[
-        Path,
-        typer.Option(help="Root directory containing ingest smoke outputs."),
-    ] = Path("results/ingest_smoke_latest"),
-    viz_root: Annotated[
-        Path,
-        typer.Option(help="Root directory containing visualization smoke outputs."),
-    ] = Path("results/viz_smoke_latest"),
-    models_path: Annotated[
-        Path,
-        typer.Option(exists=True, help="Model registry YAML path."),
-    ] = Path("configs/models.yaml"),
-    model_id: Annotated[
-        str,
-        typer.Option(help="Local Ollama model alias from configs/models.yaml."),
-    ] = "qwen3_5_local",
-    output_root: Annotated[
-        Path,
-        typer.Option(help="Directory for the local-Qwen tuning artifacts."),
-    ] = Path("results/local_qwen_tuning_latest"),
-    num_ctx_candidates: Annotated[
-        list[int] | None,
-        typer.Option(
-            "--num-ctx",
-            help="Candidate Ollama num_ctx values to test in ascending order. Repeat for multiple.",
-        ),
-    ] = None,
-    max_tokens_candidates: Annotated[
-        list[int] | None,
-        typer.Option(
-            "--max-tokens",
-            help="Candidate output-token budgets to test in ascending order. Repeat for multiple.",
-        ),
-    ] = None,
-    resume: Annotated[
-        bool,
-        typer.Option("--resume/--no-resume", help="Reuse successful tuning trials and rerun only failed ones."),
-    ] = True,
-    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
-) -> None:
-    """Tune local-Qwen num_ctx and output-token budgets by evidence mode."""
-    execute_tune_local_qwen_command(
-        abms=abms,
-        models_root=models_root,
-        ingest_root=ingest_root,
-        viz_root=viz_root,
-        models_path=models_path,
-        model_id=model_id,
-        output_root=output_root,
-        num_ctx_candidates=num_ctx_candidates,
-        max_tokens_candidates=max_tokens_candidates,
-        resume=resume,
-        json_output=json_output,
-        discover_abms=discover_configured_abms,
-        resolve_model_from_registry=resolve_model_from_registry,
-        resolve_model_path=resolve_abm_model_path,
-        assert_ollama_model_available=_assert_ollama_model_available,
-        create_adapter_fn=create_adapter,
-        run_local_qwen_tuning_fn=run_local_qwen_tuning,
-        load_abm_config_fn=load_abm_config,
-    )
-
-
 @app.command("smoke-ingest-netlogo")
 def smoke_ingest_netlogo(
     abms: Annotated[
@@ -1252,10 +1150,6 @@ def health_check(
         Path,
         typer.Option(exists=True, help="Model registry YAML path."),
     ] = Path("configs/models.yaml"),
-    include_ollama: Annotated[
-        bool,
-        typer.Option(help="Also verify that the local Ollama qwen3.5 model is available."),
-    ] = False,
     json_output: Annotated[bool, typer.Option("--json", help="Print structured JSON to stdout.")] = False,
 ) -> None:
     """Run lightweight operator health checks without executing the pipeline."""
@@ -1263,13 +1157,11 @@ def health_check(
         models_root=models_root,
         ingest_root=ingest_root,
         viz_root=viz_root,
-        include_ollama=include_ollama,
         json_output=json_output,
         discover_abms=discover_configured_abms,
         resolve_model_path=resolve_abm_model_path,
         resolve_model_from_registry=resolve_model_from_registry,
         models_path=models_path,
-        assert_ollama_model_available=_assert_ollama_model_available,
         load_abm_config_fn=load_abm_config,
     )
 
@@ -1279,17 +1171,12 @@ def main() -> None:
     app()
 
 
-def _assert_ollama_model_available(model: str) -> None:
-    assert_ollama_model_available(model)
-
-
 def _validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:
     validate_benchmark_model_policy(
         provider=provider,
         model=model,
         allow_debug_model=allow_debug_model,
         benchmark_models=BENCHMARK_MODELS,
-        assert_ollama_model_available=_assert_ollama_model_available,
     )
 
 

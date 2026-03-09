@@ -9,7 +9,10 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError, LLMRequest, LLMResponse
-from distill_abm.llm.adapters.openai_adapter import _build_payload, _extract_completion_text
+from distill_abm.llm.adapters.openai_compatible_utils import (
+    build_openai_compatible_payload,
+    extract_openai_compatible_completion_text,
+)
 from distill_abm.llm.adapters.timeout_utils import run_with_timeout
 
 DEFAULT_MISTRAL_BASE_URL = "https://api.mistral.ai/v1"
@@ -40,7 +43,7 @@ class MistralAdapter(LLMAdapter):
         if not api_key:
             raise LLMProviderError("mistral api key missing: set MISTRAL_API_KEY")
 
-        payload = _build_payload(request)
+        payload = build_openai_compatible_payload(request)
         payload["model"] = self.model or request.model
 
         try:
@@ -52,7 +55,7 @@ class MistralAdapter(LLMAdapter):
         except (HTTPError, URLError) as exc:
             raise LLMProviderError(f"mistral request failed: {exc}") from exc
 
-        text = _extract_completion_text(raw_payload)
+        text = extract_openai_compatible_completion_text(raw_payload)
         raw_payload.setdefault("provider", "mistral")
         return LLMResponse(
             provider=self.provider,
