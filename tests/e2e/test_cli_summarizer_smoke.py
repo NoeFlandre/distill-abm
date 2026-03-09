@@ -19,10 +19,12 @@ def test_cli_smoke_summarizers_invokes_runner(tmp_path: Path, monkeypatch) -> No
         output_root = kwargs["output_root"]
         return SimpleNamespace(
             success=True,
+            run_root=Path(output_root) / "runs" / "run_1",
             report_json_path=Path(output_root) / "report.json",
             report_markdown_path=Path(output_root) / "report.md",
             review_csv_path=Path(output_root) / "review.csv",
             validated_sources_path=Path(output_root) / "validated_bundles.json",
+            run_log_path=Path(output_root) / "run.log.jsonl",
             failed_bundle_ids=[],
         )
 
@@ -36,6 +38,7 @@ def test_cli_smoke_summarizers_invokes_runner(tmp_path: Path, monkeypatch) -> No
             str(tmp_path / "source"),
             "--output-root",
             str(tmp_path / "out"),
+            "--resume",
             "--json",
         ],
     )
@@ -44,3 +47,4 @@ def test_cli_smoke_summarizers_invokes_runner(tmp_path: Path, monkeypatch) -> No
     assert "report.json" in result.output
     assert captured["source_root"] == tmp_path / "source"
     assert captured["output_root"] == tmp_path / "out"
+    assert captured["resume"] is True

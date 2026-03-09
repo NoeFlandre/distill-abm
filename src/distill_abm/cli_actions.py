@@ -673,12 +673,14 @@ def execute_smoke_summarizers_command(
     *,
     source_root: Path,
     output_root: Path,
+    resume: bool,
     json_output: bool,
     run_summarizer_smoke_fn: Callable[..., Any],
 ) -> None:
     result: Any = run_summarizer_smoke_fn(
         source_root=source_root,
         output_root=output_root,
+        resume=resume,
     )
     command_result = SmokeCommandResult(
         command="smoke-summarizers",

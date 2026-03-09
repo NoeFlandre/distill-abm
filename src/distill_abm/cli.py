@@ -630,12 +630,20 @@ def smoke_summarizers(
         Path,
         typer.Option(help="Directory for summarizer smoke artifacts."),
     ] = Path("results/summarizer_smoke_latest"),
+    resume: Annotated[
+        bool,
+        typer.Option(
+            "--resume/--no-resume",
+            help="Reuse successful summarizer outputs and rerun only failed or missing modes.",
+        ),
+    ] = True,
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run the summarization stack over one hand-vetted full-case LLM bundle."""
     execute_smoke_summarizers_command(
         source_root=source_root,
         output_root=output_root,
+        resume=resume,
         json_output=json_output,
         run_summarizer_smoke_fn=run_summarizer_smoke,
     )

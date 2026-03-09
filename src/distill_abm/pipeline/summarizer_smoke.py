@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+import shutil
 import time
 from collections.abc import Callable
 from datetime import UTC, datetime
@@ -12,6 +13,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, run_log_path
+from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
 from distill_abm.summarize.models import (
     summarize_with_bart,
     summarize_with_bert,
@@ -64,17 +67,23 @@ class SummarizerSmokeResult(BaseModel):
     started_at_utc: str
     finished_at_utc: str
     output_root: Path
+    run_id: str
+    run_root: Path
     report_json_path: Path
     report_markdown_path: Path
     review_csv_path: Path
     validated_sources_path: Path
+    run_log_path: Path
     success: bool
     failed_bundle_ids: list[str] = Field(default_factory=list)
     bundles: list[SummarizerBundleResult] = Field(default_factory=list)
 
 
 def default_validated_smoke_bundles(source_root: Path) -> tuple[ValidatedSmokeBundle, ...]:
-    """Return the manually validated Nemotron full-case bundle reused for summarizer smoke."""
+    """Return validated smoke bundles discovered from full-case or matrix run artifacts."""
+    matrix_report_path = source_root / "smoke_full_case_matrix_report.json"
+    if matrix_report_path.exists():
+        return _discover_full_case_matrix_bundles(source_root, matrix_report_path)
     case_root = _discover_best_full_case_bundle(source_root / "cases")
     case_id = case_root.name
     return (
@@ -96,12 +105,20 @@ def run_summarizer_smoke(
     *,
     source_root: Path,
     output_root: Path,
+    resume: bool = False,
     validated_bundles: tuple[ValidatedSmokeBundle, ...] | None = None,
     summarizer_fns: dict[SummarizerSmokeMode, Callable[[str], str]] | None = None,
 ) -> SummarizerSmokeResult:
     """Run all summarizers over validated full-case text bundles and persist review artifacts."""
     started_at = datetime.now(UTC)
-    output_root.mkdir(parents=True, exist_ok=True)
+    _prepare_output_root(output_root, resume=resume)
+    run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
+    run_root = output_root / "runs" / run_id
+    run_root.mkdir(parents=True, exist_ok=True)
+    latest_run_pointer_path(output_root).write_text(str(run_root), encoding="utf-8")
+    previous_run_root = _resolve_previous_summarizer_run_root(output_root=output_root, current_run_id=run_id)
+    logger = get_logger(__name__)
+    attached_run_log_path = attach_json_log_file(run_log_path(run_root))
     selected_bundles = validated_bundles or default_validated_smoke_bundles(source_root)
     resolved_summarizers = summarizer_fns or {
         "bart": summarize_with_bart,
@@ -113,20 +130,27 @@ def run_summarizer_smoke(
     review_rows: list[dict[str, str]] = []
     failed_bundle_ids: list[str] = []
 
-    validated_sources_path = output_root / "validated_bundles.json"
+    validated_sources_path = run_root / "validated_bundles.json"
     validated_sources_path.write_text(
         json.dumps([bundle.model_dump(mode="json") for bundle in selected_bundles], indent=2),
         encoding="utf-8",
     )
 
     for bundle in selected_bundles:
-        bundle_dir = output_root / "bundles" / bundle.bundle_id
+        bundle_dir = run_root / "bundles" / bundle.bundle_id
+        if resume:
+            _copy_previous_bundle_if_present(
+                bundle_id=bundle.bundle_id,
+                previous_run_root=previous_run_root,
+                bundle_dir=bundle_dir,
+            )
         input_dir = bundle_dir / "01_input"
         trend_dir = input_dir / "trend_outputs"
         summary_dir = bundle_dir / "02_summaries"
         metadata_dir = bundle_dir / "03_metadata"
         for directory in (input_dir, trend_dir, summary_dir, metadata_dir):
             directory.mkdir(parents=True, exist_ok=True)
+        log_event(logger, "summarizer_bundle_start", bundle_id=bundle.bundle_id, case_id=bundle.case_id, abm=bundle.abm)
 
         combined_input = ""
         source_validation_error: str | None = None
@@ -164,32 +188,57 @@ def run_summarizer_smoke(
         if source_validation_error is None:
             for mode in ("none", "bart", "bert", "t5", "longformer_ext"):
                 output_path = summary_dir / f"{mode}.txt"
-                started = time.perf_counter()
-                try:
-                    summary_text = combined_input if mode == "none" else resolved_summarizers[mode](combined_input)
-                    duration = time.perf_counter() - started
-                    output_path.write_text(summary_text, encoding="utf-8")
-                    mode_result = SummarizerModeResult(
-                        mode=mode,
-                        success=bool(summary_text.strip()),
-                        output_path=output_path,
-                        duration_seconds=duration,
-                        input_length=len(combined_input),
-                        output_length=len(summary_text),
-                        error=None if summary_text.strip() else "summarizer produced empty text",
-                    )
-                except Exception as exc:
-                    duration = time.perf_counter() - started
-                    output_path.write_text("", encoding="utf-8")
-                    mode_result = SummarizerModeResult(
-                        mode=mode,
-                        success=False,
-                        output_path=output_path,
-                        duration_seconds=duration,
-                        input_length=len(combined_input),
-                        output_length=0,
-                        error=str(exc),
-                    )
+                existing_result = _load_resumable_mode_result(
+                    mode=mode,
+                    output_path=output_path,
+                    input_length=len(combined_input),
+                    resume=resume,
+                )
+                if existing_result is not None:
+                    mode_result = existing_result
+                    log_event(logger, "summarizer_mode_reused", bundle_id=bundle.bundle_id, mode=mode)
+                else:
+                    started = time.perf_counter()
+                    try:
+                        summary_text = combined_input if mode == "none" else resolved_summarizers[mode](combined_input)
+                        duration = time.perf_counter() - started
+                        output_path.write_text(summary_text, encoding="utf-8")
+                        mode_result = SummarizerModeResult(
+                            mode=mode,
+                            success=bool(summary_text.strip()),
+                            output_path=output_path,
+                            duration_seconds=duration,
+                            input_length=len(combined_input),
+                            output_length=len(summary_text),
+                            error=None if summary_text.strip() else "summarizer produced empty text",
+                        )
+                        log_event(
+                            logger,
+                            "summarizer_mode_success",
+                            bundle_id=bundle.bundle_id,
+                            mode=mode,
+                            output_length=len(summary_text),
+                        )
+                    except Exception as exc:
+                        duration = time.perf_counter() - started
+                        output_path.write_text("", encoding="utf-8")
+                        mode_result = SummarizerModeResult(
+                            mode=mode,
+                            success=False,
+                            output_path=output_path,
+                            duration_seconds=duration,
+                            input_length=len(combined_input),
+                            output_length=0,
+                            error=str(exc),
+                        )
+                        log_event(
+                            logger,
+                            "summarizer_mode_failure",
+                            level=40,
+                            bundle_id=bundle.bundle_id,
+                            mode=mode,
+                            error=str(exc),
+                        )
                 mode_results.append(mode_result)
                 review_rows.append(
                     {
@@ -227,18 +276,22 @@ def run_summarizer_smoke(
             bundle_result.model_dump_json(indent=2),
             encoding="utf-8",
         )
+        log_event(logger, "summarizer_bundle_complete", bundle_id=bundle.bundle_id, success=bundle_success)
 
-    review_csv_path = output_root / "review.csv"
+    review_csv_path = run_root / "review.csv"
     _write_review_csv(review_csv_path, review_rows)
 
     result = SummarizerSmokeResult(
         started_at_utc=started_at.isoformat(),
         finished_at_utc=datetime.now(UTC).isoformat(),
         output_root=output_root,
-        report_json_path=output_root / "smoke_summarizers_report.json",
-        report_markdown_path=output_root / "smoke_summarizers_report.md",
+        run_id=run_id,
+        run_root=run_root,
+        report_json_path=run_root / "smoke_summarizers_report.json",
+        report_markdown_path=run_root / "smoke_summarizers_report.md",
         review_csv_path=review_csv_path,
         validated_sources_path=validated_sources_path,
+        run_log_path=attached_run_log_path,
         success=not failed_bundle_ids,
         failed_bundle_ids=failed_bundle_ids,
         bundles=bundle_results,
@@ -311,6 +364,60 @@ def _render_markdown_report(result: SummarizerSmokeResult) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _prepare_output_root(output_root: Path, *, resume: bool) -> None:
+    if output_root.exists() and not resume:
+        shutil.rmtree(output_root)
+    output_root.mkdir(parents=True, exist_ok=True)
+
+
+def _resolve_previous_summarizer_run_root(*, output_root: Path, current_run_id: str) -> Path | None:
+    runs_root = output_root / "runs"
+    if runs_root.exists():
+        candidates = sorted(
+            (path for path in runs_root.iterdir() if path.is_dir() and path.name != current_run_id),
+            reverse=True,
+        )
+        if candidates:
+            return candidates[0]
+    legacy_bundles_root = output_root / "bundles"
+    if legacy_bundles_root.exists():
+        return output_root
+    return None
+
+
+def _copy_previous_bundle_if_present(*, bundle_id: str, previous_run_root: Path | None, bundle_dir: Path) -> None:
+    if previous_run_root is None:
+        return
+    previous_bundle_dir = previous_run_root / "bundles" / bundle_id
+    if not previous_bundle_dir.exists() or bundle_dir.exists():
+        return
+    shutil.copytree(previous_bundle_dir, bundle_dir)
+
+
+def _load_resumable_mode_result(
+    *,
+    mode: SummarizerSmokeMode,
+    output_path: Path,
+    input_length: int,
+    resume: bool,
+) -> SummarizerModeResult | None:
+    if not resume or not output_path.exists():
+        return None
+    try:
+        summary_text = _validate_source_text(output_path)
+    except Exception:
+        return None
+    return SummarizerModeResult(
+        mode=mode,
+        success=True,
+        output_path=output_path,
+        duration_seconds=0.0,
+        input_length=input_length,
+        output_length=len(summary_text),
+        error=None,
+    )
+
+
 def _discover_best_full_case_bundle(cases_root: Path) -> Path:
     candidates: list[tuple[int, str, Path]] = []
     for case_dir in sorted(cases_root.glob("*_full_case")):
@@ -323,3 +430,34 @@ def _discover_best_full_case_bundle(cases_root: Path) -> Path:
         raise FileNotFoundError(f"no completed full-case smoke bundle found under {cases_root}")
     candidates.sort(key=lambda item: (item[0], item[1]), reverse=True)
     return candidates[0][2]
+
+
+def _discover_full_case_matrix_bundles(source_root: Path, report_path: Path) -> tuple[ValidatedSmokeBundle, ...]:
+    report_payload = json.loads(report_path.read_text(encoding="utf-8"))
+    bundles: list[ValidatedSmokeBundle] = []
+    for case_payload in report_payload.get("cases", []):
+        if not case_payload.get("success"):
+            continue
+        case_dir = Path(case_payload["case_dir"])
+        context_output_path = case_dir / "02_context" / "context_output.txt"
+        trend_output_paths = tuple(sorted((case_dir / "03_trends").glob("plot_*/trend_output.txt")))
+        if not context_output_path.exists() or not trend_output_paths:
+            continue
+        case_id = str(case_payload["case_id"])
+        abm = str(case_payload.get("abm", "unknown"))
+        bundles.append(
+            ValidatedSmokeBundle(
+                bundle_id=case_id,
+                case_id=case_id,
+                abm=abm,
+                context_output_path=context_output_path,
+                trend_output_paths=trend_output_paths,
+                validation_note=(
+                    "Bundle discovered from a completed full-case matrix smoke run. "
+                    "Used to exercise the summarizer pipeline over one context output plus all trend outputs."
+                ),
+            )
+        )
+    if not bundles:
+        raise FileNotFoundError(f"no successful full-case matrix smoke bundles found under {source_root}")
+    return tuple(sorted(bundles, key=lambda bundle: bundle.case_id))
