@@ -358,9 +358,7 @@ def _render_markdown_report(result: SummarizerSmokeResult) -> str:
         "| --- | --- | --- | --- |",
     ]
     for bundle in result.bundles:
-        lines.append(
-            f"| {bundle.bundle_id} | {bundle.case_id} | {bundle.abm} | {str(bundle.success).lower()} |"
-        )
+        lines.append(f"| {bundle.bundle_id} | {bundle.case_id} | {bundle.abm} | {str(bundle.success).lower()} |")
     return "\n".join(lines) + "\n"
 
 

@@ -986,6 +986,7 @@ def monitor_run(
         json_output=json_output,
     )
 
+
 @app.command("smoke-ingest-netlogo")
 def smoke_ingest_netlogo(
     abms: Annotated[

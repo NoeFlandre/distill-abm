@@ -78,7 +78,7 @@ def test_load_experiment_parameters_validates_json_file(tmp_path: Path) -> None:
 
 def test_load_experiment_parameters_rejects_non_object_json(tmp_path: Path) -> None:
     target = tmp_path / "params.json"
-    target.write_text('[1, 2]', encoding="utf-8")
+    target.write_text("[1, 2]", encoding="utf-8")
 
     with pytest.raises(typer.BadParameter, match="top level"):
         load_experiment_parameters(target)

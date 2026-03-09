@@ -32,10 +32,7 @@ REFERENCE_NARRATIVE_FILENAMES: tuple[str, ...] = (
 def _coerce_experiment_value(value: str) -> Any:
     """Coerce a BehaviorSpace value string to Python scalar types."""
     normalized = html.unescape(value).strip()
-    if (
-        len(normalized) >= 2
-        and ((normalized[0] == normalized[-1] == '"') or (normalized[0] == normalized[-1] == "'"))
-    ):
+    if len(normalized) >= 2 and ((normalized[0] == normalized[-1] == '"') or (normalized[0] == normalized[-1] == "'")):
         normalized = normalized[1:-1]
     lowered = normalized.lower()
     if lowered == "true":

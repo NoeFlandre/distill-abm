@@ -94,8 +94,7 @@ def resolve_abm_model_path(*, abm: str, models_root: Path) -> Path:
     if not matches:
         candidates_desc = ", ".join(str(directory / name) for directory in candidate_roots for name in model_filenames)
         raise typer.BadParameter(
-            f"no .nlogo file found for ABM '{abm}' in {models_root}. "
-            f"Searched: {candidates_desc}"
+            f"no .nlogo file found for ABM '{abm}' in {models_root}. " f"Searched: {candidates_desc}"
         )
     matches = list(dict.fromkeys(matches))
 
@@ -181,8 +180,7 @@ def parse_summarizers(values: list[str] | None, fallback: tuple[SummarizerId, ..
     invalid = [value for value in normalized if value not in allowed]
     if invalid:
         raise typer.BadParameter(
-            "unsupported summarizer(s): "
-            f"{', '.join(invalid)}. Allowed: {', '.join(SUPPORTED_SUMMARIZERS)}."
+            "unsupported summarizer(s): " f"{', '.join(invalid)}. Allowed: {', '.join(SUPPORTED_SUMMARIZERS)}."
         )
     return cast(tuple[SummarizerId, ...], normalized)
 
@@ -231,6 +229,7 @@ def resolve_additional_scoring_reference_paths(abm: str) -> dict[str, Path]:
     if not resolved:
         return {}
     return {"modeler_ground_truth": Path(resolved)}
+
 
 def validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:
     """Enforce the supported benchmark model policy used by the CLI."""

@@ -33,9 +33,7 @@ class FakeAdapter(LLMAdapter):
     @property
     def context_request_count(self) -> int:
         return sum(
-            1
-            for request in self.requests
-            if "Your goal is to explain an agent-based model." in request.user_prompt()
+            1 for request in self.requests if "Your goal is to explain an agent-based model." in request.user_prompt()
         )
 
     @property
@@ -124,8 +122,7 @@ class ContextOverflowThenSuccessAdapter(LLMAdapter):
             )
         if request.metadata.get("table_downsample_stride") == 1:
             raise ValueError(
-                "This model's maximum context length is 131072 tokens. "
-                "Your request has too many input tokens."
+                "This model's maximum context length is 131072 tokens. " "Your request has too many input tokens."
             )
         return LLMResponse(
             provider=self.provider,
@@ -451,11 +448,7 @@ def test_run_local_qwen_sample_smoke_reuses_context_outputs_for_same_abm_and_rol
     assert result.success is True
     assert adapter.context_request_count == 1
     assert adapter.trend_request_count == 2
-    first_context = (
-        result.cases[0].case_dir / "03_outputs" / "context_output.txt"
-    ).read_text(encoding="utf-8")
-    second_context = (
-        result.cases[1].case_dir / "03_outputs" / "context_output.txt"
-    ).read_text(encoding="utf-8")
+    first_context = (result.cases[0].case_dir / "03_outputs" / "context_output.txt").read_text(encoding="utf-8")
+    second_context = (result.cases[1].case_dir / "03_outputs" / "context_output.txt").read_text(encoding="utf-8")
     assert first_context == "response-1"
     assert second_context == "response-1"

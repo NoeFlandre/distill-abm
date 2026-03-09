@@ -91,11 +91,7 @@ def _artifact_name_map(suffix: str) -> dict[str, str]:
 
 def _infer_abm_id(model_path: Path) -> str | None:
     """Infer ABM identifier from model path for narrative/experiment selection."""
-    candidates = {
-        _normalise_name(component)
-        for component in [model_path.stem, model_path.parent.name]
-        if component
-    }
+    candidates = {_normalise_name(component) for component in [model_path.stem, model_path.parent.name] if component}
     for candidate in candidates:
         if "fauna" in candidate:
             return "fauna"

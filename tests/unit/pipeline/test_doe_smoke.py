@@ -49,8 +49,7 @@ def _write_case_inputs(tmp_path: Path) -> DoESmokeAbmInput:
                 plot_index=1,
                 reporter_pattern="metric-a",
                 plot_description=(
-                    "The attachment is the plot representing the average weekly consumption "
-                    "of whole milk per agent."
+                    "The attachment is the plot representing the average weekly consumption " "of whole milk per agent."
                 ),
                 plot_path=plots_dir / "1.png",
             ),
@@ -185,8 +184,7 @@ def test_run_doe_smoke_suite_uses_legacy_style_prompt_composition_and_statistica
     assert "<<context_response_from_context_llm>>" in trend_prompt
     assert "You are an expert in Consumer Behavior with a statistic background." in trend_prompt
     assert (
-        "When summarizing trends, provide brief insights about their implications for decision makers."
-        in trend_prompt
+        "When summarizing trends, provide brief insights about their implications for decision makers." in trend_prompt
     )
     assert "The data table represents the average weekly consumption of whole milk per agent." in trend_prompt
     assert "Statistical summary of the relevant simulation output:" in trend_prompt
@@ -226,27 +224,19 @@ def test_run_doe_smoke_suite_adapts_plot_and_table_prompt_wording_to_combined_ev
     )
 
     trend_prompt = (
-        result.abm_shared["milk_consumption"].shared_dir
-        / "03_prompts"
-        / "trend"
-        / "plot+table"
-        / "none"
-        / "plot_1.txt"
+        result.abm_shared["milk_consumption"].shared_dir / "03_prompts" / "trend" / "plot+table" / "none" / "plot_1.txt"
     ).read_text(encoding="utf-8")
     assert "We have a plot and a data table from repeated simulations of an agent based model." in trend_prompt
     assert "If the plot and data table have very simple dynamics" in trend_prompt
     assert (
         "The attachment includes the plot, and the data table represents the average weekly consumption "
-        "of whole milk per agent."
-        in trend_prompt
+        "of whole milk per agent." in trend_prompt
     )
 
 
 def test_legacy_plot_description_for_evidence_mode_rewrites_plot_only_language_for_table() -> None:
     rewritten = legacy_plot_description_for_evidence_mode(
-        plot_description=(
-            "This plot represents the average initial risk attitude of all social learning agents."
-        ),
+        plot_description=("This plot represents the average initial risk attitude of all social learning agents."),
         evidence_mode="table",
     )
 
@@ -314,9 +304,7 @@ def test_run_doe_smoke_suite_records_unmatched_plot_reporter_without_crashing(tm
         if line.strip()
     ]
     failed_request = next(
-        record
-        for record in request_records
-        if record["request_kind"] == "trend" and record["plot_index"] == "2"
+        record for record in request_records if record["request_kind"] == "trend" and record["plot_index"] == "2"
     )
     assert failed_request["status"] == "failed"
     assert failed_request["error_code"] == "unmatched_metric_pattern"

@@ -25,6 +25,7 @@ def render_run_viewer(run_root: Path, output_path: Path | None = None) -> Path:
     target_path.write_text(_render_html(payload), encoding="utf-8")
     return target_path
 
+
 def _build_viewer_payload(run_root: Path) -> dict[str, Any]:
     report_path = _resolve_report_path(run_root)
     report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.exists() else {}

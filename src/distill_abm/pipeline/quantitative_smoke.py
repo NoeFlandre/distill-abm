@@ -561,8 +561,7 @@ def _normalize_factorial_table(frame: pd.DataFrame | None) -> pd.DataFrame:
         return pd.DataFrame(columns=columns)
     normalized = frame.copy()
     rename_map = {
-        column: column.replace("ROUGE-", "R-").replace("Reading_ease", "Reading ease")
-        for column in normalized.columns
+        column: column.replace("ROUGE-", "R-").replace("Reading_ease", "Reading ease") for column in normalized.columns
     }
     normalized = normalized.rename(columns=rename_map)
     for feature in FACTORIAL_FEATURE_ORDER:
@@ -642,8 +641,7 @@ def _render_anova_latex_table(rows: list[dict[str, float | str | None]]) -> str:
         + " {} & {} \\\\".format(
             _latex_escape(str(row["label"])),
             " & ".join(
-                _latex_escape(_format_pvalue_cell(_lookup_metric_value(row, metric)))
-                for metric in METRIC_COLUMN_NAMES
+                _latex_escape(_format_pvalue_cell(_lookup_metric_value(row, metric))) for metric in METRIC_COLUMN_NAMES
             ),
         )
         for row in rows
@@ -651,9 +649,7 @@ def _render_anova_latex_table(rows: list[dict[str, float | str | None]]) -> str:
     return (
         "\\begin{tabular}{|l|l|l|l|l|l|l|}\n\\hline\n"
         "\\textit{$\\downarrow$Variable / metric $\\rightarrow$} & BLEU & METEOR & R-1 & R-2 & R-L"
-        " & Reading ease \\\\\n"
-        + "\n".join(latex_rows)
-        + "\n\\hline\n\\end{tabular}\n"
+        " & Reading ease \\\\\n" + "\n".join(latex_rows) + "\n\\hline\n\\end{tabular}\n"
     )
 
 

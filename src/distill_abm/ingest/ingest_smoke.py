@@ -305,9 +305,7 @@ def _render_markdown_report(result: IngestSmokeSuiteResult) -> str:
         if abm.error:
             lines.append(f"- error: `{abm.error}`")
         for stage_result in abm.stage_results:
-            lines.append(
-                f"- {stage_result.stage.stage_id}: `{stage_result.status}` -> `{stage_result.artifact.path}`"
-            )
+            lines.append(f"- {stage_result.stage.stage_id}: `{stage_result.status}` -> `{stage_result.artifact.path}`")
             if stage_result.error_code:
                 lines.append(f"  error_code: `{stage_result.error_code}`")
             if stage_result.error:

@@ -19,9 +19,7 @@ class FakeAdapter(LLMAdapter):
         return LLMResponse(provider="fake", model=request.model, text=request.user_prompt(), raw={})
 
 
-def test_pipeline_outputs_full_metrics_with_abm_config(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_pipeline_outputs_full_metrics_with_abm_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     csv = tmp_path / "sim.csv"
     csv.write_text("tick;mean-incum-1\n0;1\n1;2\n", encoding="utf-8")
 

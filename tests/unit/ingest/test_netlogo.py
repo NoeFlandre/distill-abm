@@ -167,9 +167,6 @@ def test_clean_json_content_flattens_remaining_markdown_headings(tmp_path: Path)
     )
 
 
-
-
-
 def test_extract_documentation_raises_for_missing_doc_section(tmp_path: Path) -> None:
     """Test that extract_documentation raises ValueError when no doc section exists."""
     content = "globals [a b]\nto go\nend\n"

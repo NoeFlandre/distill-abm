@@ -53,6 +53,20 @@ class FullCaseSuiteSmokeResult(BaseModel):
     abms: list[FullCaseSuiteAbmResult] = Field(default_factory=list)
 
 
+def _validate_suite_inputs(
+    *,
+    abm_inputs: dict[str, FullCaseSmokeInput],
+    cases_by_abm: dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
+) -> None:
+    """Validate that suite inputs and case specs are aligned before starting work."""
+
+    for abm, case_input in abm_inputs.items():
+        if abm not in cases_by_abm:
+            raise ValueError(f"missing case specs for ABM '{abm}'")
+        if case_input.abm != abm:
+            raise ValueError(f"ABM input key '{abm}' does not match case input '{case_input.abm}'")
+
+
 def run_full_case_suite_smoke(
     *,
     abm_inputs: dict[str, FullCaseSmokeInput],
@@ -68,6 +82,7 @@ def run_full_case_suite_smoke(
     """Run the full-case matrix smoke across all configured ABMs."""
 
     started_at = datetime.now(UTC)
+    _validate_suite_inputs(abm_inputs=abm_inputs, cases_by_abm=cases_by_abm)
     output_root.mkdir(parents=True, exist_ok=True)
     run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
     run_root = output_root / "runs" / run_id
@@ -86,36 +101,57 @@ def run_full_case_suite_smoke(
     summary_rows: list[dict[str, str]] = []
     for abm, case_input in abm_inputs.items():
         abm_output_root = output_root / "abms" / abm
+        case_specs = cases_by_abm[abm]
         log_event(
             LOGGER,
             "full_case_suite_abm_start",
             abm=abm,
-            case_count=len(cases_by_abm[abm]),
+            case_count=len(case_specs),
             output_root=str(abm_output_root),
         )
-        matrix_result = run_full_case_matrix_smoke(
-            case_input=case_input,
-            adapter=adapter,
-            model=model,
-            output_root=abm_output_root,
-            cases=cases_by_abm[abm],
-            max_tokens=max_tokens,
-            max_retries=max_retries,
-            retry_backoff_seconds=retry_backoff_seconds,
-            resume_existing=resume_existing,
-        )
-        latest_abm_run = Path((abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip())
-        abm_result = FullCaseSuiteAbmResult(
-            abm=abm,
-            success=matrix_result.success,
-            run_root=latest_abm_run,
-            report_json_path=matrix_result.report_json_path,
-            report_markdown_path=matrix_result.report_markdown_path,
-            review_csv_path=matrix_result.review_csv_path,
-            review_html_path=matrix_result.viewer_html_path,
-            planned_case_count=len(cases_by_abm[abm]),
-            failed_case_ids=list(matrix_result.failed_case_ids),
-        )
+        try:
+            matrix_result = run_full_case_matrix_smoke(
+                case_input=case_input,
+                adapter=adapter,
+                model=model,
+                output_root=abm_output_root,
+                cases=case_specs,
+                max_tokens=max_tokens,
+                max_retries=max_retries,
+                retry_backoff_seconds=retry_backoff_seconds,
+                resume_existing=resume_existing,
+            )
+            latest_abm_run = Path((abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip())
+            abm_result = FullCaseSuiteAbmResult(
+                abm=abm,
+                success=matrix_result.success,
+                run_root=latest_abm_run,
+                report_json_path=matrix_result.report_json_path,
+                report_markdown_path=matrix_result.report_markdown_path,
+                review_csv_path=matrix_result.review_csv_path,
+                review_html_path=matrix_result.viewer_html_path,
+                planned_case_count=len(case_specs),
+                failed_case_ids=list(matrix_result.failed_case_ids),
+            )
+        except Exception as exc:
+            abm_result = FullCaseSuiteAbmResult(
+                abm=abm,
+                success=False,
+                run_root=abm_output_root,
+                report_json_path=abm_output_root / "smoke_full_case_matrix_report.json",
+                report_markdown_path=abm_output_root / "smoke_full_case_matrix_report.md",
+                review_csv_path=abm_output_root / "request_review.csv",
+                review_html_path=abm_output_root / "review.html",
+                planned_case_count=len(case_specs),
+                failed_case_ids=["abm_runner_failed"],
+            )
+            log_event(
+                LOGGER,
+                "full_case_suite_abm_failed",
+                abm=abm,
+                error=str(exc),
+                output_root=str(abm_output_root),
+            )
         abm_results.append(abm_result)
         summary_rows.append(
             {
@@ -216,33 +252,31 @@ def _render_html(result: FullCaseSuiteSmokeResult) -> str:
     total_failed_cases = sum(len(item.failed_case_ids) for item in result.abms)
     cards = "\n".join(
         (
-            "<article class=\"case-card\">"
+            '<article class="case-card">'
             f"<header><h2>{item.abm}</h2><span class=\"status {'ok' if item.success else 'bad'}\">"
             f"{'success' if item.success else 'failed'}</span></header>"
             f"<dl><div><dt>Planned cases</dt><dd>{item.planned_case_count}</dd></div>"
             f"<div><dt>Failed cases</dt><dd>{len(item.failed_case_ids)}</dd></div></dl>"
-            f"<p class=\"links\"><a href=\"{item.review_html_path}\">reviewer</a>"
-            f"<a href=\"{item.report_markdown_path}\">report</a>"
-            f"<a href=\"{run_log_path(item.run_root)}\">log</a></p>"
+            f'<p class="links"><a href="{item.review_html_path}">reviewer</a>'
+            f'<a href="{item.report_markdown_path}">report</a>'
+            f'<a href="{run_log_path(item.run_root)}">log</a></p>'
             "</article>"
         )
         for item in result.abms
     )
     summary_cards = (
-        f"<section class=\"summary-grid\">"
-        f"<article class=\"summary-card\"><h2>Run</h2><p>{result.run_id}</p></article>"
-        f"<article class=\"summary-card\"><h2>ABMs</h2><p>{total_abms}</p></article>"
-        f"<article class=\"summary-card\"><h2>Planned cases</h2><p>{total_cases}</p></article>"
-        f"<article class=\"summary-card\"><h2>Failed cases</h2><p>{total_failed_cases}</p></article>"
+        f'<section class="summary-grid">'
+        f'<article class="summary-card"><h2>Run</h2><p>{result.run_id}</p></article>'
+        f'<article class="summary-card"><h2>ABMs</h2><p>{total_abms}</p></article>'
+        f'<article class="summary-card"><h2>Planned cases</h2><p>{total_cases}</p></article>'
+        f'<article class="summary-card"><h2>Failed cases</h2><p>{total_failed_cases}</p></article>'
         f"<article class=\"summary-card\"><h2>Status</h2><p>{'success' if result.success else 'failed'}</p></article>"
         "</section>"
     )
-    cards = "\n".join(
-        line for line in [cards] if line
-    )
+    cards = "\n".join(line for line in [cards] if line)
     return (
-        "<!doctype html><html><head><meta charset=\"utf-8\"><title>Mistral Generation Dashboard</title>"
-        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+        '<!doctype html><html><head><meta charset="utf-8"><title>Mistral Generation Dashboard</title>'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">'
         "<style>"
         "body{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"
         "margin:0;background:#f5f3ef;color:#171717}"
@@ -270,6 +304,6 @@ def _render_html(result: FullCaseSuiteSmokeResult) -> str:
         "a{color:#0d5bd7;text-decoration:none}"
         "a:hover{text-decoration:underline}"
         "</style></head><body>"
-        f"<header><h1>Mistral Generation Dashboard</h1><p class=\"subtle\">Run {result.run_id}</p></header>"
+        f'<header><h1>Mistral Generation Dashboard</h1><p class="subtle">Run {result.run_id}</p></header>'
         f"{summary_cards}<main>{cards}</main></body></html>"
     )

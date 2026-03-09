@@ -34,7 +34,7 @@ def test_is_generic_unavailable_response_flags_known_fallback_text() -> None:
 
 
 def test_parse_structured_smoke_text_returns_final_text_for_valid_payload() -> None:
-    trace = {"response": {"raw": {"message": {"content": '{\"response_text\":\"ok\"}'}, "done_reason": "stop"}}}
+    trace = {"response": {"raw": {"message": {"content": '{"response_text":"ok"}'}, "done_reason": "stop"}}}
 
     parsed_text = parse_structured_smoke_text(raw_text='{"response_text":"ok"}', trace=trace, prompt="prompt")
 
