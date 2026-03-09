@@ -84,7 +84,7 @@
   - `run.log.jsonl`
   - `suite_progress.json`
   - `review.csv`
-  - a top-level `review.html` that refreshes from `suite_progress.json`
+  - a top-level `review.html` rewritten from persisted progress and auto-refreshing safely when opened from disk
   - suite report JSON/Markdown
 - Stores nested per-ABM matrix runs under `abms/<abm>/`.
 - Mistral runs are paced and worker-limited specifically for that provider so the scheduler stays aligned with the API request budget.

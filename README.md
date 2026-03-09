@@ -32,7 +32,7 @@ Debug-only model note:
 - The all-ABMs generation audit run is exposed through `smoke-full-case-suite`.
 - `smoke-full-case-suite` writes a stable suite root with:
   - `suite_progress.json`
-  - a top-level `review.html` that refreshes from that JSON while the run is live
+  - a top-level `review.html` that auto-refreshes from the persisted progress state while the run is live and works when opened directly from disk
   - one nested matrix run per ABM under `abms/<abm>/runs/`
 - Mistral suite execution is paced and worker-limited specifically for its API budget, so the scheduler stays below the provider request ceiling instead of overscheduling pointlessly.
 
