@@ -362,7 +362,6 @@ def run_full_case_suite_smoke(
     _write_text(result.report_markdown_path, _render_report(result))
     _write_summary_csv(result.review_csv_path, summary_rows)
     _write_text(result.review_html_path, _render_html(result))
-    _write_text(output_root / "review.html", _render_live_html())
     _write_suite_progress(
         output_root=output_root,
         progress_path=progress_path,
@@ -535,10 +534,10 @@ def _build_suite_progress(
 
 def _write_suite_progress(*, output_root: Path, progress_path: Path, progress: FullCaseSuiteProgress) -> None:
     _write_json(progress_path, progress.model_dump(mode="json"))
-    _write_text(output_root / "review.html", _render_live_html())
+    _write_text(output_root / "review.html", _render_live_html(progress))
 
 
-def _render_live_html() -> str:
+def _render_live_html(progress: FullCaseSuiteProgress) -> str:
     style_rules = [
         (
             "body{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"
@@ -576,57 +575,67 @@ def _render_live_html() -> str:
         ".error{color:#9b2335;font-size:13px;margin-top:12px;white-space:pre-wrap}",
         ".dim{color:#6b6358}",
     ]
-    script_lines = [
-        "async function load(){",
-        "const res=await fetch('./suite_progress.json?ts='+Date.now(),{cache:'no-store'});",
-        "if(!res.ok){throw new Error('progress unavailable');}",
-        "const data=await res.json();",
-        (
-            "const statusClass=(s)=>s==='completed'?'ok':"
-            "(s==='failed'?'bad':(s==='running'?'running':"
-            "(s==='waiting_to_retry'?'waiting':'pending')));"
-        ),
-        "document.getElementById('summary').innerHTML=[",
-        "`<article class=\"summary-card\"><h2>Run</h2><p>${data.run_id}</p></article>`,",
-        "`<article class=\"summary-card\"><h2>Status</h2><p>${data.status}</p></article>`,",
-        "`<article class=\"summary-card\"><h2>Current ABM</h2><p>${data.current_abm ?? '-'}</p></article>`,",
-        "`<article class=\"summary-card\"><h2>Attempt</h2><p>${data.current_attempt ?? '-'}</p></article>`,",
-        (
-            "`<article class=\"summary-card\"><h2>Completed ABMs</h2>"
-            "<p>${data.completed_abm_count}/${data.total_abms}</p></article>`,"
-        ),
-        "`<article class=\"summary-card\"><h2>Failed cases</h2><p>${data.failed_case_count}</p></article>`",
-        "].join('');",
-        "document.getElementById('abms').innerHTML=data.abms.map(item=>{",
-        "const reviewer=item.review_html_path ? `<a href=\"${item.review_html_path}\">reviewer</a>` : '';",
-        "const report=item.report_json_path ? `<a href=\"${item.report_json_path}\">report</a>` : '';",
-        "const log=item.run_log_path ? `<a href=\"${item.run_log_path}\">log</a>` : '';",
-        "const error=item.last_error ? `<p class=\"error\">${item.last_error}</p>` : '';",
-        (
-            "return `<article class=\"abm-card\"><header style=\"display:flex;"
-            "justify-content:space-between;align-items:center\"><h2>${item.abm}</h2>"
-            "<span class=\"status ${statusClass(item.status)}\">${item.status}</span></header>"
-            "<dl><div><dt>Planned cases</dt><dd>${item.planned_case_count}</dd></div>"
-            "<div><dt>Failed cases</dt><dd>${item.failed_case_count}</dd></div>"
-            "<div><dt>Attempt</dt><dd>${item.attempt ?? '-'}</dd></div>"
-            "<div><dt>Run root</dt><dd class=\"dim\">${item.run_root ?? '-'}</dd></div></dl>"
-            "<p class=\"links\">${reviewer}${report}${log}</p>${error}</article>`;"
-        ),
-        "}).join('');",
-        "}",
-        "load().catch(err=>{",
-        (
-            "document.getElementById('summary').innerHTML="
-            "`<article class=\"summary-card\"><h2>Status</h2><p>waiting</p></article>"
-            "<article class=\"summary-card\"><h2>Message</h2><p class=\"dim\">${err.message}</p></article>`;"
-        ),
-        "});",
-        "setInterval(load,3000);",
+    def status_class(status: str) -> str:
+        if status == "completed":
+            return "ok"
+        if status == "failed":
+            return "bad"
+        if status == "running":
+            return "running"
+        if status == "waiting_to_retry":
+            return "waiting"
+        return "pending"
+
+    summary_cards = [
+        ("Run", progress.run_id),
+        ("Status", progress.status),
+        ("Current ABM", progress.current_abm or "-"),
+        ("Attempt", "-" if progress.current_attempt is None else str(progress.current_attempt)),
+        ("Completed ABMs", f"{progress.completed_abm_count}/{progress.total_abms}"),
+        ("Failed cases", str(progress.failed_case_count)),
     ]
+    summary_html = "".join(
+        f'<article class="summary-card"><h2>{title}</h2><p>{value}</p></article>'
+        for title, value in summary_cards
+    )
+    abm_cards: list[str] = []
+    for item in progress.abms:
+        links: list[str] = []
+        if item.review_html_path is not None:
+            links.append(f'<a href="{item.review_html_path}">reviewer</a>')
+        if item.report_json_path is not None:
+            links.append(f'<a href="{item.report_json_path}">report</a>')
+        if item.run_log_path is not None:
+            links.append(f'<a href="{item.run_log_path}">log</a>')
+        abm_cards.append(
+            "".join(
+                [
+                    '<article class="abm-card">',
+                    '<header style="display:flex;justify-content:space-between;align-items:center">',
+                    f"<h2>{item.abm}</h2>",
+                    f'<span class="status {status_class(item.status)}">{item.status}</span>',
+                    "</header>",
+                    "<dl>",
+                    f"<div><dt>Planned cases</dt><dd>{item.planned_case_count}</dd></div>",
+                    f"<div><dt>Failed cases</dt><dd>{item.failed_case_count}</dd></div>",
+                    f"<div><dt>Attempt</dt><dd>{item.attempt if item.attempt is not None else '-'}</dd></div>",
+                    (
+                        '<div><dt>Run root</dt><dd class="dim">'
+                        f'{item.run_root if item.run_root is not None else "-"}'
+                        "</dd></div>"
+                    ),
+                    "</dl>",
+                    f'<p class="links">{"".join(links)}</p>',
+                    f'<p class="error">{item.last_error}</p>' if item.last_error else "",
+                    "</article>",
+                ]
+            )
+        )
     return "".join(
         [
             '<!doctype html><html><head><meta charset="utf-8"><title>Mistral Generation Dashboard</title>',
             '<meta name="viewport" content="width=device-width, initial-scale=1">',
+            '<meta http-equiv="refresh" content="3">',
             "<style>",
             "".join(style_rules),
             "</style></head><body>",
@@ -635,9 +644,8 @@ def _render_live_html() -> str:
                 "This page refreshes automatically while the suite is running."
                 "</p></header>"
             ),
-            '<section id="summary" class="summary-grid"></section><main id="abms"></main>',
-            "<script>",
-            "".join(script_lines),
-            "</script></body></html>",
+            f'<section class="summary-grid">{summary_html}</section>',
+            f'<main>{"".join(abm_cards)}</main>',
+            "</body></html>",
         ]
     )

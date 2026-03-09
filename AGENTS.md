@@ -150,6 +150,7 @@ Capture solutions so the team compounds knowledge:
 - **Provider-specific scheduling belongs in the shared runners.** If a provider has a clear request budget, encode pacing and worker limits in the shared smoke/runtime runners rather than in one-off scripts or ad hoc shell throttling.
 - **Long-running smoke suites should ship a simple HTML dashboard.** Logs and CSVs remain the source of truth, but top-level all-ABM smoke suites should also expose a small static dashboard for quick operator review during and after the run.
 - **Long-running smoke suites should expose one stable root-level progress contract while they are running.** Prefer a root `suite_progress.json` plus a top-level `review.html` that refreshes from it, so humans can monitor the suite from one place without drilling into nested ABM run roots.
+- **Stable dashboards must work when opened directly from disk.** Prefer rewriting a root `review.html` from persisted progress with simple auto-refresh over browser-side `fetch(...)` logic that can fail under `file://`.
 
 ---
 
