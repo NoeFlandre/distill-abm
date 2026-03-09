@@ -123,6 +123,15 @@ def test_run_doe_smoke_suite_writes_grouped_shared_and_case_artifacts(tmp_path: 
     assert "image_path" in review_header
     assert "table_csv_path" in review_header
     assert "Your goal is to explain an agent-based model." in first_review
+    logged_events = [
+        json.loads(line)["event"]
+        for line in result.run_log_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    assert "doe_smoke_start" in logged_events
+    assert "doe_smoke_shared_plot_complete" in logged_events
+    assert "doe_smoke_shared_prompt_variant_complete" in logged_events
+    assert "doe_smoke_complete" in logged_events
 
 
 def test_run_doe_smoke_suite_uses_legacy_style_prompt_composition_and_statistical_table_evidence(

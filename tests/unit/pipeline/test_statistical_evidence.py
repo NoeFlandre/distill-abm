@@ -4,6 +4,7 @@ import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any, cast
 
 import pandas as pd
 import pytest
@@ -85,7 +86,9 @@ def test_build_statistical_evidence_skips_degenerate_mann_kendall_windows() -> N
 
     evidence = build_statistical_evidence(frame=frame, reporter_pattern="metric-a")
 
-    rolling = evidence.summary_payload["series"][0]["rolling_mann_kendall"]
+    series_payload = cast(list[dict[str, Any]], evidence.summary_payload["series"])
+    first_series = series_payload[0]
+    rolling = cast(dict[str, Any], first_series["rolling_mann_kendall"])
     assert rolling["status"] == "ok"
     assert isinstance(rolling["windows"], list)
 
@@ -109,6 +112,8 @@ def test_build_statistical_evidence_handles_mann_kendall_runtime_error(
 
     evidence = build_statistical_evidence(frame=frame, reporter_pattern="metric-a")
 
-    rolling = evidence.summary_payload["series"][0]["rolling_mann_kendall"]
+    series_payload = cast(list[dict[str, Any]], evidence.summary_payload["series"])
+    first_series = series_payload[0]
+    rolling = cast(dict[str, Any], first_series["rolling_mann_kendall"])
     assert rolling["status"] == "ok"
     assert rolling["windows"] == []
