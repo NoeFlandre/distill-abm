@@ -17,6 +17,7 @@ from distill_abm.configs.models import PromptsConfig, SummarizerId
 from distill_abm.configs.runtime_defaults import get_runtime_defaults
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.llm.adapters.base import LLMAdapter, LLMMessage, LLMProviderError, LLMRequest
+from distill_abm.llm.request_defaults import resolve_request_temperature
 from distill_abm.llm.resilience import ensure_circuit_closed, record_failure, record_success
 from distill_abm.pipeline.statistical_evidence import build_statistical_evidence
 from distill_abm.structured_logging import get_logger, log_event
@@ -137,6 +138,7 @@ def invoke_adapter_with_trace(
     request = LLMRequest(
         model=model,
         messages=[LLMMessage(role="user", content=prompt)],
+        temperature=resolve_request_temperature(adapter.provider),
         image_b64=image_b64,
         max_tokens=max_tokens,
         metadata=dict(request_metadata or {}),

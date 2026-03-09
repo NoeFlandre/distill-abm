@@ -21,6 +21,10 @@ class FakeAdapter(LLMAdapter):
         return LLMResponse(provider=self.provider, model=request.model, text=self.text, raw={})
 
 
+class MistralFakeAdapter(FakeAdapter):
+    provider = "mistral"
+
+
 def _prompts() -> PromptsConfig:
     return PromptsConfig(
         context_prompt="context {parameters} {documentation}",
@@ -47,6 +51,21 @@ def test_evaluate_coverage_returns_structured_result() -> None:
     assert result.model == "fake-model"
     assert adapter.last_request is not None
     assert adapter.last_request.temperature == 1.0
+
+
+def test_evaluate_coverage_uses_mistral_temperature_override() -> None:
+    adapter = MistralFakeAdapter("Coverage score: 4. Reasoning: strong topical overlap.")
+    _ = evaluate_qualitative_score(
+        summary="summary text",
+        source="source context",
+        metric="coverage",
+        model="mistral-medium-latest",
+        prompts=_prompts(),
+        adapter=adapter,
+    )
+
+    assert adapter.last_request is not None
+    assert adapter.last_request.temperature == 0.2
 
 
 def test_evaluate_faithfulness_passes_image_to_adapter(tmp_path: Path) -> None:

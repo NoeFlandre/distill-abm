@@ -28,6 +28,7 @@ Debug-only model note:
 - `mistral_medium_debug` is available for smoke/debug work only.
 - It is not part of the benchmark model policy.
 - Use it only with `--allow-debug-model` and `MISTRAL_API_KEY` set.
+- Mistral debug requests use `temperature=0.2`; other providers remain at `1.0` unless explicitly overridden.
 
 ## Summarizers
 First-class summarizers:
