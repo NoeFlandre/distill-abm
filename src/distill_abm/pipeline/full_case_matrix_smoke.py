@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import shutil
+import threading
 import time
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
@@ -106,7 +107,8 @@ class _CachedContext(BaseModel):
 
 DEFAULT_MAX_CASE_ATTEMPTS = 3
 DEFAULT_MATRIX_PASS_WAIT_SECONDS = CIRCUIT_BREAKER_OPEN_SECONDS
-MAX_PARALLEL_TRENDS = 4
+MAX_PARALLEL_TRENDS = 6
+MAX_PARALLEL_CASES = 3
 
 
 class _MatrixTrendExecutionResult(BaseModel):
@@ -170,33 +172,44 @@ def run_full_case_matrix_smoke(
     _validate_full_case_inputs(case_input)
 
     context_cache: dict[str, _CachedContext] = {}
+    context_futures: dict[str, Future[_CachedContext]] = {}
+    context_lock = threading.Lock()
     case_results_by_id: dict[str, FullCaseMatrixCaseResult] = {}
     remaining_cases = list(cases)
     for _attempt in range(1, max(max_case_attempts, 1) + 1):
         next_remaining: list[FullCaseMatrixCaseSpec] = []
-        for case in remaining_cases:
-            case_dir = run_root / "cases" / case.case_id
-            previous_case_dir = previous_run_root / "cases" / case.case_id if previous_run_root else None
-            if resume_existing and previous_case_dir and previous_case_dir.exists() and not case_dir.exists():
-                shutil.copytree(previous_case_dir, case_dir)
-            else:
-                case_dir.mkdir(parents=True, exist_ok=True)
-            case_result = _run_full_case_matrix_case(
-                case_input=case_input,
-                adapter=adapter,
-                model=model,
-                case=case,
-                case_dir=case_dir,
-                max_tokens=max_tokens,
-                max_retries=max_retries,
-                retry_backoff_seconds=retry_backoff_seconds,
-                resume_existing=resume_existing,
-                context_cache=context_cache,
-                reused_from_previous=bool(previous_case_dir and previous_case_dir.exists()),
-            )
-            case_results_by_id[case.case_id] = case_result
-            if not case_result.success:
-                next_remaining.append(case)
+        with ThreadPoolExecutor(max_workers=min(MAX_PARALLEL_CASES, len(remaining_cases))) as executor:
+            future_to_case: dict[Future[FullCaseMatrixCaseResult], FullCaseMatrixCaseSpec] = {}
+            for case in remaining_cases:
+                case_dir = run_root / "cases" / case.case_id
+                previous_case_dir = previous_run_root / "cases" / case.case_id if previous_run_root else None
+                if resume_existing and previous_case_dir and previous_case_dir.exists() and not case_dir.exists():
+                    shutil.copytree(previous_case_dir, case_dir)
+                else:
+                    case_dir.mkdir(parents=True, exist_ok=True)
+                future = executor.submit(
+                    _run_full_case_matrix_case,
+                    case_input=case_input,
+                    adapter=adapter,
+                    model=model,
+                    case=case,
+                    case_dir=case_dir,
+                    max_tokens=max_tokens,
+                    max_retries=max_retries,
+                    retry_backoff_seconds=retry_backoff_seconds,
+                    resume_existing=resume_existing,
+                    context_cache=context_cache,
+                    context_futures=context_futures,
+                    context_lock=context_lock,
+                    reused_from_previous=bool(previous_case_dir and previous_case_dir.exists()),
+                )
+                future_to_case[future] = case
+            for future in as_completed(future_to_case):
+                case = future_to_case[future]
+                case_result = future.result()
+                case_results_by_id[case.case_id] = case_result
+                if not case_result.success:
+                    next_remaining.append(case)
         if not next_remaining:
             break
         wait_seconds = compute_matrix_retry_wait_seconds([case_results_by_id[case.case_id] for case in next_remaining])
@@ -262,6 +275,8 @@ def _run_full_case_matrix_case(
     retry_backoff_seconds: float | None,
     resume_existing: bool,
     context_cache: dict[str, _CachedContext],
+    context_futures: dict[str, Future[_CachedContext]],
+    context_lock: threading.Lock,
     reused_from_previous: bool,
 ) -> FullCaseMatrixCaseResult:
     inputs_dir = case_dir / "01_inputs"
@@ -310,14 +325,17 @@ def _run_full_case_matrix_case(
         context_text = cached_context.text
     else:
         try:
-            context_text, context_trace = _invoke_structured_smoke_text(
+            cached_context = _resolve_shared_matrix_context(
                 adapter=adapter,
                 model=model,
-                prompt_with_schema=context_prompt,
+                prompt=context_prompt,
                 max_tokens=max_tokens,
                 ollama_num_ctx=0,
                 max_retries=max_retries,
                 retry_backoff_seconds=retry_backoff_seconds,
+                context_cache=context_cache,
+                context_futures=context_futures,
+                context_lock=context_lock,
             )
         except StructuredSmokeResponseError as exc:
             _write_json(context_dir / "context_request.json", exc.trace["request"])
@@ -344,6 +362,8 @@ def _run_full_case_matrix_case(
                 resumed_from_existing=reused_from_previous,
                 error=str(exc),
             )
+        context_text = cached_context.text
+        context_trace = cached_context.trace
         _materialize_context_artifacts(
             requests_dir=context_dir,
             outputs_dir=context_dir,
@@ -353,10 +373,6 @@ def _run_full_case_matrix_case(
         validation_state.context = {"status": "accepted", "error": None}
         if (context_dir / "error.txt").exists():
             (context_dir / "error.txt").unlink()
-        context_cache[_context_cache_key(prompt=context_prompt, model=model)] = _CachedContext(
-            text=context_text,
-            trace=context_trace,
-        )
         _record_context_review_row(review_rows=review_rows, context_dir=context_dir, validation_status="accepted")
 
     frame = pd.read_csv(case_input.csv_path, sep=";")
@@ -482,6 +498,60 @@ def _run_full_case_matrix_case(
         resumed_from_existing=reused_from_previous,
         error=error_text or None,
     )
+
+
+def _resolve_shared_matrix_context(
+    *,
+    adapter: LLMAdapter,
+    model: str,
+    prompt: str,
+    max_tokens: int,
+    ollama_num_ctx: int,
+    max_retries: int | None,
+    retry_backoff_seconds: float | None,
+    context_cache: dict[str, _CachedContext],
+    context_futures: dict[str, Future[_CachedContext]],
+    context_lock: threading.Lock,
+) -> _CachedContext:
+    context_key = _context_cache_key(prompt=prompt, model=model)
+    with context_lock:
+        cached_context = context_cache.get(context_key)
+        if cached_context is not None:
+            return cached_context
+        in_flight_future = context_futures.get(context_key)
+        if in_flight_future is None:
+            in_flight_future = Future()
+            context_futures[context_key] = in_flight_future
+            should_compute = True
+        else:
+            should_compute = False
+
+    if should_compute:
+        try:
+            context_text, context_trace = _invoke_structured_smoke_text(
+                adapter=adapter,
+                model=model,
+                prompt_with_schema=prompt,
+                max_tokens=max_tokens,
+                ollama_num_ctx=ollama_num_ctx,
+                max_retries=max_retries,
+                retry_backoff_seconds=retry_backoff_seconds,
+            )
+            cached_context = _CachedContext(text=context_text, trace=context_trace)
+        except Exception as exc:
+            with context_lock:
+                inflight = context_futures.pop(context_key, None)
+                if inflight is not None and not inflight.done():
+                    inflight.set_exception(exc)
+            raise
+        with context_lock:
+            context_cache[context_key] = cached_context
+            inflight = context_futures.pop(context_key, None)
+            if inflight is not None and not inflight.done():
+                inflight.set_result(cached_context)
+        return cached_context
+
+    return in_flight_future.result()
 
 
 def _execute_matrix_trend(
