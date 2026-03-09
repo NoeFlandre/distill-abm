@@ -38,12 +38,20 @@ def build_run_signature(inputs: PipelineInputs, prompts: PromptsConfig, adapter:
             "scoring_reference_path": (
                 str(inputs.scoring_reference_path.resolve()) if inputs.scoring_reference_path is not None else None
             ),
+            "additional_scoring_reference_paths": {
+                reference_name: str(reference_path.resolve())
+                for reference_name, reference_path in sorted(inputs.additional_scoring_reference_paths.items())
+            },
         },
         "input_file_hashes": {
             "csv": _hash_file(inputs.csv_path),
             "parameters": _hash_file(inputs.parameters_path),
             "documentation": _hash_file(inputs.documentation_path),
             "scoring_reference": _hash_file(inputs.scoring_reference_path),
+            "additional_scoring_references": {
+                reference_name: _hash_file(reference_path)
+                for reference_name, reference_path in sorted(inputs.additional_scoring_reference_paths.items())
+            },
         },
         "llm": {
             "provider": adapter.provider,
@@ -154,6 +162,8 @@ def write_run_metadata(
     scoring_reference_text: str,
     scoring_reference_source: str,
     scoring_reference_path: Path | None,
+    additional_scoring_references: Mapping[str, tuple[str, str, Path]] | None,
+    additional_reference_scores: Mapping[str, Mapping[str, SummaryScores | None]] | None,
     include_pattern: str,
     evidence_mode: str,
     requested_evidence_mode: str,
@@ -175,6 +185,11 @@ def write_run_metadata(
         stats_table_csv_path=stats_table_csv_path,
         stats_image_path=stats_image_path,
         scoring_reference_path=scoring_reference_path,
+        additional_scoring_reference_paths=(
+            {name: path for name, (_text, _source, path) in additional_scoring_references.items()}
+            if additional_scoring_references is not None
+            else None
+        ),
         context_trace=context_trace,
         trend_trace=trend_trace,
         summarization_trace=summarization_trace,
@@ -200,6 +215,8 @@ def write_run_metadata(
         scoring_reference_text=scoring_reference_text,
         scoring_reference_source=scoring_reference_source,
         scoring_reference_path=scoring_reference_path,
+        additional_scoring_references=additional_scoring_references,
+        additional_reference_scores=additional_reference_scores,
         include_pattern=include_pattern,
         evidence_mode=evidence_mode,
         requested_evidence_mode=requested_evidence_mode,
@@ -234,6 +251,8 @@ def _write_run_metadata(
     scoring_reference_text: str,
     scoring_reference_source: str,
     scoring_reference_path: Path | None,
+    additional_scoring_references: Mapping[str, tuple[str, str, Path]] | None,
+    additional_reference_scores: Mapping[str, Mapping[str, SummaryScores | None]] | None,
     include_pattern: str,
     evidence_mode: str,
     requested_evidence_mode: str,
@@ -267,6 +286,8 @@ def _write_run_metadata(
         scoring_reference_text=scoring_reference_text,
         scoring_reference_source=scoring_reference_source,
         scoring_reference_path=scoring_reference_path,
+        additional_scoring_references=additional_scoring_references,
+        additional_reference_scores=additional_reference_scores,
         include_pattern=include_pattern,
         evidence_mode=evidence_mode,
         requested_evidence_mode=requested_evidence_mode,
@@ -337,6 +358,8 @@ def _build_metadata_payload(
     scoring_reference_text: str,
     scoring_reference_source: str,
     scoring_reference_path: Path | None,
+    additional_scoring_references: Mapping[str, tuple[str, str, Path]] | None,
+    additional_reference_scores: Mapping[str, Mapping[str, SummaryScores | None]] | None,
     include_pattern: str,
     evidence_mode: str,
     requested_evidence_mode: str,
@@ -355,6 +378,10 @@ def _build_metadata_payload(
     context_usage = _extract_trace_usage(debug_trace, "context_request_path")
     trend_usage = _extract_trace_usage(debug_trace, "trend_request_path")
     observability = _build_observability_summary(context_usage=context_usage, trend_usage=trend_usage)
+    additional_reference_metadata = _build_additional_reference_metadata(
+        additional_scoring_references=additional_scoring_references,
+        additional_reference_scores=additional_reference_scores,
+    )
     return {
         "run_timestamp_utc": datetime.now(UTC).isoformat(),
         "inputs": {
@@ -372,6 +399,10 @@ def _build_metadata_payload(
             "enabled_style_features": list(inputs.enabled_style_features) if inputs.enabled_style_features else None,
             "output_dir": str(inputs.output_dir),
             "scoring_reference_path": str(scoring_reference_path) if scoring_reference_path is not None else None,
+            "additional_scoring_reference_paths": {
+                reference_name: str(reference_path)
+                for reference_name, (_text, _source, reference_path) in (additional_scoring_references or {}).items()
+            },
             "resume_existing": inputs.resume_existing,
             "allow_summary_fallback": allow_summary_fallback,
         },
@@ -481,6 +512,7 @@ def _build_metadata_payload(
                 "length": len(scoring_reference_text),
                 "signature": hashlib.sha256(scoring_reference_text.encode("utf-8")).hexdigest(),
             },
+            "additional_references": additional_reference_metadata,
         },
         "outputs": {
             "summary_csv_path": str(
@@ -565,6 +597,7 @@ def _write_debug_trace_bundle(
     stats_table_csv_path: Path,
     stats_image_path: Path | None,
     scoring_reference_path: Path | None,
+    additional_scoring_reference_paths: Mapping[str, Path] | None,
     context_trace: dict[str, object],
     trend_trace: dict[str, object],
     summarization_trace: dict[str, object],
@@ -586,6 +619,13 @@ def _write_debug_trace_bundle(
         if scoring_reference_path is not None
         else None
     )
+    additional_scoring_snapshots = {
+        reference_name: _snapshot_file(
+            reference_path,
+            inputs_dir / "additional_scoring_references" / f"{reference_name}.txt",
+        )
+        for reference_name, reference_path in (additional_scoring_reference_paths or {}).items()
+    }
 
     context_request_path = llm_dir / "context_request.json"
     context_request_path.write_text(json.dumps(context_trace, indent=2, sort_keys=True), encoding="utf-8")
@@ -599,8 +639,28 @@ def _write_debug_trace_bundle(
         "parameters": _build_file_debug_record(inputs.parameters_path),
         "documentation": _build_file_debug_record(inputs.documentation_path),
         "scoring_reference": _build_file_debug_record(scoring_reference_path) if scoring_reference_path else None,
+        "additional_scoring_references": {
+            reference_name: _build_file_debug_record(reference_path)
+            for reference_name, reference_path in (additional_scoring_reference_paths or {}).items()
+        },
     }
-    warnings = _collect_debug_warnings(input_validations=input_validations, frame_summary=frame_summary)
+    csv_validation = cast(dict[str, object] | None, input_validations["csv"])
+    parameters_validation = cast(dict[str, object] | None, input_validations["parameters"])
+    documentation_validation = cast(dict[str, object] | None, input_validations["documentation"])
+    scoring_validation = cast(dict[str, object] | None, input_validations["scoring_reference"])
+    additional_reference_validations = cast(
+        dict[str, dict[str, object]],
+        input_validations["additional_scoring_references"],
+    )
+    warning_input_validations: dict[str, dict[str, object] | None] = {
+        "csv": csv_validation,
+        "parameters": parameters_validation,
+        "documentation": documentation_validation,
+        "scoring_reference": scoring_validation,
+    }
+    for reference_name, record in additional_reference_validations.items():
+        warning_input_validations[f"additional_scoring_reference:{reference_name}"] = record
+    warnings = _collect_debug_warnings(input_validations=warning_input_validations, frame_summary=frame_summary)
 
     artifact_manifest = {
         "plot_path": _build_file_debug_record(plot_path),
@@ -630,6 +690,10 @@ def _write_debug_trace_bundle(
             "parameters_path": str(parameters_snapshot),
             "documentation_path": str(documentation_snapshot),
             "scoring_reference_path": str(scoring_snapshot) if scoring_snapshot is not None else None,
+            "additional_scoring_reference_paths": {
+                reference_name: str(snapshot_path)
+                for reference_name, snapshot_path in additional_scoring_snapshots.items()
+            },
         },
         "context_request_path": str(context_request_path),
         "trend_request_path": str(trend_request_path),
@@ -645,6 +709,34 @@ def _snapshot_file(source: Path, destination: Path) -> Path:
     destination.parent.mkdir(parents=True, exist_ok=True)
     copy2(source, destination)
     return destination
+
+
+def _build_additional_reference_metadata(
+    *,
+    additional_scoring_references: Mapping[str, tuple[str, str, Path]] | None,
+    additional_reference_scores: Mapping[str, Mapping[str, SummaryScores | None]] | None,
+) -> dict[str, object]:
+    metadata: dict[str, object] = {}
+    for reference_name, reference_scores in (additional_reference_scores or {}).items():
+        if additional_scoring_references is None or reference_name not in additional_scoring_references:
+            continue
+        reference_text, reference_source, reference_path = additional_scoring_references[reference_name]
+        selected_scores = reference_scores.get("selected_scores")
+        full_scores = reference_scores.get("full_scores")
+        summary_scores = reference_scores.get("summary_scores")
+        metadata[reference_name] = {
+            "reference": {
+                "source": reference_source,
+                "path": str(reference_path),
+                "text": reference_text,
+                "length": len(reference_text),
+                "signature": hashlib.sha256(reference_text.encode("utf-8")).hexdigest(),
+            },
+            "selected_scores": selected_scores.model_dump() if selected_scores is not None else None,
+            "full_scores": full_scores.model_dump() if full_scores is not None else None,
+            "summary_scores": summary_scores.model_dump() if summary_scores is not None else None,
+        }
+    return metadata
 
 
 def _build_file_debug_record(path: Path | None) -> dict[str, object]:

@@ -41,7 +41,7 @@ configs/
   runtime_defaults.yaml      runtime defaults (modes, summarizers, requests)
   experiment_settings.yaml   ABM ground-truth mapping
   prompts.yaml               prompt templates + style factors
-  ground_truth/              human references for lexical scoring
+  ground_truth/              author + modeler references for lexical scoring
   prompt_assets/             qualitative prompt examples
 
 src/distill_abm/
@@ -255,6 +255,7 @@ Each run writes `pipeline_run_metadata.json` with:
 4. Input artifact paths and hashes
 5. Run signature for resumable execution
 6. Score source provenance (`context_response` or human ground truth file)
+7. Additional reference-score blocks when an ABM has optional secondary references
 
 Each run also writes `debug_trace/` with:
 

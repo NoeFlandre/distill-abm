@@ -463,3 +463,44 @@ def test_write_report_with_both_full_and_summary_scores(tmp_path: Path) -> None:
     assert "full_token_f1" in rows[0]
     assert "summary_token_f1" in rows[0]
     assert rows[1][1] == "summary trend"
+
+
+def test_write_report_includes_additional_reference_scores(tmp_path: Path) -> None:
+    def fake_scores(token_f1: float) -> SummaryScores:
+        return SummaryScores(
+            token_f1=token_f1,
+            precision=0.1,
+            recall=0.2,
+            bleu=0.3,
+            meteor=0.4,
+            rouge1=0.5,
+            rouge2=0.6,
+            rouge_l=0.7,
+            flesch_reading_ease=75.0,
+            reference_length=10,
+            candidate_length=5,
+        )
+
+    report_path = helpers.write_report(
+        output_dir=tmp_path,
+        context="context",
+        trend_full="full trend",
+        trend_summary="summary trend",
+        scores=fake_scores(0.9),
+        full_scores=fake_scores(0.7),
+        summary_scores=fake_scores(0.8),
+        include_extended_columns=True,
+        additional_reference_scores={
+            "modeler_ground_truth": {
+                "selected_scores": fake_scores(0.11),
+                "full_scores": fake_scores(0.22),
+                "summary_scores": fake_scores(0.33),
+            }
+        },
+    )
+
+    with report_path.open("r", encoding="utf-8", newline="") as handle:
+        rows = list(csv.reader(handle))
+    assert "modeler_ground_truth_token_f1" in rows[0]
+    assert "modeler_ground_truth_full_token_f1" in rows[0]
+    assert "modeler_ground_truth_summary_token_f1" in rows[0]

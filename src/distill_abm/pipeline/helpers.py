@@ -7,7 +7,7 @@ import csv
 import hashlib
 import logging
 import time
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Literal, Protocol, cast
 
@@ -407,6 +407,7 @@ def write_report(
     full_scores: SummaryScores | None = None,
     summary_scores: SummaryScores | None = None,
     include_extended_columns: bool = False,
+    additional_reference_scores: Mapping[str, Mapping[str, SummaryScores | None]] | None = None,
 ) -> Path:
     """Persist benchmark metrics and trend/context text for one pipeline run."""
     report_path = output_dir / "report.csv"
@@ -491,11 +492,65 @@ def write_report(
             ]
         )
 
+    if additional_reference_scores is not None:
+        for reference_name, reference_scores in additional_reference_scores.items():
+            _append_reference_score_columns(
+                headers=headers,
+                row=row,
+                prefix=reference_name,
+                scores=reference_scores.get("selected_scores"),
+            )
+            _append_reference_score_columns(
+                headers=headers,
+                row=row,
+                prefix=f"{reference_name}_full",
+                scores=reference_scores.get("full_scores"),
+            )
+            _append_reference_score_columns(
+                headers=headers,
+                row=row,
+                prefix=f"{reference_name}_summary",
+                scores=reference_scores.get("summary_scores"),
+            )
+
     with report_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle)
         writer.writerow(headers)
         writer.writerow(row)
     return report_path
+
+
+def _append_reference_score_columns(
+    *,
+    headers: list[str],
+    row: list[str | float | int],
+    prefix: str,
+    scores: SummaryScores | None,
+) -> None:
+    if scores is None:
+        return
+    headers.extend(
+        [
+            f"{prefix}_token_f1",
+            f"{prefix}_bleu",
+            f"{prefix}_meteor",
+            f"{prefix}_rouge1",
+            f"{prefix}_rouge2",
+            f"{prefix}_rouge_l",
+            f"{prefix}_flesch_reading_ease",
+        ]
+    )
+    row.extend(
+        [
+            scores.token_f1,
+            scores.bleu,
+            scores.meteor,
+            scores.rouge1,
+            scores.rouge2,
+            scores.rouge_l,
+            scores.flesch_reading_ease,
+        ]
+    )
 
 
 def sweep_headers(max_items: int, csv_column_style: str) -> list[str]:

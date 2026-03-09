@@ -214,6 +214,26 @@ def resolve_scoring_reference_path(abm: str) -> Path:
     return Path(mapping[abm])
 
 
+def resolve_additional_scoring_reference_paths(abm: str) -> dict[str, Path]:
+    """Resolve optional secondary human reference paths for one supported ABM."""
+    settings = load_experiment_settings(Path("configs/experiment_settings.yaml"))
+    if settings.modeler_ground_truth is None:
+        return {}
+    mapping = {
+        "fauna": settings.modeler_ground_truth.fauna,
+        "grazing": settings.modeler_ground_truth.grazing,
+        "milk_consumption": settings.modeler_ground_truth.milk_consumption,
+    }
+    if abm not in mapping:
+        raise typer.BadParameter(
+            f"unsupported ABM for additional scoring references: {abm}. Allowed: fauna, grazing, milk_consumption."
+        )
+    resolved = mapping[abm]
+    if not resolved:
+        return {}
+    return {"modeler_ground_truth": Path(resolved)}
+
+
 def assert_ollama_model_available(model: str) -> None:
     """Verify that a required local Ollama model is available."""
     client_error: Exception | None = None

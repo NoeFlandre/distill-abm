@@ -1,3 +1,4 @@
-Human reference reports for ABM scoring can be stored here.
+Human reference reports and source documents for ABM scoring can be stored here.
 
-Populate with per-ABM references when running full benchmark studies.
+Use this area for modeler-authored source material that supports the cleaned scoring
+references configured in `configs/experiment_settings.yaml`.

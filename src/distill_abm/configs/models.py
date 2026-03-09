@@ -118,10 +118,19 @@ class ExperimentGroundTruthConfig(BaseModel):
     milk_consumption: str
 
 
+class OptionalExperimentGroundTruthConfig(BaseModel):
+    """Optional secondary human reference files used for additional lexical scoring."""
+
+    fauna: str | None = None
+    grazing: str | None = None
+    milk_consumption: str | None = None
+
+
 class ExperimentSettings(BaseModel):
     """Paper-aligned experiment settings required by CLI and reproducibility tooling."""
 
     ground_truth: ExperimentGroundTruthConfig
+    modeler_ground_truth: OptionalExperimentGroundTruthConfig | None = None
     qualitative_example_text_dir: str | None = None
     human_reference_dir: str | None = None
 

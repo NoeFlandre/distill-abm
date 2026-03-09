@@ -255,6 +255,8 @@ def _ensure_case_response_bundles(case_result: SmokeCaseResult, smoke_inputs: Sm
     copy_if_exists(smoke_inputs.documentation_path, inputs_dir / "documentation.txt")
     if smoke_inputs.scoring_reference_path is not None:
         copy_if_exists(smoke_inputs.scoring_reference_path, inputs_dir / "ground_truth.txt")
+    for reference_name, reference_path in sorted(smoke_inputs.additional_scoring_reference_paths.items()):
+        copy_if_exists(reference_path, inputs_dir / f"{reference_name}.txt")
 
     copy_if_exists(case_result.context_prompt_path, prompts_dir / "context_prompt.txt")
     copy_if_exists(case_result.trend_prompt_path, prompts_dir / "trend_prompt.txt")

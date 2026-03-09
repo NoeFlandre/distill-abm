@@ -76,6 +76,7 @@ class DescribeAbmResult(BaseModel):
     model_path: Path
     experiment_parameters_path: Path | None = None
     scoring_reference_path: Path | None = None
+    additional_scoring_reference_paths: dict[str, Path] = Field(default_factory=dict)
     metric_pattern: str
     metric_description: str
     plot_descriptions: list[str] = Field(default_factory=list)

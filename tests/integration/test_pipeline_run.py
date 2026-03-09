@@ -269,9 +269,8 @@ def test_run_pipeline_uses_scoring_reference_file_when_provided(
             model="fake-model",
             metric_pattern="mean-incum",
             metric_description="weekly milk",
-            text_source_mode="summary_only",
+            text_source_mode="full_text_only",
             evidence_mode="plot",
-            allow_summary_fallback=True,
             scoring_reference_path=reference_path,
         ),
         prompts=_prompts(),
@@ -280,6 +279,66 @@ def test_run_pipeline_uses_scoring_reference_file_when_provided(
 
     assert references
     assert all(reference == "HUMAN-GROUND-TRUTH" for reference in references)
+
+
+def test_run_pipeline_scores_additional_references_and_records_them(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csv_path, parameters_path, documentation_path = _write_inputs(tmp_path)
+    primary_reference_path = tmp_path / "ground_truth.txt"
+    primary_reference_path.write_text("PRIMARY-GROUND-TRUTH", encoding="utf-8")
+    modeler_reference_path = tmp_path / "modeler_ground_truth.txt"
+    modeler_reference_path.write_text("MODELER-GROUND-TRUTH", encoding="utf-8")
+
+    references: list[str] = []
+
+    def fake_score_summary(reference: str, candidate: str) -> SummaryScores:
+        references.append(reference)
+        return SummaryScores(
+            token_f1=0.5,
+            precision=0.5,
+            recall=0.5,
+            bleu=0.5,
+            meteor=0.5,
+            rouge1=0.5,
+            rouge2=0.5,
+            rouge_l=0.5,
+            flesch_reading_ease=50.0,
+            reference_length=1,
+            candidate_length=1,
+        )
+
+    monkeypatch.setattr(run_module, "score_summary", fake_score_summary)
+
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=parameters_path,
+            documentation_path=documentation_path,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            text_source_mode="full_text_only",
+            evidence_mode="plot",
+            scoring_reference_path=primary_reference_path,
+            additional_scoring_reference_paths={"modeler_ground_truth": modeler_reference_path},
+        ),
+        prompts=_prompts(),
+        adapter=FakeAdapter(),
+    )
+
+    assert "PRIMARY-GROUND-TRUTH" in references
+    assert "MODELER-GROUND-TRUTH" in references
+
+    report_text = result.report_csv.read_text(encoding="utf-8")
+    assert "modeler_ground_truth_bleu" in report_text
+
+    metadata_path = tmp_path / "out" / "pipeline_run_metadata.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    additional_references = metadata["scores"]["additional_references"]
+    assert additional_references["modeler_ground_truth"]["reference"]["text"] == "MODELER-GROUND-TRUTH"
+    assert additional_references["modeler_ground_truth"]["selected_scores"]["bleu"] == 0.5
 
 
 def test_run_pipeline_resume_existing_reuses_artifacts(tmp_path: Path) -> None:
