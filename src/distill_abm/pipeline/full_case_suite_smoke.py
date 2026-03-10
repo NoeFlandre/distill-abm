@@ -487,5 +487,6 @@ def _render_html(result: FullCaseSuiteSmokeResult) -> str:
         f"{summary_cards}<main>{cards}</main></body></html>"
     )
 
+
 def _write_suite_progress(*, output_root: Path, progress_path: Path, progress: FullCaseSuiteProgress) -> None:
     _write_json(progress_path, progress.model_dump(mode="json"))

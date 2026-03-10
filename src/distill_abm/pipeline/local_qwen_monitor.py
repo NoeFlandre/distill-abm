@@ -346,9 +346,11 @@ def _render_selected_case_details(case: LocalQwenCaseSnapshot | None) -> Rendera
     details.add_row("progress", case.progress_detail or "-")
     details.add_row(
         "steps",
-        "-"
-        if case.completed_steps is None or case.total_steps is None
-        else f"{case.completed_steps}/{case.total_steps}",
+        (
+            "-"
+            if case.completed_steps is None or case.total_steps is None
+            else f"{case.completed_steps}/{case.total_steps}"
+        ),
     )
     details.add_row("error", case.error or "-")
     return details

@@ -73,8 +73,7 @@ def collect_local_qwen_monitor_snapshot(output_root: Path) -> LocalQwenMonitorSn
         )
 
     case_snapshots = tuple(
-        _collect_case_snapshot(case_dir)
-        for case_dir in sorted(path for path in cases_root.iterdir() if path.is_dir())
+        _collect_case_snapshot(case_dir) for case_dir in sorted(path for path in cases_root.iterdir() if path.is_dir())
     )
     running_case_id = next((case.case_id for case in case_snapshots if case.status.startswith("running")), None)
     completed_cases = sum(1 for case in case_snapshots if case.status == "completed")
@@ -286,9 +285,7 @@ def _collect_suite_snapshot(output_root: Path, payload: JsonObject) -> LocalQwen
                         "failed"
                         if nested_snapshot.failed_cases
                         else (
-                            "completed"
-                            if nested_snapshot.completed_cases == nested_snapshot.total_cases
-                            else "running"
+                            "completed" if nested_snapshot.completed_cases == nested_snapshot.total_cases else "running"
                         )
                     )
                 ),
@@ -375,9 +372,7 @@ def _collect_trial_snapshot(trial_dir: Path) -> LocalQwenCaseSnapshot:
         case_id=str(trial_dir.relative_to(trial_dir.parents[2])),
         status=status,
         label=f"{trial_dir.parent.name}/{trial_dir.name}",
-        num_ctx=(
-            representative.num_ctx if representative and representative.num_ctx is not None else fallback_num_ctx
-        ),
+        num_ctx=(representative.num_ctx if representative and representative.num_ctx is not None else fallback_num_ctx),
         max_tokens=(
             representative.max_tokens
             if representative and representative.max_tokens is not None

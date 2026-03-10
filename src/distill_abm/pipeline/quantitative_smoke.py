@@ -56,19 +56,17 @@ _render_factorial_latex_table = _render_factorial_latex_table
 _render_optimal_markdown_table = _render_optimal_markdown_table
 _render_optimal_latex_table = _render_optimal_latex_table
 
-__all__ = sorted(
-    [
+__all__ = [
+    "QuantitativeRecord",
+    "QuantitativeSmokeResult",
     "_render_anova_latex_table",
     "_render_anova_markdown_table",
     "_render_factorial_latex_table",
     "_render_factorial_markdown_table",
     "_render_optimal_latex_table",
     "_render_optimal_markdown_table",
-    "QuantitativeRecord",
-    "QuantitativeSmokeResult",
     "run_quantitative_smoke",
-    ]
-)
+]
 
 QUANTITATIVE_REPORT_FILENAME = "smoke_quantitative_report.json"
 ANOVA_ROW_SPECS: tuple[tuple[str, str], ...] = (
@@ -710,6 +708,7 @@ def _factorial_feature_sort_key(feature: str) -> int:
         return FACTORIAL_FEATURE_ORDER.index(feature)
     except ValueError:
         return len(FACTORIAL_FEATURE_ORDER)
+
 
 def _format_float_cell(value: float | int | str) -> str:
     return f"{float(value):.2f}"

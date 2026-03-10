@@ -146,6 +146,7 @@ def test_run_full_case_suite_smoke_marks_abm_failure_without_crashing(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setenv("MISTRAL_API_KEY", "debug-token")
+
     def fake_run_full_case_matrix_smoke(**kwargs):  # type: ignore[no-untyped-def]
         case_input = kwargs["case_input"]
         if case_input.abm == "grazing":
@@ -547,9 +548,7 @@ def test_refresh_progress_abm_snapshot_preserves_progress_on_nested_snapshot_val
     assert refreshed == progress
 
 
-def test_build_suite_progress_aggregates_current_case_fields(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_build_suite_progress_aggregates_current_case_fields(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     output_root = tmp_path / "suite"
     run_root = output_root / "runs" / "run_suite"
     started_at = datetime.now(UTC)
