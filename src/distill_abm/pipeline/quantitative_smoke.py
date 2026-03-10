@@ -39,6 +39,7 @@ from distill_abm.pipeline.quantitative_rendering import (
 from distill_abm.pipeline.quantitative_rendering import (
     render_optimal_markdown_table as _render_optimal_markdown_table,
 )
+from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import (
     latest_run_pointer_path,
     resolve_run_root,
@@ -55,17 +56,19 @@ _render_factorial_latex_table = _render_factorial_latex_table
 _render_optimal_markdown_table = _render_optimal_markdown_table
 _render_optimal_latex_table = _render_optimal_latex_table
 
-__all__ = [
+__all__ = sorted(
+    [
+    "_render_anova_latex_table",
+    "_render_anova_markdown_table",
+    "_render_factorial_latex_table",
+    "_render_factorial_markdown_table",
+    "_render_optimal_latex_table",
+    "_render_optimal_markdown_table",
     "QuantitativeRecord",
     "QuantitativeSmokeResult",
     "run_quantitative_smoke",
-    "_render_anova_markdown_table",
-    "_render_anova_latex_table",
-    "_render_factorial_markdown_table",
-    "_render_factorial_latex_table",
-    "_render_optimal_markdown_table",
-    "_render_optimal_latex_table",
-]
+    ]
+)
 
 QUANTITATIVE_REPORT_FILENAME = "smoke_quantitative_report.json"
 ANOVA_ROW_SPECS: tuple[tuple[str, str], ...] = (
@@ -315,8 +318,12 @@ def run_quantitative_smoke(
         failed_record_ids=sorted(dict.fromkeys(failed_record_ids)),
         record_count=len(review_rows),
     )
-    result.report_json_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
-    result.report_markdown_path.write_text(_render_markdown_report(result), encoding="utf-8")
+    write_model_report_files(
+        result=result,
+        report_json_path=result.report_json_path,
+        report_markdown_path=result.report_markdown_path,
+        markdown=_render_markdown_report(result),
+    )
     return result
 
 
