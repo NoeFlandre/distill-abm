@@ -85,6 +85,12 @@ tests/
   unit/
 ```
 
+Recent internal refactors preserved the public smoke/monitor contracts while splitting a few dense modules into narrower helpers:
+- `pipeline/local_qwen_monitor.py` now keeps the TUI/rendering surface, while `pipeline/local_qwen_monitor_snapshots.py` owns sampled/full-case/tuning/suite snapshot collection.
+- `pipeline/full_case_suite_progress.py` owns the stable suite progress/current-view contract used by `smoke-full-case-suite`.
+- `pipeline/full_case_review_csv.py` owns the shared per-case full-case review CSV writer used by both single-case and matrix smoke runs.
+- `run_viewer_payloads.py` owns typed payload construction for the static `review.html` viewer.
+
 ## Quick Start
 
 ```bash

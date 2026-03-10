@@ -91,6 +91,25 @@
 - Keeps a stable `abms/<abm>/current/` view with the latest report/log/CSV for each ABM.
 - Mistral runs are paced and worker-limited specifically for that provider so the scheduler stays aligned with the API request budget.
 
+### `src/distill_abm/pipeline/local_qwen_monitor.py`
+- Terminal/TUI rendering and keyboard navigation for live local-Qwen and suite monitoring.
+- Re-exports the stable monitor snapshot types and collection entrypoint used by CLI and suite-progress code.
+
+### `src/distill_abm/pipeline/local_qwen_monitor_snapshots.py`
+- Filesystem snapshot collection for sampled smoke, full-case smoke, tuning trials, and suite-progress views.
+- Owns the characterization-pinned status/payload logic that feeds the monitor TUI and JSON output.
+
+### `src/distill_abm/pipeline/full_case_suite_progress.py`
+- Builds the stable suite progress contract and syncs the nested `abms/<abm>/current/` view.
+- Treats `suite_progress.json` and the per-ABM current-view artifacts as the operator-facing progress contract.
+
+### `src/distill_abm/pipeline/full_case_review_csv.py`
+- Shared writer for the stable per-case full-case review CSV contract used by both single-case and matrix smoke runs.
+
+### `src/distill_abm/run_viewer_payloads.py`
+- Builds the typed JSON payload consumed by the static run review HTML viewer.
+- Centralizes run/case payload construction so viewer HTML rendering stays separate from filesystem interpretation.
+
 ### `src/distill_abm/llm/*`
 - Provider-neutral adapter interface.
 - Provider-specific adapters for OpenRouter, Mistral, and Echo.
