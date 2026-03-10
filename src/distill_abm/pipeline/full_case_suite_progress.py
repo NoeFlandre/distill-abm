@@ -124,9 +124,9 @@ def refresh_progress_abm_snapshot(
     running_case = next((case for case in snapshot.cases if case.case_id == snapshot.running_case_id), None)
     return progress.model_copy(
         update={
-            "run_root": stable_paths["run_root"],
-            "run_log_path": stable_paths["run_log_path"],
-            "report_json_path": stable_paths["report_json_path"],
+            "run_root": stable_paths.run_root,
+            "run_log_path": stable_paths.run_log_path,
+            "report_json_path": stable_paths.report_json_path,
             "completed_case_count": snapshot.completed_cases,
             "failed_case_count": snapshot.failed_cases,
             "running_case_id": snapshot.running_case_id,
