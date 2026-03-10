@@ -13,6 +13,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, run_log_path
 from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
 from distill_abm.summarize.models import (
@@ -306,8 +307,12 @@ def run_summarizer_smoke(
         failed_bundle_ids=failed_bundle_ids,
         bundles=bundle_results,
     )
-    result.report_json_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
-    result.report_markdown_path.write_text(_render_markdown_report(result), encoding="utf-8")
+    write_model_report_files(
+        result=result,
+        report_json_path=result.report_json_path,
+        report_markdown_path=result.report_markdown_path,
+        markdown=_render_markdown_report(result),
+    )
     return result
 
 
