@@ -4,7 +4,7 @@ from pathlib import Path
 from textwrap import dedent
 
 from distill_abm.pipeline.run_artifact_contracts import resolve_run_root
-from distill_abm.run_viewer import render_run_viewer
+from distill_abm.run_viewer import _build_viewer_payload, render_run_viewer
 
 
 def _build_sample_run(root: Path) -> Path:
@@ -83,6 +83,24 @@ def test_render_run_viewer_writes_minimal_review_html(tmp_path: Path) -> None:
     assert "trend_evidence_plot.png" in html
 
 
+def test_build_viewer_payload_includes_sample_case_paths_and_text(tmp_path: Path) -> None:
+    root = _build_sample_run(tmp_path)
+
+    payload = _build_viewer_payload(root / "runs" / "run_1")
+
+    assert payload["success"] is True
+    assert payload["failed_case_ids"] == []
+    assert len(payload["cases"]) == 1
+    case = payload["cases"][0]
+    assert case["case_id"] == "01_case"
+    assert case["paths"]["context_prompt"] == "cases/01_case/01_inputs/context_prompt.txt"
+    assert case["paths"]["hyperparameters"] == "cases/01_case/02_requests/hyperparameters.json"
+    assert case["context_prompt_text"] == "ctx prompt"
+    assert case["documentation_text"] == "docs body"
+    assert case["parameters_text"] == "params body"
+    assert case["trend_output_text"] == "trend out"
+
+
 def test_render_run_viewer_writes_full_case_trend_sections(tmp_path: Path) -> None:
     run_root = tmp_path / "runs" / "run_1"
     case_root = run_root / "cases" / "01_case"
@@ -121,3 +139,47 @@ def test_render_run_viewer_writes_full_case_trend_sections(tmp_path: Path) -> No
     assert "trend out" in html
     assert "plot_01" in html
     assert "Statistical evidence for simulation series matching `metric`." in html
+
+
+def test_build_viewer_payload_includes_full_case_trend_entries(tmp_path: Path) -> None:
+    run_root = tmp_path / "runs" / "run_1"
+    case_root = run_root / "cases" / "01_case"
+    (case_root / "01_inputs").mkdir(parents=True)
+    (case_root / "02_context").mkdir(parents=True)
+    (case_root / "03_trends" / "plot_01").mkdir(parents=True)
+    (tmp_path / "latest_run.txt").write_text(str(run_root), encoding="utf-8")
+    (run_root / "smoke_full_case_matrix_report.json").write_text(
+        '{"success": true, "failed_case_ids": [], "cases": [{"case_id": "01_case", "abm": "grazing", '
+        '"evidence_mode": "plot+table", "prompt_variant": "role", "model": "m", "resumed_from_existing": true, '
+        '"success": true, "error": null}]}',
+        encoding="utf-8",
+    )
+    (run_root / "run.log.jsonl").write_text('{"message":"x"}\n', encoding="utf-8")
+    (case_root / "00_case_summary.json").write_text(
+        '{"case_id":"01_case","abm":"grazing","evidence_mode":"plot+table","prompt_variant":"role","model":"m"}',
+        encoding="utf-8",
+    )
+    (case_root / "01_inputs" / "context_prompt.txt").write_text("ctx prompt", encoding="utf-8")
+    (case_root / "01_inputs" / "documentation.txt").write_text("docs body", encoding="utf-8")
+    (case_root / "01_inputs" / "parameters.txt").write_text("params body", encoding="utf-8")
+    (case_root / "02_context" / "context_output.txt").write_text("ctx out", encoding="utf-8")
+    (case_root / "02_context" / "context_trace.json").write_text("{}", encoding="utf-8")
+    (case_root / "03_trends" / "plot_01" / "trend_prompt.txt").write_text("trend prompt", encoding="utf-8")
+    (case_root / "03_trends" / "plot_01" / "trend_output.txt").write_text("trend out", encoding="utf-8")
+    (case_root / "03_trends" / "plot_01" / "trend_trace.json").write_text("{}", encoding="utf-8")
+    (case_root / "03_trends" / "plot_01" / "trend_evidence_table.txt").write_text(
+        "Statistical evidence for simulation series matching `metric`.\n",
+        encoding="utf-8",
+    )
+
+    payload = _build_viewer_payload(run_root)
+
+    assert len(payload["cases"]) == 1
+    case = payload["cases"][0]
+    assert case["resumed_from_existing"] is True
+    assert case["paths"]["validation_state"] == ""
+    assert len(case["trends"]) == 1
+    trend = case["trends"][0]
+    assert trend["plot_id"] == "plot_01"
+    assert trend["table_csv_path"] == "cases/01_case/03_trends/plot_01/trend_evidence_table.txt"
+    assert trend["trend_output_text"] == "trend out"
