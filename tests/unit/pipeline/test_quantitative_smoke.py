@@ -13,6 +13,9 @@ from distill_abm.pipeline.quantitative_smoke import (
     _derive_prompt_flags,
     _normalize_factorial_table,
     _render_anova_markdown_table,
+    _render_factorial_latex_table,
+    _render_optimal_latex_table,
+    _render_optimal_markdown_table,
     run_quantitative_smoke,
 )
 
@@ -168,6 +171,54 @@ def test_render_anova_markdown_table_marks_fixed_factors_absent() -> None:
     assert "Agent-Based Model" in table
     assert "| — | — | — | — | — | — |" in table
     assert "<0.01" in table
+
+
+def test_render_optimal_tables_preserve_expected_headers_and_rows() -> None:
+    rows = [
+        {
+            "ABM": "grazing",
+            "Summary": "bart",
+            "LLM": "mistral-medium-latest",
+            "BLEU": "0.12",
+            "METEOR": "0.34",
+            "R-1": "0.56",
+            "R-2": "0.22",
+            "R-L": "0.44",
+            "Reading ease": "61.00",
+        }
+    ]
+
+    markdown = _render_optimal_markdown_table(rows)
+    latex = _render_optimal_latex_table(rows)
+
+    assert "| ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |" in markdown
+    assert "| grazing | bart | mistral-medium-latest | 0.12 | 0.34 | 0.56 | 0.22 | 0.44 | 61.00 |" in markdown
+    assert "\\textit{\\textbf{ABM}}" in latex
+    assert "grazing & bart & mistral-medium-latest" in latex
+
+
+def test_render_factorial_latex_table_bolds_large_contributions() -> None:
+    frame = pd.DataFrame(
+        [
+            {
+                "Feature": "Summarizer_AND_Evidence",
+                "BLEU": 6.25,
+                "METEOR": 4.0,
+                "R-1": 5.5,
+                "R-2": 1.0,
+                "R-L": 0.5,
+                "Reading ease": 10.0,
+            }
+        ]
+    )
+
+    latex = _render_factorial_latex_table(frame)
+
+    assert "Summarizer and Evidence" in latex
+    assert "\\textbf{6.25}" in latex
+    assert "\\textbf{5.50}" in latex
+    assert "\\textbf{10.00}" in latex
+    assert "4.00" in latex
 
 
 def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> None:
