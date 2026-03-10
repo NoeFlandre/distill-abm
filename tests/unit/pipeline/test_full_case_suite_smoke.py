@@ -492,6 +492,9 @@ def test_refresh_progress_abm_snapshot_updates_current_view_and_running_detail(
     assert refreshed.running_case_status == "running"
     assert refreshed.running_case_detail == "trend plot_07"
     assert (abm_output_root / "current" / "run.log.jsonl").read_text(encoding="utf-8") == '{"event":"x"}\n'
+    assert (abm_output_root / "current" / "smoke_full_case_matrix_report.json").read_text(encoding="utf-8") == "{}"
+    assert (abm_output_root / "current" / "smoke_full_case_matrix_report.md").read_text(encoding="utf-8") == "report"
+    assert (abm_output_root / "current" / "request_review.csv").read_text(encoding="utf-8") == "case_id\n01\n"
     assert (abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip() == str(run_root)
 
 
