@@ -10,12 +10,12 @@ import pytest
 from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline.full_case_matrix_smoke import FullCaseMatrixCaseSpec
 from distill_abm.pipeline.full_case_smoke import FullCaseSmokeInput
-from distill_abm.pipeline.full_case_suite_smoke import (
+from distill_abm.pipeline.full_case_suite_progress import (
     FullCaseSuiteProgressAbm,
-    _build_suite_progress,
-    _refresh_progress_abm_snapshot,
-    run_full_case_suite_smoke,
+    build_suite_progress,
+    refresh_progress_abm_snapshot,
 )
+from distill_abm.pipeline.full_case_suite_smoke import run_full_case_suite_smoke
 from distill_abm.pipeline.local_qwen_monitor import LocalQwenCaseSnapshot, LocalQwenMonitorSnapshot
 
 
@@ -51,7 +51,7 @@ def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkey
         fake_run_full_case_matrix_smoke,
     )
     monkeypatch.setattr(
-        "distill_abm.pipeline.full_case_suite_smoke.collect_local_qwen_monitor_snapshot",
+        "distill_abm.pipeline.full_case_suite_progress.collect_local_qwen_monitor_snapshot",
         lambda output_root: LocalQwenMonitorSnapshot(
             output_root=output_root / "runs" / "run_1",
             exists=True,
@@ -465,7 +465,7 @@ def test_refresh_progress_abm_snapshot_updates_current_view_and_running_detail(
         ),
     )
     monkeypatch.setattr(
-        "distill_abm.pipeline.full_case_suite_smoke.collect_local_qwen_monitor_snapshot",
+        "distill_abm.pipeline.full_case_suite_progress.collect_local_qwen_monitor_snapshot",
         lambda _: snapshot,
     )
 
@@ -484,7 +484,7 @@ def test_refresh_progress_abm_snapshot_updates_current_view_and_running_detail(
         last_error=None,
     )
 
-    refreshed = _refresh_progress_abm_snapshot(output_root=output_root, progress=progress)
+    refreshed = refresh_progress_abm_snapshot(output_root=output_root, progress=progress)
 
     assert refreshed.completed_case_count == 10
     assert refreshed.failed_case_count == 1
@@ -528,7 +528,7 @@ def test_build_suite_progress_aggregates_current_case_fields(
         )
 
     monkeypatch.setattr(
-        "distill_abm.pipeline.full_case_suite_smoke._refresh_progress_abm_snapshot",
+        "distill_abm.pipeline.full_case_suite_progress.refresh_progress_abm_snapshot",
         fake_refresh_progress_abm_snapshot,
     )
 
@@ -563,7 +563,7 @@ def test_build_suite_progress_aggregates_current_case_fields(
         ),
     }
 
-    progress = _build_suite_progress(
+    progress = build_suite_progress(
         run_id="run_suite",
         run_root=run_root,
         output_root=output_root,
