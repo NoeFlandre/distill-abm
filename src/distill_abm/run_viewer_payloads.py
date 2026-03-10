@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from distill_abm.pipeline.run_artifact_contracts import (
     CASE_SUMMARY_FILENAME,
@@ -14,14 +14,18 @@ from distill_abm.pipeline.run_artifact_contracts import (
     VALIDATION_STATE_FILENAME,
 )
 
+JsonScalar = str | int | float | bool | None
+JsonValue = JsonScalar | list["JsonValue"] | dict[str, "JsonValue"]
+JsonObject = dict[str, JsonValue]
 
-def build_viewer_payload(run_root: Path) -> dict[str, Any]:
+
+def build_viewer_payload(run_root: Path) -> JsonObject:
     """Build the serialized payload consumed by the static HTML viewer."""
     report_path = resolve_report_path(run_root)
-    report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.exists() else {}
+    report: JsonObject = read_optional_json(report_path) if report_path.exists() else {}
     run_log_path = run_root / RUN_LOG_FILENAME
     cases_root = run_root / "cases"
-    cases = []
+    cases: list[JsonValue] = []
     for case_dir in sorted(path for path in cases_root.iterdir() if path.is_dir()):
         if (case_dir / "03_outputs").exists():
             cases.append(build_sample_case_payload(run_root=run_root, report=report, case_dir=case_dir))
@@ -35,7 +39,7 @@ def build_viewer_payload(run_root: Path) -> dict[str, Any]:
         "failed_case_ids": report.get("failed_case_ids", []),
         "started_at_utc": report.get("started_at_utc", ""),
         "finished_at_utc": report.get("finished_at_utc", ""),
-        "cases": cases,
+        "cases": cast(JsonValue, cases),
     }
 
 
@@ -48,21 +52,22 @@ def resolve_report_path(run_root: Path) -> Path:
     return run_root / SAMPLED_SMOKE_REPORT_FILENAME
 
 
-def build_sample_case_payload(*, run_root: Path, report: dict[str, Any], case_dir: Path) -> dict[str, Any]:
+def build_sample_case_payload(*, run_root: Path, report: JsonObject, case_dir: Path) -> JsonObject:
     """Build the viewer payload for a sampled smoke case."""
     case_summary = read_optional_json(case_dir / CASE_SUMMARY_FILENAME)
+    case_id = _get_string(case_summary, "case_id", default=case_dir.name)
     inputs_dir = case_dir / "01_inputs"
     requests_dir = case_dir / "02_requests"
     outputs_dir = case_dir / "03_outputs"
     return {
-        "case_id": case_summary.get("case_id", case_dir.name),
-        "abm": case_summary.get("abm", ""),
-        "evidence_mode": case_summary.get("evidence_mode", ""),
-        "prompt_variant": case_summary.get("prompt_variant", ""),
-        "model": case_summary.get("model", ""),
+        "case_id": case_id,
+        "abm": _get_string(case_summary, "abm"),
+        "evidence_mode": _get_string(case_summary, "evidence_mode"),
+        "prompt_variant": _get_string(case_summary, "prompt_variant"),
+        "model": _get_string(case_summary, "model"),
         "resumed_from_existing": lookup_resumed_flag(
             report=report,
-            case_id=case_summary.get("case_id", case_dir.name),
+            case_id=case_id,
         ),
         "success": not (outputs_dir / "error.txt").exists(),
         "error_text": read_optional_text(outputs_dir / "error.txt"),
@@ -90,17 +95,18 @@ def build_sample_case_payload(*, run_root: Path, report: dict[str, Any], case_di
         "context_output_text": read_optional_text(outputs_dir / "context_output.txt"),
         "trend_output_text": read_optional_text(outputs_dir / "trend_output.txt"),
         "hyperparameters_text": read_optional_text(requests_dir / "hyperparameters.json"),
-        "trends": [],
+        "trends": cast(JsonValue, []),
     }
 
 
-def build_full_case_payload(*, run_root: Path, report: dict[str, Any], case_dir: Path) -> dict[str, Any]:
+def build_full_case_payload(*, run_root: Path, report: JsonObject, case_dir: Path) -> JsonObject:
     """Build the viewer payload for a full-case smoke case."""
     case_summary = read_optional_json(case_dir / CASE_SUMMARY_FILENAME)
+    case_id = _get_string(case_summary, "case_id", default=case_dir.name)
     inputs_dir = case_dir / "01_inputs"
     context_dir = case_dir / "02_context"
     trends_root = case_dir / "03_trends"
-    trend_entries = []
+    trend_entries: list[JsonObject] = []
     for trend_dir in sorted(path for path in trends_root.iterdir() if path.is_dir()):
         trend_entries.append(
             {
@@ -118,16 +124,18 @@ def build_full_case_payload(*, run_root: Path, report: dict[str, Any], case_dir:
                 "error_text": read_optional_text(trend_dir / "error.txt"),
             }
         )
-    success = not (context_dir / "error.txt").exists() and all(not item["error_text"] for item in trend_entries)
+    success = not (context_dir / "error.txt").exists() and all(
+        not _get_string(item, "error_text") for item in trend_entries
+    )
     return {
-        "case_id": case_summary.get("case_id", case_dir.name),
-        "abm": case_summary.get("abm", ""),
-        "evidence_mode": case_summary.get("evidence_mode", ""),
-        "prompt_variant": case_summary.get("prompt_variant", ""),
-        "model": case_summary.get("model", ""),
+        "case_id": case_id,
+        "abm": _get_string(case_summary, "abm"),
+        "evidence_mode": _get_string(case_summary, "evidence_mode"),
+        "prompt_variant": _get_string(case_summary, "prompt_variant"),
+        "model": _get_string(case_summary, "model"),
         "resumed_from_existing": lookup_resumed_flag(
             report=report,
-            case_id=case_summary.get("case_id", case_dir.name),
+            case_id=case_id,
         ),
         "success": success,
         "error_text": read_optional_text(context_dir / "error.txt"),
@@ -149,11 +157,11 @@ def build_full_case_payload(*, run_root: Path, report: dict[str, Any], case_dir:
         "context_output_text": read_optional_text(context_dir / "context_output.txt"),
         "trend_output_text": "",
         "hyperparameters_text": "",
-        "trends": trend_entries,
+        "trends": cast(JsonValue, trend_entries),
     }
 
 
-def lookup_resumed_flag(*, report: dict[str, Any], case_id: str) -> bool:
+def lookup_resumed_flag(*, report: JsonObject, case_id: str) -> bool:
     """Look up whether a case was reused from a previous run."""
     cases = report.get("cases")
     if not isinstance(cases, list):
@@ -171,11 +179,14 @@ def read_optional_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
-def read_optional_json(path: Path) -> dict[str, Any]:
+def read_optional_json(path: Path) -> JsonObject:
     """Return decoded JSON or an empty mapping when absent."""
     if not path.exists():
         return {}
-    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        return {}
+    return cast(JsonObject, payload)
 
 
 def relative_path(run_root: Path, path: Path) -> str:
@@ -184,3 +195,7 @@ def relative_path(run_root: Path, path: Path) -> str:
         return ""
     return path.relative_to(run_root).as_posix()
 
+
+def _get_string(payload: JsonObject, key: str, *, default: str = "") -> str:
+    value = payload.get(key)
+    return value if isinstance(value, str) else default
