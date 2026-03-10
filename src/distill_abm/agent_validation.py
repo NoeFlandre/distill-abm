@@ -10,6 +10,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from distill_abm.ingest.ingest_smoke import run_ingest_smoke_suite
+from distill_abm.pipeline.report_writers import write_model_report_files
 
 ValidationStatus = Literal["ok", "failed", "skipped"]
 ValidationExecutionMode = Literal["fresh", "skipped"]
@@ -179,8 +180,12 @@ def run_validation_suite(
         report_json_path=report_json_path,
         report_markdown_path=report_markdown_path,
     )
-    report_json_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
-    report_markdown_path.write_text(_render_markdown_report(result), encoding="utf-8")
+    write_model_report_files(
+        result=result,
+        report_json_path=report_json_path,
+        report_markdown_path=report_markdown_path,
+        markdown=_render_markdown_report(result),
+    )
     return result
 
 
