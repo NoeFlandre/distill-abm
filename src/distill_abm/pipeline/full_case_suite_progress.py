@@ -116,7 +116,7 @@ def refresh_progress_abm_snapshot(
         return progress
     try:
         snapshot = collect_local_qwen_monitor_snapshot(abm_output_root)
-    except Exception:
+    except (OSError, ValueError):
         return progress
     if not snapshot.exists:
         return progress

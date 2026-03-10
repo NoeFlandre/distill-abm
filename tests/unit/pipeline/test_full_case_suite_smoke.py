@@ -517,6 +517,36 @@ def test_sync_stable_abm_current_view_returns_typed_paths(tmp_path: Path) -> Non
     assert stable_paths.review_csv_path == abm_output_root / "current" / "request_review.csv"
 
 
+def test_refresh_progress_abm_snapshot_preserves_progress_on_nested_snapshot_value_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output_root = tmp_path / "suite"
+    abm_output_root = output_root / "abms" / "fauna"
+    abm_output_root.mkdir(parents=True, exist_ok=True)
+    progress = FullCaseSuiteProgressAbm(
+        abm="fauna",
+        status="running",
+        planned_case_count=72,
+        completed_case_count=5,
+        failed_case_count=1,
+        run_root=abm_output_root / "runs" / "run_1",
+        run_log_path=abm_output_root / "runs" / "run_1" / "run.log.jsonl",
+        report_json_path=abm_output_root / "runs" / "run_1" / "smoke_full_case_matrix_report.json",
+        running_case_id="01_case",
+        running_case_status="running",
+        running_case_detail="trend plot_01",
+        last_error=None,
+    )
+    monkeypatch.setattr(
+        "distill_abm.pipeline.full_case_suite_progress.collect_local_qwen_monitor_snapshot",
+        lambda _: (_ for _ in ()).throw(ValueError("bad nested snapshot")),
+    )
+
+    refreshed = refresh_progress_abm_snapshot(output_root=output_root, progress=progress)
+
+    assert refreshed == progress
+
+
 def test_build_suite_progress_aggregates_current_case_fields(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
