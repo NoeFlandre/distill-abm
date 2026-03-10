@@ -48,9 +48,7 @@ def render_anova_latex_table(rows: list[dict[str, float | str | None]]) -> str:
     return (
         "\\begin{tabular}{|l|l|l|l|l|l|l|}\n\\hline\n"
         "\\textit{$\\downarrow$Variable / metric $\\rightarrow$} & BLEU & METEOR & R-1 & R-2 & R-L"
-        " & Reading ease \\\\\n"
-        + "\n".join(latex_rows)
-        + "\n\\hline\n\\end{tabular}\n"
+        " & Reading ease \\\\\n" + "\n".join(latex_rows) + "\n\\hline\n\\end{tabular}\n"
     )
 
 
