@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 from typing import cast
@@ -9,7 +10,12 @@ import pytest
 from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline.full_case_matrix_smoke import FullCaseMatrixCaseSpec
 from distill_abm.pipeline.full_case_smoke import FullCaseSmokeInput
-from distill_abm.pipeline.full_case_suite_smoke import run_full_case_suite_smoke
+from distill_abm.pipeline.full_case_suite_smoke import (
+    FullCaseSuiteProgressAbm,
+    _build_suite_progress,
+    _refresh_progress_abm_snapshot,
+    run_full_case_suite_smoke,
+)
 from distill_abm.pipeline.local_qwen_monitor import LocalQwenCaseSnapshot, LocalQwenMonitorSnapshot
 
 
@@ -418,3 +424,164 @@ def test_run_full_case_suite_smoke_rejects_duplicate_active_run(
             model="mistral-medium-latest",
             output_root=suite_root,
         )
+
+
+def test_refresh_progress_abm_snapshot_updates_current_view_and_running_detail(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output_root = tmp_path / "suite"
+    abm_output_root = output_root / "abms" / "fauna"
+    run_root = abm_output_root / "runs" / "run_1"
+    run_root.mkdir(parents=True, exist_ok=True)
+    (run_root / "run.log.jsonl").write_text('{"event":"x"}\n', encoding="utf-8")
+    (run_root / "smoke_full_case_matrix_report.json").write_text("{}", encoding="utf-8")
+    (run_root / "smoke_full_case_matrix_report.md").write_text("report", encoding="utf-8")
+    (run_root / "request_review.csv").write_text("case_id\n01\n", encoding="utf-8")
+
+    snapshot = LocalQwenMonitorSnapshot(
+        output_root=run_root,
+        exists=True,
+        mode="full_case_matrix",
+        total_cases=72,
+        completed_cases=10,
+        failed_cases=1,
+        running_case_id="11_fauna_example_table_rep1",
+        cases=(
+            LocalQwenCaseSnapshot(
+                case_id="11_fauna_example_table_rep1",
+                status="running",
+                label="11_fauna_example_table_rep1",
+                num_ctx=None,
+                max_tokens=None,
+                context_prompt_length=None,
+                trend_prompt_length=None,
+                context_total_tokens=None,
+                trend_total_tokens=None,
+                error=None,
+                progress_detail="trend plot_07",
+                completed_steps=8,
+                total_steps=15,
+            ),
+        ),
+    )
+    monkeypatch.setattr(
+        "distill_abm.pipeline.full_case_suite_smoke.collect_local_qwen_monitor_snapshot",
+        lambda _: snapshot,
+    )
+
+    progress = FullCaseSuiteProgressAbm(
+        abm="fauna",
+        status="running",
+        planned_case_count=72,
+        completed_case_count=0,
+        failed_case_count=0,
+        run_root=run_root,
+        run_log_path=run_root / "run.log.jsonl",
+        report_json_path=run_root / "smoke_full_case_matrix_report.json",
+        running_case_id=None,
+        running_case_status=None,
+        running_case_detail=None,
+        last_error=None,
+    )
+
+    refreshed = _refresh_progress_abm_snapshot(output_root=output_root, progress=progress)
+
+    assert refreshed.completed_case_count == 10
+    assert refreshed.failed_case_count == 1
+    assert refreshed.running_case_id == "11_fauna_example_table_rep1"
+    assert refreshed.running_case_status == "running"
+    assert refreshed.running_case_detail == "trend plot_07"
+    assert (abm_output_root / "current" / "run.log.jsonl").read_text(encoding="utf-8") == '{"event":"x"}\n'
+    assert (abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip() == str(run_root)
+
+
+def test_build_suite_progress_aggregates_current_case_fields(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output_root = tmp_path / "suite"
+    run_root = output_root / "runs" / "run_suite"
+    started_at = datetime.now(UTC)
+
+    def fake_refresh_progress_abm_snapshot(
+        *,
+        output_root: Path,
+        progress: FullCaseSuiteProgressAbm,
+    ) -> FullCaseSuiteProgressAbm:
+        _ = output_root
+        if progress.abm == "fauna":
+            return progress.model_copy(
+                update={
+                    "status": "completed",
+                    "completed_case_count": 72,
+                    "failed_case_count": 0,
+                }
+            )
+        return progress.model_copy(
+            update={
+                "status": "running",
+                "completed_case_count": 12,
+                "failed_case_count": 2,
+                "running_case_id": "15_grazing_role_plot_rep1",
+                "running_case_status": "running",
+                "running_case_detail": "context",
+            }
+        )
+
+    monkeypatch.setattr(
+        "distill_abm.pipeline.full_case_suite_smoke._refresh_progress_abm_snapshot",
+        fake_refresh_progress_abm_snapshot,
+    )
+
+    base_progress = {
+        "fauna": FullCaseSuiteProgressAbm(
+            abm="fauna",
+            status="pending",
+            planned_case_count=72,
+            completed_case_count=0,
+            failed_case_count=0,
+            run_root=run_root,
+            run_log_path=run_root / "run.log.jsonl",
+            report_json_path=run_root / "report.json",
+            running_case_id=None,
+            running_case_status=None,
+            running_case_detail=None,
+            last_error=None,
+        ),
+        "grazing": FullCaseSuiteProgressAbm(
+            abm="grazing",
+            status="pending",
+            planned_case_count=72,
+            completed_case_count=0,
+            failed_case_count=0,
+            run_root=run_root,
+            run_log_path=run_root / "run.log.jsonl",
+            report_json_path=run_root / "report.json",
+            running_case_id=None,
+            running_case_status=None,
+            running_case_detail=None,
+            last_error=None,
+        ),
+    }
+
+    progress = _build_suite_progress(
+        run_id="run_suite",
+        run_root=run_root,
+        output_root=output_root,
+        model="mistral-medium-latest",
+        started_at=started_at,
+        status="running",
+        current_abm="grazing",
+        current_attempt=2,
+        remaining_abms=["grazing"],
+        progress_by_name=base_progress,
+    )
+
+    assert progress.total_abms == 2
+    assert progress.completed_abm_count == 1
+    assert progress.failed_abm_count == 0
+    assert progress.planned_case_count == 144
+    assert progress.completed_case_count == 84
+    assert progress.failed_case_count == 2
+    assert progress.current_case_id == "15_grazing_role_plot_rep1"
+    assert progress.current_case_status == "running"
+    assert progress.current_case_detail == "context"
