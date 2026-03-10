@@ -10,6 +10,7 @@ import pytest
 from distill_abm.llm.adapters.base import LLMAdapter
 from distill_abm.pipeline.full_case_matrix_smoke import FullCaseMatrixCaseSpec
 from distill_abm.pipeline.full_case_smoke import FullCaseSmokeInput
+from distill_abm.pipeline.full_case_suite_current_view import sync_stable_abm_current_view
 from distill_abm.pipeline.full_case_suite_progress import (
     FullCaseSuiteProgressAbm,
     build_suite_progress,
@@ -496,6 +497,24 @@ def test_refresh_progress_abm_snapshot_updates_current_view_and_running_detail(
     assert (abm_output_root / "current" / "smoke_full_case_matrix_report.md").read_text(encoding="utf-8") == "report"
     assert (abm_output_root / "current" / "request_review.csv").read_text(encoding="utf-8") == "case_id\n01\n"
     assert (abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip() == str(run_root)
+
+
+def test_sync_stable_abm_current_view_returns_typed_paths(tmp_path: Path) -> None:
+    abm_output_root = tmp_path / "suite" / "abms" / "fauna"
+    run_root = abm_output_root / "runs" / "run_1"
+    run_root.mkdir(parents=True, exist_ok=True)
+    (run_root / "run.log.jsonl").write_text('{"event":"x"}\n', encoding="utf-8")
+    (run_root / "smoke_full_case_matrix_report.json").write_text("{}", encoding="utf-8")
+    (run_root / "smoke_full_case_matrix_report.md").write_text("report", encoding="utf-8")
+    (run_root / "request_review.csv").write_text("case_id\n01\n", encoding="utf-8")
+
+    stable_paths = sync_stable_abm_current_view(abm_output_root=abm_output_root, run_root=run_root)
+
+    assert stable_paths.run_root == run_root
+    assert stable_paths.run_log_path == abm_output_root / "current" / "run.log.jsonl"
+    assert stable_paths.report_json_path == abm_output_root / "current" / "smoke_full_case_matrix_report.json"
+    assert stable_paths.report_markdown_path == abm_output_root / "current" / "smoke_full_case_matrix_report.md"
+    assert stable_paths.review_csv_path == abm_output_root / "current" / "request_review.csv"
 
 
 def test_build_suite_progress_aggregates_current_case_fields(
