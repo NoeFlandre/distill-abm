@@ -150,6 +150,9 @@ Capture solutions so the team compounds knowledge:
 - **Provider-specific scheduling belongs in the shared runners.** If a provider has a clear request budget, encode pacing and worker limits in the shared smoke/runtime runners rather than in one-off scripts or ad hoc shell throttling.
 - **Long-running smoke suites should ship a simple HTML dashboard.** Logs and CSVs remain the source of truth, but top-level all-ABM smoke suites should also expose a small static dashboard for quick operator review during and after the run.
 - **Long-running smoke suites should expose one stable root-level progress contract while they are running.** Prefer a root `suite_progress.json` plus a terminal-first monitor path that reads it and the nested ABM run state, so humans can monitor the suite from one place without drilling into nested ABM run roots.
+- **Keep monitor/rendering boundaries explicit.** `pipeline/local_qwen_monitor.py` should stay focused on terminal rendering and interaction, while filesystem snapshot collection belongs in `pipeline/local_qwen_monitor_snapshots.py`.
+- **Keep stable artifact writers centralized when schemas repeat.** Shared contracts like per-case full-case review CSVs, suite current-view sync, and paired JSON/Markdown smoke reports should be written through small helper modules so layout changes happen in one place.
+- **Treat viewer payload building as a separate typed boundary.** `run_viewer_payloads.py` owns the JSON payload contract for `review.html`; avoid rebuilding that structure ad hoc inside HTML rendering code.
 
 ---
 
