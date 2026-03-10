@@ -5,9 +5,11 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import cast
 
 from distill_abm.pipeline.run_artifact_contracts import resolve_run_root
+
+JsonObject = dict[str, object]
 
 
 @dataclass(frozen=True)
@@ -239,7 +241,7 @@ def _collect_tuning_snapshot(output_root: Path, trials_root: Path) -> LocalQwenM
     )
 
 
-def _collect_suite_snapshot(output_root: Path, payload: dict[str, Any]) -> LocalQwenMonitorSnapshot:
+def _collect_suite_snapshot(output_root: Path, payload: JsonObject) -> LocalQwenMonitorSnapshot:
     abm_payloads = payload.get("abms")
     if not isinstance(abm_payloads, list):
         abm_payloads = []
@@ -389,7 +391,7 @@ def _collect_trial_snapshot(trial_dir: Path) -> LocalQwenCaseSnapshot:
     )
 
 
-def _extract_num_ctx(request: dict[str, Any] | None) -> int | None:
+def _extract_num_ctx(request: JsonObject | None) -> int | None:
     if not isinstance(request, dict):
         return None
     metadata = request.get("metadata")
@@ -399,21 +401,21 @@ def _extract_num_ctx(request: dict[str, Any] | None) -> int | None:
     return value if isinstance(value, int) else None
 
 
-def _extract_max_tokens(request: dict[str, Any] | None) -> int | None:
+def _extract_max_tokens(request: JsonObject | None) -> int | None:
     if not isinstance(request, dict):
         return None
     value = request.get("max_tokens")
     return value if isinstance(value, int) else None
 
 
-def _extract_prompt_length(request: dict[str, Any] | None) -> int | None:
+def _extract_prompt_length(request: JsonObject | None) -> int | None:
     if not isinstance(request, dict):
         return None
     value = request.get("prompt_length")
     return value if isinstance(value, int) else None
 
 
-def _extract_total_tokens(trace: dict[str, Any] | None) -> int | None:
+def _extract_total_tokens(trace: JsonObject | None) -> int | None:
     if not isinstance(trace, dict):
         return None
     response = trace.get("response")
@@ -426,11 +428,11 @@ def _extract_total_tokens(trace: dict[str, Any] | None) -> int | None:
     return value if isinstance(value, int) else None
 
 
-def _read_json(path: Path) -> dict[str, Any] | None:
+def _read_json(path: Path) -> JsonObject | None:
     if not path.exists():
         return None
     payload = json.loads(path.read_text(encoding="utf-8"))
-    return payload if isinstance(payload, dict) else None
+    return cast(JsonObject, payload) if isinstance(payload, dict) else None
 
 
 def _read_text(path: Path) -> str | None:
@@ -440,7 +442,7 @@ def _read_text(path: Path) -> str | None:
     return text or None
 
 
-def _validation_context_status(validation_state: dict[str, Any] | None) -> str | None:
+def _validation_context_status(validation_state: JsonObject | None) -> str | None:
     if not isinstance(validation_state, dict):
         return None
     context = validation_state.get("context")
@@ -450,7 +452,7 @@ def _validation_context_status(validation_state: dict[str, Any] | None) -> str |
     return status if isinstance(status, str) else None
 
 
-def _accepted_trend_count_from_validation_state(validation_state: dict[str, Any] | None) -> int:
+def _accepted_trend_count_from_validation_state(validation_state: JsonObject | None) -> int:
     if not isinstance(validation_state, dict):
         return 0
     trends = validation_state.get("trends")
@@ -459,7 +461,7 @@ def _accepted_trend_count_from_validation_state(validation_state: dict[str, Any]
     return sum(1 for payload in trends.values() if isinstance(payload, dict) and payload.get("status") == "accepted")
 
 
-def _failed_trends_from_validation_state(validation_state: dict[str, Any] | None, trend_dirs: list[Path]) -> list[str]:
+def _failed_trends_from_validation_state(validation_state: JsonObject | None, trend_dirs: list[Path]) -> list[str]:
     if not isinstance(validation_state, dict):
         return [path.name for path in trend_dirs if _read_text(path / "error.txt")]
     trends = validation_state.get("trends")
