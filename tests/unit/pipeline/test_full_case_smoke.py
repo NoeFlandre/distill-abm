@@ -163,6 +163,10 @@ def test_run_full_case_smoke_writes_context_and_all_trends(tmp_path: Path) -> No
     assert row_by_plot["context"]["validation_status"] == "accepted"
     assert row_by_plot["1"]["validation_status"] == "accepted"
     assert row_by_plot["2"]["validation_status"] == "accepted"
+    assert result.review_csv_path.read_text(encoding="utf-8").splitlines()[0] == (
+        "plot_index,reporter_pattern,plot_description,trend_prompt_path,"
+        "trend_output_path,image_path,table_csv_path,success,error,validation_status"
+    )
 
 
 def test_run_full_case_smoke_resume_reuses_context_and_accepted_trends(tmp_path: Path) -> None:

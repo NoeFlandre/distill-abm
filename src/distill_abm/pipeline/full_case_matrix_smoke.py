@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError
 from distill_abm.llm.resilience import CIRCUIT_BREAKER_OPEN_SECONDS, is_transient_provider_error
 from distill_abm.pipeline.doe_smoke_prompts import build_legacy_doe_context_prompt, build_legacy_doe_trend_prompt
+from distill_abm.pipeline.full_case_review_csv import write_case_review_csv
 from distill_abm.pipeline.full_case_smoke import (
     EvidenceMode,
     FullCasePlotInput,
@@ -719,23 +720,7 @@ def _finalize_case(
 
 
 def _write_case_review_csv(path: Path, rows: list[dict[str, str]]) -> None:
-    fieldnames = [
-        "plot_index",
-        "reporter_pattern",
-        "plot_description",
-        "trend_prompt_path",
-        "trend_output_path",
-        "image_path",
-        "table_csv_path",
-        "success",
-        "error",
-        "validation_status",
-    ]
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in rows:
-            writer.writerow(row)
+    write_case_review_csv(path, rows)
 
 
 def _write_run_review_csv(path: Path, rows: list[dict[str, str]]) -> None:
