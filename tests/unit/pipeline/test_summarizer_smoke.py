@@ -175,3 +175,37 @@ def test_run_summarizer_smoke_reuses_successful_outputs_when_resuming(tmp_path: 
     assert resumed.run_root != first.run_root
     assert all(mode.success for mode in resumed.bundles[0].modes)
     assert {mode.duration_seconds for mode in resumed.bundles[0].modes} == {0.0}
+
+
+def test_default_validated_smoke_bundles_discovers_completed_suite_abms(tmp_path: Path) -> None:
+    suite_root = tmp_path / "suite"
+    fauna_run = suite_root / "abms" / "fauna" / "runs" / "run_1"
+    grazing_run = suite_root / "abms" / "grazing" / "runs" / "run_1"
+    for abm, run_root in [("fauna", fauna_run), ("grazing", grazing_run)]:
+        (suite_root / "abms" / abm).mkdir(parents=True, exist_ok=True)
+        (suite_root / "abms" / abm / "latest_run.txt").write_text(str(run_root), encoding="utf-8")
+        case_root = run_root / "cases" / f"01_{abm}_none_plot_rep1"
+        (case_root / "02_context").mkdir(parents=True)
+        (case_root / "03_trends" / "plot_01").mkdir(parents=True)
+        (case_root / "02_context" / "context_output.txt").write_text("Valid context.", encoding="utf-8")
+        (case_root / "03_trends" / "plot_01" / "trend_output.txt").write_text("Valid trend.", encoding="utf-8")
+        (run_root / "smoke_full_case_matrix_report.json").write_text(
+            json.dumps(
+                {
+                    "cases": [
+                        {
+                            "case_id": f"01_{abm}_none_plot_rep1",
+                            "case_dir": str(case_root),
+                            "abm": abm,
+                            "success": True,
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    bundles = default_validated_smoke_bundles(suite_root, include_abms=("fauna",))
+
+    assert [bundle.abm for bundle in bundles] == ["fauna"]
+    assert bundles[0].case_id == "01_fauna_none_plot_rep1"

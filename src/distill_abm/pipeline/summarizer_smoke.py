@@ -79,14 +79,22 @@ class SummarizerSmokeResult(BaseModel):
     bundles: list[SummarizerBundleResult] = Field(default_factory=list)
 
 
-def default_validated_smoke_bundles(source_root: Path) -> tuple[ValidatedSmokeBundle, ...]:
+def default_validated_smoke_bundles(
+    source_root: Path,
+    *,
+    include_abms: tuple[str, ...] | None = None,
+) -> tuple[ValidatedSmokeBundle, ...]:
     """Return validated smoke bundles discovered from full-case or matrix run artifacts."""
+    suite_abms_root = source_root / "abms"
+    if suite_abms_root.exists():
+        return _discover_full_case_suite_bundles(source_root=source_root, include_abms=include_abms)
     matrix_report_path = source_root / "smoke_full_case_matrix_report.json"
     if matrix_report_path.exists():
-        return _discover_full_case_matrix_bundles(source_root, matrix_report_path)
+        bundles = _discover_full_case_matrix_bundles(source_root, matrix_report_path)
+        return _filter_bundles_by_abm(bundles, include_abms=include_abms)
     case_root = _discover_best_full_case_bundle(source_root / "cases")
     case_id = case_root.name
-    return (
+    bundles = (
         ValidatedSmokeBundle(
             bundle_id=case_id,
             case_id=case_id,
@@ -99,6 +107,7 @@ def default_validated_smoke_bundles(source_root: Path) -> tuple[ValidatedSmokeBu
             ),
         ),
     )
+    return _filter_bundles_by_abm(bundles, include_abms=include_abms)
 
 
 def run_summarizer_smoke(
@@ -106,6 +115,7 @@ def run_summarizer_smoke(
     source_root: Path,
     output_root: Path,
     resume: bool = False,
+    include_abms: tuple[str, ...] | None = None,
     validated_bundles: tuple[ValidatedSmokeBundle, ...] | None = None,
     summarizer_fns: dict[SummarizerSmokeMode, Callable[[str], str]] | None = None,
 ) -> SummarizerSmokeResult:
@@ -119,7 +129,7 @@ def run_summarizer_smoke(
     previous_run_root = _resolve_previous_summarizer_run_root(output_root=output_root, current_run_id=run_id)
     logger = get_logger(__name__)
     attached_run_log_path = attach_json_log_file(run_log_path(run_root))
-    selected_bundles = validated_bundles or default_validated_smoke_bundles(source_root)
+    selected_bundles = validated_bundles or default_validated_smoke_bundles(source_root, include_abms=include_abms)
     resolved_summarizers = summarizer_fns or {
         "bart": summarize_with_bart,
         "bert": summarize_with_bert,
@@ -459,3 +469,44 @@ def _discover_full_case_matrix_bundles(source_root: Path, report_path: Path) -> 
     if not bundles:
         raise FileNotFoundError(f"no successful full-case matrix smoke bundles found under {source_root}")
     return tuple(sorted(bundles, key=lambda bundle: bundle.case_id))
+
+
+def _discover_full_case_suite_bundles(
+    *,
+    source_root: Path,
+    include_abms: tuple[str, ...] | None = None,
+) -> tuple[ValidatedSmokeBundle, ...]:
+    abms_root = source_root / "abms"
+    target_abms = include_abms or tuple(sorted(path.name for path in abms_root.iterdir() if path.is_dir()))
+    bundles: list[ValidatedSmokeBundle] = []
+    missing_abms: list[str] = []
+    for abm in target_abms:
+        abm_root = abms_root / abm
+        latest_run_path = abm_root / "latest_run.txt"
+        if not latest_run_path.exists():
+            missing_abms.append(abm)
+            continue
+        run_root = Path(latest_run_path.read_text(encoding="utf-8").strip())
+        report_path = run_root / "smoke_full_case_matrix_report.json"
+        if not report_path.exists():
+            missing_abms.append(abm)
+            continue
+        bundles.extend(_discover_full_case_matrix_bundles(run_root, report_path))
+    if include_abms and missing_abms:
+        raise FileNotFoundError(f"missing completed ABM runs for: {', '.join(sorted(missing_abms))}")
+    if not bundles:
+        raise FileNotFoundError(f"no successful full-case matrix smoke bundles found under suite root {source_root}")
+    return tuple(sorted(bundles, key=lambda bundle: (bundle.abm, bundle.case_id)))
+
+
+def _filter_bundles_by_abm(
+    bundles: tuple[ValidatedSmokeBundle, ...],
+    *,
+    include_abms: tuple[str, ...] | None,
+) -> tuple[ValidatedSmokeBundle, ...]:
+    if not include_abms:
+        return bundles
+    selected = tuple(bundle for bundle in bundles if bundle.abm in include_abms)
+    if not selected:
+        raise FileNotFoundError(f"no validated bundles found for ABMs: {', '.join(include_abms)}")
+    return selected

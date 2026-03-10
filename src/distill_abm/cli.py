@@ -610,6 +610,13 @@ def smoke_summarizers(
         Path,
         typer.Option(help="Root directory containing the vetted full-case LLM smoke outputs."),
     ] = Path("results/full_case_smoke_latest"),
+    abm: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--abm",
+            help="Optional ABM filter when the source root is a multi-ABM suite run. Repeat for multiple.",
+        ),
+    ] = None,
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for summarizer smoke artifacts."),
@@ -626,6 +633,7 @@ def smoke_summarizers(
     """Run the summarization stack over one hand-vetted full-case LLM bundle."""
     execute_smoke_summarizers_command(
         source_root=source_root,
+        abms=tuple(abm) if abm else None,
         output_root=output_root,
         resume=resume,
         json_output=json_output,

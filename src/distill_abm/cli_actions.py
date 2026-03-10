@@ -659,6 +659,7 @@ def execute_monitor_local_qwen_command(
 def execute_smoke_summarizers_command(
     *,
     source_root: Path,
+    abms: tuple[str, ...] | None,
     output_root: Path,
     resume: bool,
     json_output: bool,
@@ -666,6 +667,7 @@ def execute_smoke_summarizers_command(
 ) -> None:
     result: Any = run_summarizer_smoke_fn(
         source_root=source_root,
+        include_abms=abms,
         output_root=output_root,
         resume=resume,
     )
