@@ -36,6 +36,10 @@ def test_cli_smoke_summarizers_invokes_runner(tmp_path: Path, monkeypatch) -> No
             "smoke-summarizers",
             "--source-root",
             str(tmp_path / "source"),
+            "--abm",
+            "fauna",
+            "--abm",
+            "grazing",
             "--output-root",
             str(tmp_path / "out"),
             "--resume",
@@ -46,5 +50,6 @@ def test_cli_smoke_summarizers_invokes_runner(tmp_path: Path, monkeypatch) -> No
     assert result.exit_code == 0
     assert "report.json" in result.output
     assert captured["source_root"] == tmp_path / "source"
+    assert captured["include_abms"] == ("fauna", "grazing")
     assert captured["output_root"] == tmp_path / "out"
     assert captured["resume"] is True
