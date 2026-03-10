@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import csv
 import json
 import shutil
 import threading
@@ -17,6 +16,7 @@ from pydantic import BaseModel, Field
 from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError
 from distill_abm.llm.resilience import CIRCUIT_BREAKER_OPEN_SECONDS, is_transient_provider_error
 from distill_abm.pipeline.doe_smoke_prompts import build_legacy_doe_context_prompt, build_legacy_doe_trend_prompt
+from distill_abm.pipeline.full_case_matrix_run_review import build_run_review_rows, write_run_review_csv
 from distill_abm.pipeline.full_case_review_csv import write_case_review_csv
 from distill_abm.pipeline.full_case_smoke import (
     EvidenceMode,
@@ -232,26 +232,7 @@ def run_full_case_matrix_smoke(
     failed_case_ids = [case.case_id for case in case_results if not case.success]
 
     review_csv_path = run_root / "request_review.csv"
-    _write_run_review_csv(
-        review_csv_path,
-        [
-            {
-                "case_id": case.case_id,
-                "abm": case.abm,
-                "evidence_mode": case.evidence_mode,
-                "prompt_variant": case.prompt_variant,
-                "repetition": str(case.repetition),
-                "case_dir": str(case.case_dir),
-                "case_summary_path": str(case_summary_path(case.case_dir)),
-                "review_csv_path": str(case.case_dir / "review.csv"),
-                "validation_state_path": str(validation_state_path(case.case_dir)),
-                "success": str(case.success),
-                "resumed_from_existing": str(case.resumed_from_existing),
-                "error": case.error or "",
-            }
-            for case in case_results
-        ],
-    )
+    write_run_review_csv(review_csv_path, build_run_review_rows(case_results))
     finished_at = datetime.now(UTC)
     smoke_result = FullCaseMatrixSmokeResult(
         started_at_utc=started_at.isoformat(),
@@ -721,28 +702,6 @@ def _finalize_case(
 
 def _write_case_review_csv(path: Path, rows: list[dict[str, str]]) -> None:
     write_case_review_csv(path, rows)
-
-
-def _write_run_review_csv(path: Path, rows: list[dict[str, str]]) -> None:
-    fieldnames = [
-        "case_id",
-        "abm",
-        "evidence_mode",
-        "prompt_variant",
-        "repetition",
-        "case_dir",
-        "case_summary_path",
-        "review_csv_path",
-        "validation_state_path",
-        "success",
-        "resumed_from_existing",
-        "error",
-    ]
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in rows:
-            writer.writerow(row)
 
 
 def _resolve_previous_run_root(*, output_root: Path, current_run_id: str) -> Path | None:
