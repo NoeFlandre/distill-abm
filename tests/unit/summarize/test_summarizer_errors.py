@@ -42,7 +42,38 @@ def test_bert_runner_raises_summarization_error_on_missing_dependencies(monkeypa
     with pytest.raises(SummarizationError) as exc_info:
         runner.summarize("abc")
 
-    assert "bert summarization dependencies unavailable" in str(exc_info.value).lower()
+    message = str(exc_info.value).lower()
+    assert "bert summarization dependencies unavailable" in message
+    assert "fallback failed" in message
+
+
+def test_bert_runner_falls_back_when_legacy_backend_breaks(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Python 3.14 breaks the legacy bert-extractive-summarizer import path; the fallback should still run."""
+
+    def mock_import(name: str, *args: object, **kwargs: object) -> object:
+        if name == "summarizer.bert":
+            raise RuntimeError("unable to infer type for attribute \"REGEX\"")
+        return __import__(name)
+
+    monkeypatch.setattr("builtins.__import__", mock_import)
+    runner = BertSummarizerRunner()
+    runner._build_transformers_runtime = lambda: ("bert-fallback", None)  # type: ignore[method-assign]
+    runner._model = lambda text, min_length, max_length: f"fallback::{text}"  # type: ignore[assignment]
+    runner._tokenizer = None  # type: ignore[assignment]
+
+    class FakeTokenizer:
+        def encode(self, text: str, truncation: bool = False, add_special_tokens: bool = True) -> list[int]:
+            _ = (truncation, add_special_tokens)
+            return [ord(ch) for ch in text]
+
+        def decode(self, ids: list[int], skip_special_tokens: bool = False) -> str:
+            _ = skip_special_tokens
+            return "".join(chr(i) for i in ids)
+
+    runner._build_transformers_runtime = lambda: (runner._model, FakeTokenizer())  # type: ignore[method-assign]
+    out = runner.summarize("ABCDE", max_input_length=2)
+
+    assert out == "fallback::AB fallback::CD fallback::E"
 
 
 def test_t5_runner_raises_summarization_error_on_missing_transformers(monkeypatch: pytest.MonkeyPatch) -> None:

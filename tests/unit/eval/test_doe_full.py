@@ -34,6 +34,33 @@ def test_analyze_factorial_anova_generates_table(tmp_path: Path) -> None:
     assert "BLEU" in result.columns
 
 
+def test_analyze_factorial_anova_includes_string_dtype_prompt_factors(tmp_path: Path) -> None:
+    frame = pd.DataFrame(
+        {
+            "Summarizer": pd.Series(
+                ["none", "none", "bart", "bart", "none", "none", "bart", "bart"],
+                dtype="string",
+            ),
+            "Evidence": pd.Series(
+                ["plot", "table", "plot", "table", "plot", "table", "plot", "table"],
+                dtype="string",
+            ),
+            "Role": pd.Series(["off", "off", "off", "off", "on", "on", "on", "on"], dtype="string"),
+            "Insights": pd.Series(["off", "off", "on", "on", "off", "off", "on", "on"], dtype="string"),
+            "Example": pd.Series(["off", "on", "off", "on", "off", "on", "off", "on"], dtype="string"),
+            "BLEU": [0.10, 0.20, 0.30, 0.40, 0.15, 0.25, 0.35, 0.45],
+        }
+    )
+    source = tmp_path / "anova_prompt_flags.csv"
+    out = tmp_path / "anova_prompt_flags_out.csv"
+    frame.to_csv(source, index=False)
+
+    result = analyze_factorial_anova(source, out, max_interaction_order=2)
+
+    assert result is not None
+    assert {"Summarizer", "Evidence", "Role", "Insights", "Example"}.issubset(set(result["Feature"]))
+
+
 def test_analyze_factorial_anova_returns_none_for_unreadable_csv(tmp_path: Path) -> None:
     """Test that analyze_factorial_anova returns None for unreadable CSV path."""
     unreadable_path = tmp_path / "nonexistent.csv"

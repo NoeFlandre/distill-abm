@@ -25,7 +25,7 @@ def identify_factors_and_metrics(df: pd.DataFrame) -> tuple[list[str], list[str]
 
 
 def _candidate_factor_columns(df: pd.DataFrame, max_unique: int) -> list[str]:
-    potential = [str(column) for column in df.select_dtypes(include=["object", "category"]).columns.tolist()]
+    potential = [str(column) for column in df.select_dtypes(include=["object", "category", "string"]).columns.tolist()]
     numeric_columns = [str(column) for column in df.select_dtypes(include=["number"]).columns.tolist()]
     for column in numeric_columns:
         unique_values = set(df[column].dropna().unique())
@@ -49,8 +49,12 @@ def _identify_factors(df: pd.DataFrame, candidates: list[str], max_unique: int) 
         unique_values = set(df[column].dropna().astype(str).unique())
         known = any(unique_values == pattern for pattern in known_patterns)
         is_categorical = isinstance(df[column].dtype, pd.CategoricalDtype)
-        is_object = pd.api.types.is_object_dtype(df[column]) or is_categorical
-        low_cardinality = is_object and df[column].nunique(dropna=True) <= max_unique
+        is_string_like = (
+            pd.api.types.is_object_dtype(df[column])
+            or pd.api.types.is_string_dtype(df[column])
+            or is_categorical
+        )
+        low_cardinality = is_string_like and df[column].nunique(dropna=True) <= max_unique
         if (known or low_cardinality) and column not in seen:
             factors.append(column)
             seen.add(column)

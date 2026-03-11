@@ -375,6 +375,10 @@ def test_run_pipeline_scores_additional_references_and_records_them(
     primary_reference_path.write_text("PRIMARY-GROUND-TRUTH", encoding="utf-8")
     modeler_reference_path = tmp_path / "modeler_ground_truth.txt"
     modeler_reference_path.write_text("MODELER-GROUND-TRUTH", encoding="utf-8")
+    gpt_short_reference_path = tmp_path / "gpt5.2_short_ground_truth.txt"
+    gpt_short_reference_path.write_text("GPT5.2-SHORT-GROUND-TRUTH", encoding="utf-8")
+    gpt_long_reference_path = tmp_path / "gpt5.2_long_ground_truth.txt"
+    gpt_long_reference_path.write_text("GPT5.2-LONG-GROUND-TRUTH", encoding="utf-8")
 
     references: list[str] = []
 
@@ -408,7 +412,11 @@ def test_run_pipeline_scores_additional_references_and_records_them(
             text_source_mode="full_text_only",
             evidence_mode="plot",
             scoring_reference_path=primary_reference_path,
-            additional_scoring_reference_paths={"modeler_ground_truth": modeler_reference_path},
+            additional_scoring_reference_paths={
+                "modeler": modeler_reference_path,
+                "gpt5.2_short": gpt_short_reference_path,
+                "gpt5.2_long": gpt_long_reference_path,
+            },
         ),
         prompts=_prompts(),
         adapter=FakeAdapter(),
@@ -416,15 +424,21 @@ def test_run_pipeline_scores_additional_references_and_records_them(
 
     assert "PRIMARY-GROUND-TRUTH" in references
     assert "MODELER-GROUND-TRUTH" in references
+    assert "GPT5.2-SHORT-GROUND-TRUTH" in references
+    assert "GPT5.2-LONG-GROUND-TRUTH" in references
 
     report_text = result.report_csv.read_text(encoding="utf-8")
-    assert "modeler_ground_truth_bleu" in report_text
+    assert "modeler_bleu" in report_text
+    assert "gpt5.2_short_bleu" in report_text
+    assert "gpt5.2_long_bleu" in report_text
 
     metadata_path = tmp_path / "out" / "pipeline_run_metadata.json"
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     additional_references = metadata["scores"]["additional_references"]
-    assert additional_references["modeler_ground_truth"]["reference"]["text"] == "MODELER-GROUND-TRUTH"
-    assert additional_references["modeler_ground_truth"]["selected_scores"]["bleu"] == 0.5
+    assert additional_references["modeler"]["reference"]["text"] == "MODELER-GROUND-TRUTH"
+    assert additional_references["modeler"]["selected_scores"]["bleu"] == 0.5
+    assert additional_references["gpt5.2_short"]["reference"]["text"] == "GPT5.2-SHORT-GROUND-TRUTH"
+    assert additional_references["gpt5.2_long"]["reference"]["text"] == "GPT5.2-LONG-GROUND-TRUTH"
 
 
 def test_run_pipeline_resume_existing_reuses_artifacts(tmp_path: Path) -> None:

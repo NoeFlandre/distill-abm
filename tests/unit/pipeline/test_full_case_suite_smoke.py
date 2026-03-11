@@ -110,14 +110,15 @@ def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkey
     cases_by_abm = cast(
         dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
         {
-            abm: (
+            abm: tuple(
                 FullCaseMatrixCaseSpec(
-                    case_id=f"01_{abm}_none_plot_rep1",
+                    case_id=f"{idx:02d}_{abm}_none_plot_rep1",
                     abm=abm,
                     evidence_mode="plot",
                     prompt_variant="none",
                     repetition=1,
-                ),
+                )
+                for idx in range(1, 73)
             )
             for abm in suite_input
         },
@@ -198,14 +199,15 @@ def test_run_full_case_suite_smoke_marks_abm_failure_without_crashing(
     cases_by_abm = cast(
         dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
         {
-            abm: (
+            abm: tuple(
                 FullCaseMatrixCaseSpec(
-                    case_id=f"01_{abm}_none_plot_rep1",
+                    case_id=f"{index:02d}_{abm}_none_plot_rep1",
                     abm=abm,
                     evidence_mode="plot",
                     prompt_variant="none",
                     repetition=1,
-                ),
+                )
+                for index in range(1, 73)
             )
             for abm in suite_input
         },
@@ -450,6 +452,168 @@ def test_run_full_case_suite_smoke_refreshes_suite_progress_during_active_abm_ru
     )
 
     assert result.success is True
+
+
+def test_run_full_case_suite_smoke_resume_skips_completed_abms_and_starts_at_frontier(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("MISTRAL_API_KEY", "debug-token")
+    suite_root = tmp_path / "suite"
+    call_order: list[str] = []
+
+    def write_run_artifacts(abm: str, run_name: str) -> Path:
+        run_root = suite_root / "abms" / abm / "runs" / run_name
+        run_root.mkdir(parents=True, exist_ok=True)
+        (run_root / "run.log.jsonl").write_text('{"event":"x"}\n', encoding="utf-8")
+        (run_root / "smoke_full_case_matrix_report.json").write_text("{}", encoding="utf-8")
+        (run_root / "smoke_full_case_matrix_report.md").write_text("report", encoding="utf-8")
+        (run_root / "request_review.csv").write_text("case_id\n01\n", encoding="utf-8")
+        (run_root / "review.html").write_text("<html></html>", encoding="utf-8")
+        return run_root
+
+    fauna_run_root = write_run_artifacts("fauna", "run_done")
+    grazing_run_root = write_run_artifacts("grazing", "run_done")
+    milk_run_root = write_run_artifacts("milk_consumption", "run_partial")
+
+    def fake_collect_local_qwen_monitor_snapshot(output_root: Path) -> LocalQwenMonitorSnapshot:
+        abm = output_root.name
+        if abm == "fauna":
+            run_root = fauna_run_root
+            completed_cases = 72
+            running_case_id = None
+            status = "completed"
+            progress_detail = "done"
+        elif abm == "grazing":
+            run_root = grazing_run_root
+            completed_cases = 72
+            running_case_id = None
+            status = "completed"
+            progress_detail = "done"
+        else:
+            run_root = milk_run_root
+            completed_cases = 47
+            running_case_id = "48_milk_consumption_all_three_plot_plus_table_rep2"
+            status = "running"
+            progress_detail = "trend"
+        return LocalQwenMonitorSnapshot(
+            output_root=run_root,
+            exists=True,
+            mode="smoke",
+            total_cases=72,
+            completed_cases=completed_cases,
+            failed_cases=0,
+            running_case_id=running_case_id,
+            cases=(
+                LocalQwenCaseSnapshot(
+                    case_id=running_case_id or f"72_{abm}_all_three_plot_plus_table_rep3",
+                    status=status,
+                    label=running_case_id or f"72_{abm}_all_three_plot_plus_table_rep3",
+                    num_ctx=None,
+                    max_tokens=None,
+                    context_prompt_length=None,
+                    trend_prompt_length=None,
+                    context_total_tokens=None,
+                    trend_total_tokens=None,
+                    error=None,
+                    progress_detail=progress_detail,
+                    completed_steps=completed_cases,
+                    total_steps=72,
+                ),
+            ),
+        )
+
+    def fake_run_full_case_matrix_smoke(**kwargs):  # type: ignore[no-untyped-def]
+        case_input = kwargs["case_input"]
+        call_order.append(case_input.abm)
+        output_root = kwargs["output_root"]
+        run_root = output_root / "runs" / "run_resumed"
+        run_root.mkdir(parents=True, exist_ok=True)
+        (output_root / "latest_run.txt").write_text(str(run_root), encoding="utf-8")
+        return SimpleNamespace(
+            success=True,
+            report_json_path=run_root / "report.json",
+            report_markdown_path=run_root / "report.md",
+            review_csv_path=run_root / "review.csv",
+            viewer_html_path=run_root / "review.html",
+            failed_case_ids=[],
+        )
+
+    monkeypatch.setattr(
+        "distill_abm.pipeline.full_case_suite_smoke.run_full_case_matrix_smoke",
+        fake_run_full_case_matrix_smoke,
+    )
+    monkeypatch.setattr(
+        "distill_abm.pipeline.full_case_suite_progress.collect_local_qwen_monitor_snapshot",
+        fake_collect_local_qwen_monitor_snapshot,
+    )
+
+    suite_input = {
+        "fauna": FullCaseSmokeInput(
+            abm="fauna",
+            csv_path=tmp_path / "fauna.csv",
+            parameters_path=tmp_path / "fauna_params.txt",
+            documentation_path=tmp_path / "fauna_docs.txt",
+            plots=(),
+        ),
+        "grazing": FullCaseSmokeInput(
+            abm="grazing",
+            csv_path=tmp_path / "grazing.csv",
+            parameters_path=tmp_path / "grazing_params.txt",
+            documentation_path=tmp_path / "grazing_docs.txt",
+            plots=(),
+        ),
+        "milk_consumption": FullCaseSmokeInput(
+            abm="milk_consumption",
+            csv_path=tmp_path / "milk.csv",
+            parameters_path=tmp_path / "milk_params.txt",
+            documentation_path=tmp_path / "milk_docs.txt",
+            plots=(),
+        ),
+    }
+    for path in [
+        suite_input["fauna"].csv_path,
+        suite_input["fauna"].parameters_path,
+        suite_input["fauna"].documentation_path,
+        suite_input["grazing"].csv_path,
+        suite_input["grazing"].parameters_path,
+        suite_input["grazing"].documentation_path,
+        suite_input["milk_consumption"].csv_path,
+        suite_input["milk_consumption"].parameters_path,
+        suite_input["milk_consumption"].documentation_path,
+    ]:
+        path.write_text("x", encoding="utf-8")
+
+    cases_by_abm = cast(
+        dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
+        {
+            abm: tuple(
+                FullCaseMatrixCaseSpec(
+                    case_id=f"{index:02d}_{abm}_none_plot_rep1",
+                    abm=abm,
+                    evidence_mode="plot",
+                    prompt_variant="none",
+                    repetition=1,
+                )
+                for index in range(1, 73)
+            )
+            for abm in suite_input
+        },
+    )
+
+    result = run_full_case_suite_smoke(
+        abm_inputs=suite_input,
+        cases_by_abm=cases_by_abm,
+        adapter=_Adapter(),
+        model="mistral-medium-latest",
+        output_root=suite_root,
+        resume_existing=True,
+    )
+
+    progress_payload = (suite_root / "suite_progress.json").read_text(encoding="utf-8")
+    assert result.success is True
+    assert call_order == ["milk_consumption"]
+    assert '"completed_case_count":191' in progress_payload.replace(" ", "")
+    assert '"current_abm":null' in progress_payload.replace(" ", "")
 
 
 def test_run_full_case_suite_smoke_rejects_missing_provider_credentials(

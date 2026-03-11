@@ -54,3 +54,21 @@ def test_identify_factors_supports_current_summarizers_and_evidence_modes() -> N
     factors, metrics = identify_factors_and_metrics(frame)
     assert factors == ["Summary", "Evidence", "Role"]
     assert metrics == ["BLEU"]
+
+
+def test_identify_factors_supports_string_dtype_prompt_flags() -> None:
+    frame = pd.DataFrame(
+        {
+            "Summarizer": pd.Series(["none", "bart", "bert", "t5"], dtype="string"),
+            "Evidence": pd.Series(["plot", "table", "plot+table", "plot"], dtype="string"),
+            "Role": pd.Series(["off", "on", "off", "on"], dtype="string"),
+            "Insights": pd.Series(["off", "off", "on", "on"], dtype="string"),
+            "Example": pd.Series(["off", "on", "on", "off"], dtype="string"),
+            "BLEU": [0.1, 0.2, 0.3, 0.4],
+        }
+    )
+
+    factors, metrics = identify_factors_and_metrics(frame)
+
+    assert factors == ["Summarizer", "Evidence", "Role", "Insights", "Example"]
+    assert metrics == ["BLEU"]

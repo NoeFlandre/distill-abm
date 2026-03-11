@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 import pandas as pd
 
 ABSENT_MARKER = "—"
@@ -56,7 +58,7 @@ def render_factorial_markdown_table(frame: pd.DataFrame) -> str:
     header = "| Feature | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |\n| --- | --- | --- | --- | --- | --- | --- |"
     body = []
     for row in frame.to_dict(orient="records"):
-        values = [_format_contribution_cell(float(row[column])) for column in METRIC_COLUMN_NAMES]
+        values = [_format_contribution_cell(row[column]) for column in METRIC_COLUMN_NAMES]
         body.append("| " + " | ".join([str(row["Feature"]), *values]) + " |")
     return "# Factorial Contributions\n\n" + "\n".join([header, *body]) + "\n"
 
@@ -64,7 +66,7 @@ def render_factorial_markdown_table(frame: pd.DataFrame) -> str:
 def render_factorial_latex_table(frame: pd.DataFrame) -> str:
     latex_rows = []
     for row in frame.to_dict(orient="records"):
-        formatted_values = [_latex_format_contribution(float(row[column])) for column in METRIC_COLUMN_NAMES]
+        formatted_values = [_latex_format_contribution(row[column]) for column in METRIC_COLUMN_NAMES]
         latex_rows.append(
             " \\hline\n"
             + " {} & {} \\\\".format(
@@ -82,12 +84,14 @@ def render_factorial_latex_table(frame: pd.DataFrame) -> str:
 
 def render_optimal_markdown_table(rows: list[dict[str, str]]) -> str:
     header = (
-        "| ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |\n"
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+        "| Reference family | ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |\n"
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
     )
     body = [
         "| "
-        + " | ".join([row["ABM"], row["Summary"], row["LLM"], *(row[metric] for metric in METRIC_COLUMN_NAMES)])
+        + " | ".join(
+            [row["Reference family"], row["ABM"], row["Summary"], row["LLM"], *(row[metric] for metric in METRIC_COLUMN_NAMES)]
+        )
         + " |"
         for row in rows
     ]
@@ -97,7 +101,8 @@ def render_optimal_markdown_table(rows: list[dict[str, str]]) -> str:
 def render_optimal_latex_table(rows: list[dict[str, str]]) -> str:
     latex_rows = [
         " \\hline\n"
-        + " {} & {} & {} & {} \\\\".format(
+        + " {} & {} & {} & {} & {} \\\\".format(
+            _latex_escape(row["Reference family"]),
             _latex_escape(row["ABM"]),
             _latex_escape(row["Summary"]),
             _latex_escape(row["LLM"]),
@@ -106,9 +111,9 @@ def render_optimal_latex_table(rows: list[dict[str, str]]) -> str:
         for row in rows
     ]
     return (
-        "\\begin{tabular}{|l|l|l|l|l|l|l|l|l|}\n\\hline\n"
-        "\\textit{\\textbf{ABM}} & \\textit{\\textbf{Summary}} & \\textit{\\textbf{LLM}}"
-        " & BLEU & METEOR & R-1 & R-2 & R-L & Reading ease \\\\\n"
+        "\\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}\n\\hline\n"
+        "\\textit{\\textbf{Reference family}} & \\textit{\\textbf{ABM}} & \\textit{\\textbf{Summary}}"
+        " & \\textit{\\textbf{LLM}} & BLEU & METEOR & R-1 & R-2 & R-L & Reading ease \\\\\n"
         + "\n".join(latex_rows)
         + "\n\\hline\n\\end{tabular}\n"
     )
@@ -135,14 +140,35 @@ def _lookup_metric_value(row: dict[str, float | str | None], metric: str) -> flo
     return None
 
 
-def _format_contribution_cell(value: float) -> str:
-    rendered = f"{value:.2f}"
-    return f"**{rendered}**" if value > 5 else rendered
+def _format_contribution_cell(value: float | int | None) -> str:
+    numeric_value = _coerce_optional_float(value)
+    if numeric_value is None:
+        return ABSENT_MARKER
+    if 0 < abs(numeric_value) < 0.01:
+        rendered = "<0.01"
+        return f"**{rendered}**" if numeric_value > 5 else rendered
+    rendered = f"{numeric_value:.2f}"
+    return f"**{rendered}**" if numeric_value > 5 else rendered
 
 
-def _latex_format_contribution(value: float) -> str:
-    rendered = f"{value:.2f}"
-    return f"\\textbf{{{rendered}}}" if value > 5 else rendered
+def _latex_format_contribution(value: float | int | None) -> str:
+    numeric_value = _coerce_optional_float(value)
+    if numeric_value is None:
+        return _latex_escape(ABSENT_MARKER)
+    if 0 < abs(numeric_value) < 0.01:
+        rendered = _latex_escape("<0.01")
+        return f"\\textbf{{{rendered}}}" if numeric_value > 5 else rendered
+    rendered = f"{numeric_value:.2f}"
+    return f"\\textbf{{{rendered}}}" if numeric_value > 5 else rendered
+
+
+def _coerce_optional_float(value: float | int | None) -> float | None:
+    if value is None:
+        return None
+    numeric_value = float(value)
+    if math.isnan(numeric_value):
+        return None
+    return numeric_value
 
 
 def _latex_escape(value: str) -> str:

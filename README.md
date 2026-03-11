@@ -76,6 +76,7 @@ src/distill_abm/
 
 docs/
   ARCHITECTURE.md
+  EVALUATION_FREEZE.md
   WALKTHROUGH.md
   HYPERPARAMETERS.md
   TESTING_REPORT.md

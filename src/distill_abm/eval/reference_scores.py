@@ -1,12 +1,14 @@
-"""Lexical metric helpers with graceful dependency fallbacks.
+"""Lexical metric helpers used by quantitative scoring.
 
-The default lexical metric path intentionally matches the legacy scoring
-notebooks:
+The metric path intentionally matches the legacy scoring notebooks:
 - tokenization via ``str.split()``
 - BLEU with NLTK smoothing method4
 - METEOR with tokenized inputs
 - ROUGE-1/2/L with stemming
 - Flesch Reading Ease on the candidate summary text
+
+If any dependency or required NLTK resource is unavailable, scoring must fail
+explicitly rather than silently substituting fallback values.
 """
 
 from __future__ import annotations
@@ -34,8 +36,11 @@ def compute_scores(ground_truth: str, summary: str) -> ReferenceScores:
     """Compute BLEU/METEOR/ROUGE/Flesch scores."""
     try:
         return _compute_with_external_metrics(ground_truth, summary)
-    except (ImportError, LookupError):
-        return _compute_fallback_scores(ground_truth, summary)
+    except (ImportError, LookupError) as exc:
+        raise RuntimeError(
+            "lexical metrics unavailable: install required metric dependencies "
+            "and NLTK resources instead of using fallback scores"
+        ) from exc
 
 
 def _compute_with_external_metrics(ground_truth: str, summary: str) -> ReferenceScores:

@@ -13,11 +13,12 @@ from pathlib import Path
 import pandas as pd
 from pydantic import BaseModel, Field
 
-from distill_abm.cli_support import resolve_scoring_reference_path
+from distill_abm.cli_support import resolve_quantitative_reference_paths
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.metrics import SummaryScores, score_summary
 from distill_abm.pipeline.quantitative_rendering import (
     METRIC_COLUMN_NAMES,
+    _format_contribution_cell,
     _format_pvalue_cell,
     _lookup_metric_value,
 )
@@ -80,19 +81,19 @@ ANOVA_ROW_SPECS: tuple[tuple[str, str], ...] = (
 )
 FACTORIAL_FEATURE_ORDER: tuple[str, ...] = (
     "Example",
-    "Example_AND_Insight",
     "Evidence",
     "Evidence_AND_Example",
-    "Evidence_AND_Insight",
+    "Evidence_AND_Insights",
     "Evidence_AND_Role",
-    "Insight",
+    "Insights",
+    "Insights_AND_Example",
     "Role",
     "Role_AND_Example",
-    "Role_AND_Insight",
+    "Role_AND_Insights",
     "Summarizer",
     "Summarizer_AND_Example",
     "Summarizer_AND_Evidence",
-    "Summarizer_AND_Insight",
+    "Summarizer_AND_Insights",
     "Summarizer_AND_Role",
 )
 
@@ -113,6 +114,7 @@ class QuantitativeRecord(BaseModel):
     summarizer: str
     repetition: int
     reference_family: str
+    reference_path: Path
     summary_output_path: Path
     source_run_root: Path
     success: bool
@@ -136,6 +138,7 @@ class QuantitativeSmokeResult(BaseModel):
     output_root: Path
     run_id: str
     run_root: Path
+    overview_root: Path
     report_json_path: Path
     report_markdown_path: Path
     review_csv_path: Path
@@ -154,6 +157,7 @@ class QuantitativeSmokeResult(BaseModel):
     success: bool
     failed_record_ids: list[str] = Field(default_factory=list)
     record_count: int = 0
+    reference_roots: dict[str, Path] = Field(default_factory=dict)
 
 
 def run_quantitative_smoke(
@@ -180,116 +184,122 @@ def run_quantitative_smoke(
     review_rows: list[dict[str, str]] = []
     record_rows: list[dict[str, str]] = []
     failed_record_ids: list[str] = []
-    record_dir_root = run_root / "records"
-    record_dir_root.mkdir(parents=True, exist_ok=True)
+    reference_review_rows: dict[str, list[dict[str, str]]] = {}
+    reference_record_rows: dict[str, list[dict[str, str]]] = {}
+    reference_failed_record_ids: dict[str, list[str]] = {}
+    reference_roots: dict[str, Path] = {}
 
     for source_row in source_rows:
-        record = _build_quantitative_record_from_source_row(source_row)
-        record_dir = record_dir_root / record.record_id
-        previous_record_dir = None if previous_run_root is None else previous_run_root / "records" / record.record_id
-        reused = False
-        if resume and previous_record_dir is not None:
-            reused = _copy_previous_record_if_valid(previous_record_dir=previous_record_dir, record_dir=record_dir)
-        if reused:
-            loaded_record = _load_record_json(record_dir / "record.json")
-            if loaded_record is None:
-                reused = False
-            else:
-                record = loaded_record
-                log_event(logger, "quantitative_record_reused", record_id=record.record_id, case_id=record.case_id)
-        if not reused:
-            try:
-                summary_text = _read_summary_text(record.summary_output_path)
-                reference_text = _load_author_reference_text(record.abm)
-                scores = score_summary_fn(reference_text, summary_text)
-                record = record.model_copy(
-                    update={
-                        "success": True,
-                        "error": None,
-                        "bleu": scores.bleu,
-                        "meteor": scores.meteor,
-                        "rouge1": scores.rouge1,
-                        "rouge2": scores.rouge2,
-                        "rouge_l": scores.rouge_l,
-                        "flesch_reading_ease": scores.flesch_reading_ease,
-                        "token_f1": scores.token_f1,
-                        "precision": scores.precision,
-                        "recall": scores.recall,
-                    }
-                )
-                log_event(
-                    logger,
-                    "quantitative_record_success",
-                    record_id=record.record_id,
-                    case_id=record.case_id,
-                )
-            except Exception as exc:
-                record = record.model_copy(update={"success": False, "error": str(exc)})
+        for record in _build_quantitative_records_from_source_row(source_row):
+            reference_root = run_root / record.reference_family
+            reference_roots.setdefault(record.reference_family, reference_root)
+            record_dir = reference_root / "records" / record.record_id
+            previous_record_dir = (
+                None
+                if previous_run_root is None
+                else previous_run_root / record.reference_family / "records" / record.record_id
+            )
+            reused = False
+            if resume and previous_record_dir is not None:
+                reused = _copy_previous_record_if_valid(previous_record_dir=previous_record_dir, record_dir=record_dir)
+            if reused:
+                loaded_record = _load_record_json(record_dir / "record.json")
+                if loaded_record is None:
+                    reused = False
+                else:
+                    record = loaded_record
+                    log_event(
+                        logger,
+                        "quantitative_record_reused",
+                        record_id=record.record_id,
+                        case_id=record.case_id,
+                        reference_family=record.reference_family,
+                    )
+            if not reused:
+                try:
+                    summary_text = _read_summary_text(record.summary_output_path)
+                    reference_text = _load_reference_text(record.reference_path)
+                    scores = score_summary_fn(reference_text, summary_text)
+                    record = record.model_copy(
+                        update={
+                            "success": True,
+                            "error": None,
+                            "bleu": scores.bleu,
+                            "meteor": scores.meteor,
+                            "rouge1": scores.rouge1,
+                            "rouge2": scores.rouge2,
+                            "rouge_l": scores.rouge_l,
+                            "flesch_reading_ease": scores.flesch_reading_ease,
+                            "token_f1": scores.token_f1,
+                            "precision": scores.precision,
+                            "recall": scores.recall,
+                        }
+                    )
+                    log_event(
+                        logger,
+                        "quantitative_record_success",
+                        record_id=record.record_id,
+                        case_id=record.case_id,
+                        reference_family=record.reference_family,
+                    )
+                except Exception as exc:
+                    record = record.model_copy(update={"success": False, "error": str(exc)})
+                    failed_record_ids.append(record.record_id)
+                    reference_failed_record_ids.setdefault(record.reference_family, []).append(record.record_id)
+                    log_event(
+                        logger,
+                        "quantitative_record_failure",
+                        level=40,
+                        record_id=record.record_id,
+                        case_id=record.case_id,
+                        reference_family=record.reference_family,
+                        error=str(exc),
+                    )
+                _write_record_bundle(record_dir=record_dir, record=record)
+
+            review_row = _record_to_review_row(record)
+            review_rows.append(review_row)
+            reference_review_rows.setdefault(record.reference_family, []).append(review_row)
+            if record.success:
+                record_row = _record_to_csv_row(record)
+                record_rows.append(record_row)
+                reference_record_rows.setdefault(record.reference_family, []).append(record_row)
+            elif record.record_id not in failed_record_ids:
                 failed_record_ids.append(record.record_id)
-                log_event(
-                    logger,
-                    "quantitative_record_failure",
-                    level=40,
-                    record_id=record.record_id,
-                    case_id=record.case_id,
-                    error=str(exc),
-                )
-            _write_record_bundle(record_dir=record_dir, record=record)
+                reference_failed_record_ids.setdefault(record.reference_family, []).append(record.record_id)
 
-        review_rows.append(_record_to_review_row(record))
-        if record.success:
-            record_rows.append(_record_to_csv_row(record))
-        elif record.record_id not in failed_record_ids:
-            failed_record_ids.append(record.record_id)
-
-    quantitative_rows_path = run_root / "quantitative_rows.csv"
-    structured_results_path = run_root / "structured_results.csv"
-    _write_csv(
-        quantitative_rows_path,
-        fieldnames=list(record_rows[0].keys()) if record_rows else _quantitative_row_fields(),
-        rows=record_rows,
-    )
-    structured_rows = _build_structured_results_rows(record_rows)
-    _write_csv(
-        structured_results_path,
-        fieldnames=list(structured_rows[0].keys()) if structured_rows else _structured_results_fields(),
-        rows=structured_rows,
+    combined_root = run_root / "combined"
+    combined_root.mkdir(parents=True, exist_ok=True)
+    combined_paths = _write_analysis_bundle(
+        bundle_root=combined_root,
+        review_rows=review_rows,
+        record_rows=record_rows,
+        analyze_factorial_anova_fn=analyze_factorial_anova_fn,
     )
 
-    anova_csv_path = run_root / "anova_pvalues.csv"
-    factorial_csv_path = run_root / "factorial_contributions.csv"
-    optimal_csv_path = run_root / "best_scores.csv"
-    anova_table_markdown_path = run_root / "anova_table.md"
-    anova_table_latex_path = run_root / "anova_table.tex"
-    factorial_table_markdown_path = run_root / "factorial_table.md"
-    factorial_table_latex_path = run_root / "factorial_table.tex"
-    optimal_table_markdown_path = run_root / "best_scores_table.md"
-    optimal_table_latex_path = run_root / "best_scores_table.tex"
-    review_csv_path = run_root / "review.csv"
-    _write_csv(
-        review_csv_path,
-        fieldnames=list(review_rows[0].keys()) if review_rows else _review_row_fields(),
-        rows=review_rows,
+    for reference_family, reference_root in reference_roots.items():
+        reference_root.mkdir(parents=True, exist_ok=True)
+        _write_analysis_bundle(
+            bundle_root=reference_root,
+            review_rows=reference_review_rows.get(reference_family, []),
+            record_rows=reference_record_rows.get(reference_family, []),
+            analyze_factorial_anova_fn=analyze_factorial_anova_fn,
+        )
+        _write_bundle_readme(
+            bundle_root=reference_root,
+            title=f"{reference_family} quantitative results",
+            review_rows=reference_review_rows.get(reference_family, []),
+            failed_record_ids=reference_failed_record_ids.get(reference_family, []),
+        )
+
+    overview_root = run_root / "overview"
+    overview_root.mkdir(parents=True, exist_ok=True)
+    overview_paths = _write_overview_tables(
+        overview_root=overview_root,
+        reference_record_rows=reference_record_rows,
+        scratch_root=combined_root,
+        analyze_factorial_anova_fn=analyze_factorial_anova_fn,
     )
-
-    analysis_frame = pd.DataFrame(record_rows)
-    anova_rows = _compute_anova_rows(analysis_frame)
-    _write_anova_csv(anova_csv_path, anova_rows)
-    anova_table_markdown_path.write_text(_render_anova_markdown_table(anova_rows), encoding="utf-8")
-    anova_table_latex_path.write_text(_render_anova_latex_table(anova_rows), encoding="utf-8")
-
-    factorial_input_path = run_root / "factorial_input.csv"
-    factorial_frame = _build_factorial_input_frame(record_rows)
-    factorial_frame.to_csv(factorial_input_path, index=False)
-    factorial_result = analyze_factorial_anova_fn(factorial_input_path, factorial_csv_path, 2)
-    normalized_factorial = _normalize_factorial_table(factorial_result)
-    normalized_factorial.to_csv(factorial_csv_path, index=False, float_format="%.2f")
-    factorial_table_markdown_path.write_text(_render_factorial_markdown_table(normalized_factorial), encoding="utf-8")
-    factorial_table_latex_path.write_text(_render_factorial_latex_table(normalized_factorial), encoding="utf-8")
-    optimal_rows = _build_optimal_score_rows(record_rows)
-    _write_optimal_csv(optimal_csv_path, optimal_rows)
-    optimal_table_markdown_path.write_text(_render_optimal_markdown_table(optimal_rows), encoding="utf-8")
-    optimal_table_latex_path.write_text(_render_optimal_latex_table(optimal_rows), encoding="utf-8")
 
     result = QuantitativeSmokeResult(
         started_at_utc=started_at.isoformat(),
@@ -297,24 +307,26 @@ def run_quantitative_smoke(
         output_root=output_root,
         run_id=run_id,
         run_root=run_root,
+        overview_root=overview_root,
         report_json_path=run_root / QUANTITATIVE_REPORT_FILENAME,
         report_markdown_path=run_root / "smoke_quantitative_report.md",
-        review_csv_path=review_csv_path,
-        quantitative_rows_path=quantitative_rows_path,
-        structured_results_path=structured_results_path,
-        anova_csv_path=anova_csv_path,
-        factorial_csv_path=factorial_csv_path,
-        optimal_csv_path=optimal_csv_path,
-        anova_table_markdown_path=anova_table_markdown_path,
-        anova_table_latex_path=anova_table_latex_path,
-        factorial_table_markdown_path=factorial_table_markdown_path,
-        factorial_table_latex_path=factorial_table_latex_path,
-        optimal_table_markdown_path=optimal_table_markdown_path,
-        optimal_table_latex_path=optimal_table_latex_path,
+        review_csv_path=combined_paths["review_csv_path"],
+        quantitative_rows_path=combined_paths["quantitative_rows_path"],
+        structured_results_path=combined_paths["structured_results_path"],
+        anova_csv_path=combined_paths["anova_csv_path"],
+        factorial_csv_path=combined_paths["factorial_csv_path"],
+        optimal_csv_path=combined_paths["optimal_csv_path"],
+        anova_table_markdown_path=overview_paths["anova_table_markdown_path"],
+        anova_table_latex_path=combined_paths["anova_table_latex_path"],
+        factorial_table_markdown_path=overview_paths["factorial_table_markdown_path"],
+        factorial_table_latex_path=combined_paths["factorial_table_latex_path"],
+        optimal_table_markdown_path=overview_paths["optimal_table_markdown_path"],
+        optimal_table_latex_path=combined_paths["optimal_table_latex_path"],
         run_log_path=attached_run_log_path,
         success=not failed_record_ids,
         failed_record_ids=sorted(dict.fromkeys(failed_record_ids)),
         record_count=len(review_rows),
+        reference_roots=dict(sorted(reference_roots.items())),
     )
     write_model_report_files(
         result=result,
@@ -336,7 +348,7 @@ def _load_summarizer_review_rows(source_root: Path) -> list[dict[str, str]]:
     return [row for row in rows if row.get("success", "").lower() == "true"]
 
 
-def _build_quantitative_record_from_source_row(source_row: dict[str, str]) -> QuantitativeRecord:
+def _build_quantitative_records_from_source_row(source_row: dict[str, str]) -> list[QuantitativeRecord]:
     case_metadata = _load_case_metadata_from_context_output(Path(source_row["context_output_path"]))
     llm = case_metadata.get("model_id", "") or case_metadata.get("model", "") or ""
     evidence_mode = str(case_metadata["evidence_mode"])
@@ -344,24 +356,30 @@ def _build_quantitative_record_from_source_row(source_row: dict[str, str]) -> Qu
     repetition = int(str(case_metadata["repetition"]))
     run_root = Path(str(case_metadata["run_root"]))
     prompt_flags = _derive_prompt_flags(prompt_variant)
-    return QuantitativeRecord(
-        record_id=f"{source_row['case_id']}__{source_row['mode']}",
-        bundle_id=source_row["bundle_id"],
-        case_id=source_row["case_id"],
-        abm=source_row["abm"],
-        llm=str(llm),
-        evidence=evidence_mode,
-        prompt=prompt_variant,
-        role=prompt_flags["role"],
-        insights=prompt_flags["insights"],
-        example=prompt_flags["example"],
-        summarizer=source_row["mode"],
-        repetition=repetition,
-        reference_family="author",
-        summary_output_path=Path(source_row["summary_output_path"]),
-        source_run_root=run_root,
-        success=False,
-    )
+    records: list[QuantitativeRecord] = []
+    for reference_family, reference_path in resolve_quantitative_reference_paths(source_row["abm"]).items():
+        records.append(
+            QuantitativeRecord(
+                record_id=f"{source_row['case_id']}__{source_row['mode']}__{reference_family.replace('.', '_')}",
+                bundle_id=source_row["bundle_id"],
+                case_id=source_row["case_id"],
+                abm=source_row["abm"],
+                llm=str(llm),
+                evidence=evidence_mode,
+                prompt=prompt_variant,
+                role=prompt_flags["role"],
+                insights=prompt_flags["insights"],
+                example=prompt_flags["example"],
+                summarizer=source_row["mode"],
+                repetition=repetition,
+                reference_family=reference_family,
+                reference_path=reference_path,
+                summary_output_path=Path(source_row["summary_output_path"]),
+                source_run_root=run_root,
+                success=False,
+            )
+        )
+    return records
 
 
 def _load_case_metadata_from_context_output(context_output_path: Path) -> dict[str, object]:
@@ -402,8 +420,7 @@ def _read_summary_text(path: Path) -> str:
     return text
 
 
-def _load_author_reference_text(abm: str) -> str:
-    reference_path = resolve_scoring_reference_path(abm)
+def _load_reference_text(reference_path: Path) -> str:
     return reference_path.read_text(encoding="utf-8").strip()
 
 
@@ -528,6 +545,7 @@ def _review_row_fields() -> list[str]:
 def _structured_results_fields() -> list[str]:
     return [
         "Case study",
+        "Reference family",
         "Summary",
         "LLM",
         "Role",
@@ -552,6 +570,7 @@ def _build_structured_results_rows(record_rows: list[dict[str, str]]) -> list[di
         structured_rows.append(
             {
                 "Case study": row["abm"],
+                "Reference family": row["reference_family"],
                 "Summary": row["summarizer"],
                 "LLM": row["llm"],
                 "Role": "Yes" if row["role"] == "True" else "No",
@@ -576,6 +595,184 @@ def _write_csv(path: Path, *, fieldnames: Iterable[str], rows: list[dict[str, st
         writer = csv.DictWriter(handle, fieldnames=list(fieldnames))
         writer.writeheader()
         writer.writerows(rows)
+
+
+def _write_analysis_bundle(
+    *,
+    bundle_root: Path,
+    review_rows: list[dict[str, str]],
+    record_rows: list[dict[str, str]],
+    analyze_factorial_anova_fn: Callable[[Path, Path, int], pd.DataFrame | None],
+) -> dict[str, Path]:
+    bundle_root.mkdir(parents=True, exist_ok=True)
+    quantitative_rows_path = bundle_root / "quantitative_rows.csv"
+    structured_results_path = bundle_root / "structured_results.csv"
+    review_csv_path = bundle_root / "review.csv"
+    anova_csv_path = bundle_root / "anova_pvalues.csv"
+    factorial_csv_path = bundle_root / "factorial_contributions.csv"
+    optimal_csv_path = bundle_root / "best_scores.csv"
+    anova_table_markdown_path = bundle_root / "anova_table.md"
+    anova_table_latex_path = bundle_root / "anova_table.tex"
+    factorial_table_markdown_path = bundle_root / "factorial_table.md"
+    factorial_table_latex_path = bundle_root / "factorial_table.tex"
+    optimal_table_markdown_path = bundle_root / "best_scores_table.md"
+    optimal_table_latex_path = bundle_root / "best_scores_table.tex"
+
+    _write_csv(
+        quantitative_rows_path,
+        fieldnames=list(record_rows[0].keys()) if record_rows else _quantitative_row_fields(),
+        rows=record_rows,
+    )
+    structured_rows = _build_structured_results_rows(record_rows)
+    _write_csv(
+        structured_results_path,
+        fieldnames=list(structured_rows[0].keys()) if structured_rows else _structured_results_fields(),
+        rows=structured_rows,
+    )
+    _write_csv(
+        review_csv_path,
+        fieldnames=list(review_rows[0].keys()) if review_rows else _review_row_fields(),
+        rows=review_rows,
+    )
+
+    analysis_frame = pd.DataFrame(record_rows)
+    anova_rows = _compute_anova_rows(analysis_frame)
+    _write_anova_csv(anova_csv_path, anova_rows)
+    anova_table_markdown_path.write_text(_render_anova_markdown_table(anova_rows), encoding="utf-8")
+    anova_table_latex_path.write_text(_render_anova_latex_table(anova_rows), encoding="utf-8")
+
+    factorial_input_path = bundle_root / "factorial_input.csv"
+    factorial_frame = _build_factorial_input_frame(record_rows)
+    factorial_frame.to_csv(factorial_input_path, index=False)
+    factorial_result = analyze_factorial_anova_fn(factorial_input_path, factorial_csv_path, 2)
+    normalized_factorial = _normalize_factorial_table(factorial_result)
+    normalized_factorial.to_csv(factorial_csv_path, index=False, float_format="%.8f")
+    factorial_table_markdown_path.write_text(_render_factorial_markdown_table(normalized_factorial), encoding="utf-8")
+    factorial_table_latex_path.write_text(_render_factorial_latex_table(normalized_factorial), encoding="utf-8")
+
+    optimal_rows = _build_optimal_score_rows(record_rows)
+    _write_optimal_csv(optimal_csv_path, optimal_rows)
+    optimal_table_markdown_path.write_text(_render_optimal_markdown_table(optimal_rows), encoding="utf-8")
+    optimal_table_latex_path.write_text(_render_optimal_latex_table(optimal_rows), encoding="utf-8")
+
+    return {
+        "review_csv_path": review_csv_path,
+        "quantitative_rows_path": quantitative_rows_path,
+        "structured_results_path": structured_results_path,
+        "anova_csv_path": anova_csv_path,
+        "factorial_csv_path": factorial_csv_path,
+        "optimal_csv_path": optimal_csv_path,
+        "anova_table_markdown_path": anova_table_markdown_path,
+        "anova_table_latex_path": anova_table_latex_path,
+        "factorial_table_markdown_path": factorial_table_markdown_path,
+        "factorial_table_latex_path": factorial_table_latex_path,
+        "optimal_table_markdown_path": optimal_table_markdown_path,
+        "optimal_table_latex_path": optimal_table_latex_path,
+    }
+
+
+def _write_bundle_readme(
+    *,
+    bundle_root: Path,
+    title: str,
+    review_rows: list[dict[str, str]],
+    failed_record_ids: list[str],
+) -> None:
+    (bundle_root / "README.md").write_text(
+        (
+            f"# {title}\n\n"
+            f"- reviewed_records: `{len(review_rows)}`\n"
+            f"- failed_records: `{len(set(failed_record_ids))}`\n"
+            "- artifacts:\n"
+            f"  - `review.csv`\n"
+            f"  - `quantitative_rows.csv`\n"
+            f"  - `structured_results.csv`\n"
+            f"  - `best_scores.csv`\n"
+            f"  - `anova_pvalues.csv`\n"
+            f"  - `factorial_contributions.csv`\n"
+        ),
+        encoding="utf-8",
+    )
+
+
+def _write_overview_tables(
+    *,
+    overview_root: Path,
+    reference_record_rows: dict[str, list[dict[str, str]]],
+    scratch_root: Path,
+    analyze_factorial_anova_fn: Callable[[Path, Path, int], pd.DataFrame | None],
+) -> dict[str, Path]:
+    overview_root.mkdir(parents=True, exist_ok=True)
+    anova_table_markdown_path = overview_root / "anova_table.md"
+    factorial_table_markdown_path = overview_root / "factorial_table.md"
+    optimal_table_markdown_path = overview_root / "best_scores_table.md"
+
+    anova_rows: list[dict[str, float | str | None]] = []
+    factorial_frames: list[pd.DataFrame] = []
+    optimal_rows: list[dict[str, str]] = []
+    for reference_family, record_rows in sorted(reference_record_rows.items()):
+        frame = pd.DataFrame(record_rows)
+        for row in _compute_anova_rows(frame):
+            anova_rows.append({"Reference family": reference_family, **row})
+        factorial_input_path = scratch_root / f"{reference_family}_overview_factorial_input.csv"
+        factorial_output_path = scratch_root / f"{reference_family}_overview_factorial_contributions.csv"
+        factorial_input_frame = _build_factorial_input_frame(record_rows)
+        factorial_input_frame.to_csv(factorial_input_path, index=False)
+        factorial_result = analyze_factorial_anova_fn(factorial_input_path, factorial_output_path, 2)
+        factorial_frame = _normalize_factorial_table(factorial_result)
+        if not factorial_frame.empty:
+            factorial_frame.insert(0, "Reference family", reference_family)
+            factorial_frames.append(factorial_frame)
+        optimal_rows.extend(_build_optimal_score_rows(record_rows))
+
+    combined_factorial = (
+        pd.concat(factorial_frames, ignore_index=True)
+        if factorial_frames
+        else pd.DataFrame(columns=["Reference family", "Feature", *METRIC_COLUMN_NAMES])
+    )
+    anova_table_markdown_path.write_text(_render_overview_anova_markdown_table(anova_rows), encoding="utf-8")
+    factorial_table_markdown_path.write_text(
+        _render_overview_factorial_markdown_table(combined_factorial),
+        encoding="utf-8",
+    )
+    optimal_table_markdown_path.write_text(_render_optimal_markdown_table(optimal_rows), encoding="utf-8")
+    return {
+        "anova_table_markdown_path": anova_table_markdown_path,
+        "factorial_table_markdown_path": factorial_table_markdown_path,
+        "optimal_table_markdown_path": optimal_table_markdown_path,
+    }
+
+
+def _render_overview_anova_markdown_table(rows: list[dict[str, float | str | None]]) -> str:
+    header = (
+        "| Reference family | Variable / metric | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |\n"
+        "| --- | --- | --- | --- | --- | --- | --- | --- |"
+    )
+    body = [
+        "| "
+        + " | ".join(
+            [
+                str(row["Reference family"]),
+                str(row["label"]),
+                *(_format_pvalue_cell(_lookup_metric_value(row, metric)) for metric in METRIC_COLUMN_NAMES),
+            ]
+        )
+        + " |"
+        for row in rows
+    ]
+    return "# ANOVA Table\n\n" + "\n".join([header, *body]) + "\n"
+
+
+def _render_overview_factorial_markdown_table(frame: pd.DataFrame) -> str:
+    header = (
+        "| Reference family | Feature | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |\n"
+        "| --- | --- | --- | --- | --- | --- | --- | --- |"
+    )
+    body = []
+    for row in frame.to_dict(orient="records"):
+        values = [_format_contribution_cell(row[column]) for column in METRIC_COLUMN_NAMES]
+        body.append("| " + " | ".join([str(row["Reference family"]), str(row["Feature"]), *values]) + " |")
+    return "# Factorial Contributions\n\n" + "\n".join([header, *body]) + "\n"
 
 
 def _compute_anova_rows(frame: pd.DataFrame) -> list[dict[str, float | str | None]]:
@@ -658,9 +855,11 @@ def _normalize_factorial_table(frame: pd.DataFrame | None) -> pd.DataFrame:
         column: column.replace("ROUGE-", "R-").replace("Reading_ease", "Reading ease") for column in normalized.columns
     }
     normalized = normalized.rename(columns=rename_map)
+    normalized["Feature"] = normalized["Feature"].astype(str).map(_canonicalize_factorial_feature_name)
+    normalized = normalized.groupby("Feature", as_index=False, dropna=False).agg("sum")
     for feature in FACTORIAL_FEATURE_ORDER:
         if feature not in set(normalized["Feature"]):
-            normalized.loc[len(normalized)] = {column: 0.0 if column != "Feature" else feature for column in columns}
+            normalized.loc[len(normalized)] = {column: float("nan") if column != "Feature" else feature for column in columns}
     normalized = normalized[columns].copy()
     normalized["Feature"] = normalized["Feature"].astype(str)
     for metric in METRIC_COLUMN_NAMES:
@@ -676,15 +875,16 @@ def _build_optimal_score_rows(record_rows: list[dict[str, str]]) -> list[dict[st
     if not record_rows:
         return []
     frame = pd.DataFrame(record_rows).copy()
-    group_columns = ["abm", "summarizer", "llm"]
+    group_columns = ["reference_family", "abm", "summarizer", "llm"]
     optimal_rows: list[dict[str, str]] = []
     for group_values, group_frame in frame.groupby(group_columns, sort=True):
-        abm, summarizer, llm = group_values
+        reference_family, abm, summarizer, llm = group_values
         numeric_frame = group_frame.copy()
         for metric in METRIC_COLUMN_NAMES:
             numeric_frame[metric] = numeric_frame[metric].astype(float)
         optimal_rows.append(
             {
+                "Reference family": str(reference_family),
                 "ABM": str(abm),
                 "Summary": str(summarizer),
                 "LLM": str(llm),
@@ -700,7 +900,7 @@ def _build_optimal_score_rows(record_rows: list[dict[str, str]]) -> list[dict[st
 
 
 def _write_optimal_csv(path: Path, rows: list[dict[str, str]]) -> None:
-    _write_csv(path, fieldnames=["ABM", "Summary", "LLM", *METRIC_COLUMN_NAMES], rows=rows)
+    _write_csv(path, fieldnames=["Reference family", "ABM", "Summary", "LLM", *METRIC_COLUMN_NAMES], rows=rows)
 
 
 def _factorial_feature_sort_key(feature: str) -> int:
@@ -710,16 +910,37 @@ def _factorial_feature_sort_key(feature: str) -> int:
         return len(FACTORIAL_FEATURE_ORDER)
 
 
+def _canonicalize_factorial_feature_name(feature: str) -> str:
+    alias_map = {
+        "Insight": "Insights",
+        "Example_AND_Insight": "Insights_AND_Example",
+        "Evidence_AND_Insight": "Evidence_AND_Insights",
+        "Role_AND_Insight": "Role_AND_Insights",
+        "Summarizer_AND_Insight": "Summarizer_AND_Insights",
+        "Example_AND_Insights": "Insights_AND_Example",
+        "Insights_AND_Role": "Role_AND_Insights",
+        "Example_AND_Role": "Role_AND_Example",
+        "Example_AND_Summarizer": "Summarizer_AND_Example",
+        "Evidence_AND_Summarizer": "Summarizer_AND_Evidence",
+        "Insights_AND_Summarizer": "Summarizer_AND_Insights",
+        "Role_AND_Summarizer": "Summarizer_AND_Role",
+    }
+    return alias_map.get(feature, feature)
+
+
 def _format_float_cell(value: float | int | str) -> str:
     return f"{float(value):.2f}"
 
 
 def _render_markdown_report(result: QuantitativeSmokeResult) -> str:
+    reference_families = ", ".join(sorted(result.reference_roots)) or "none"
     return (
         "# Quantitative Smoke Report\n\n"
         f"- success: `{str(result.success).lower()}`\n"
         f"- record_count: `{result.record_count}`\n"
         f"- failed_record_count: `{len(result.failed_record_ids)}`\n"
+        f"- overview_root: `{result.overview_root}`\n"
+        f"- reference_families: `{reference_families}`\n"
         f"- quantitative_rows_path: `{result.quantitative_rows_path}`\n"
         f"- structured_results_path: `{result.structured_results_path}`\n"
         f"- anova_csv_path: `{result.anova_csv_path}`\n"

@@ -6,5 +6,15 @@ ground_truth:
 modeler_ground_truth:
   milk_consumption: configs/ground_truth/milk_modeler_ground_truth.txt
 
+gpt5.2_short_ground_truth:
+  fauna: configs/ground_truth/fauna_gpt5.2_short_ground_truth.txt
+  grazing: configs/ground_truth/grazing_gpt5.2_short_ground_truth.txt
+  milk_consumption: configs/ground_truth/milk_gpt5.2_short_ground_truth.txt
+
+gpt5.2_long_ground_truth:
+  fauna: configs/ground_truth/fauna_gpt5.2_long_ground_truth.txt
+  grazing: configs/ground_truth/grazing_gpt5.2_long_ground_truth.txt
+  milk_consumption: configs/ground_truth/milk_gpt5.2_long_ground_truth.txt
+
 qualitative_example_text_dir: configs/prompt_assets/Evaluation/Qualitative Assessment using LLMs/Examples/Text
 human_reference_dir: data/human_reference

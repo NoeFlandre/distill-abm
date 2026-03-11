@@ -214,21 +214,45 @@ def resolve_scoring_reference_path(abm: str) -> Path:
 def resolve_additional_scoring_reference_paths(abm: str) -> dict[str, Path]:
     """Resolve optional secondary human reference paths for one supported ABM."""
     settings = load_experiment_settings(Path("configs/experiment_settings.yaml"))
-    if settings.modeler_ground_truth is None:
-        return {}
-    mapping = {
-        "fauna": settings.modeler_ground_truth.fauna,
-        "grazing": settings.modeler_ground_truth.grazing,
-        "milk_consumption": settings.modeler_ground_truth.milk_consumption,
-    }
-    if abm not in mapping:
+    supported_abms = {"fauna", "grazing", "milk_consumption"}
+    if abm not in supported_abms:
         raise typer.BadParameter(
             f"unsupported ABM for additional scoring references: {abm}. Allowed: fauna, grazing, milk_consumption."
         )
-    resolved = mapping[abm]
-    if not resolved:
-        return {}
-    return {"modeler_ground_truth": Path(resolved)}
+
+    references: dict[str, Path] = {}
+    if settings.modeler_ground_truth is not None:
+        modeler_mapping = {
+            "fauna": settings.modeler_ground_truth.fauna,
+            "grazing": settings.modeler_ground_truth.grazing,
+            "milk_consumption": settings.modeler_ground_truth.milk_consumption,
+        }
+        resolved_modeler = modeler_mapping[abm]
+        if resolved_modeler:
+            references["modeler"] = Path(resolved_modeler)
+
+    if settings.gpt5_2_short_ground_truth is not None:
+        short_mapping = {
+            "fauna": settings.gpt5_2_short_ground_truth.fauna,
+            "grazing": settings.gpt5_2_short_ground_truth.grazing,
+            "milk_consumption": settings.gpt5_2_short_ground_truth.milk_consumption,
+        }
+        references["gpt5.2_short"] = Path(short_mapping[abm])
+
+    if settings.gpt5_2_long_ground_truth is not None:
+        long_mapping = {
+            "fauna": settings.gpt5_2_long_ground_truth.fauna,
+            "grazing": settings.gpt5_2_long_ground_truth.grazing,
+            "milk_consumption": settings.gpt5_2_long_ground_truth.milk_consumption,
+        }
+        references["gpt5.2_long"] = Path(long_mapping[abm])
+
+    return references
+
+
+def resolve_quantitative_reference_paths(abm: str) -> dict[str, Path]:
+    """Resolve all reviewer-facing scoring reference families for one supported ABM."""
+    return {"author": resolve_scoring_reference_path(abm), **resolve_additional_scoring_reference_paths(abm)}
 
 
 def validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:
