@@ -97,6 +97,51 @@ def _validate_adapter_environment(*, adapter: LLMAdapter) -> None:
         raise ValueError("openrouter api key missing: set OPENROUTER_API_KEY")
 
 
+def _initial_progress_by_name(
+    *,
+    output_root: Path,
+    abm_inputs: dict[str, FullCaseSmokeInput],
+    cases_by_abm: dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
+    resume_existing: bool,
+) -> dict[str, FullCaseSuiteProgressAbm]:
+    progress_by_name: dict[str, FullCaseSuiteProgressAbm] = {}
+    for abm in abm_inputs:
+        progress = FullCaseSuiteProgressAbm(
+            abm=abm,
+            status="pending",
+            planned_case_count=len(cases_by_abm[abm]),
+        )
+        if resume_existing:
+            progress = _refresh_progress_abm_snapshot(output_root=output_root, progress=progress)
+            if progress.completed_case_count >= progress.planned_case_count and progress.failed_case_count == 0:
+                progress = progress.model_copy(update={"status": "completed"})
+        progress_by_name[abm] = progress
+    return progress_by_name
+
+
+def _initial_abm_results_by_name(
+    *,
+    progress_by_name: dict[str, FullCaseSuiteProgressAbm],
+) -> dict[str, FullCaseSuiteAbmResult]:
+    results: dict[str, FullCaseSuiteAbmResult] = {}
+    for abm, progress in progress_by_name.items():
+        if progress.status != "completed" or progress.run_root is None:
+            continue
+        run_root = progress.run_root
+        results[abm] = FullCaseSuiteAbmResult(
+            abm=abm,
+            success=True,
+            run_root=run_root,
+            report_json_path=progress.report_json_path or (run_root / "smoke_full_case_matrix_report.json"),
+            report_markdown_path=run_root / "smoke_full_case_matrix_report.md",
+            review_csv_path=run_root / "request_review.csv",
+            review_html_path=run_root / "review.html",
+            planned_case_count=progress.planned_case_count,
+            failed_case_ids=[],
+        )
+    return results
+
+
 def run_full_case_suite_smoke(
     *,
     abm_inputs: dict[str, FullCaseSmokeInput],
@@ -171,20 +216,18 @@ def run_full_case_suite_smoke(
         )
 
     try:
-        abm_results_by_name: dict[str, FullCaseSuiteAbmResult] = {}
-        progress_by_name = {
-            abm: FullCaseSuiteProgressAbm(
-                abm=abm,
-                status="pending",
-                planned_case_count=len(cases_by_abm[abm]),
-            )
-            for abm in abm_inputs
-        }
-        remaining_abms = list(abm_inputs)
+        progress_by_name = _initial_progress_by_name(
+            output_root=output_root,
+            abm_inputs=abm_inputs,
+            cases_by_abm=cases_by_abm,
+            resume_existing=resume_existing,
+        )
+        abm_results_by_name = _initial_abm_results_by_name(progress_by_name=progress_by_name)
+        remaining_abms = [abm for abm in abm_inputs if progress_by_name[abm].status != "completed"]
         _write_live_suite_progress(
             status="running",
-            current_abm=None,
-            current_attempt=None,
+            current_abm=remaining_abms[0] if remaining_abms else None,
+            current_attempt=1 if remaining_abms else None,
             remaining_abms=remaining_abms,
         )
         for attempt in range(1, max(max_abm_attempts, 1) + 1):

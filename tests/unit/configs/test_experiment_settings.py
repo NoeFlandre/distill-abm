@@ -21,5 +21,21 @@ def test_load_experiment_settings_config() -> None:
     assert settings.modeler_ground_truth.milk_consumption.endswith("milk_modeler_ground_truth.txt")
     assert Path(settings.modeler_ground_truth.milk_consumption).exists()
 
+    assert settings.gpt5_2_short_ground_truth is not None
+    assert settings.gpt5_2_short_ground_truth.fauna.endswith("fauna_gpt5.2_short_ground_truth.txt")
+    assert settings.gpt5_2_short_ground_truth.grazing.endswith("grazing_gpt5.2_short_ground_truth.txt")
+    assert settings.gpt5_2_short_ground_truth.milk_consumption.endswith("milk_gpt5.2_short_ground_truth.txt")
+    assert Path(settings.gpt5_2_short_ground_truth.fauna).exists()
+    assert Path(settings.gpt5_2_short_ground_truth.grazing).exists()
+    assert Path(settings.gpt5_2_short_ground_truth.milk_consumption).exists()
+
+    assert settings.gpt5_2_long_ground_truth is not None
+    assert settings.gpt5_2_long_ground_truth.fauna.endswith("fauna_gpt5.2_long_ground_truth.txt")
+    assert settings.gpt5_2_long_ground_truth.grazing.endswith("grazing_gpt5.2_long_ground_truth.txt")
+    assert settings.gpt5_2_long_ground_truth.milk_consumption.endswith("milk_gpt5.2_long_ground_truth.txt")
+    assert Path(settings.gpt5_2_long_ground_truth.fauna).exists()
+    assert Path(settings.gpt5_2_long_ground_truth.grazing).exists()
+    assert Path(settings.gpt5_2_long_ground_truth.milk_consumption).exists()
+
     assert settings.qualitative_example_text_dir is not None
     assert "prompt_assets" in settings.qualitative_example_text_dir

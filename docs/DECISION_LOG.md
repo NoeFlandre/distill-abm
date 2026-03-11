@@ -49,3 +49,8 @@
 - Date: 2026-03-09
 - Decision: Preserve the public evidence labels `plot`, `table`, and `plot+table`, but redefine `table` as statistical evidence derived only from the plot-relevant simulation series.
 - Rationale: reviewer guidance explicitly asks for statistical summaries rather than raw CSV dumps. This must be implemented at the shared helper/core pipeline layer so DOE, smoke workflows, and real runs all use the same evidence semantics.
+
+## DL-011
+- Date: 2026-03-11
+- Decision: Freeze the validated quantitative evaluation path unless a task explicitly requests evaluation changes.
+- Rationale: the current quantitative path has been manually debugged and revalidated to remove silent lexical-metric fallbacks, preserve additive multi-reference scoring, include string-dtype prompt factors in DOE/factorial analysis, distinguish absent factorial terms from tiny nonzero effects, and publish exactly three cross-reference overview tables. This contract should not drift casually after validation.

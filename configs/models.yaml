@@ -17,6 +17,12 @@ models:
   mistral_medium_debug:
     provider: mistral
     model: mistral-medium-latest
+  mistral_small_2506:
+    provider: mistral
+    model: mistral-small-2506
+  ministral_14b_2512:
+    provider: mistral
+    model: ministral-14b-2512
   magistral_medium_2509:
     provider: mistral
     model: magistral-medium-2509

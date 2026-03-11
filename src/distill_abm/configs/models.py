@@ -131,6 +131,14 @@ class ExperimentSettings(BaseModel):
 
     ground_truth: ExperimentGroundTruthConfig
     modeler_ground_truth: OptionalExperimentGroundTruthConfig | None = None
+    gpt5_2_short_ground_truth: ExperimentGroundTruthConfig | None = Field(
+        default=None,
+        validation_alias=AliasChoices("gpt5.2_short_ground_truth", "gpt5_2_short_ground_truth"),
+    )
+    gpt5_2_long_ground_truth: ExperimentGroundTruthConfig | None = Field(
+        default=None,
+        validation_alias=AliasChoices("gpt5.2_long_ground_truth", "gpt5_2_long_ground_truth"),
+    )
     qualitative_example_text_dir: str | None = None
     human_reference_dir: str | None = None
 

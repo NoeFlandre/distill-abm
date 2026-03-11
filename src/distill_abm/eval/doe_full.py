@@ -32,7 +32,7 @@ def analyze_factorial_anova(
     if not contributions:
         return None
     result = _finalize_table(contributions, clean_factors, max_interaction_order)
-    result.to_csv(output_csv, index=False, float_format="%.2f")
+    result.to_csv(output_csv, index=False, float_format="%.8f")
     return result
 
 

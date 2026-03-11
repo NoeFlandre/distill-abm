@@ -14,6 +14,7 @@ from distill_abm.pipeline.quantitative_smoke import (
     _normalize_factorial_table,
     _render_anova_markdown_table,
     _render_factorial_latex_table,
+    _render_overview_factorial_markdown_table,
     _render_optimal_latex_table,
     _render_optimal_markdown_table,
     run_quantitative_smoke,
@@ -176,6 +177,7 @@ def test_render_anova_markdown_table_marks_fixed_factors_absent() -> None:
 def test_render_optimal_tables_preserve_expected_headers_and_rows() -> None:
     rows = [
         {
+            "Reference family": "author",
             "ABM": "grazing",
             "Summary": "bart",
             "LLM": "mistral-medium-latest",
@@ -191,10 +193,10 @@ def test_render_optimal_tables_preserve_expected_headers_and_rows() -> None:
     markdown = _render_optimal_markdown_table(rows)
     latex = _render_optimal_latex_table(rows)
 
-    assert "| ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |" in markdown
-    assert "| grazing | bart | mistral-medium-latest | 0.12 | 0.34 | 0.56 | 0.22 | 0.44 | 61.00 |" in markdown
-    assert "\\textit{\\textbf{ABM}}" in latex
-    assert "grazing & bart & mistral-medium-latest" in latex
+    assert "| Reference family | ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |" in markdown
+    assert "| author | grazing | bart | mistral-medium-latest | 0.12 | 0.34 | 0.56 | 0.22 | 0.44 | 61.00 |" in markdown
+    assert "\\textit{\\textbf{Reference family}}" in latex
+    assert "author & grazing & bart & mistral-medium-latest" in latex
 
 
 def test_render_factorial_latex_table_bolds_large_contributions() -> None:
@@ -221,6 +223,38 @@ def test_render_factorial_latex_table_bolds_large_contributions() -> None:
     assert "4.00" in latex
 
 
+def test_render_overview_factorial_table_marks_absent_terms_and_tiny_nonzero_values() -> None:
+    frame = pd.DataFrame(
+        [
+            {
+                "Reference family": "author",
+                "Feature": "Evidence",
+                "BLEU": 0.004,
+                "METEOR": 0.0,
+                "R-1": 0.5,
+                "R-2": 1.0,
+                "R-L": 2.0,
+                "Reading ease": 3.0,
+            },
+            {
+                "Reference family": "author",
+                "Feature": "Role_AND_Insight",
+                "BLEU": float("nan"),
+                "METEOR": float("nan"),
+                "R-1": float("nan"),
+                "R-2": float("nan"),
+                "R-L": float("nan"),
+                "Reading ease": float("nan"),
+            },
+        ]
+    )
+
+    table = _render_overview_factorial_markdown_table(frame)
+
+    assert "<0.01" in table
+    assert "| author | Role_AND_Insight | — | — | — | — | — | — |" in table
+
+
 def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> None:
     summarizer_root, _matrix_root = _build_source_roots(tmp_path)
     result = run_quantitative_smoke(
@@ -237,9 +271,21 @@ def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> Non
     assert result.anova_table_markdown_path.exists() is True
     assert result.factorial_table_markdown_path.exists() is True
     assert result.optimal_table_markdown_path.exists() is True
+    assert result.anova_csv_path.parent.name == "combined"
+    assert result.factorial_csv_path.parent.name == "combined"
+    assert result.optimal_csv_path.parent.name == "combined"
+    assert (result.run_root / "author").exists() is True
+    assert (result.run_root / "gpt5.2_short").exists() is True
+    assert (result.run_root / "gpt5.2_long").exists() is True
+    assert (result.run_root / "overview").exists() is True
+    assert sorted(path.name for path in result.overview_root.iterdir()) == [
+        "anova_table.md",
+        "best_scores_table.md",
+        "factorial_table.md",
+    ]
     rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
-    assert len(rows) == 20
-    assert rows[0]["reference_family"] == "author"
+    assert len(rows) == 60
+    assert {row["reference_family"] for row in rows} == {"author", "gpt5.2_short", "gpt5.2_long"}
     assert rows[0]["evidence"]
     assert rows[0]["prompt"]
     assert rows[0]["summarizer"]
@@ -257,7 +303,10 @@ def test_run_quantitative_smoke_writes_best_score_table(tmp_path: Path) -> None:
 
     rows = list(csv.DictReader(result.optimal_csv_path.open(encoding="utf-8")))
     assert rows
-    assert {"ABM", "Summary", "LLM", "BLEU", "METEOR", "R-1", "R-2", "R-L", "Reading ease"} == set(rows[0].keys())
+    assert {"Reference family", "ABM", "Summary", "LLM", "BLEU", "METEOR", "R-1", "R-2", "R-L", "Reading ease"} == set(
+        rows[0].keys()
+    )
+    assert {row["Reference family"] for row in rows} == {"author", "gpt5.2_short", "gpt5.2_long"}
     assert {row["Summary"] for row in rows} == {"none", "bart", "bert", "t5", "longformer_ext"}
     assert {row["LLM"] for row in rows} == {"nvidia/nemotron-nano-12b-v2-vl:free"}
 
@@ -268,6 +317,7 @@ def test_build_structured_results_rows_exposes_modern_factor_sheet() -> None:
             {
                 "case_id": "01_grazing_role_plot_plus_table_rep2",
                 "abm": "grazing",
+                "reference_family": "author",
                 "llm": "mistral-medium-latest",
                 "evidence": "plot+table",
                 "prompt": "role+insights",
@@ -290,6 +340,7 @@ def test_build_structured_results_rows_exposes_modern_factor_sheet() -> None:
     assert rows == [
         {
             "Case study": "grazing",
+            "Reference family": "author",
             "Summary": "t5",
             "LLM": "mistral-medium-latest",
             "Role": "Yes",
@@ -396,6 +447,69 @@ def test_normalize_factorial_table_scales_each_metric_to_full_share() -> None:
         assert round(float(frame[metric].sum()), 6) == 100.0
 
 
+def test_normalize_factorial_table_marks_missing_features_absent_instead_of_zero() -> None:
+    frame = _normalize_factorial_table(
+        pd.DataFrame(
+            [
+                {
+                    "Feature": "Summarizer",
+                    "BLEU": 30.0,
+                    "METEOR": 10.0,
+                    "R-1": 20.0,
+                    "R-2": 4.0,
+                    "R-L": 6.0,
+                    "Reading ease": 1.0,
+                }
+            ]
+        )
+    )
+
+    missing_row = frame.loc[frame["Feature"] == "Role_AND_Insights"].iloc[0]
+    assert pd.isna(missing_row["BLEU"])
+    assert pd.isna(missing_row["Reading ease"])
+
+
+def test_normalize_factorial_table_canonicalizes_insight_and_reversed_interaction_names() -> None:
+    frame = _normalize_factorial_table(
+        pd.DataFrame(
+            [
+                {
+                    "Feature": "Example_AND_Insight",
+                    "BLEU": 1.0,
+                    "METEOR": 2.0,
+                    "R-1": 3.0,
+                    "R-2": 4.0,
+                    "R-L": 5.0,
+                    "Reading ease": 6.0,
+                },
+                {
+                    "Feature": "Insights_AND_Example",
+                    "BLEU": 1.0,
+                    "METEOR": 2.0,
+                    "R-1": 3.0,
+                    "R-2": 4.0,
+                    "R-L": 5.0,
+                    "Reading ease": 6.0,
+                },
+                {
+                    "Feature": "Insight",
+                    "BLEU": 1.0,
+                    "METEOR": 1.0,
+                    "R-1": 1.0,
+                    "R-2": 1.0,
+                    "R-L": 1.0,
+                    "Reading ease": 1.0,
+                },
+            ]
+        )
+    )
+
+    assert "Example_AND_Insight" not in set(frame["Feature"])
+    assert "Insight" not in set(frame["Feature"])
+    assert "Insights_AND_Example" in set(frame["Feature"])
+    assert "Insights" in set(frame["Feature"])
+
+
 def test_run_quantitative_smoke_reuses_valid_rows_when_resuming(tmp_path: Path) -> None:
     summarizer_root, _matrix_root = _build_source_roots(tmp_path)
     first = run_quantitative_smoke(
@@ -417,3 +531,69 @@ def test_run_quantitative_smoke_reuses_valid_rows_when_resuming(tmp_path: Path) 
 
     assert resumed.success is True
     assert resumed.run_root != first.run_root
+
+
+def test_run_quantitative_smoke_includes_modeler_only_for_supported_abms(tmp_path: Path) -> None:
+    matrix_root = tmp_path / "matrix" / "runs" / "run_1"
+    summarizer_root = tmp_path / "summ" / "runs" / "run_1"
+    review_rows: list[dict[str, str]] = []
+
+    for abm in ("grazing", "milk_consumption"):
+        case_id = f"01_{abm}_none_plot_rep1"
+        case_dir = matrix_root / "cases" / case_id
+        context_output = _write_text(case_dir / "02_context" / "context_output.txt", f"context {case_id}")
+        _write_text(
+            case_dir / "00_case_summary.json",
+            json.dumps(
+                {
+                    "case_id": case_id,
+                    "abm": abm,
+                    "evidence_mode": "plot",
+                    "prompt_variant": "none",
+                    "repetition": 1,
+                    "model": "mistral-medium-latest",
+                }
+            ),
+        )
+        _write_text(case_dir / "03_trends" / "plot_01" / "trend_output.txt", f"trend {case_id}")
+        bundle_dir = summarizer_root / "bundles" / case_id
+        combined_input = _write_text(bundle_dir / "01_input" / "combined_input.txt", f"combined {case_id}")
+        summary_path = _write_text(bundle_dir / "02_summaries" / "none.txt", f"summary {case_id}")
+        review_rows.append(
+            {
+                "bundle_id": case_id,
+                "case_id": case_id,
+                "abm": abm,
+                "mode": "none",
+                "success": "True",
+                "context_output_path": str(context_output),
+                "trend_output_paths": str(case_dir / "03_trends" / "plot_01" / "trend_output.txt"),
+                "combined_input_path": str(combined_input),
+                "summary_output_path": str(summary_path),
+                "input_length": "100",
+                "output_length": "80",
+                "duration_seconds": "0.1",
+                "validation_note": "validated",
+                "error": "",
+            }
+        )
+
+    (summarizer_root / "review.csv").parent.mkdir(parents=True, exist_ok=True)
+    with (summarizer_root / "review.csv").open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(review_rows[0].keys()))
+        writer.writeheader()
+        writer.writerows(review_rows)
+
+    result = run_quantitative_smoke(
+        source_root=summarizer_root,
+        output_root=tmp_path / "quant",
+        score_summary_fn=_fake_score_summary,
+    )
+
+    rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
+    by_abm: dict[str, set[str]] = {}
+    for row in rows:
+        by_abm.setdefault(row["abm"], set()).add(row["reference_family"])
+
+    assert by_abm["grazing"] == {"author", "gpt5.2_short", "gpt5.2_long"}
+    assert by_abm["milk_consumption"] == {"author", "modeler", "gpt5.2_short", "gpt5.2_long"}
