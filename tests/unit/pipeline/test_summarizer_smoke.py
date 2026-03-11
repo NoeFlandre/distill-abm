@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 from distill_abm.pipeline.summarizer_smoke import (
     ValidatedSmokeBundle,
@@ -209,3 +210,118 @@ def test_default_validated_smoke_bundles_discovers_completed_suite_abms(tmp_path
 
     assert [bundle.abm for bundle in bundles] == ["fauna"]
     assert bundles[0].case_id == "01_fauna_none_plot_rep1"
+
+
+def test_default_validated_smoke_bundles_discovers_live_suite_cases_without_matrix_report(tmp_path: Path) -> None:
+    suite_root = tmp_path / "suite"
+    run_root = suite_root / "abms" / "fauna" / "runs" / "run_live"
+    case_root = run_root / "cases" / "01_fauna_none_plot_rep1"
+    (suite_root / "abms" / "fauna").mkdir(parents=True, exist_ok=True)
+    (suite_root / "abms" / "fauna" / "latest_run.txt").write_text(str(run_root), encoding="utf-8")
+    (case_root / "02_context").mkdir(parents=True)
+    (case_root / "03_trends" / "plot_01").mkdir(parents=True)
+    (case_root / "02_context" / "context_output.txt").write_text("Valid context.", encoding="utf-8")
+    (case_root / "03_trends" / "plot_01" / "trend_output.txt").write_text("Valid trend.", encoding="utf-8")
+    (case_root / "00_case_summary.json").write_text(
+        json.dumps(
+            {
+                "case_id": "01_fauna_none_plot_rep1",
+                "abm": "fauna",
+                "evidence_mode": "plot",
+                "prompt_variant": "none",
+                "repetition": 1,
+                "model": "mistral-medium-latest",
+            }
+        ),
+        encoding="utf-8",
+    )
+    (case_root / "validation_state.json").write_text(
+        json.dumps(
+            {
+                "context": {"status": "accepted", "error": None},
+                "trends": {"1": {"status": "accepted", "error": None}},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    bundles = default_validated_smoke_bundles(suite_root, include_abms=("fauna",))
+
+    assert [bundle.case_id for bundle in bundles] == ["01_fauna_none_plot_rep1"]
+    assert bundles[0].context_output_path == case_root / "02_context" / "context_output.txt"
+    assert bundles[0].trend_output_paths == (case_root / "03_trends" / "plot_01" / "trend_output.txt",)
+
+
+def test_run_summarizer_smoke_watch_mode_processes_bundle_when_it_appears(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:  # type: ignore[no-untyped-def]
+    source_root = tmp_path / "suite"
+    output_root = tmp_path / "summaries"
+    run_root = source_root / "abms" / "fauna" / "runs" / "run_live"
+    abm_root = source_root / "abms" / "fauna"
+    abm_root.mkdir(parents=True, exist_ok=True)
+    (abm_root / "latest_run.txt").write_text(str(run_root), encoding="utf-8")
+
+    state = {"bundle_created": False, "active": True}
+
+    def _create_bundle() -> None:
+        case_root = run_root / "cases" / "01_fauna_none_plot_rep1"
+        (case_root / "02_context").mkdir(parents=True, exist_ok=True)
+        (case_root / "03_trends" / "plot_01").mkdir(parents=True, exist_ok=True)
+        (case_root / "02_context" / "context_output.txt").write_text("Valid context.", encoding="utf-8")
+        (case_root / "03_trends" / "plot_01" / "trend_output.txt").write_text("Valid trend.", encoding="utf-8")
+        (case_root / "00_case_summary.json").write_text(
+            json.dumps(
+                {
+                    "case_id": "01_fauna_none_plot_rep1",
+                    "abm": "fauna",
+                    "evidence_mode": "plot",
+                    "prompt_variant": "none",
+                    "repetition": 1,
+                    "model": "mistral-medium-latest",
+                }
+            ),
+            encoding="utf-8",
+        )
+        (case_root / "validation_state.json").write_text(
+            json.dumps(
+                {
+                    "context": {"status": "accepted", "error": None},
+                    "trends": {"1": {"status": "accepted", "error": None}},
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    def fake_read_active_run_lock(_: Path) -> SimpleNamespace | None:
+        if state["active"]:
+            return SimpleNamespace(pid=123, run_id="run_live", run_root=run_root)
+        return None
+
+    def fake_sleep(_: float) -> None:
+        if not state["bundle_created"]:
+            _create_bundle()
+            state["bundle_created"] = True
+            state["active"] = False
+
+    monkeypatch.setattr("distill_abm.pipeline.summarizer_smoke.read_active_run_lock", fake_read_active_run_lock)
+    monkeypatch.setattr("distill_abm.pipeline.summarizer_smoke.time.sleep", fake_sleep)
+
+    result = run_summarizer_smoke(
+        source_root=source_root,
+        output_root=output_root,
+        watch=True,
+        poll_interval_seconds=0.01,
+        summarizer_fns={
+            "bart": lambda text: f"bart::{text}",
+            "bert": lambda text: f"bert::{text}",
+            "t5": lambda text: f"t5::{text}",
+            "longformer_ext": lambda text: f"longformer::{text}",
+        },
+    )
+
+    assert result.success is True
+    assert state["bundle_created"] is True
+    assert [bundle.case_id for bundle in result.bundles] == ["01_fauna_none_plot_rep1"]
+    assert (result.bundles[0].bundle_dir / "02_summaries" / "bart.txt").read_text(encoding="utf-8").startswith("bart::")

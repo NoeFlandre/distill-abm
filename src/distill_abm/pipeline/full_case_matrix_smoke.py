@@ -6,6 +6,7 @@ import json
 import shutil
 import threading
 import time
+from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
 from pathlib import Path
@@ -169,6 +170,7 @@ def run_full_case_matrix_smoke(
     retry_backoff_seconds: float | None = None,
     resume_existing: bool = True,
     max_case_attempts: int = DEFAULT_MAX_CASE_ATTEMPTS,
+    on_case_completed: Callable[[FullCaseMatrixCaseResult], None] | None = None,
 ) -> FullCaseMatrixSmokeResult:
     """Run many full ABM cases in one separated run root with resume and review artifacts."""
     started_at = datetime.now(UTC)
@@ -219,6 +221,8 @@ def run_full_case_matrix_smoke(
                 case = future_to_case[future]
                 case_result = future.result()
                 case_results_by_id[case.case_id] = case_result
+                if on_case_completed is not None:
+                    on_case_completed(case_result)
                 if not case_result.success:
                     next_remaining.append(case)
         if not next_remaining:

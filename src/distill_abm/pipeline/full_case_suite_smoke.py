@@ -131,6 +131,45 @@ def run_full_case_suite_smoke(
         run_root=str(run_root),
     )
 
+    def _handle_case_completed(
+        *,
+        abm: str,
+        attempt: int,
+        remaining_abms: list[str],
+    ) -> None:
+        _write_live_suite_progress(
+            status="running",
+            current_abm=abm,
+            current_attempt=attempt,
+            remaining_abms=remaining_abms,
+        )
+
+    def _write_live_suite_progress(
+        *,
+        status: str,
+        current_abm: str | None,
+        current_attempt: int | None,
+        remaining_abms: list[str],
+        finished_at: datetime | None = None,
+    ) -> None:
+        _write_suite_progress(
+            output_root=output_root,
+            progress_path=progress_path,
+            progress=build_suite_progress(
+                run_id=run_id,
+                run_root=run_root,
+                output_root=output_root,
+                model=model,
+                started_at=started_at,
+                status=status,
+                current_abm=current_abm,
+                current_attempt=current_attempt,
+                remaining_abms=remaining_abms,
+                progress_by_name=progress_by_name,
+                finished_at=finished_at,
+            ),
+        )
+
     try:
         abm_results_by_name: dict[str, FullCaseSuiteAbmResult] = {}
         progress_by_name = {
@@ -142,21 +181,11 @@ def run_full_case_suite_smoke(
             for abm in abm_inputs
         }
         remaining_abms = list(abm_inputs)
-        _write_suite_progress(
-            output_root=output_root,
-            progress_path=progress_path,
-            progress=build_suite_progress(
-                run_id=run_id,
-                run_root=run_root,
-                output_root=output_root,
-                model=model,
-                started_at=started_at,
-                status="running",
-                current_abm=None,
-                current_attempt=None,
-                remaining_abms=remaining_abms,
-                progress_by_name=progress_by_name,
-            ),
+        _write_live_suite_progress(
+            status="running",
+            current_abm=None,
+            current_attempt=None,
+            remaining_abms=remaining_abms,
         )
         for attempt in range(1, max(max_abm_attempts, 1) + 1):
             next_remaining: list[str] = []
@@ -168,21 +197,11 @@ def run_full_case_suite_smoke(
                 progress_by_name[abm] = progress_by_name[abm].model_copy(
                     update={"status": "running", "attempt": attempt, "last_error": None}
                 )
-                _write_suite_progress(
-                    output_root=output_root,
-                    progress_path=progress_path,
-                    progress=build_suite_progress(
-                        run_id=run_id,
-                        run_root=run_root,
-                        output_root=output_root,
-                        model=model,
-                        started_at=started_at,
-                        status="running",
-                        current_abm=abm,
-                        current_attempt=attempt,
-                        remaining_abms=remaining_abms,
-                        progress_by_name=progress_by_name,
-                    ),
+                _write_live_suite_progress(
+                    status="running",
+                    current_abm=abm,
+                    current_attempt=attempt,
+                    remaining_abms=remaining_abms,
                 )
                 log_event(
                     LOGGER,
@@ -192,6 +211,21 @@ def run_full_case_suite_smoke(
                     output_root=str(abm_output_root),
                     attempt=attempt,
                 )
+
+                def live_case_progress_callback(
+                    _case_result: object,
+                    *,
+                    _abm: str = abm,
+                    _attempt: int = attempt,
+                    _remaining_abms: list[str] = remaining_abms,
+                ) -> None:
+                    _ = _case_result
+                    _handle_case_completed(
+                        abm=_abm,
+                        attempt=_attempt,
+                        remaining_abms=_remaining_abms,
+                    )
+
                 try:
                     matrix_result = run_full_case_matrix_smoke(
                         case_input=case_input,
@@ -203,6 +237,7 @@ def run_full_case_suite_smoke(
                         max_retries=max_retries,
                         retry_backoff_seconds=retry_backoff_seconds,
                         resume_existing=resume_existing,
+                        on_case_completed=live_case_progress_callback,
                     )
                     latest_abm_run = Path((abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip())
                     abm_result = FullCaseSuiteAbmResult(
@@ -274,21 +309,11 @@ def run_full_case_suite_smoke(
                     run_root=str(abm_result.run_root),
                     attempt=attempt,
                 )
-                _write_suite_progress(
-                    output_root=output_root,
-                    progress_path=progress_path,
-                    progress=build_suite_progress(
-                        run_id=run_id,
-                        run_root=run_root,
-                        output_root=output_root,
-                        model=model,
-                        started_at=started_at,
-                        status="running",
-                        current_abm=abm,
-                        current_attempt=attempt,
-                        remaining_abms=next_remaining or [item for item in remaining_abms if item != abm],
-                        progress_by_name=progress_by_name,
-                    ),
+                _write_live_suite_progress(
+                    status="running",
+                    current_abm=abm,
+                    current_attempt=attempt,
+                    remaining_abms=next_remaining or [item for item in remaining_abms if item != abm],
                 )
             if not next_remaining:
                 break
@@ -300,21 +325,11 @@ def run_full_case_suite_smoke(
                     remaining_abms=next_remaining,
                     next_attempt=attempt + 1,
                 )
-                _write_suite_progress(
-                    output_root=output_root,
-                    progress_path=progress_path,
-                    progress=build_suite_progress(
-                        run_id=run_id,
-                        run_root=run_root,
-                        output_root=output_root,
-                        model=model,
-                        started_at=started_at,
-                        status="waiting_to_retry",
-                        current_abm=None,
-                        current_attempt=attempt + 1,
-                        remaining_abms=next_remaining,
-                        progress_by_name=progress_by_name,
-                    ),
+                _write_live_suite_progress(
+                    status="waiting_to_retry",
+                    current_abm=None,
+                    current_attempt=attempt + 1,
+                    remaining_abms=next_remaining,
                 )
                 time.sleep(CIRCUIT_BREAKER_OPEN_SECONDS)
             remaining_abms = next_remaining
@@ -355,22 +370,12 @@ def run_full_case_suite_smoke(
         _write_text(result.report_markdown_path, _render_report(result))
         _write_summary_csv(result.review_csv_path, summary_rows)
         _write_text(result.review_html_path, _render_html(result))
-        _write_suite_progress(
-            output_root=output_root,
-            progress_path=progress_path,
-            progress=build_suite_progress(
-                run_id=run_id,
-                run_root=run_root,
-                output_root=output_root,
-                model=model,
-                started_at=started_at,
-                status="completed" if result.success else "failed",
-                current_abm=None,
-                current_attempt=None,
-                remaining_abms=[],
-                progress_by_name=progress_by_name,
-                finished_at=finished_at,
-            ),
+        _write_live_suite_progress(
+            status="completed" if result.success else "failed",
+            current_abm=None,
+            current_attempt=None,
+            remaining_abms=[],
+            finished_at=finished_at,
         )
         log_event(
             LOGGER,

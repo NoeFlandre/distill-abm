@@ -662,6 +662,8 @@ def execute_smoke_summarizers_command(
     abms: tuple[str, ...] | None,
     output_root: Path,
     resume: bool,
+    watch: bool,
+    poll_interval_seconds: float,
     json_output: bool,
     run_summarizer_smoke_fn: Callable[..., Any],
 ) -> None:
@@ -670,6 +672,8 @@ def execute_smoke_summarizers_command(
         include_abms=abms,
         output_root=output_root,
         resume=resume,
+        watch=watch,
+        poll_interval_seconds=poll_interval_seconds,
     )
     command_result = SmokeCommandResult(
         command="smoke-summarizers",

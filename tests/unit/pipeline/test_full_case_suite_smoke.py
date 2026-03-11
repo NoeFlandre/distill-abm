@@ -333,6 +333,125 @@ def test_run_full_case_suite_smoke_retries_transient_abm_failure(
     assert sleep_calls == [60.0]
 
 
+def test_run_full_case_suite_smoke_refreshes_suite_progress_during_active_abm_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("MISTRAL_API_KEY", "debug-token")
+    suite_root = tmp_path / "suite"
+    nested_run_root = suite_root / "abms" / "fauna" / "runs" / "run_live"
+    nested_run_root.mkdir(parents=True, exist_ok=True)
+    (nested_run_root / "run.log.jsonl").write_text('{"event":"x"}\n', encoding="utf-8")
+    (nested_run_root / "smoke_full_case_matrix_report.json").write_text("{}", encoding="utf-8")
+    (nested_run_root / "smoke_full_case_matrix_report.md").write_text("report", encoding="utf-8")
+    (nested_run_root / "request_review.csv").write_text("case_id\n01\n", encoding="utf-8")
+    live_completed_cases = {"value": 0}
+
+    def fake_run_full_case_matrix_smoke(**kwargs):  # type: ignore[no-untyped-def]
+        output_root = kwargs["output_root"]
+        (output_root / "latest_run.txt").write_text(str(nested_run_root), encoding="utf-8")
+        live_completed_cases["value"] = 51
+        on_case_completed = kwargs.get("on_case_completed")
+        assert on_case_completed is not None
+        on_case_completed(
+            SimpleNamespace(
+                case_id="51_fauna_role_plot_plus_table_rep3",
+                success=True,
+            )
+        )
+        progress_payload = (suite_root / "suite_progress.json").read_text(encoding="utf-8")
+        assert '"completed_case_count":51' in progress_payload.replace(" ", "")
+        return SimpleNamespace(
+            success=True,
+            report_json_path=nested_run_root / "report.json",
+            report_markdown_path=nested_run_root / "report.md",
+            review_csv_path=nested_run_root / "review.csv",
+            viewer_html_path=nested_run_root / "review.html",
+            failed_case_ids=[],
+        )
+
+    def fake_collect_local_qwen_monitor_snapshot(_output_root: Path) -> LocalQwenMonitorSnapshot:
+        completed_cases = live_completed_cases["value"]
+        running_case_id = None if completed_cases >= 72 else "52_fauna_role_plot_plus_table_rep3"
+        status = "completed" if completed_cases >= 72 else "running"
+        progress_detail = "done" if completed_cases >= 72 else "trend"
+        return LocalQwenMonitorSnapshot(
+            output_root=nested_run_root,
+            exists=True,
+            mode="smoke",
+            total_cases=72,
+            completed_cases=completed_cases,
+            failed_cases=0,
+            running_case_id=running_case_id,
+            cases=(
+                LocalQwenCaseSnapshot(
+                    case_id=running_case_id or "72_fauna_role_plot_plus_table_rep3",
+                    status=status,
+                    label=running_case_id or "72_fauna_role_plot_plus_table_rep3",
+                    num_ctx=None,
+                    max_tokens=None,
+                    context_prompt_length=None,
+                    trend_prompt_length=None,
+                    context_total_tokens=None,
+                    trend_total_tokens=None,
+                    error=None,
+                    progress_detail=progress_detail,
+                    completed_steps=completed_cases,
+                    total_steps=72,
+                ),
+            ),
+        )
+
+    monkeypatch.setattr(
+        "distill_abm.pipeline.full_case_suite_smoke.run_full_case_matrix_smoke",
+        fake_run_full_case_matrix_smoke,
+    )
+    monkeypatch.setattr(
+        "distill_abm.pipeline.full_case_suite_progress.collect_local_qwen_monitor_snapshot",
+        fake_collect_local_qwen_monitor_snapshot,
+    )
+
+    suite_input = {
+        "fauna": FullCaseSmokeInput(
+            abm="fauna",
+            csv_path=tmp_path / "fauna.csv",
+            parameters_path=tmp_path / "fauna_params.txt",
+            documentation_path=tmp_path / "fauna_docs.txt",
+            plots=(),
+        ),
+    }
+    for path in [
+        suite_input["fauna"].csv_path,
+        suite_input["fauna"].parameters_path,
+        suite_input["fauna"].documentation_path,
+    ]:
+        path.write_text("x", encoding="utf-8")
+
+    cases_by_abm = cast(
+        dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
+        {
+            "fauna": (
+                FullCaseMatrixCaseSpec(
+                    case_id="01_fauna_none_plot_rep1",
+                    abm="fauna",
+                    evidence_mode="plot",
+                    prompt_variant="none",
+                    repetition=1,
+                ),
+            )
+        },
+    )
+
+    result = run_full_case_suite_smoke(
+        abm_inputs=suite_input,
+        cases_by_abm=cases_by_abm,
+        adapter=_Adapter(),
+        model="mistral-medium-latest",
+        output_root=suite_root,
+    )
+
+    assert result.success is True
+
+
 def test_run_full_case_suite_smoke_rejects_missing_provider_credentials(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

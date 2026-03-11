@@ -11,6 +11,12 @@ models:
   nemotron_nano_12b_v2_vl_free:
     provider: openrouter
     model: nvidia/nemotron-nano-12b-v2-vl:free
+  mistral_large_2512:
+    provider: mistral
+    model: mistral-large-2512
   mistral_medium_debug:
     provider: mistral
     model: mistral-medium-latest
+  magistral_medium_2509:
+    provider: mistral
+    model: magistral-medium-2509
