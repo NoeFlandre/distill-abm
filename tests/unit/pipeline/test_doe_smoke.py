@@ -189,7 +189,7 @@ def test_run_doe_smoke_suite_uses_legacy_style_prompt_composition_and_statistica
     assert "The data table represents the average weekly consumption of whole milk per agent." in trend_prompt
     assert "Statistical summary of the relevant simulation output:" in trend_prompt
     assert "Series: metric-a" in trend_prompt
-    assert "rolling Mann-Kendall:" in trend_prompt
+    assert "rolling Mann-Kendall status:" in trend_prompt
 
     table_summary = (
         result.abm_shared["milk_consumption"].shared_dir / "02_evidence" / "tables" / "plot_1.txt"

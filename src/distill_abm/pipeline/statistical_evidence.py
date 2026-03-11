@@ -508,66 +508,84 @@ def _render_summary_text(
                 f"- samples: {summary.sample_count}",
                 f"- valid numeric samples: {summary.valid_sample_count}",
                 f"- dropped non-numeric samples: {summary.dropped_non_numeric_count}",
-                f"- start/end values: {summary.start_value:.4f} -> {summary.end_value:.4f}",
-                (
-                    f"- mean/median/std/variance: {summary.mean:.4f}, {summary.median:.4f}, "
-                    f"{summary.std:.4f}, {summary.variance:.4f}"
-                ),
-                (
-                    f"- min/max: {summary.minimum:.4f} at index {summary.minimum_index}; "
-                    f"{summary.maximum:.4f} at index {summary.maximum_index}"
-                ),
-                f"- peaks: {_render_extrema(summary.peaks)}",
-                f"- valleys: {_render_extrema(summary.valleys)}",
-                f"- inflection indices: {_render_ints(summary.inflection_indices)}",
-                f"- rolling Mann-Kendall: {_render_mann_kendall(summary.rolling_mann_kendall)}",
-                f"- change points: {_render_ints(summary.change_points)}",
-                f"- oscillation summary: {_render_oscillation(summary.oscillation)}",
+                f"- start value: {summary.start_value:.4f}",
+                f"- end value: {summary.end_value:.4f}",
+                f"- mean: {summary.mean:.4f}",
+                f"- median: {summary.median:.4f}",
+                f"- std: {summary.std:.4f}",
+                f"- variance: {summary.variance:.4f}",
+                f"- minimum value: {summary.minimum:.4f}",
+                f"- minimum index: {summary.minimum_index}",
+                f"- maximum value: {summary.maximum:.4f}",
+                f"- maximum index: {summary.maximum_index}",
+                "- peaks:",
+                *_render_extrema(summary.peaks, "peak"),
+                "- valleys:",
+                *_render_extrema(summary.valleys, "valley"),
+                *_render_inflections(summary.inflection_indices),
+                *_render_mann_kendall(summary.rolling_mann_kendall),
+                *_render_int_items(summary.change_points, "change point"),
+                *_render_oscillation(summary.oscillation),
             ]
         )
     return "\n".join(lines).strip() + "\n"
 
 
-def _render_extrema(rows: list[dict[str, float]]) -> str:
+def _render_extrema(rows: list[dict[str, float]], label: str) -> list[str]:
     if not rows:
-        return "none detected"
-    return "; ".join(
-        f"index {int(row['index'])} value {row['value']:.4f} prominence {row['prominence']:.4f}" for row in rows
-    )
+        return [f"  - {label} none detected"]
+    return [
+        f"  - {label} {index}: index {int(row['index'])} value {row['value']:.4f} prominence {row['prominence']:.4f}"
+        for index, row in enumerate(rows, start=1)
+    ]
 
 
-def _render_ints(values: list[int]) -> str:
+def _render_inflections(values: list[int]) -> list[str]:
     if not values:
-        return "none detected"
-    return ", ".join(str(value) for value in values)
+        return ["- inflection index none detected"]
+    return [f"- inflection index {index}: {value}" for index, value in enumerate(values, start=1)]
 
 
-def _render_mann_kendall(payload: dict[str, object]) -> str:
+def _render_int_items(values: list[int], label: str) -> list[str]:
+    if not values:
+        return [f"- {label} none detected"]
+    return [f"- {label} {index}: {value}" for index, value in enumerate(values, start=1)]
+
+
+def _render_mann_kendall(payload: dict[str, object]) -> list[str]:
     status = str(payload.get("status", "unknown"))
     if status != "ok":
-        return status
+        return [f"- rolling Mann-Kendall: {status}"]
     windows = payload.get("windows")
     if not isinstance(windows, list) or not windows:
-        return "no windows analysed"
-    return "; ".join(
-        (
-            f"{window['start_index']}-{window['end_index']}: {window['trend']} "
-            f"(tau={float(window['tau']):.3f}, slope={float(window['slope']):.3f}, "
-            f"p={float(window['p']):.3f}, significant={window['significant']})"
+        return ["- rolling Mann-Kendall: no windows analysed"]
+    lines: list[str] = ["- rolling Mann-Kendall status: ok"]
+    for index, window in enumerate(windows, start=1):
+        if not isinstance(window, dict):
+            continue
+        lines.append(
+            (
+                f"- rolling Mann-Kendall window {index}: start={int(window['start_index'])} "
+                f"end={int(window['end_index'])} trend={window['trend']} "
+                f"tau={float(window['tau']):.3f} slope={float(window['slope']):.3f} "
+                f"p={float(window['p']):.3f} significant={window['significant']}"
+            )
         )
-        for window in windows
-        if isinstance(window, dict)
-    )
+    return lines
 
 
-def _render_oscillation(payload: dict[str, object]) -> str:
+def _render_oscillation(payload: dict[str, object]) -> list[str]:
     status = str(payload.get("status", "unknown"))
     if status != "ok":
-        return status
+        return [f"- oscillation status: {status}"]
     dominant_period_value = payload.get("dominant_period", 0.0)
     dominant_period = float(dominant_period_value) if isinstance(dominant_period_value, (int, float)) else 0.0
+    lines: list[str] = [f"- oscillation dominant period: {dominant_period:.2f}"]
     indices = payload.get("oscillation_indices")
     if not isinstance(indices, list) or not indices:
-        return f"dominant period {dominant_period:.2f}, no strong oscillation intervals detected"
-    preview = ", ".join(str(int(value)) for value in indices if isinstance(value, (int, float)))
-    return f"dominant period {dominant_period:.2f}, strong oscillation indices: {preview}"
+        lines.append("- oscillation indices: none detected")
+        return lines
+    for index, value in enumerate(indices, start=1):
+        if isinstance(value, (int, float)):
+            lines.append(f"- oscillation index {index}: {int(value)}")
+    return lines

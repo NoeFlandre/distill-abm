@@ -47,9 +47,19 @@ def test_build_statistical_evidence_reports_only_matched_series() -> None:
     assert evidence.matched_columns == ["metric-a"]
     assert "other" not in evidence.selected_frame_csv
     assert "Statistical evidence for simulation series matching `metric-a`." in evidence.summary_text
-    assert "rolling Mann-Kendall:" in evidence.summary_text
-    assert "change points:" in evidence.summary_text
-    assert "oscillation summary:" in evidence.summary_text
+    assert "- minimum value: 1.0000" in evidence.summary_text
+    assert "- minimum index: 0" in evidence.summary_text
+    assert "- maximum value: 4.0000" in evidence.summary_text
+    assert "- maximum index: 3" in evidence.summary_text
+    assert "- peaks:" in evidence.summary_text
+    assert "  - peak 1:" in evidence.summary_text
+    assert "- inflection index 1:" in evidence.summary_text
+    assert "- rolling Mann-Kendall window 1:" in evidence.summary_text
+    assert "- change point 1:" in evidence.summary_text
+    assert "- oscillation dominant period:" in evidence.summary_text
+    assert "- oscillation index 1:" in evidence.summary_text
+    assert "at index" not in evidence.summary_text
+    assert "rolling Mann-Kendall status:" in evidence.summary_text
 
 
 def test_build_statistical_evidence_aggregates_multi_series_matches() -> None:

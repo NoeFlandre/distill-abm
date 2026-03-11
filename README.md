@@ -28,6 +28,9 @@ Debug-only model note:
 - `mistral_medium_debug` is available for smoke/debug work only.
 - It is not part of the benchmark model policy.
 - Use it only with `--allow-debug-model` and `MISTRAL_API_KEY` set.
+- `mistral_large_2512` is available for smoke/debug work only.
+- It is not part of the benchmark model policy.
+- Use it only with `--allow-debug-model` and `MISTRAL_API_KEY` set.
 - Mistral debug requests use `temperature=0.2`; other providers remain at `1.0` unless explicitly overridden.
 - The all-ABMs generation audit run is exposed through `smoke-full-case-suite`.
 - `smoke-full-case-suite` writes a stable suite root with:

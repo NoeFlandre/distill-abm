@@ -43,6 +43,9 @@ def test_cli_smoke_summarizers_invokes_runner(tmp_path: Path, monkeypatch) -> No
             "--output-root",
             str(tmp_path / "out"),
             "--resume",
+            "--watch",
+            "--poll-interval-seconds",
+            "1.5",
             "--json",
         ],
     )
@@ -53,3 +56,5 @@ def test_cli_smoke_summarizers_invokes_runner(tmp_path: Path, monkeypatch) -> No
     assert captured["include_abms"] == ("fauna", "grazing")
     assert captured["output_root"] == tmp_path / "out"
     assert captured["resume"] is True
+    assert captured["watch"] is True
+    assert captured["poll_interval_seconds"] == 1.5

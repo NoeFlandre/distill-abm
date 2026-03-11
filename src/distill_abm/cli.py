@@ -628,6 +628,17 @@ def smoke_summarizers(
             help="Reuse successful summarizer outputs and rerun only failed or missing modes.",
         ),
     ] = True,
+    watch: Annotated[
+        bool,
+        typer.Option(
+            "--watch/--no-watch",
+            help="Keep polling the source root and summarize accepted bundles as soon as they appear.",
+        ),
+    ] = False,
+    poll_interval_seconds: Annotated[
+        float,
+        typer.Option(help="Polling interval used with --watch while waiting for new accepted bundles."),
+    ] = 5.0,
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run the summarization stack over one hand-vetted full-case LLM bundle."""
@@ -636,6 +647,8 @@ def smoke_summarizers(
         abms=tuple(abm) if abm else None,
         output_root=output_root,
         resume=resume,
+        watch=watch,
+        poll_interval_seconds=poll_interval_seconds,
         json_output=json_output,
         run_summarizer_smoke_fn=run_summarizer_smoke,
     )
