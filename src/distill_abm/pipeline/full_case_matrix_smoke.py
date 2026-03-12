@@ -48,6 +48,10 @@ from distill_abm.pipeline.local_qwen_sample_smoke import (
     _write_optional_thinking,
     _write_text,
 )
+from distill_abm.pipeline.prompt_compression_artifacts import (
+    PromptCompressionAttempt,
+    write_prompt_compression_artifacts,
+)
 from distill_abm.pipeline.run_artifact_contracts import (
     FULL_CASE_MATRIX_REPORT_FILENAME,
     case_summary_path,
@@ -616,6 +620,8 @@ def _run_trend_with_fitting_table(
     image_path: Path | None,
 ) -> tuple[str, dict[str, object]]:
     last_exc: StructuredSmokeResponseError | None = None
+    compression_attempts: list[PromptCompressionAttempt] = []
+    compression_prompts: list[str] = []
     for stride in range(1, 65):
         table_csv = _build_trend_table_csv_for_stride(
             frame=frame,
@@ -633,6 +639,20 @@ def _run_trend_with_fitting_table(
             enabled=_enabled_features_from_variant(case.prompt_variant),
         )
         _write_text(trend_dir / "trend_prompt.txt", trend_prompt)
+        compression_attempts.append(
+            PromptCompressionAttempt(
+                attempt_index=len(compression_attempts) + 1,
+                table_downsample_stride=stride,
+                compression_tier=max(stride - 1, 0),
+                prompt_length=len(trend_prompt),
+            )
+        )
+        compression_prompts.append(trend_prompt)
+        write_prompt_compression_artifacts(
+            output_dir=trend_dir,
+            attempts=compression_attempts,
+            prompts=compression_prompts,
+        )
         try:
             return _invoke_structured_smoke_text(
                 adapter=adapter,
