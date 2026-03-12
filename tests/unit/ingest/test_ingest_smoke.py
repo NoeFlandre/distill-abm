@@ -10,7 +10,7 @@ from distill_abm.ingest.ingest_smoke import (
 
 
 def _write_model(root: Path, abm: str, documentation: str) -> Path:
-    model_dir = root / f"{abm}_abm"
+    model_dir = root / "abms" / abm
     model_dir.mkdir(parents=True, exist_ok=True)
     model_path = model_dir / (f"{abm}.nlogo" if abm != "milk_consumption" else "model.nlogo")
     model_path.write_text(
@@ -49,9 +49,9 @@ def test_run_ingest_smoke_suite_writes_stage_level_report(tmp_path: Path) -> Non
 
     result = run_ingest_smoke_suite(
         abm_models={
-            "fauna": models_root / "fauna_abm" / "fauna.nlogo",
-            "grazing": models_root / "grazing_abm" / "grazing.nlogo",
-            "milk_consumption": models_root / "milk_consumption_abm" / "model.nlogo",
+            "fauna": models_root / "abms" / "fauna" / "fauna.nlogo",
+            "grazing": models_root / "abms" / "grazing" / "grazing.nlogo",
+            "milk_consumption": models_root / "abms" / "milk_consumption" / "model.nlogo",
         },
         output_root=tmp_path / "ingest-smoke",
         stage_ids=["documentation", "final-documentation"],
@@ -77,7 +77,7 @@ def test_run_ingest_smoke_suite_writes_stage_level_report(tmp_path: Path) -> Non
 
 
 def test_code_stage_allows_todo_comments_in_real_code(tmp_path: Path) -> None:
-    model_dir = tmp_path / "data" / "grazing_abm"
+    model_dir = tmp_path / "data" / "abms" / "grazing"
     model_dir.mkdir(parents=True, exist_ok=True)
     model_path = model_dir / "grazing.nlogo"
     model_path.write_text(

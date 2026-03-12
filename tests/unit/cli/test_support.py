@@ -55,8 +55,8 @@ def test_resolve_model_filenames_handles_milk_special_case() -> None:
 
 
 def test_resolve_abm_experiment_parameters_path_prefers_existing_file(tmp_path: Path) -> None:
-    model_dir = tmp_path / "fauna_abm"
-    model_dir.mkdir()
+    model_dir = tmp_path / "abms" / "fauna"
+    model_dir.mkdir(parents=True)
     target = model_dir / "experiment_parameters.json"
     target.write_text("{}", encoding="utf-8")
 
@@ -87,8 +87,8 @@ def test_load_experiment_parameters_rejects_non_object_json(tmp_path: Path) -> N
 def test_resolve_abm_model_path_rejects_ambiguous_matches(tmp_path: Path) -> None:
     root = tmp_path
     (root / "fauna.nlogo").write_text("", encoding="utf-8")
-    abm_dir = root / "fauna_abm"
-    abm_dir.mkdir()
+    abm_dir = root / "abms" / "fauna"
+    abm_dir.mkdir(parents=True)
     (abm_dir / "fauna_model.nlogo").write_text("", encoding="utf-8")
 
     with pytest.raises(typer.BadParameter, match=r"multiple \.nlogo files"):
@@ -99,6 +99,7 @@ def test_resolve_abm_model_path_does_not_mutate_model_layout(tmp_path: Path) -> 
     root = tmp_path
     root_model = root / "fauna.nlogo"
     root_model.write_text("", encoding="utf-8")
+    (root / "abms").mkdir(exist_ok=True)
 
     resolved = resolve_abm_model_path(abm="fauna", models_root=root)
 
@@ -109,7 +110,7 @@ def test_resolve_abm_model_path_does_not_mutate_model_layout(tmp_path: Path) -> 
 def test_resolve_viz_smoke_specs_rejects_missing_netlogo_viz_config(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    model_path = tmp_path / "fauna_abm" / "fauna.nlogo"
+    model_path = tmp_path / "abms" / "fauna" / "fauna.nlogo"
     model_path.parent.mkdir(parents=True)
     model_path.write_text("", encoding="utf-8")
 

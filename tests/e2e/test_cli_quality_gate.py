@@ -13,7 +13,7 @@ runner = CliRunner()
 
 
 def _write_min_nlogo_model_dir(root: Path, abm: str, docs_text: str) -> None:
-    model_dir = root / f"{abm}_abm"
+    model_dir = root / "abms" / abm
     model_dir.mkdir(parents=True, exist_ok=True)
     (model_dir / f"{abm}.nlogo").write_text(
         "\n".join(

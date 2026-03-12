@@ -53,8 +53,8 @@ netlogo_viz:
   smoke_max_ticks: 101
   smoke_interval: 1
   fallback_mode: always
-  fallback_csv: data/grazing_abm/legacy/reduced3.csv
-  fallback_plot_dir: data/grazing_abm/legacy/plots
+  fallback_csv: data/abms/grazing/legacy/reduced3.csv
+  fallback_plot_dir: data/abms/grazing/legacy/plots
   reporters:
     - mean [household-risk-att-init] of households
     - mean [household-risk-att] of households

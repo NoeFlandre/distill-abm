@@ -14,7 +14,7 @@ plot_descriptions:
   - "The attachment is the plot representing the mean percentage difference between the maximum and minimum choice function scores among agents."
   - "The attachment is the plot representing the mean deviation between the agents' held health values and the implied values by their milk choices."
   - "The attachment is the plot representing the mean deviation between the agents' held environmental values and the implied values by their milk choices."
-default_input_csv: data/milk_consumption_abm/legacy/reducedmilk.csv
+default_input_csv: data/abms/milk_consumption/legacy/reducedmilk.csv
 netlogo_viz:
   experiment_name: Milk Consumption Trends
   num_runs: 30
@@ -41,8 +41,8 @@ netlogo_viz:
   smoke_max_ticks: 33
   smoke_interval: 1
   fallback_mode: always
-  fallback_csv: data/milk_consumption_abm/legacy/reducedmilk.csv
-  fallback_plot_dir: data/milk_consumption_abm/legacy/plots
+  fallback_csv: data/abms/milk_consumption/legacy/reducedmilk.csv
+  fallback_plot_dir: data/abms/milk_consumption/legacy/plots
   reporters:
     - mean-incum
     - mean-alt
