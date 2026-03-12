@@ -8,11 +8,13 @@ import pandas as pd
 
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.pipeline.quantitative_smoke import (
+    _build_evidence_summary_rows,
     _build_factorial_input_frame,
     _build_structured_results_rows,
     _derive_prompt_flags,
     _normalize_factorial_table,
     _render_anova_markdown_table,
+    _render_evidence_summary_markdown_table,
     _render_factorial_latex_table,
     _render_overview_factorial_markdown_table,
     _render_optimal_latex_table,
@@ -255,6 +257,156 @@ def test_render_overview_factorial_table_marks_absent_terms_and_tiny_nonzero_val
     assert "| author | Role_AND_Insight | — | — | — | — | — | — |" in table
 
 
+def test_build_evidence_summary_rows_aggregates_average_and_best_scores() -> None:
+    rows = _build_evidence_summary_rows(
+        [
+            {
+                "reference_family": "author",
+                "abm": "grazing",
+                "evidence": "plot",
+                "BLEU": "0.10",
+                "METEOR": "0.20",
+                "R-1": "0.30",
+                "R-2": "0.40",
+                "R-L": "0.50",
+                "Reading ease": "60.00",
+            },
+            {
+                "reference_family": "author",
+                "abm": "grazing",
+                "evidence": "plot",
+                "BLEU": "0.50",
+                "METEOR": "0.60",
+                "R-1": "0.70",
+                "R-2": "0.80",
+                "R-L": "0.90",
+                "Reading ease": "80.00",
+            },
+            {
+                "reference_family": "author",
+                "abm": "grazing",
+                "evidence": "table",
+                "BLEU": "0.20",
+                "METEOR": "0.30",
+                "R-1": "0.40",
+                "R-2": "0.50",
+                "R-L": "0.60",
+                "Reading ease": "70.00",
+            },
+            {
+                "reference_family": "gpt5.2_short",
+                "abm": "fauna",
+                "evidence": "plot+table",
+                "BLEU": "0.25",
+                "METEOR": "0.35",
+                "R-1": "0.45",
+                "R-2": "0.55",
+                "R-L": "0.65",
+                "Reading ease": "75.00",
+            },
+        ]
+    )
+
+    assert rows == [
+        {
+            "Reference family": "author",
+            "Evidence": "plot",
+            "ABM": "grazing",
+            "Avg BLEU": "0.30",
+            "Avg METEOR": "0.40",
+            "Avg R-1": "0.50",
+            "Avg R-2": "0.60",
+            "Avg R-L": "0.70",
+            "Avg Reading ease": "70.00",
+            "Best BLEU": "0.50",
+            "Best METEOR": "0.60",
+            "Best R-1": "0.70",
+            "Best R-2": "0.80",
+            "Best R-L": "0.90",
+            "Best Reading ease": "80.00",
+        },
+        {
+            "Reference family": "author",
+            "Evidence": "table",
+            "ABM": "grazing",
+            "Avg BLEU": "0.20",
+            "Avg METEOR": "0.30",
+            "Avg R-1": "0.40",
+            "Avg R-2": "0.50",
+            "Avg R-L": "0.60",
+            "Avg Reading ease": "70.00",
+            "Best BLEU": "0.20",
+            "Best METEOR": "0.30",
+            "Best R-1": "0.40",
+            "Best R-2": "0.50",
+            "Best R-L": "0.60",
+            "Best Reading ease": "70.00",
+        },
+        {
+            "Reference family": "gpt5.2_short",
+            "Evidence": "plot+table",
+            "ABM": "fauna",
+            "Avg BLEU": "0.25",
+            "Avg METEOR": "0.35",
+            "Avg R-1": "0.45",
+            "Avg R-2": "0.55",
+            "Avg R-L": "0.65",
+            "Avg Reading ease": "75.00",
+            "Best BLEU": "0.25",
+            "Best METEOR": "0.35",
+            "Best R-1": "0.45",
+            "Best R-2": "0.55",
+            "Best R-L": "0.65",
+            "Best Reading ease": "75.00",
+        },
+    ]
+
+
+def test_render_evidence_summary_markdown_table_groups_rows_by_reference_family() -> None:
+    markdown = _render_evidence_summary_markdown_table(
+        [
+            {
+                "Reference family": "author",
+                "Evidence": "plot",
+                "ABM": "grazing",
+                "Avg BLEU": "0.30",
+                "Avg METEOR": "0.40",
+                "Avg R-1": "0.50",
+                "Avg R-2": "0.60",
+                "Avg R-L": "0.70",
+                "Avg Reading ease": "70.00",
+                "Best BLEU": "0.50",
+                "Best METEOR": "0.60",
+                "Best R-1": "0.70",
+                "Best R-2": "0.80",
+                "Best R-L": "0.90",
+                "Best Reading ease": "80.00",
+            },
+            {
+                "Reference family": "gpt5.2_short",
+                "Evidence": "plot+table",
+                "ABM": "fauna",
+                "Avg BLEU": "0.25",
+                "Avg METEOR": "0.35",
+                "Avg R-1": "0.45",
+                "Avg R-2": "0.55",
+                "Avg R-L": "0.65",
+                "Avg Reading ease": "75.00",
+                "Best BLEU": "0.25",
+                "Best METEOR": "0.35",
+                "Best R-1": "0.45",
+                "Best R-2": "0.55",
+                "Best R-L": "0.65",
+                "Best Reading ease": "75.00",
+            },
+        ]
+    )
+
+    assert markdown.startswith("# Evidence Mode Summary\n\n## author\n\n| Evidence | ABM | Avg BLEU | Avg METEOR |")
+    assert "| plot | grazing | 0.30 | 0.40 | 0.50 | 0.60 | 0.70 | 70.00 | 0.50 | 0.60 | 0.70 | 0.80 | 0.90 | 80.00 |" in markdown
+    assert "\n## gpt5.2_short\n\n| Evidence | ABM | Avg BLEU | Avg METEOR |" in markdown
+
+
 def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> None:
     summarizer_root, _matrix_root = _build_source_roots(tmp_path)
     result = run_quantitative_smoke(
@@ -269,6 +421,7 @@ def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> Non
     assert result.factorial_csv_path.exists() is True
     assert result.optimal_csv_path.exists() is True
     assert result.anova_table_markdown_path.exists() is True
+    assert result.evidence_summary_table_markdown_path.exists() is True
     assert result.factorial_table_markdown_path.exists() is True
     assert result.optimal_table_markdown_path.exists() is True
     assert result.anova_csv_path.parent.name == "combined"
@@ -281,6 +434,7 @@ def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> Non
     assert sorted(path.name for path in result.overview_root.iterdir()) == [
         "anova_table.md",
         "best_scores_table.md",
+        "evidence_summary_table.md",
         "factorial_table.md",
     ]
     rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))

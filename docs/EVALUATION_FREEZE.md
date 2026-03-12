@@ -27,8 +27,9 @@ The current validated behavior is:
    - `0.00` means a computed value that rounds to zero at display precision
 5. Missing factorial terms must not be backfilled as numeric zero.
 6. Factorial feature naming is canonicalized before publication so alias rows do not duplicate or hide real effects.
-7. The human-facing `overview/` publication surface contains exactly three files:
+7. The human-facing `overview/` publication surface contains exactly four files:
    - `anova_table.md`
+   - `evidence_summary_table.md`
    - `factorial_table.md`
    - `best_scores_table.md`
 8. Each overview table spans all available reference families rather than collapsing them into one unlabeled aggregate table.
@@ -66,5 +67,5 @@ Not allowed unless explicitly requested:
 - changing how references are combined or labeled
 - changing which factors enter the DOE/factorial model
 - changing how absent versus tiny factorial effects are rendered
-- changing the three-file `overview/` contract
+- changing the four-file `overview/` contract
 - changing result file naming or layout in a way that breaks downstream review
