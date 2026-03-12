@@ -105,6 +105,7 @@ tests/
 For result artifacts, start with the Hugging Face bucket:
 
 - `hf://buckets/NoeFlandre/distill-abms-results`
+- `https://huggingface.co/buckets/NoeFlandre/distill-abms-results`
 
 GitHub remains the code/method repository. The bucket is the primary storage/download surface for the exported smoke and evaluation outputs.
 
@@ -115,7 +116,7 @@ The tracked snapshot mirrored from this repository currently contains:
 - `results/qwen3.5-27b_openrouter_all_abms_chain/`
 - `results/eval_qwen_mistral/`
 
-See [docs/RESULTS_BUCKET.md](docs/RESULTS_BUCKET.md) for the bucket contract, sync commands, and the local-to-remote folder mapping.
+See [docs/RESULTS_BUCKET.md](docs/RESULTS_BUCKET.md) for the bucket contract, sync commands, the direct bucket link, and the local-to-remote folder mapping.
 
 Recent internal refactors preserved the public smoke/monitor contracts while splitting a few dense modules into narrower helpers:
 - `pipeline/local_qwen_monitor.py` now keeps the TUI/rendering surface, while `pipeline/local_qwen_monitor_snapshots.py` owns sampled/full-case/tuning/suite snapshot collection.

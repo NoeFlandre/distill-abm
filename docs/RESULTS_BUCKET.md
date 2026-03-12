@@ -3,6 +3,7 @@
 If you are looking for run outputs, quantitative tables, or smoke artifacts, start here. If you are looking for code, pipeline logic, tests, or documentation, go to the GitHub repository.
 
 - Bucket URI: `hf://buckets/NoeFlandre/distill-abms-results`
+- Bucket Web UI: `https://huggingface.co/buckets/NoeFlandre/distill-abms-results`
 - Repository: `https://github.com/NoeFlandre/distill-abm`
 
 ## Purpose
