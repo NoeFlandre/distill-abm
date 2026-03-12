@@ -151,6 +151,83 @@ def _fake_score_summary(reference: str, candidate: str) -> SummaryScores:
     )
 
 
+def _build_quantitative_root(
+    tmp_path: Path,
+    *,
+    root_name: str,
+    matrix_name: str,
+    model: str,
+    output_name: str,
+) -> Path:
+    summarizer_root, _ = _build_source_roots(
+        tmp_path,
+        root_name=root_name,
+        matrix_name=matrix_name,
+        model=model,
+    )
+    output_root = tmp_path / output_name
+    result = run_quantitative_smoke(
+        source_root=summarizer_root,
+        output_root=output_root,
+        score_summary_fn=_fake_score_summary,
+    )
+    assert result.success is True
+    return output_root
+
+
+def _write_prompt_compression_summary(matrix_root: Path, *, final_tiers: list[int]) -> None:
+    entries = []
+    total_compressions = 0
+    triggered_entries = 0
+    for index, final_tier in enumerate(final_tiers, start=1):
+        case_id = f"{index:02d}_grazing_none_plot_rep1"
+        artifacts_dir = matrix_root / "cases" / case_id / "03_trends" / f"plot_{index:02d}"
+        attempts = [
+            {
+                "attempt_index": tier + 1,
+                "table_downsample_stride": tier + 1,
+                "compression_tier": tier,
+                "prompt_length": max(1000 - (tier * 100), 100),
+            }
+            for tier in range(final_tier + 1)
+        ]
+        if final_tier > 0:
+            triggered_entries += 1
+            total_compressions += final_tier
+        entries.append(
+            {
+                "source_run_root": str(matrix_root),
+                "scope": "full_case_matrix_plot",
+                "case_id": case_id,
+                "abm": "grazing",
+                "evidence_mode": "plot",
+                "prompt_variant": "none",
+                "repetition": 1,
+                "plot_index": index,
+                "artifacts_dir": str(artifacts_dir),
+                "compression_artifact_path": str(artifacts_dir / "trend_prompt_compression.json"),
+                "pre_compression_prompt_path": None,
+                "compressed_prompt_path": None,
+                "triggered": final_tier > 0,
+                "compression_count": final_tier,
+                "attempt_count": len(attempts),
+                "attempts": attempts,
+            }
+        )
+    (matrix_root / "prompt_compression_summary.json").write_text(
+        json.dumps(
+            {
+                "run_root": str(matrix_root),
+                "total_entries": len(entries),
+                "triggered_entries": triggered_entries,
+                "total_compressions": total_compressions,
+                "entries": entries,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
 def test_derive_prompt_flags() -> None:
     assert _derive_prompt_flags("none") == {"role": False, "insights": False, "example": False}
     assert _derive_prompt_flags("role+insights") == {"role": True, "insights": True, "example": False}
@@ -457,6 +534,7 @@ def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> Non
     assert rows[0]["summarizer"]
     report = json.loads(result.report_json_path.read_text(encoding="utf-8"))
     assert report["success"] is True
+    assert result.prompt_compression_summary_markdown_path is None
 
 
 def test_run_quantitative_smoke_single_llm_accepts_unlabeled_runs(tmp_path: Path) -> None:
@@ -490,6 +568,45 @@ def test_run_quantitative_smoke_writes_best_score_table(tmp_path: Path) -> None:
     assert {row["Reference family"] for row in rows} == {"author", "gpt5.2_short", "gpt5.2_long"}
     assert {row["Summary"] for row in rows} == {"none", "bart", "bert", "t5", "longformer_ext"}
     assert {row["LLM"] for row in rows} == {"nvidia/nemotron-nano-12b-v2-vl:free"}
+
+
+def test_run_quantitative_smoke_writes_prompt_compression_summary_when_metadata_exists(tmp_path: Path) -> None:
+    summarizer_root, matrix_root = _build_source_roots(tmp_path)
+    _write_prompt_compression_summary(matrix_root, final_tiers=[0, 1, 2])
+
+    result = run_quantitative_smoke(
+        source_root=summarizer_root,
+        output_root=tmp_path / "quant",
+        score_summary_fn=_fake_score_summary,
+    )
+
+    assert result.prompt_compression_summary_markdown_path is not None
+    summary_text = result.prompt_compression_summary_markdown_path.read_text(encoding="utf-8")
+    assert "- prompt_compression_triggered: `true`" in summary_text
+    assert "- prompts_with_compression: `2`" in summary_text
+    assert "- total_compression_steps: `3`" in summary_text
+    assert '- compression_tiers_used: `[1, 2]`' in summary_text
+    assert '- compression_steps_by_tier: `{"1": 2, "2": 1}`' in summary_text
+    assert '- prompts_by_final_tier: `{"1": 1, "2": 1}`' in summary_text
+
+
+def test_run_quantitative_smoke_writes_prompt_compression_summary_for_zero_trigger_case(tmp_path: Path) -> None:
+    summarizer_root, matrix_root = _build_source_roots(tmp_path)
+    _write_prompt_compression_summary(matrix_root, final_tiers=[0, 0])
+
+    result = run_quantitative_smoke(
+        source_root=summarizer_root,
+        output_root=tmp_path / "quant",
+        score_summary_fn=_fake_score_summary,
+    )
+
+    assert result.prompt_compression_summary_markdown_path is not None
+    summary_text = result.prompt_compression_summary_markdown_path.read_text(encoding="utf-8")
+    assert "- prompt_compression_triggered: `false`" in summary_text
+    assert "- prompts_with_compression: `0`" in summary_text
+    assert "- total_compression_steps: `0`" in summary_text
+    assert "- compression_tiers_used: `[]`" in summary_text
+    assert "- compression_steps_by_tier: `{}`" in summary_text
 
 
 def test_build_structured_results_rows_exposes_modern_factor_sheet() -> None:
@@ -839,6 +956,70 @@ def test_run_quantitative_smoke_multi_llm_merges_sources_without_record_id_colli
     assert "LLM" in result.anova_table_markdown_path.read_text(encoding="utf-8")
 
 
+def test_run_quantitative_smoke_multi_llm_reuses_existing_single_llm_quantitative_results(tmp_path: Path) -> None:
+    mistral_quant_root = _build_quantitative_root(
+        tmp_path,
+        root_name="summ_mistral",
+        matrix_name="matrix_mistral",
+        model="mistral-medium-latest",
+        output_name="quant_mistral",
+    )
+    qwen_quant_root = _build_quantitative_root(
+        tmp_path,
+        root_name="summ_qwen",
+        matrix_name="matrix_qwen",
+        model="qwen/qwen3.5-27b",
+        output_name="quant_qwen",
+    )
+
+    def _should_not_score(reference: str, candidate: str) -> SummaryScores:
+        raise AssertionError("score_summary should not rerun for precomputed quantitative roots")
+
+    result = run_quantitative_smoke_multi_llm(
+        source_roots=(mistral_quant_root, qwen_quant_root),
+        output_root=tmp_path / "quant_multi",
+        score_summary_fn=_should_not_score,
+    )
+
+    rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
+    assert result.success is True
+    assert len(rows) == 120
+    assert {row["llm"] for row in rows} == {"mistral-medium-latest", "qwen/qwen3.5-27b"}
+
+
+def test_run_quantitative_smoke_multi_llm_supports_mixed_quantitative_and_summarizer_sources(tmp_path: Path) -> None:
+    mistral_quant_root = _build_quantitative_root(
+        tmp_path,
+        root_name="summ_mistral",
+        matrix_name="matrix_mistral",
+        model="mistral-medium-latest",
+        output_name="quant_mistral",
+    )
+    qwen_summarizer_root, _ = _build_source_roots(
+        tmp_path,
+        root_name="summ_qwen",
+        matrix_name="matrix_qwen",
+        model="qwen/qwen3.5-27b",
+    )
+    score_calls = 0
+
+    def _counting_score(reference: str, candidate: str) -> SummaryScores:
+        nonlocal score_calls
+        score_calls += 1
+        return _fake_score_summary(reference, candidate)
+
+    result = run_quantitative_smoke_multi_llm(
+        source_roots=(mistral_quant_root, qwen_summarizer_root),
+        output_root=tmp_path / "quant_multi",
+        score_summary_fn=_counting_score,
+    )
+
+    rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
+    assert result.success is True
+    assert len(rows) == 120
+    assert score_calls == 60
+
+
 def test_run_quantitative_smoke_multi_llm_keeps_distinct_ids_for_punctuation_variant_labels(tmp_path: Path) -> None:
     first_root, _ = _build_source_roots(
         tmp_path,
@@ -904,6 +1085,66 @@ def test_run_quantitative_smoke_multi_llm_rejects_missing_llm_labels(tmp_path: P
     with pytest.raises(ValueError, match="missing llm label"):
         run_quantitative_smoke_multi_llm(
             source_roots=(first_root, second_root),
+            output_root=tmp_path / "quant_multi",
+            score_summary_fn=_fake_score_summary,
+        )
+
+
+def test_run_quantitative_smoke_multi_llm_rejects_quantitative_sources_with_multiple_llm_labels(tmp_path: Path) -> None:
+    quant_root = _build_quantitative_root(
+        tmp_path,
+        root_name="summ_mistral",
+        matrix_name="matrix_mistral",
+        model="mistral-medium-latest",
+        output_name="quant_mistral",
+    )
+    quant_run_root = Path((quant_root / "latest_run.txt").read_text(encoding="utf-8").strip())
+    record_json_path = next((quant_run_root / "author" / "records").glob("*/record.json"))
+    record_payload = json.loads(record_json_path.read_text(encoding="utf-8"))
+    record_payload["llm"] = "qwen/qwen3.5-27b"
+    record_json_path.write_text(json.dumps(record_payload), encoding="utf-8")
+
+    qwen_quant_root = _build_quantitative_root(
+        tmp_path,
+        root_name="summ_qwen",
+        matrix_name="matrix_qwen",
+        model="qwen/qwen3.5-27b",
+        output_name="quant_qwen",
+    )
+
+    with pytest.raises(ValueError, match="expected one llm label per multi-llm quantitative source"):
+        run_quantitative_smoke_multi_llm(
+            source_roots=(quant_root, qwen_quant_root),
+            output_root=tmp_path / "quant_multi",
+            score_summary_fn=_fake_score_summary,
+        )
+
+
+def test_run_quantitative_smoke_multi_llm_rejects_quantitative_sources_with_missing_llm_labels(tmp_path: Path) -> None:
+    quant_root = _build_quantitative_root(
+        tmp_path,
+        root_name="summ_mistral",
+        matrix_name="matrix_mistral",
+        model="mistral-medium-latest",
+        output_name="quant_mistral",
+    )
+    quant_run_root = Path((quant_root / "latest_run.txt").read_text(encoding="utf-8").strip())
+    for record_json_path in quant_run_root.glob("*/records/*/record.json"):
+        record_payload = json.loads(record_json_path.read_text(encoding="utf-8"))
+        record_payload["llm"] = ""
+        record_json_path.write_text(json.dumps(record_payload), encoding="utf-8")
+
+    qwen_quant_root = _build_quantitative_root(
+        tmp_path,
+        root_name="summ_qwen",
+        matrix_name="matrix_qwen",
+        model="qwen/qwen3.5-27b",
+        output_name="quant_qwen",
+    )
+
+    with pytest.raises(ValueError, match="missing llm label"):
+        run_quantitative_smoke_multi_llm(
+            source_roots=(quant_root, qwen_quant_root),
             output_root=tmp_path / "quant_multi",
             score_summary_fn=_fake_score_summary,
         )
