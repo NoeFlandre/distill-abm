@@ -54,6 +54,12 @@ def _build_sample_run(root: Path) -> Path:
     (case_root / "01_inputs" / "documentation.txt").write_text("docs body", encoding="utf-8")
     (case_root / "01_inputs" / "parameters.txt").write_text("params body", encoding="utf-8")
     (case_root / "01_inputs" / "trend_prompt.txt").write_text("trend prompt", encoding="utf-8")
+    (case_root / "01_inputs" / "trend_prompt_pre_compression.txt").write_text("trend prompt original", encoding="utf-8")
+    (case_root / "01_inputs" / "trend_prompt_compressed.txt").write_text("trend prompt compressed", encoding="utf-8")
+    (case_root / "01_inputs" / "trend_prompt_compression.json").write_text(
+        '{"triggered": true, "compression_count": 1, "attempt_count": 2}',
+        encoding="utf-8",
+    )
     (case_root / "01_inputs" / "trend_evidence_plot.png").write_bytes(b"png")
     (case_root / "02_requests" / "hyperparameters.json").write_text('{"max_tokens": 10}', encoding="utf-8")
     (case_root / "03_outputs" / "context_output.txt").write_text("ctx out", encoding="utf-8")
@@ -95,10 +101,14 @@ def test_build_viewer_payload_includes_sample_case_paths_and_text(tmp_path: Path
     assert case["case_id"] == "01_case"
     assert case["paths"]["context_prompt"] == "cases/01_case/01_inputs/context_prompt.txt"
     assert case["paths"]["hyperparameters"] == "cases/01_case/02_requests/hyperparameters.json"
+    assert case["paths"]["trend_prompt_compression"] == "cases/01_case/01_inputs/trend_prompt_compression.json"
     assert case["context_prompt_text"] == "ctx prompt"
     assert case["documentation_text"] == "docs body"
     assert case["parameters_text"] == "params body"
     assert case["trend_output_text"] == "trend out"
+    assert case["trend_prompt_pre_compression_text"] == "trend prompt original"
+    assert case["trend_prompt_compressed_text"] == "trend prompt compressed"
+    assert case["trend_prompt_compression_text"] == '{"triggered": true, "compression_count": 1, "attempt_count": 2}'
 
 
 def test_render_run_viewer_writes_full_case_trend_sections(tmp_path: Path) -> None:
@@ -125,6 +135,18 @@ def test_render_run_viewer_writes_full_case_trend_sections(tmp_path: Path) -> No
     (case_root / "02_context" / "context_output.txt").write_text("ctx out", encoding="utf-8")
     (case_root / "02_context" / "context_trace.json").write_text("{}", encoding="utf-8")
     (case_root / "03_trends" / "plot_01" / "trend_prompt.txt").write_text("trend prompt", encoding="utf-8")
+    (case_root / "03_trends" / "plot_01" / "trend_prompt_pre_compression.txt").write_text(
+        "trend prompt original",
+        encoding="utf-8",
+    )
+    (case_root / "03_trends" / "plot_01" / "trend_prompt_compressed.txt").write_text(
+        "trend prompt compressed",
+        encoding="utf-8",
+    )
+    (case_root / "03_trends" / "plot_01" / "trend_prompt_compression.json").write_text(
+        '{"triggered": true, "compression_count": 1, "attempt_count": 2}',
+        encoding="utf-8",
+    )
     (case_root / "03_trends" / "plot_01" / "trend_output.txt").write_text("trend out", encoding="utf-8")
     (case_root / "03_trends" / "plot_01" / "trend_trace.json").write_text("{}", encoding="utf-8")
     (case_root / "03_trends" / "plot_01" / "trend_evidence_table.txt").write_text(
@@ -165,6 +187,18 @@ def test_build_viewer_payload_includes_full_case_trend_entries(tmp_path: Path) -
     (case_root / "02_context" / "context_output.txt").write_text("ctx out", encoding="utf-8")
     (case_root / "02_context" / "context_trace.json").write_text("{}", encoding="utf-8")
     (case_root / "03_trends" / "plot_01" / "trend_prompt.txt").write_text("trend prompt", encoding="utf-8")
+    (case_root / "03_trends" / "plot_01" / "trend_prompt_pre_compression.txt").write_text(
+        "trend prompt original",
+        encoding="utf-8",
+    )
+    (case_root / "03_trends" / "plot_01" / "trend_prompt_compressed.txt").write_text(
+        "trend prompt compressed",
+        encoding="utf-8",
+    )
+    (case_root / "03_trends" / "plot_01" / "trend_prompt_compression.json").write_text(
+        '{"triggered": true, "compression_count": 1, "attempt_count": 2}',
+        encoding="utf-8",
+    )
     (case_root / "03_trends" / "plot_01" / "trend_output.txt").write_text("trend out", encoding="utf-8")
     (case_root / "03_trends" / "plot_01" / "trend_trace.json").write_text("{}", encoding="utf-8")
     (case_root / "03_trends" / "plot_01" / "trend_evidence_table.txt").write_text(
@@ -182,4 +216,7 @@ def test_build_viewer_payload_includes_full_case_trend_entries(tmp_path: Path) -
     trend = case["trends"][0]
     assert trend["plot_id"] == "plot_01"
     assert trend["table_csv_path"] == "cases/01_case/03_trends/plot_01/trend_evidence_table.txt"
+    assert trend["trend_prompt_compression_path"] == "cases/01_case/03_trends/plot_01/trend_prompt_compression.json"
     assert trend["trend_output_text"] == "trend out"
+    assert trend["trend_prompt_pre_compression_text"] == "trend prompt original"
+    assert trend["trend_prompt_compressed_text"] == "trend prompt compressed"

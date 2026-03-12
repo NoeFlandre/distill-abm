@@ -29,6 +29,10 @@ from distill_abm.pipeline.local_qwen_sample_smoke import (
     _write_optional_thinking,
     _write_text,
 )
+from distill_abm.pipeline.prompt_compression_artifacts import (
+    PromptCompressionAttempt,
+    write_prompt_compression_artifacts,
+)
 from distill_abm.pipeline.run_artifact_contracts import case_summary_path, validation_state_path
 from distill_abm.pipeline.statistical_evidence import build_statistical_evidence, render_evidence_artifacts
 
@@ -395,6 +399,18 @@ def _execute_full_case_trend(
         enabled=enabled,
     )
     _write_text(trend_dir / "trend_prompt.txt", trend_prompt)
+    write_prompt_compression_artifacts(
+        output_dir=trend_dir,
+        attempts=[
+            PromptCompressionAttempt(
+                attempt_index=1,
+                table_downsample_stride=1,
+                compression_tier=0,
+                prompt_length=len(trend_prompt),
+            )
+        ],
+        prompts=[trend_prompt],
+    )
     try:
         trend_text, trend_trace = _invoke_structured_smoke_text(
             adapter=adapter,
