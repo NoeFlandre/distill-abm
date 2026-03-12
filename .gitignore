@@ -19,6 +19,7 @@ results/*
 !results/mistral-medium-latest_all_abms_chain/**
 !results/qwen3.5-27b_openrouter_all_abms_chain/
 !results/qwen3.5-27b_openrouter_all_abms_chain/**
+results/**/.DS_Store
 !tests/fixtures/notebook_parity/archive_assets/**
 *.log
 data/paper/
