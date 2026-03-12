@@ -1,0 +1,8 @@
+Variable,BLEU,METEOR,R-1,R-2,R-L,Reading ease
+Agent-Based Model,—,—,—,—,—,—
+Summarization algorithm,<0.01,<0.01,<0.01,<0.01,<0.01,<0.01
+Simulation evidence,0.07,0.56,0.01,<0.01,<0.01,<0.01
+LLM,—,—,—,—,—,—
+Use of roles,0.06,0.01,0.04,0.67,0.20,0.24
+Generating insights,0.09,0.32,0.02,<0.01,<0.01,<0.01
+Providing examples,0.79,0.62,0.62,0.52,0.64,<0.01

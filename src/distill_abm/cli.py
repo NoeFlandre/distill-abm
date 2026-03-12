@@ -696,7 +696,10 @@ def smoke_quantitative_multi_llm(
             exists=True,
             file_okay=False,
             dir_okay=True,
-            help="Completed summarizer smoke roots to merge. Repeat for one root per LLM.",
+            help=(
+                "Completed single-LLM quantitative smoke roots or summarizer smoke roots to merge. "
+                "Repeat for one root per LLM."
+            ),
         ),
     ],
     output_root: Annotated[
@@ -709,7 +712,7 @@ def smoke_quantitative_multi_llm(
     ] = False,
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
-    """Score completed summarizer smokes jointly and add LLM as an explicit analysis factor."""
+    """Score completed single-LLM quantitative or summarizer smokes jointly and add LLM as a factor."""
     execute_smoke_quantitative_multi_llm_command(
         source_roots=tuple(source_root),
         output_root=output_root,

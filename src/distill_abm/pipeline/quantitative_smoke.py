@@ -7,7 +7,9 @@ import hashlib
 import json
 import math
 import shutil
+from collections import Counter
 from collections.abc import Callable, Iterable
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -17,6 +19,11 @@ from pydantic import BaseModel, Field
 from distill_abm.cli_support import resolve_quantitative_reference_paths
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.metrics import SummaryScores, score_summary
+from distill_abm.pipeline.prompt_compression_artifacts import (
+    PROMPT_COMPRESSION_SUMMARY_FILENAME,
+    PromptCompressionRunSummary,
+    read_prompt_compression_run_summary,
+)
 from distill_abm.pipeline.quantitative_rendering import (
     METRIC_COLUMN_NAMES,
     _format_contribution_cell,
@@ -159,6 +166,7 @@ class QuantitativeSmokeResult(BaseModel):
     anova_table_markdown_path: Path
     anova_table_latex_path: Path
     evidence_summary_table_markdown_path: Path
+    prompt_compression_summary_markdown_path: Path | None = None
     factorial_table_markdown_path: Path
     factorial_table_latex_path: Path
     optimal_table_markdown_path: Path
@@ -168,6 +176,12 @@ class QuantitativeSmokeResult(BaseModel):
     failed_record_ids: list[str] = Field(default_factory=list)
     record_count: int = 0
     reference_roots: dict[str, Path] = Field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class _QuantitativeSourceRecord:
+    record: QuantitativeRecord
+    precomputed: bool
 
 
 def run_quantitative_smoke(
@@ -231,9 +245,10 @@ def _run_quantitative_smoke_impl(
     attached_run_log_path = attach_json_log_file(run_log_path(run_root))
 
     resolved_source_roots = tuple(resolve_run_root(path) for path in source_roots)
-    source_rows = _load_quantitative_source_rows(
+    source_records = _load_quantitative_source_records(
         resolved_source_roots,
         require_source_llm_label=include_llm_factor,
+        include_llm_in_record_id=include_llm_factor,
     )
     review_rows: list[dict[str, str]] = []
     record_rows: list[dict[str, str]] = []
@@ -242,41 +257,49 @@ def _run_quantitative_smoke_impl(
     reference_record_rows: dict[str, list[dict[str, str]]] = {}
     reference_failed_record_ids: dict[str, list[str]] = {}
     reference_roots: dict[str, Path] = {}
+    processed_records: list[QuantitativeRecord] = []
 
     factorial_input_builder = (
         _build_factorial_input_frame_with_llm if include_llm_factor else _build_factorial_input_frame
     )
 
-    for source_row in source_rows:
-        for record in _build_quantitative_records_from_source_row(
-            source_row,
-            include_llm_in_record_id=include_llm_factor,
-        ):
-            reference_root = run_root / record.reference_family
-            reference_roots.setdefault(record.reference_family, reference_root)
-            record_dir = reference_root / "records" / record.record_id
-            previous_record_dir = (
-                None
-                if previous_run_root is None
-                else previous_run_root / record.reference_family / "records" / record.record_id
-            )
-            reused = False
-            if resume and previous_record_dir is not None:
-                reused = _copy_previous_record_if_valid(previous_record_dir=previous_record_dir, record_dir=record_dir)
-            if reused:
-                loaded_record = _load_record_json(record_dir / "record.json")
-                if loaded_record is None:
-                    reused = False
-                else:
-                    record = loaded_record
-                    log_event(
-                        logger,
-                        "quantitative_record_reused",
-                        record_id=record.record_id,
-                        case_id=record.case_id,
-                        reference_family=record.reference_family,
-                    )
-            if not reused:
+    for source_record in source_records:
+        record = source_record.record
+        reference_root = run_root / record.reference_family
+        reference_roots.setdefault(record.reference_family, reference_root)
+        record_dir = reference_root / "records" / record.record_id
+        previous_record_dir = (
+            None
+            if previous_run_root is None
+            else previous_run_root / record.reference_family / "records" / record.record_id
+        )
+        reused = False
+        if resume and previous_record_dir is not None:
+            reused = _copy_previous_record_if_valid(previous_record_dir=previous_record_dir, record_dir=record_dir)
+        if reused:
+            loaded_record = _load_record_json(record_dir / "record.json")
+            if loaded_record is None:
+                reused = False
+            else:
+                record = loaded_record
+                log_event(
+                    logger,
+                    "quantitative_record_reused",
+                    record_id=record.record_id,
+                    case_id=record.case_id,
+                    reference_family=record.reference_family,
+                )
+        if not reused:
+            if source_record.precomputed:
+                log_event(
+                    logger,
+                    "quantitative_record_imported",
+                    record_id=record.record_id,
+                    case_id=record.case_id,
+                    reference_family=record.reference_family,
+                    success=record.success,
+                )
+            else:
                 try:
                     summary_text = _read_summary_text(record.summary_output_path)
                     reference_text = _load_reference_text(record.reference_path)
@@ -316,18 +339,19 @@ def _run_quantitative_smoke_impl(
                         reference_family=record.reference_family,
                         error=str(exc),
                     )
-                _write_record_bundle(record_dir=record_dir, record=record)
+            _write_record_bundle(record_dir=record_dir, record=record)
 
-            review_row = _record_to_review_row(record)
-            review_rows.append(review_row)
-            reference_review_rows.setdefault(record.reference_family, []).append(review_row)
-            if record.success:
-                record_row = _record_to_csv_row(record)
-                record_rows.append(record_row)
-                reference_record_rows.setdefault(record.reference_family, []).append(record_row)
-            elif record.record_id not in failed_record_ids:
-                failed_record_ids.append(record.record_id)
-                reference_failed_record_ids.setdefault(record.reference_family, []).append(record.record_id)
+        review_row = _record_to_review_row(record)
+        review_rows.append(review_row)
+        reference_review_rows.setdefault(record.reference_family, []).append(review_row)
+        if record.success:
+            record_row = _record_to_csv_row(record)
+            record_rows.append(record_row)
+            reference_record_rows.setdefault(record.reference_family, []).append(record_row)
+        elif record.record_id not in failed_record_ids:
+            failed_record_ids.append(record.record_id)
+            reference_failed_record_ids.setdefault(record.reference_family, []).append(record.record_id)
+        processed_records.append(record)
 
     combined_root = run_root / "combined"
     combined_root.mkdir(parents=True, exist_ok=True)
@@ -360,6 +384,7 @@ def _run_quantitative_smoke_impl(
     overview_paths = _write_overview_tables(
         overview_root=overview_root,
         reference_record_rows=reference_record_rows,
+        records=processed_records,
         scratch_root=combined_root,
         analyze_factorial_anova_fn=analyze_factorial_anova_fn,
         build_factorial_input_frame_fn=factorial_input_builder,
@@ -383,6 +408,7 @@ def _run_quantitative_smoke_impl(
         anova_table_markdown_path=overview_paths["anova_table_markdown_path"],
         anova_table_latex_path=combined_paths["anova_table_latex_path"],
         evidence_summary_table_markdown_path=overview_paths["evidence_summary_table_markdown_path"],
+        prompt_compression_summary_markdown_path=overview_paths["prompt_compression_summary_markdown_path"],
         factorial_table_markdown_path=overview_paths["factorial_table_markdown_path"],
         factorial_table_latex_path=combined_paths["factorial_table_latex_path"],
         optimal_table_markdown_path=overview_paths["optimal_table_markdown_path"],
@@ -402,34 +428,109 @@ def _run_quantitative_smoke_impl(
     return result
 
 
-def _load_quantitative_source_rows(
+def _load_quantitative_source_records(
     source_roots: tuple[Path, ...],
     *,
     require_source_llm_label: bool,
-) -> list[dict[str, str]]:
+    include_llm_in_record_id: bool,
+) -> list[_QuantitativeSourceRecord]:
     source_labels: dict[Path, str] = {}
-    source_rows: list[dict[str, str]] = []
+    source_records: list[_QuantitativeSourceRecord] = []
     for source_root in source_roots:
+        source_type = _resolve_quantitative_source_type(source_root)
+        if source_type == "quantitative":
+            records = _load_precomputed_quantitative_records(source_root)
+            source_label = None
+            if require_source_llm_label:
+                source_label = _resolve_quantitative_record_source_llm_label(source_root=source_root, records=records)
+                _register_multi_llm_source_label(
+                    source_root=source_root,
+                    source_label=source_label,
+                    source_labels=source_labels,
+                )
+            for record in records:
+                source_records.append(
+                    _QuantitativeSourceRecord(
+                        record=_normalize_quantitative_source_record(
+                            record,
+                            include_llm_in_record_id=include_llm_in_record_id,
+                            source_llm=source_label,
+                        ),
+                        precomputed=True,
+                    )
+                )
+            continue
+
         rows = _load_summarizer_review_rows(source_root)
         source_label = None
         if require_source_llm_label:
             source_label = _resolve_quantitative_source_llm_label(source_root=source_root, rows=rows)
-            existing_root = next(
-                (root for root, label in source_labels.items() if label.lower() == source_label.lower()),
-                None,
+            _register_multi_llm_source_label(
+                source_root=source_root,
+                source_label=source_label,
+                source_labels=source_labels,
             )
-            if existing_root is not None:
-                raise ValueError(
-                    "duplicate llm labels across multi-llm quantitative sources: "
-                    f"{source_label!r} for {existing_root} and {source_root}"
-                )
-            source_labels[source_root] = source_label
         for row in rows:
             source_row = {"__source_root": str(source_root), **row}
             if source_label is not None:
                 source_row["__source_llm"] = source_label
-            source_rows.append(source_row)
-    return source_rows
+            for record in _build_quantitative_records_from_source_row(
+                source_row,
+                include_llm_in_record_id=include_llm_in_record_id,
+            ):
+                source_records.append(_QuantitativeSourceRecord(record=record, precomputed=False))
+    return source_records
+
+
+def _resolve_quantitative_source_type(source_root: Path) -> str:
+    if (source_root / QUANTITATIVE_REPORT_FILENAME).exists():
+        return "quantitative"
+    if (source_root / "review.csv").exists():
+        return "summarizer"
+    raise FileNotFoundError(
+        "quantitative source root must contain either smoke_quantitative_report.json or review.csv: "
+        f"{source_root}"
+    )
+
+
+def _load_precomputed_quantitative_records(source_root: Path) -> list[QuantitativeRecord]:
+    report_path = source_root / QUANTITATIVE_REPORT_FILENAME
+    try:
+        report = QuantitativeSmokeResult.model_validate_json(report_path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        raise ValueError(f"invalid quantitative smoke report: {report_path}") from exc
+
+    records: list[QuantitativeRecord] = []
+    for reference_root in report.reference_roots.values():
+        records_root = reference_root / "records"
+        if not records_root.exists():
+            raise ValueError(f"missing quantitative records directory: {records_root}")
+        for record_json_path in sorted(records_root.glob("*/record.json")):
+            record = _load_record_json(record_json_path)
+            if record is None:
+                raise ValueError(f"invalid quantitative record bundle: {record_json_path}")
+            records.append(record)
+    if not records:
+        raise ValueError(f"quantitative source has no record bundles: {source_root}")
+    return records
+
+
+def _register_multi_llm_source_label(
+    *,
+    source_root: Path,
+    source_label: str,
+    source_labels: dict[Path, str],
+) -> None:
+    existing_root = next(
+        (root for root, label in source_labels.items() if label.lower() == source_label.lower()),
+        None,
+    )
+    if existing_root is not None:
+        raise ValueError(
+            "duplicate llm labels across multi-llm quantitative sources: "
+            f"{source_label!r} for {existing_root} and {source_root}"
+        )
+    source_labels[source_root] = source_label
 
 
 def _resolve_quantitative_source_llm_label(*, source_root: Path, rows: list[dict[str, str]]) -> str:
@@ -438,6 +539,19 @@ def _resolve_quantitative_source_llm_label(*, source_root: Path, rows: list[dict
         for row in rows
         if (label := _extract_quantitative_source_row_llm_label(row).strip())
     }
+    return _resolve_quantitative_source_llm_label_from_labels(source_root=source_root, labels=labels)
+
+
+def _resolve_quantitative_record_source_llm_label(*, source_root: Path, records: list[QuantitativeRecord]) -> str:
+    labels = {
+        label
+        for record in records
+        if (label := record.llm.strip())
+    }
+    return _resolve_quantitative_source_llm_label_from_labels(source_root=source_root, labels=labels)
+
+
+def _resolve_quantitative_source_llm_label_from_labels(*, source_root: Path, labels: set[str]) -> str:
     if not labels:
         raise ValueError(f"missing llm label for multi-llm quantitative source: {source_root}")
     if len(labels) > 1:
@@ -477,13 +591,16 @@ def _build_quantitative_records_from_source_row(
     run_root = Path(str(case_metadata["run_root"]))
     prompt_flags = _derive_prompt_flags(prompt_variant)
     records: list[QuantitativeRecord] = []
-    record_id_parts = [source_row["case_id"], source_row["mode"]]
-    if include_llm_in_record_id:
-        record_id_parts.append(_build_multi_llm_record_id_component(str(llm) or "unknown"))
     for reference_family, reference_path in resolve_quantitative_reference_paths(source_row["abm"]).items():
         records.append(
             QuantitativeRecord(
-                record_id="__".join([*record_id_parts, reference_family.replace(".", "_")]),
+                record_id=_build_quantitative_record_id(
+                    case_id=source_row["case_id"],
+                    summarizer=source_row["mode"],
+                    reference_family=reference_family,
+                    llm=str(llm),
+                    include_llm_in_record_id=include_llm_in_record_id,
+                ),
                 bundle_id=source_row["bundle_id"],
                 case_id=source_row["case_id"],
                 abm=source_row["abm"],
@@ -503,6 +620,40 @@ def _build_quantitative_records_from_source_row(
             )
         )
     return records
+
+
+def _normalize_quantitative_source_record(
+    record: QuantitativeRecord,
+    *,
+    include_llm_in_record_id: bool,
+    source_llm: str | None,
+) -> QuantitativeRecord:
+    llm = source_llm or record.llm
+    record_id = _build_quantitative_record_id(
+        case_id=record.case_id,
+        summarizer=record.summarizer,
+        reference_family=record.reference_family,
+        llm=llm,
+        include_llm_in_record_id=include_llm_in_record_id,
+    )
+    if llm == record.llm and record_id == record.record_id:
+        return record
+    return record.model_copy(update={"llm": llm, "record_id": record_id})
+
+
+def _build_quantitative_record_id(
+    *,
+    case_id: str,
+    summarizer: str,
+    reference_family: str,
+    llm: str,
+    include_llm_in_record_id: bool,
+) -> str:
+    record_id_parts = [case_id, summarizer]
+    if include_llm_in_record_id:
+        record_id_parts.append(_build_multi_llm_record_id_component(llm or "unknown"))
+    record_id_parts.append(reference_family.replace(".", "_"))
+    return "__".join(record_id_parts)
 
 
 def _slugify_record_id_component(value: str) -> str:
@@ -835,6 +986,7 @@ def _write_overview_tables(
     *,
     overview_root: Path,
     reference_record_rows: dict[str, list[dict[str, str]]],
+    records: list[QuantitativeRecord],
     scratch_root: Path,
     analyze_factorial_anova_fn: Callable[[Path, Path, int], pd.DataFrame | None],
     build_factorial_input_frame_fn: Callable[[list[dict[str, str]]], pd.DataFrame],
@@ -842,6 +994,7 @@ def _write_overview_tables(
     overview_root.mkdir(parents=True, exist_ok=True)
     anova_table_markdown_path = overview_root / "anova_table.md"
     evidence_summary_table_markdown_path = overview_root / "evidence_summary_table.md"
+    prompt_compression_summary_markdown_path = overview_root / "prompt_compression_summary.md"
     factorial_table_markdown_path = overview_root / "factorial_table.md"
     optimal_table_markdown_path = overview_root / "best_scores_table.md"
 
@@ -875,6 +1028,14 @@ def _write_overview_tables(
         _render_evidence_summary_markdown_table(evidence_summary_rows),
         encoding="utf-8",
     )
+    prompt_compression_markdown = _render_prompt_compression_summary_markdown(records)
+    if prompt_compression_markdown is None:
+        if prompt_compression_summary_markdown_path.exists():
+            prompt_compression_summary_markdown_path.unlink()
+        resolved_prompt_compression_summary_markdown_path = None
+    else:
+        prompt_compression_summary_markdown_path.write_text(prompt_compression_markdown, encoding="utf-8")
+        resolved_prompt_compression_summary_markdown_path = prompt_compression_summary_markdown_path
     factorial_table_markdown_path.write_text(
         _render_overview_factorial_markdown_table(combined_factorial),
         encoding="utf-8",
@@ -883,9 +1044,68 @@ def _write_overview_tables(
     return {
         "anova_table_markdown_path": anova_table_markdown_path,
         "evidence_summary_table_markdown_path": evidence_summary_table_markdown_path,
+        "prompt_compression_summary_markdown_path": resolved_prompt_compression_summary_markdown_path,
         "factorial_table_markdown_path": factorial_table_markdown_path,
         "optimal_table_markdown_path": optimal_table_markdown_path,
     }
+
+
+def _render_prompt_compression_summary_markdown(records: list[QuantitativeRecord]) -> str | None:
+    summaries = _load_prompt_compression_summaries(records)
+    if not summaries:
+        return None
+
+    triggered_entries = 0
+    total_entries = 0
+    total_compressions = 0
+    compression_steps_by_tier: Counter[int] = Counter()
+    prompts_by_final_tier: Counter[int] = Counter()
+    source_roots: list[str] = []
+
+    for summary in summaries:
+        total_entries += summary.total_entries
+        triggered_entries += summary.triggered_entries
+        total_compressions += summary.total_compressions
+        source_roots.append(str(summary.run_root))
+        for entry in summary.entries:
+            positive_tiers = [attempt.compression_tier for attempt in entry.attempts if attempt.compression_tier > 0]
+            for tier in positive_tiers:
+                compression_steps_by_tier[tier] += 1
+            if positive_tiers:
+                prompts_by_final_tier[max(positive_tiers)] += 1
+
+    tiers_used = sorted(compression_steps_by_tier)
+    lines = [
+        "# Prompt Compression Summary",
+        "",
+        "Prompt compression observed in the generation prompts that fed the summarized cases.",
+        "",
+        f"- source_run_count: `{len(summaries)}`",
+        f"- source_runs: `{json.dumps(sorted(source_roots))}`",
+        "- prompt_compression_info_available: `true`",
+        f"- prompt_compression_triggered: `{str(triggered_entries > 0).lower()}`",
+        f"- tracked_prompt_count: `{total_entries}`",
+        f"- prompts_with_compression: `{triggered_entries}`",
+        f"- total_compression_steps: `{total_compressions}`",
+        f"- compression_tiers_used: `{json.dumps(tiers_used)}`",
+        f"- compression_steps_by_tier: `{json.dumps(dict(sorted(compression_steps_by_tier.items())))}`",
+        f"- prompts_by_final_tier: `{json.dumps(dict(sorted(prompts_by_final_tier.items())))}`",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def _load_prompt_compression_summaries(records: list[QuantitativeRecord]) -> list[PromptCompressionRunSummary]:
+    summaries: list[PromptCompressionRunSummary] = []
+    seen_roots: set[Path] = set()
+    for record in records:
+        run_root = record.source_run_root
+        if run_root in seen_roots:
+            continue
+        seen_roots.add(run_root)
+        summary = read_prompt_compression_run_summary(run_root / PROMPT_COMPRESSION_SUMMARY_FILENAME)
+        if summary is not None:
+            summaries.append(summary)
+    return sorted(summaries, key=lambda summary: str(summary.run_root))
 
 
 def _render_overview_anova_markdown_table(rows: list[dict[str, float | str | None]]) -> str:
@@ -1137,20 +1357,26 @@ def _format_float_cell(value: float | int | str) -> str:
 
 def _render_markdown_report(result: QuantitativeSmokeResult) -> str:
     reference_families = ", ".join(sorted(result.reference_roots)) or "none"
-    return (
-        "# Quantitative Smoke Report\n\n"
-        f"- success: `{str(result.success).lower()}`\n"
-        f"- record_count: `{result.record_count}`\n"
-        f"- failed_record_count: `{len(result.failed_record_ids)}`\n"
-        f"- overview_root: `{result.overview_root}`\n"
-        f"- reference_families: `{reference_families}`\n"
-        f"- quantitative_rows_path: `{result.quantitative_rows_path}`\n"
-        f"- structured_results_path: `{result.structured_results_path}`\n"
-        f"- anova_csv_path: `{result.anova_csv_path}`\n"
-        f"- evidence_summary_table_markdown_path: `{result.evidence_summary_table_markdown_path}`\n"
-        f"- factorial_csv_path: `{result.factorial_csv_path}`\n"
-        f"- optimal_csv_path: `{result.optimal_csv_path}`\n"
-    )
+    lines = [
+        "# Quantitative Smoke Report",
+        "",
+        f"- success: `{str(result.success).lower()}`",
+        f"- record_count: `{result.record_count}`",
+        f"- failed_record_count: `{len(result.failed_record_ids)}`",
+        f"- overview_root: `{result.overview_root}`",
+        f"- reference_families: `{reference_families}`",
+        f"- quantitative_rows_path: `{result.quantitative_rows_path}`",
+        f"- structured_results_path: `{result.structured_results_path}`",
+        f"- anova_csv_path: `{result.anova_csv_path}`",
+        f"- evidence_summary_table_markdown_path: `{result.evidence_summary_table_markdown_path}`",
+        f"- factorial_csv_path: `{result.factorial_csv_path}`",
+        f"- optimal_csv_path: `{result.optimal_csv_path}`",
+    ]
+    if result.prompt_compression_summary_markdown_path is not None:
+        lines.append(
+            f"- prompt_compression_summary_markdown_path: `{result.prompt_compression_summary_markdown_path}`"
+        )
+    return "\n".join(lines) + "\n"
 
 
 def _prepare_output_root(output_root: Path, *, resume: bool) -> None:
