@@ -8,6 +8,8 @@ from distill_abm.pipeline.local_qwen_sample_response import (
     is_generic_unavailable_response,
     looks_like_context_overflow,
     parse_structured_smoke_text,
+    should_retry_without_structured_output,
+    should_retry_without_structured_output_error,
     validate_structured_smoke_text_content,
 )
 
@@ -41,6 +43,25 @@ def test_parse_structured_smoke_text_returns_final_text_for_valid_payload() -> N
     assert parsed_text == "ok"
 
 
+def test_parse_structured_smoke_text_accepts_fenced_json_payload() -> None:
+    trace = {
+        "response": {
+            "raw": {
+                "message": {"content": '```json\n{"response_text":"ok"}\n```'},
+                "done_reason": "stop",
+            }
+        }
+    }
+
+    parsed_text = parse_structured_smoke_text(
+        raw_text='```json\n{"response_text":"ok"}\n```',
+        trace=trace,
+        prompt="prompt",
+    )
+
+    assert parsed_text == "ok"
+
+
 def test_parse_structured_smoke_text_rejects_thinking_only_length_stop() -> None:
     trace = {
         "response": {
@@ -67,3 +88,28 @@ def test_parse_structured_smoke_text_rejects_pathologically_large_response() -> 
 def test_validate_structured_smoke_text_content_rejects_generic_unavailable_text() -> None:
     with pytest.raises(ValueError, match="generic unavailable"):
         validate_structured_smoke_text_content("The analysis is currently unavailable.")
+
+
+def test_should_retry_without_structured_output_matches_openrouter_empty_error_payload() -> None:
+    trace = {
+        "response": {
+            "provider": "openrouter",
+            "clean_text_length": 0,
+            "raw": {
+                "choices": None,
+                "error": {"code": 500, "message": "Internal Server Error"},
+            },
+        }
+    }
+
+    assert should_retry_without_structured_output(trace) is True
+
+
+def test_should_retry_without_structured_output_error_matches_openrouter_internal_error() -> None:
+    assert (
+        should_retry_without_structured_output_error(
+            provider="openrouter",
+            error="openrouter completion failed: Error code: 500 - {'error': {'message': 'Internal Server Error'}}",
+        )
+        is True
+    )

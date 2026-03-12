@@ -54,3 +54,52 @@ def test_cli_smoke_quantitative_invokes_runner(tmp_path: Path, monkeypatch) -> N
     assert captured["source_root"] == tmp_path / "source"
     assert captured["output_root"] == tmp_path / "out"
     assert captured["resume"] is True
+
+
+def test_cli_smoke_quantitative_multi_llm_invokes_runner(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    captured: dict[str, object] = {}
+    (tmp_path / "mistral").mkdir()
+    (tmp_path / "qwen").mkdir()
+
+    def fake_run_quantitative_smoke_multi_llm(**kwargs):  # type: ignore[no-untyped-def]
+        captured.update(kwargs)
+        output_root = Path(kwargs["output_root"])
+        run_root = output_root / "runs" / "run_1"
+        return SimpleNamespace(
+            success=True,
+            run_root=run_root,
+            report_json_path=run_root / "report.json",
+            report_markdown_path=run_root / "report.md",
+            review_csv_path=run_root / "review.csv",
+            quantitative_rows_path=run_root / "quantitative_rows.csv",
+            structured_results_path=run_root / "structured_results.csv",
+            anova_csv_path=run_root / "anova_pvalues.csv",
+            factorial_csv_path=run_root / "factorial_contributions.csv",
+            optimal_csv_path=run_root / "best_scores.csv",
+            run_log_path=run_root / "run.log.jsonl",
+            failed_record_ids=[],
+        )
+
+    monkeypatch.setattr(cli_module, "run_quantitative_smoke_multi_llm", fake_run_quantitative_smoke_multi_llm)
+
+    result = runner.invoke(
+        app,
+        [
+            "smoke-quantitative-multi-llm",
+            "--source-root",
+            str(tmp_path / "mistral"),
+            "--source-root",
+            str(tmp_path / "qwen"),
+            "--output-root",
+            str(tmp_path / "out"),
+            "--resume",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "quantitative_rows.csv" in result.output
+    assert "best_scores.csv" in result.output
+    assert captured["source_roots"] == (tmp_path / "mistral", tmp_path / "qwen")
+    assert captured["output_root"] == tmp_path / "out"
+    assert captured["resume"] is True

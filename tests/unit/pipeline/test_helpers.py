@@ -220,6 +220,34 @@ def test_invoke_adapter_with_trace_preserves_raw_text_when_requested() -> None:
     assert text == '{"response_text":"# keep * raw"}'
 
 
+def test_invoke_adapter_with_trace_extracts_runtime_precision_from_provider_metadata() -> None:
+    class ProviderMetadataAdapter(LLMAdapter):
+        provider = "openrouter"
+
+        def complete(self, request: LLMRequest) -> LLMResponse:
+            return LLMResponse(
+                provider=self.provider,
+                model=request.model,
+                text="ok",
+                raw={
+                    "provider": "Alibaba",
+                    "provider_metadata": {"provider": "Alibaba", "quantization": "int8"},
+                },
+            )
+
+    _text, trace = helpers.invoke_adapter_with_trace(
+        adapter=ProviderMetadataAdapter(),
+        model="qwen/qwen3.5-27b",
+        prompt="hello",
+        max_retries=0,
+        retry_backoff_seconds=0.0,
+    )
+
+    response = trace["response"]
+    assert isinstance(response, dict)
+    assert response["runtime"] == {"provider": "Alibaba", "precision": "int8"}
+
+
 def test_build_stats_csv_uses_expected_column_order() -> None:
     stats_table = pd.DataFrame(
         {

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import math
 import shutil
@@ -29,6 +30,9 @@ from distill_abm.pipeline.quantitative_rendering import (
     render_anova_markdown_table as _render_anova_markdown_table,
 )
 from distill_abm.pipeline.quantitative_rendering import (
+    render_evidence_summary_markdown_table as _render_evidence_summary_markdown_table,
+)
+from distill_abm.pipeline.quantitative_rendering import (
     render_factorial_latex_table as _render_factorial_latex_table,
 )
 from distill_abm.pipeline.quantitative_rendering import (
@@ -39,9 +43,6 @@ from distill_abm.pipeline.quantitative_rendering import (
 )
 from distill_abm.pipeline.quantitative_rendering import (
     render_optimal_markdown_table as _render_optimal_markdown_table,
-)
-from distill_abm.pipeline.quantitative_rendering import (
-    render_evidence_summary_markdown_table as _render_evidence_summary_markdown_table,
 )
 from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import (
@@ -65,6 +66,7 @@ __all__ = [
     "QuantitativeRecord",
     "QuantitativeSmokeResult",
     "_build_evidence_summary_rows",
+    "_build_factorial_input_frame_with_llm",
     "_render_anova_latex_table",
     "_render_anova_markdown_table",
     "_render_evidence_summary_markdown_table",
@@ -73,6 +75,7 @@ __all__ = [
     "_render_optimal_latex_table",
     "_render_optimal_markdown_table",
     "run_quantitative_smoke",
+    "run_quantitative_smoke_multi_llm",
 ]
 
 QUANTITATIVE_REPORT_FILENAME = "smoke_quantitative_report.json"
@@ -176,6 +179,47 @@ def run_quantitative_smoke(
     analyze_factorial_anova_fn: Callable[[Path, Path, int], pd.DataFrame | None] = analyze_factorial_anova,
 ) -> QuantitativeSmokeResult:
     """Score completed summarizer smoke outputs and render publication-oriented analysis tables."""
+    return _run_quantitative_smoke_impl(
+        source_roots=(source_root,),
+        output_root=output_root,
+        resume=resume,
+        score_summary_fn=score_summary_fn,
+        analyze_factorial_anova_fn=analyze_factorial_anova_fn,
+        include_llm_factor=False,
+    )
+
+
+def run_quantitative_smoke_multi_llm(
+    *,
+    source_roots: tuple[Path, ...],
+    output_root: Path,
+    resume: bool = False,
+    score_summary_fn: Callable[[str, str], SummaryScores] = score_summary,
+    analyze_factorial_anova_fn: Callable[[Path, Path, int], pd.DataFrame | None] = analyze_factorial_anova,
+) -> QuantitativeSmokeResult:
+    """Score multiple completed summarizer smoke outputs and include LLM as a factorial feature."""
+    if len(source_roots) < 2:
+        raise ValueError("multi-llm quantitative smoke requires at least two --source-root values")
+    return _run_quantitative_smoke_impl(
+        source_roots=source_roots,
+        output_root=output_root,
+        resume=resume,
+        score_summary_fn=score_summary_fn,
+        analyze_factorial_anova_fn=analyze_factorial_anova_fn,
+        include_llm_factor=True,
+    )
+
+
+def _run_quantitative_smoke_impl(
+    *,
+    source_roots: tuple[Path, ...],
+    output_root: Path,
+    resume: bool,
+    score_summary_fn: Callable[[str, str], SummaryScores],
+    analyze_factorial_anova_fn: Callable[[Path, Path, int], pd.DataFrame | None],
+    include_llm_factor: bool,
+) -> QuantitativeSmokeResult:
+    """Core scoring flow shared by the single-LLM and multi-LLM quantitative smokes."""
     started_at = datetime.now(UTC)
     _prepare_output_root(output_root, resume=resume)
     run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
@@ -186,8 +230,11 @@ def run_quantitative_smoke(
     logger = get_logger(__name__)
     attached_run_log_path = attach_json_log_file(run_log_path(run_root))
 
-    resolved_source_root = resolve_run_root(source_root)
-    source_rows = _load_summarizer_review_rows(resolved_source_root)
+    resolved_source_roots = tuple(resolve_run_root(path) for path in source_roots)
+    source_rows = _load_quantitative_source_rows(
+        resolved_source_roots,
+        require_source_llm_label=include_llm_factor,
+    )
     review_rows: list[dict[str, str]] = []
     record_rows: list[dict[str, str]] = []
     failed_record_ids: list[str] = []
@@ -196,8 +243,15 @@ def run_quantitative_smoke(
     reference_failed_record_ids: dict[str, list[str]] = {}
     reference_roots: dict[str, Path] = {}
 
+    factorial_input_builder = (
+        _build_factorial_input_frame_with_llm if include_llm_factor else _build_factorial_input_frame
+    )
+
     for source_row in source_rows:
-        for record in _build_quantitative_records_from_source_row(source_row):
+        for record in _build_quantitative_records_from_source_row(
+            source_row,
+            include_llm_in_record_id=include_llm_factor,
+        ):
             reference_root = run_root / record.reference_family
             reference_roots.setdefault(record.reference_family, reference_root)
             record_dir = reference_root / "records" / record.record_id
@@ -282,6 +336,7 @@ def run_quantitative_smoke(
         review_rows=review_rows,
         record_rows=record_rows,
         analyze_factorial_anova_fn=analyze_factorial_anova_fn,
+        build_factorial_input_frame_fn=factorial_input_builder,
     )
 
     for reference_family, reference_root in reference_roots.items():
@@ -291,6 +346,7 @@ def run_quantitative_smoke(
             review_rows=reference_review_rows.get(reference_family, []),
             record_rows=reference_record_rows.get(reference_family, []),
             analyze_factorial_anova_fn=analyze_factorial_anova_fn,
+            build_factorial_input_frame_fn=factorial_input_builder,
         )
         _write_bundle_readme(
             bundle_root=reference_root,
@@ -306,6 +362,7 @@ def run_quantitative_smoke(
         reference_record_rows=reference_record_rows,
         scratch_root=combined_root,
         analyze_factorial_anova_fn=analyze_factorial_anova_fn,
+        build_factorial_input_frame_fn=factorial_input_builder,
     )
 
     result = QuantitativeSmokeResult(
@@ -345,6 +402,57 @@ def run_quantitative_smoke(
     return result
 
 
+def _load_quantitative_source_rows(
+    source_roots: tuple[Path, ...],
+    *,
+    require_source_llm_label: bool,
+) -> list[dict[str, str]]:
+    source_labels: dict[Path, str] = {}
+    source_rows: list[dict[str, str]] = []
+    for source_root in source_roots:
+        rows = _load_summarizer_review_rows(source_root)
+        source_label = None
+        if require_source_llm_label:
+            source_label = _resolve_quantitative_source_llm_label(source_root=source_root, rows=rows)
+            existing_root = next(
+                (root for root, label in source_labels.items() if label.lower() == source_label.lower()),
+                None,
+            )
+            if existing_root is not None:
+                raise ValueError(
+                    "duplicate llm labels across multi-llm quantitative sources: "
+                    f"{source_label!r} for {existing_root} and {source_root}"
+                )
+            source_labels[source_root] = source_label
+        for row in rows:
+            source_row = {"__source_root": str(source_root), **row}
+            if source_label is not None:
+                source_row["__source_llm"] = source_label
+            source_rows.append(source_row)
+    return source_rows
+
+
+def _resolve_quantitative_source_llm_label(*, source_root: Path, rows: list[dict[str, str]]) -> str:
+    labels = {
+        label
+        for row in rows
+        if (label := _extract_quantitative_source_row_llm_label(row).strip())
+    }
+    if not labels:
+        raise ValueError(f"missing llm label for multi-llm quantitative source: {source_root}")
+    if len(labels) > 1:
+        raise ValueError(
+            "expected one llm label per multi-llm quantitative source, "
+            f"found {sorted(labels)} in {source_root}"
+        )
+    return next(iter(labels))
+
+
+def _extract_quantitative_source_row_llm_label(source_row: dict[str, str]) -> str:
+    case_metadata = _load_case_metadata_from_context_output(Path(source_row["context_output_path"]))
+    return str(case_metadata.get("model_id", "") or case_metadata.get("model", "") or "")
+
+
 def _load_summarizer_review_rows(source_root: Path) -> list[dict[str, str]]:
     review_csv_path = source_root / "review.csv"
     if not review_csv_path.exists():
@@ -356,19 +464,26 @@ def _load_summarizer_review_rows(source_root: Path) -> list[dict[str, str]]:
     return [row for row in rows if row.get("success", "").lower() == "true"]
 
 
-def _build_quantitative_records_from_source_row(source_row: dict[str, str]) -> list[QuantitativeRecord]:
+def _build_quantitative_records_from_source_row(
+    source_row: dict[str, str],
+    *,
+    include_llm_in_record_id: bool = False,
+) -> list[QuantitativeRecord]:
     case_metadata = _load_case_metadata_from_context_output(Path(source_row["context_output_path"]))
-    llm = case_metadata.get("model_id", "") or case_metadata.get("model", "") or ""
+    llm = source_row.get("__source_llm") or case_metadata.get("model_id", "") or case_metadata.get("model", "") or ""
     evidence_mode = str(case_metadata["evidence_mode"])
     prompt_variant = str(case_metadata["prompt_variant"])
     repetition = int(str(case_metadata["repetition"]))
     run_root = Path(str(case_metadata["run_root"]))
     prompt_flags = _derive_prompt_flags(prompt_variant)
     records: list[QuantitativeRecord] = []
+    record_id_parts = [source_row["case_id"], source_row["mode"]]
+    if include_llm_in_record_id:
+        record_id_parts.append(_build_multi_llm_record_id_component(str(llm) or "unknown"))
     for reference_family, reference_path in resolve_quantitative_reference_paths(source_row["abm"]).items():
         records.append(
             QuantitativeRecord(
-                record_id=f"{source_row['case_id']}__{source_row['mode']}__{reference_family.replace('.', '_')}",
+                record_id="__".join([*record_id_parts, reference_family.replace(".", "_")]),
                 bundle_id=source_row["bundle_id"],
                 case_id=source_row["case_id"],
                 abm=source_row["abm"],
@@ -388,6 +503,18 @@ def _build_quantitative_records_from_source_row(source_row: dict[str, str]) -> l
             )
         )
     return records
+
+
+def _slugify_record_id_component(value: str) -> str:
+    normalized = "".join(character if character.isalnum() else "_" for character in value.lower())
+    collapsed = "_".join(part for part in normalized.split("_") if part)
+    return collapsed or "unknown"
+
+
+def _build_multi_llm_record_id_component(llm_label: str) -> str:
+    slug = _slugify_record_id_component(llm_label)
+    digest = hashlib.sha1(llm_label.encode("utf-8")).hexdigest()[:12]
+    return f"llm_{slug}_{digest}"
 
 
 def _load_case_metadata_from_context_output(context_output_path: Path) -> dict[str, object]:
@@ -611,6 +738,7 @@ def _write_analysis_bundle(
     review_rows: list[dict[str, str]],
     record_rows: list[dict[str, str]],
     analyze_factorial_anova_fn: Callable[[Path, Path, int], pd.DataFrame | None],
+    build_factorial_input_frame_fn: Callable[[list[dict[str, str]]], pd.DataFrame],
 ) -> dict[str, Path]:
     bundle_root.mkdir(parents=True, exist_ok=True)
     quantitative_rows_path = bundle_root / "quantitative_rows.csv"
@@ -650,7 +778,7 @@ def _write_analysis_bundle(
     anova_table_latex_path.write_text(_render_anova_latex_table(anova_rows), encoding="utf-8")
 
     factorial_input_path = bundle_root / "factorial_input.csv"
-    factorial_frame = _build_factorial_input_frame(record_rows)
+    factorial_frame = build_factorial_input_frame_fn(record_rows)
     factorial_frame.to_csv(factorial_input_path, index=False)
     factorial_result = analyze_factorial_anova_fn(factorial_input_path, factorial_csv_path, 2)
     normalized_factorial = _normalize_factorial_table(factorial_result)
@@ -709,6 +837,7 @@ def _write_overview_tables(
     reference_record_rows: dict[str, list[dict[str, str]]],
     scratch_root: Path,
     analyze_factorial_anova_fn: Callable[[Path, Path, int], pd.DataFrame | None],
+    build_factorial_input_frame_fn: Callable[[list[dict[str, str]]], pd.DataFrame],
 ) -> dict[str, Path]:
     overview_root.mkdir(parents=True, exist_ok=True)
     anova_table_markdown_path = overview_root / "anova_table.md"
@@ -727,7 +856,7 @@ def _write_overview_tables(
         evidence_summary_rows.extend(_build_evidence_summary_rows(record_rows))
         factorial_input_path = scratch_root / f"{reference_family}_overview_factorial_input.csv"
         factorial_output_path = scratch_root / f"{reference_family}_overview_factorial_contributions.csv"
-        factorial_input_frame = _build_factorial_input_frame(record_rows)
+        factorial_input_frame = build_factorial_input_frame_fn(record_rows)
         factorial_input_frame.to_csv(factorial_input_path, index=False)
         factorial_result = analyze_factorial_anova_fn(factorial_input_path, factorial_output_path, 2)
         factorial_frame = _normalize_factorial_table(factorial_result)
@@ -862,6 +991,32 @@ def _build_factorial_input_frame(record_rows: list[dict[str, str]]) -> pd.DataFr
     return pd.DataFrame(normalized_rows)
 
 
+def _build_factorial_input_frame_with_llm(record_rows: list[dict[str, str]]) -> pd.DataFrame:
+    if not record_rows:
+        return pd.DataFrame(
+            columns=["LLM", "Summarizer", "Evidence", "Role", "Insights", "Example", *METRIC_COLUMN_NAMES]
+        )
+    normalized_rows: list[dict[str, object]] = []
+    for row in record_rows:
+        normalized_rows.append(
+            {
+                "LLM": row["llm"],
+                "Summarizer": row["summarizer"],
+                "Evidence": row["evidence"],
+                "Role": "on" if row["role"] == "True" else "off",
+                "Insights": "on" if row["insights"] == "True" else "off",
+                "Example": "on" if row["example"] == "True" else "off",
+                "BLEU": float(row["BLEU"]),
+                "METEOR": float(row["METEOR"]),
+                "R-1": float(row["R-1"]),
+                "R-2": float(row["R-2"]),
+                "R-L": float(row["R-L"]),
+                "Reading ease": float(row["Reading ease"]),
+            }
+        )
+    return pd.DataFrame(normalized_rows)
+
+
 def _normalize_factorial_table(frame: pd.DataFrame | None) -> pd.DataFrame:
     columns = ["Feature", *METRIC_COLUMN_NAMES]
     if frame is None or frame.empty:
@@ -875,7 +1030,9 @@ def _normalize_factorial_table(frame: pd.DataFrame | None) -> pd.DataFrame:
     normalized = normalized.groupby("Feature", as_index=False, dropna=False).agg("sum")
     for feature in FACTORIAL_FEATURE_ORDER:
         if feature not in set(normalized["Feature"]):
-            normalized.loc[len(normalized)] = {column: float("nan") if column != "Feature" else feature for column in columns}
+            normalized.loc[len(normalized)] = {
+                column: float("nan") if column != "Feature" else feature for column in columns
+            }
     normalized = normalized[columns].copy()
     normalized["Feature"] = normalized["Feature"].astype(str)
     for metric in METRIC_COLUMN_NAMES:

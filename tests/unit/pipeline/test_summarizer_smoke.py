@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 from distill_abm.pipeline.summarizer_smoke import (
     ValidatedSmokeBundle,
     default_validated_smoke_bundles,
@@ -309,6 +311,47 @@ def test_default_validated_smoke_bundles_discovers_live_suite_cases_without_matr
     assert [bundle.case_id for bundle in bundles] == ["01_fauna_none_plot_rep1"]
     assert bundles[0].context_output_path == case_root / "02_context" / "context_output.txt"
     assert bundles[0].trend_output_paths == (case_root / "03_trends" / "plot_01" / "trend_output.txt",)
+
+
+def test_default_validated_smoke_bundles_skips_live_case_with_retry_trend_missing_output(tmp_path: Path) -> None:
+    suite_root = tmp_path / "suite"
+    run_root = suite_root / "abms" / "fauna" / "runs" / "run_live"
+    case_root = run_root / "cases" / "02_fauna_none_table_rep1"
+    (suite_root / "abms" / "fauna").mkdir(parents=True, exist_ok=True)
+    (suite_root / "abms" / "fauna" / "latest_run.txt").write_text(str(run_root), encoding="utf-8")
+    (case_root / "02_context").mkdir(parents=True)
+    (case_root / "03_trends" / "plot_01").mkdir(parents=True)
+    (case_root / "03_trends" / "plot_02").mkdir(parents=True)
+    (case_root / "02_context" / "context_output.txt").write_text("Valid context.", encoding="utf-8")
+    (case_root / "03_trends" / "plot_02" / "trend_output.txt").write_text("Valid trend 02.", encoding="utf-8")
+    (case_root / "00_case_summary.json").write_text(
+        json.dumps(
+            {
+                "case_id": "02_fauna_none_table_rep1",
+                "abm": "fauna",
+                "evidence_mode": "table",
+                "prompt_variant": "none",
+                "repetition": 1,
+                "model": "qwen/qwen3.5-27b",
+            }
+        ),
+        encoding="utf-8",
+    )
+    (case_root / "validation_state.json").write_text(
+        json.dumps(
+            {
+                "context": {"status": "accepted", "error": None},
+                "trends": {
+                    "1": {"status": "retry", "error": "model did not return valid structured JSON"},
+                    "2": {"status": "accepted", "error": None},
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(FileNotFoundError, match="missing completed ABM runs for: fauna"):
+        default_validated_smoke_bundles(suite_root, include_abms=("fauna",))
 
 
 def test_run_summarizer_smoke_watch_mode_processes_bundle_when_it_appears(

@@ -32,6 +32,8 @@ from distill_abm.pipeline.local_qwen_sample_response import (
     extract_thinking_text,
     looks_like_context_overflow,
     parse_structured_smoke_text,
+    should_retry_without_structured_output,
+    should_retry_without_structured_output_error,
 )
 from distill_abm.pipeline.prompt_compression_artifacts import (
     PromptCompressionAttempt,
@@ -509,24 +511,99 @@ def _invoke_structured_smoke_text(
     retry_backoff_seconds: float | None = None,
     request_metadata: dict[str, object] | None = None,
 ) -> tuple[str, dict[str, object]]:
-    raw_text, trace = invoke_adapter_with_trace(
-        adapter=adapter,
-        model=model,
-        prompt=prompt_with_schema,
-        image_b64=image_b64,
-        max_tokens=max_tokens,
-        request_metadata={
-            "structured_output_name": "structured_smoke_text",
-            "structured_output_schema": StructuredSmokeText.model_json_schema(),
-            "ollama_num_ctx": ollama_num_ctx,
-            "ollama_format": StructuredSmokeText.model_json_schema(),
-            "preserve_raw_text": True,
-            **(request_metadata or {}),
-        },
-        max_retries=max_retries,
-        retry_backoff_seconds=retry_backoff_seconds,
+    structured_request_metadata = {
+        "structured_output_name": "structured_smoke_text",
+        "structured_output_schema": StructuredSmokeText.model_json_schema(),
+        "ollama_num_ctx": ollama_num_ctx,
+        "ollama_format": StructuredSmokeText.model_json_schema(),
+        "preserve_raw_text": True,
+        **(request_metadata or {}),
+    }
+    initial_error: LLMProviderError | None = None
+    try:
+        raw_text, trace = invoke_adapter_with_trace(
+            adapter=adapter,
+            model=model,
+            prompt=prompt_with_schema,
+            image_b64=image_b64,
+            max_tokens=max_tokens,
+            request_metadata=structured_request_metadata,
+            max_retries=max_retries,
+            retry_backoff_seconds=retry_backoff_seconds,
+        )
+    except LLMProviderError as exc:
+        if not should_retry_without_structured_output_error(provider=adapter.provider, error=str(exc)):
+            raise
+        initial_error = exc
+        raw_text = ""
+        trace = {}
+
+    fallback_prompt = (
+        f"{prompt_with_schema}\n\n"
+        "Return only a valid JSON object with exactly one key: "
+        '{"response_text": "<your answer>"}.\n'
+        "Do not use markdown fences or any text before or after the JSON object."
     )
-    final_text = parse_structured_smoke_text(raw_text=raw_text, trace=trace, prompt=prompt_with_schema)
+    fallback_metadata = {
+        key: value
+        for key, value in structured_request_metadata.items()
+        if key not in {"structured_output_name", "structured_output_schema"}
+    }
+
+    if initial_error is not None:
+        fallback_raw_text, fallback_trace = invoke_adapter_with_trace(
+            adapter=adapter,
+            model=model,
+            prompt=fallback_prompt,
+            image_b64=image_b64,
+            max_tokens=max_tokens,
+            request_metadata=fallback_metadata,
+            max_retries=max_retries,
+            retry_backoff_seconds=retry_backoff_seconds,
+        )
+        fallback_trace["structured_output_fallback"] = {
+            "triggered": True,
+            "reason": str(initial_error),
+            "fallback_mode": "prompted_json_without_response_format",
+            "initial_failure": {"provider_error": str(initial_error)},
+        }
+        final_text = parse_structured_smoke_text(
+            raw_text=fallback_raw_text,
+            trace=fallback_trace,
+            prompt=fallback_prompt,
+        )
+        return final_text, fallback_trace
+    try:
+        final_text = parse_structured_smoke_text(raw_text=raw_text, trace=trace, prompt=prompt_with_schema)
+    except StructuredSmokeResponseError as exc:
+        if not should_retry_without_structured_output(trace):
+            raise
+        fallback_raw_text, fallback_trace = invoke_adapter_with_trace(
+            adapter=adapter,
+            model=model,
+            prompt=fallback_prompt,
+            image_b64=image_b64,
+            max_tokens=max_tokens,
+            request_metadata=fallback_metadata,
+            max_retries=max_retries,
+            retry_backoff_seconds=retry_backoff_seconds,
+        )
+        fallback_trace["structured_output_fallback"] = {
+            "triggered": True,
+            "reason": str(exc),
+            "fallback_mode": "prompted_json_without_response_format",
+            "initial_failure": {
+                "attempts_made": trace.get("attempts_made"),
+                "errors": trace.get("errors"),
+                "response": trace.get("response"),
+            },
+        }
+        final_text = parse_structured_smoke_text(
+            raw_text=fallback_raw_text,
+            trace=fallback_trace,
+            prompt=fallback_prompt,
+        )
+        return final_text, fallback_trace
     return final_text, trace
 
 

@@ -5,10 +5,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from distill_abm.llm.adapters.base import LLMAdapter, LLMRequest, LLMResponse
+from distill_abm.llm.adapters.base import LLMAdapter, LLMProviderError, LLMRequest, LLMResponse
 from distill_abm.pipeline.local_qwen_sample_smoke import (
     LocalQwenCaseInput,
     LocalQwenSampleCase,
+    _invoke_structured_smoke_text,
     default_local_qwen_sample_cases,
     run_local_qwen_sample_smoke,
 )
@@ -163,6 +164,54 @@ class GenericUnavailableAdapter(LLMAdapter):
         )
 
 
+class StructuredFailureThenPromptedJsonAdapter(LLMAdapter):
+    provider = "openrouter"
+
+    def __init__(self) -> None:
+        self.requests: list[LLMRequest] = []
+
+    def complete(self, request: LLMRequest) -> LLMResponse:
+        self.requests.append(request)
+        if len(self.requests) == 1:
+            return LLMResponse(
+                provider=self.provider,
+                model=request.model,
+                text="",
+                raw={
+                    "choices": None,
+                    "error": {"code": 500, "message": "Internal Server Error"},
+                },
+            )
+        return LLMResponse(
+            provider=self.provider,
+            model=request.model,
+            text='```json\n{"response_text":"fallback-ok"}\n```',
+            raw={
+                "choices": [{"message": {"content": '```json\n{"response_text":"fallback-ok"}\n```'}}],
+            },
+        )
+
+
+class RaisedStructuredFailureThenPromptedJsonAdapter(LLMAdapter):
+    provider = "openrouter"
+
+    def __init__(self) -> None:
+        self.requests: list[LLMRequest] = []
+
+    def complete(self, request: LLMRequest) -> LLMResponse:
+        self.requests.append(request)
+        if len(self.requests) == 1:
+            raise LLMProviderError(
+                "openrouter completion failed: Error code: 500 - {'error': {'message': 'Internal Server Error'}}"
+            )
+        return LLMResponse(
+            provider=self.provider,
+            model=request.model,
+            text='{"response_text":"fallback-ok-after-error"}',
+            raw={"choices": [{"message": {"content": '{"response_text":"fallback-ok-after-error"}'}}]},
+        )
+
+
 def _write_case_input(tmp_path: Path) -> LocalQwenCaseInput:
     csv_path = tmp_path / "simulation.csv"
     pd.DataFrame(
@@ -278,6 +327,46 @@ def test_run_local_qwen_sample_smoke_writes_review_friendly_case_artifacts(tmp_p
     assert "case_summary_path" in review_csv
     assert "context_prompt_text" in review_csv
     assert "trend_output_text" in review_csv
+
+
+def test_invoke_structured_smoke_text_retries_without_response_format_on_openrouter_empty_error() -> None:
+    adapter = StructuredFailureThenPromptedJsonAdapter()
+
+    final_text, trace = _invoke_structured_smoke_text(
+        adapter=adapter,
+        model="qwen/qwen3.5-27b",
+        prompt_with_schema="Explain the ABM.",
+        max_tokens=512,
+        ollama_num_ctx=131072,
+    )
+
+    assert final_text == "fallback-ok"
+    assert len(adapter.requests) == 2
+    assert "structured_output_schema" in adapter.requests[0].metadata
+    assert "structured_output_schema" not in adapter.requests[1].metadata
+    assert 'Return only a valid JSON object with exactly one key' in adapter.requests[1].user_prompt()
+    assert trace["structured_output_fallback"]["triggered"] is True
+    assert trace["structured_output_fallback"]["fallback_mode"] == "prompted_json_without_response_format"
+
+
+def test_invoke_structured_smoke_text_retries_without_response_format_on_openrouter_provider_error() -> None:
+    adapter = RaisedStructuredFailureThenPromptedJsonAdapter()
+
+    final_text, trace = _invoke_structured_smoke_text(
+        adapter=adapter,
+        model="qwen/qwen3.5-27b",
+        prompt_with_schema="Explain the ABM.",
+        max_tokens=512,
+        ollama_num_ctx=131072,
+        max_retries=0,
+    )
+
+    assert final_text == "fallback-ok-after-error"
+    assert len(adapter.requests) == 2
+    assert "structured_output_schema" in adapter.requests[0].metadata
+    assert "structured_output_schema" not in adapter.requests[1].metadata
+    assert trace["structured_output_fallback"]["triggered"] is True
+    assert "Internal Server Error" in trace["structured_output_fallback"]["reason"]
 
 
 def test_run_local_qwen_sample_smoke_resume_reuses_successful_case(tmp_path: Path) -> None:
