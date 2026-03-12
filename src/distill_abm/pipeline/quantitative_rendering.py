@@ -119,6 +119,46 @@ def render_optimal_latex_table(rows: list[dict[str, str]]) -> str:
     )
 
 
+def render_evidence_summary_markdown_table(rows: list[dict[str, str]]) -> str:
+    header = (
+        "| Evidence | ABM | Avg BLEU | Avg METEOR | Avg R-1 | Avg R-2 | Avg R-L | Avg Reading ease |"
+        " Best BLEU | Best METEOR | Best R-1 | Best R-2 | Best R-L | Best Reading ease |\n"
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+    )
+    sections = ["# Evidence Mode Summary", ""]
+    for reference_family in sorted({row["Reference family"] for row in rows}):
+        sections.append(f"## {reference_family}")
+        sections.append("")
+        sections.append(header)
+        for row in rows:
+            if row["Reference family"] != reference_family:
+                continue
+            sections.append(
+                "| "
+                + " | ".join(
+                    [
+                        row["Evidence"],
+                        row["ABM"],
+                        row["Avg BLEU"],
+                        row["Avg METEOR"],
+                        row["Avg R-1"],
+                        row["Avg R-2"],
+                        row["Avg R-L"],
+                        row["Avg Reading ease"],
+                        row["Best BLEU"],
+                        row["Best METEOR"],
+                        row["Best R-1"],
+                        row["Best R-2"],
+                        row["Best R-L"],
+                        row["Best Reading ease"],
+                    ]
+                )
+                + " |"
+            )
+        sections.append("")
+    return "\n".join(sections).rstrip() + "\n"
+
+
 def _format_pvalue_cell(value: float | None) -> str:
     if value is None:
         return ABSENT_MARKER
