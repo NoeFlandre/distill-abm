@@ -47,9 +47,17 @@ Provider-specific override:
 
 | ABM | Ground Truth File |
 |---|---|
-| `fauna` | `configs/ground_truth/fauna_scoring_ground_truth.txt` |
-| `grazing` | `configs/ground_truth/grazing_scoring_ground_truth.txt` |
-| `milk_consumption` | `configs/ground_truth/milk_scoring_ground_truth.txt` |
+| `fauna` | `data/summaries/authors/fauna_scoring_ground_truth.txt` |
+| `grazing` | `data/summaries/authors/grazing_scoring_ground_truth.txt` |
+| `milk_consumption` | `data/summaries/authors/milk_scoring_ground_truth.txt` |
+
+## GPT-5.2 Ground Truth Mapping (`configs/experiment_settings.yaml`)
+
+| ABM | GPT-5.2_short | GPT-5.2_long |
+|---|---|---|
+| `fauna` | `data/summaries/gpt5.2/fauna_gpt5.2_short_ground_truth.txt` | `data/summaries/gpt5.2/fauna_gpt5.2_long_ground_truth.txt` |
+| `grazing` | `data/summaries/gpt5.2/grazing_gpt5.2_short_ground_truth.txt` | `data/summaries/gpt5.2/grazing_gpt5.2_long_ground_truth.txt` |
+| `milk_consumption` | `data/summaries/gpt5.2/milk_gpt5.2_short_ground_truth.txt` | `data/summaries/gpt5.2/milk_gpt5.2_long_ground_truth.txt` |
 
 ## Optional Modeler Ground Truth Mapping (`configs/experiment_settings.yaml`)
 
@@ -57,4 +65,4 @@ These references are scored in addition to the primary author reference when pre
 
 | ABM | Modeler Ground Truth File |
 |---|---|
-| `milk_consumption` | `configs/ground_truth/milk_modeler_ground_truth.txt` |
+| `milk_consumption` | `data/summaries/modelers/milk_modeler_ground_truth.txt` |

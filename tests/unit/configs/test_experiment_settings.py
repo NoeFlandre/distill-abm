@@ -13,6 +13,9 @@ def test_load_experiment_settings_config() -> None:
     assert Path(settings.ground_truth.fauna).exists()
     assert Path(settings.ground_truth.grazing).exists()
     assert Path(settings.ground_truth.milk_consumption).exists()
+    assert "data/summaries/authors/" in settings.ground_truth.fauna
+    assert "data/summaries/authors/" in settings.ground_truth.grazing
+    assert "data/summaries/authors/" in settings.ground_truth.milk_consumption
 
     assert settings.modeler_ground_truth is not None
     assert settings.modeler_ground_truth.milk_consumption is not None
@@ -20,6 +23,7 @@ def test_load_experiment_settings_config() -> None:
     assert settings.modeler_ground_truth.grazing is None
     assert settings.modeler_ground_truth.milk_consumption.endswith("milk_modeler_ground_truth.txt")
     assert Path(settings.modeler_ground_truth.milk_consumption).exists()
+    assert "data/summaries/modelers/" in settings.modeler_ground_truth.milk_consumption
 
     assert settings.gpt5_2_short_ground_truth is not None
     assert settings.gpt5_2_short_ground_truth.fauna.endswith("fauna_gpt5.2_short_ground_truth.txt")
@@ -28,6 +32,9 @@ def test_load_experiment_settings_config() -> None:
     assert Path(settings.gpt5_2_short_ground_truth.fauna).exists()
     assert Path(settings.gpt5_2_short_ground_truth.grazing).exists()
     assert Path(settings.gpt5_2_short_ground_truth.milk_consumption).exists()
+    assert "data/summaries/gpt5.2/" in settings.gpt5_2_short_ground_truth.fauna
+    assert "data/summaries/gpt5.2/" in settings.gpt5_2_short_ground_truth.grazing
+    assert "data/summaries/gpt5.2/" in settings.gpt5_2_short_ground_truth.milk_consumption
 
     assert settings.gpt5_2_long_ground_truth is not None
     assert settings.gpt5_2_long_ground_truth.fauna.endswith("fauna_gpt5.2_long_ground_truth.txt")
@@ -36,6 +43,9 @@ def test_load_experiment_settings_config() -> None:
     assert Path(settings.gpt5_2_long_ground_truth.fauna).exists()
     assert Path(settings.gpt5_2_long_ground_truth.grazing).exists()
     assert Path(settings.gpt5_2_long_ground_truth.milk_consumption).exists()
+    assert "data/summaries/gpt5.2/" in settings.gpt5_2_long_ground_truth.fauna
+    assert "data/summaries/gpt5.2/" in settings.gpt5_2_long_ground_truth.grazing
+    assert "data/summaries/gpt5.2/" in settings.gpt5_2_long_ground_truth.milk_consumption
 
     assert settings.qualitative_example_text_dir is not None
     assert "prompt_assets" in settings.qualitative_example_text_dir

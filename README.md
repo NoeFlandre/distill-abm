@@ -62,8 +62,12 @@ configs/
   runtime_defaults.yaml      runtime defaults (modes, summarizers, requests)
   experiment_settings.yaml   ABM ground-truth mapping
   prompts.yaml               prompt templates + style factors
-  ground_truth/              author + modeler references for lexical scoring
   prompt_assets/             qualitative prompt examples
+  
+data/summaries/
+  authors/                   primary scoring references by ABM
+  modelers/                  optional modeler-authored references
+  gpt5.2/                    GPT-5.2 reference family references
 
 src/distill_abm/
   cli.py                     Typer entrypoint
@@ -77,6 +81,7 @@ src/distill_abm/
 docs/
   ARCHITECTURE.md
   EVALUATION_FREEZE.md
+  QUALITY_SWEEP_2026-03-11.md
   WALKTHROUGH.md
   HYPERPARAMETERS.md
   TESTING_REPORT.md
