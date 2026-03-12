@@ -25,8 +25,8 @@ netlogo_viz:
   smoke_max_ticks: 73000
   smoke_interval: 50
   fallback_mode: always
-  fallback_csv: data/fauna_abm/legacy/reduced_version.csv
-  fallback_plot_dir: data/fauna_abm/legacy/plots
+  fallback_csv: data/abms/fauna/legacy/reduced_version.csv
+  fallback_plot_dir: data/abms/fauna/legacy/plots
   reporters:
     - num-foragers
     - sum [energy] of foragers

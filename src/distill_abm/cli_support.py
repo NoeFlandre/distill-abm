@@ -76,7 +76,7 @@ def resolve_model_filenames(abm: str) -> tuple[str, ...]:
 
 def resolve_abm_model_path(*, abm: str, models_root: Path) -> Path:
     """Find a single NetLogo model for an ABM and fail with a clear message if absent or ambiguous."""
-    candidate_roots = [models_root, models_root / f"{abm}_abm", models_root / abm]
+    candidate_roots = [models_root / "abms" / abm, models_root / abm, models_root]
     model_filenames = resolve_model_filenames(abm)
     matches: list[Path] = []
     for directory in candidate_roots:

@@ -49,3 +49,6 @@ def test_load_experiment_settings_config() -> None:
 
     assert settings.qualitative_example_text_dir is not None
     assert "prompt_assets" in settings.qualitative_example_text_dir
+
+    assert settings.human_reference_dir == "data/summaries"
+    assert Path(settings.human_reference_dir).exists()

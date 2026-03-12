@@ -68,6 +68,10 @@ data/summaries/
   authors/                   primary scoring references by ABM
   modelers/                  optional modeler-authored references
   gpt5.2/                    GPT-5.2 reference family references
+data/abms/
+  fauna/                     fauna ABM assets
+  grazing/                   grazing ABM assets
+  milk_consumption/          milk consumption ABM assets
 
 src/distill_abm/
   cli.py                     Typer entrypoint
