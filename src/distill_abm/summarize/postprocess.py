@@ -176,12 +176,13 @@ def _collapse_tail_loop(sentence: str) -> str:
         trailing_punctuation = sentence[-1]
         sentence = sentence[:-1]
 
-    tokens = re.findall(r"[A-Za-z0-9']+", sentence)
+    token_matches = list(re.finditer(r"[A-Za-z0-9']+", sentence))
+    tokens = [match.group(0) for match in token_matches]
     if len(tokens) < 9:
         return (sentence + trailing_punctuation).strip()
 
     lowered = [token.casefold() for token in tokens]
-    best_candidate: list[str] | None = None
+    best_keep_end: int | None = None
     best_start = len(tokens) + 1
 
     for start in range(len(tokens)):
@@ -198,15 +199,17 @@ def _collapse_tail_loop(sentence: str) -> str:
             if full_repeats < 3:
                 continue
             _ = remainder
-            candidate = tokens[:start] + tokens[start : start + unit_length]
-            if start < best_start or (start == best_start and best_candidate is not None and len(candidate) < len(best_candidate)):
-                best_candidate = candidate
+            keep_end = start + unit_length
+            keep_end = _trim_trailing_connector_end(lowered, keep_end)
+            if keep_end <= 0:
+                continue
+            if start < best_start or (start == best_start and best_keep_end is not None and keep_end < best_keep_end):
+                best_keep_end = keep_end
                 best_start = start
 
-    if best_candidate is None:
+    if best_keep_end is None:
         return (sentence + trailing_punctuation).strip()
-    best_candidate = _trim_trailing_connector(best_candidate)
-    collapsed = " ".join(best_candidate).strip()
+    collapsed = sentence[: token_matches[best_keep_end - 1].end()].strip()
     return f"{collapsed}{trailing_punctuation}".strip()
 
 
@@ -219,10 +222,10 @@ def _tail_matches_repeating_unit(tail: list[str], unit: list[str]) -> bool:
     return True
 
 
-def _trim_trailing_connector(tokens: list[str]) -> list[str]:
-    if len(tokens) <= 3:
-        return tokens
-    if tokens[-1].casefold() in {
+def _trim_trailing_connector_end(tokens: list[str], keep_end: int) -> int:
+    if keep_end <= 3:
+        return keep_end
+    if tokens[keep_end - 1].casefold() in {
         "in",
         "of",
         "the",
@@ -237,5 +240,5 @@ def _trim_trailing_connector(tokens: list[str]) -> list[str]:
         "from",
         "as",
     }:
-        return tokens[:-1]
-    return tokens
+        return keep_end - 1
+    return keep_end
