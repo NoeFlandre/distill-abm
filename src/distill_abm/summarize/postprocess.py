@@ -197,14 +197,15 @@ def _collapse_tail_loop(sentence: str) -> str:
             full_repeats, remainder = divmod(len(tail), unit_length)
             if full_repeats < 3:
                 continue
-            keep_length = remainder if remainder else unit_length
-            candidate = tokens[:start] + tokens[start : start + keep_length]
+            _ = remainder
+            candidate = tokens[:start] + tokens[start : start + unit_length]
             if start < best_start or (start == best_start and best_candidate is not None and len(candidate) < len(best_candidate)):
                 best_candidate = candidate
                 best_start = start
 
     if best_candidate is None:
         return (sentence + trailing_punctuation).strip()
+    best_candidate = _trim_trailing_connector(best_candidate)
     collapsed = " ".join(best_candidate).strip()
     return f"{collapsed}{trailing_punctuation}".strip()
 
@@ -216,3 +217,25 @@ def _tail_matches_repeating_unit(tail: list[str], unit: list[str]) -> bool:
         if token != unit[index % len(unit)]:
             return False
     return True
+
+
+def _trim_trailing_connector(tokens: list[str]) -> list[str]:
+    if len(tokens) <= 3:
+        return tokens
+    if tokens[-1].casefold() in {
+        "in",
+        "of",
+        "the",
+        "and",
+        "or",
+        "to",
+        "for",
+        "with",
+        "on",
+        "at",
+        "by",
+        "from",
+        "as",
+    }:
+        return tokens[:-1]
+    return tokens
