@@ -168,7 +168,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         context=context,
     )
     additional_scoring_references = _resolve_additional_scoring_references(inputs=inputs)
-    trend_full, trend_summary = _summarize_report_text(
+    trend_full, trend_summary, summarizer_outputs = _summarize_report_text(
         text=trend_raw,
         text_source_mode=inputs.text_source_mode,
         summarizers=inputs.summarizers,
@@ -187,6 +187,7 @@ def run_pipeline(inputs: PipelineInputs, prompts: PromptsConfig, adapter: LLMAda
         "trend_full_length": len(trend_full),
         "trend_summary_text": trend_summary,
         "trend_summary_length": len(trend_summary) if trend_summary is not None else None,
+        "summarizer_outputs": summarizer_outputs,
     }
 
     selected_scores = score_summary(reference=scoring_reference_text, candidate=report_trend)
@@ -312,9 +313,9 @@ def _summarize_report_text(
     text_source_mode: TextSourceMode,
     summarizers: tuple[SummarizerId, ...],
     allow_summary_fallback: bool,
-) -> tuple[str, str | None]:
+) -> tuple[str, str | None, list[dict[str, object]]]:
     """Resolve and generate trend text variants based on selected text-source mode."""
-    return helpers.summarize_report_text_pair_for_ids(
+    return helpers.summarize_report_text_pair_with_details_for_ids(
         text=text,
         skip_summarization=text_source_mode == "full_text_only",
         summarizer_ids=summarizers,

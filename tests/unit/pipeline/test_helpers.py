@@ -397,6 +397,48 @@ def test_summarize_report_text_pair_includes_additional_summarizers() -> None:
     assert summary == "bart:raw\nbert:raw\nt5:raw\nlongformer:raw"
 
 
+def test_summarize_report_text_pair_cleans_obvious_repetition_before_combining() -> None:
+    repeated = (
+        "Signal rises steadily. The rate of change in the rate of change in the rate of change in the rate of change."
+    )
+
+    _raw, summary = helpers.summarize_report_text_pair(
+        text="raw",
+        skip_summarization=False,
+        summarize_with_bart_fn=lambda _text: repeated,
+        summarize_with_bert_fn=lambda _text: "bert:raw",
+    )
+
+    assert summary == "Signal rises steadily. The rate of change.\nbert:raw"
+
+
+def test_collect_summary_details_preserves_raw_and_cleaned_versions() -> None:
+    repeated = "Trend repeats. Trend repeats."
+
+    details = helpers._collect_summary_details(
+        text="raw",
+        summarizer_specs=[
+            ("bart", lambda _text: repeated),
+            ("bert", lambda _text: "bert:raw"),
+        ],
+    )
+
+    assert details == [
+        {
+            "summarizer": "bart",
+            "raw_text": repeated,
+            "cleaned_text": "Trend repeats.",
+            "postprocess_changed": True,
+        },
+        {
+            "summarizer": "bert",
+            "raw_text": "bert:raw",
+            "cleaned_text": "bert:raw",
+            "postprocess_changed": False,
+        },
+    ]
+
+
 def test_summarize_report_text_pair_skips_failing_additional_summarizer() -> None:
     def fake_bart(text: str) -> str:
         return f"bart:{text}"

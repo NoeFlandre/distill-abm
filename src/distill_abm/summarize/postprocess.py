@@ -43,11 +43,39 @@ def remove_space_before_dot(text: str) -> str:
     return re.sub(r"\s+\.", ".", text)
 
 
+def remove_repeated_sentences(text: str) -> str:
+    """Collapse adjacent duplicate sentences while preserving non-adjacent repeats."""
+    sentences = _split_sentences(text)
+    if not sentences:
+        return text.strip()
+
+    deduped: list[str] = []
+    previous_normalized: str | None = None
+    for sentence in sentences:
+        normalized = _normalize_sentence_for_comparison(sentence)
+        if normalized and normalized == previous_normalized:
+            continue
+        deduped.append(sentence.strip())
+        previous_normalized = normalized
+    return " ".join(part for part in deduped if part).strip()
+
+
+def remove_repeated_phrases(text: str) -> str:
+    """Collapse obvious contiguous repeated tail loops inside sentences."""
+    sentences = _split_sentences(text)
+    if not sentences:
+        return text.strip()
+    cleaned = [_collapse_tail_loop(sentence) for sentence in sentences]
+    return " ".join(part for part in cleaned if part).strip()
+
+
 def capitalize_sentences(text: str) -> str:
     """Capitalizes sentence and paragraph starts after regex cleanups."""
     if not text:
         return text
-    updated = text[0].upper() + text[1:]
+    updated = text
+    if not _starts_with_label_prefix(text):
+        updated = text[0].upper() + text[1:]
     updated = re.sub(r"([.!?]\s+)([a-z])", _capitalize_match, updated)
     return re.sub(r"(\n\s*)([a-z])", _capitalize_match, updated)
 
@@ -74,6 +102,8 @@ def _remove_non_unicode(text: str) -> str:
 def postprocess_summary(text: str) -> str:
     """Apply cleanup stages in deterministic order."""
     cleaned = remove_sentences_with_www(text)
+    cleaned = remove_repeated_sentences(cleaned)
+    cleaned = remove_repeated_phrases(cleaned)
     cleaned = remove_hyphens_after_punctuation(cleaned)
     cleaned = remove_unnecessary_punctuation(cleaned)
     cleaned = remove_unnecessary_spaces_in_parentheses(cleaned)
@@ -123,3 +153,66 @@ def postprocess_csv_batch(
         clean_non_unicode(interim, output_csv)
 
     return pd.read_csv(output_csv)
+
+
+def _split_sentences(text: str) -> list[str]:
+    normalized = " ".join(text.split())
+    if not normalized:
+        return []
+    return [part.strip() for part in re.split(r"(?<=[.!?])\s+", normalized) if part.strip()]
+
+
+def _normalize_sentence_for_comparison(sentence: str) -> str:
+    return " ".join(sentence.split()).strip().casefold()
+
+
+def _starts_with_label_prefix(text: str) -> bool:
+    return re.match(r"^[A-Za-z0-9_-]+:{1,2}\S", text) is not None
+
+
+def _collapse_tail_loop(sentence: str) -> str:
+    trailing_punctuation = ""
+    if sentence and sentence[-1] in ".!?":
+        trailing_punctuation = sentence[-1]
+        sentence = sentence[:-1]
+
+    tokens = re.findall(r"[A-Za-z0-9']+", sentence)
+    if len(tokens) < 9:
+        return (sentence + trailing_punctuation).strip()
+
+    lowered = [token.casefold() for token in tokens]
+    best_candidate: list[str] | None = None
+    best_start = len(tokens) + 1
+
+    for start in range(len(tokens)):
+        tail = lowered[start:]
+        if len(tail) < 9:
+            continue
+        for unit_length in range(3, min(12, len(tail)) + 1):
+            unit = tail[:unit_length]
+            if not unit:
+                continue
+            if not _tail_matches_repeating_unit(tail, unit):
+                continue
+            full_repeats, remainder = divmod(len(tail), unit_length)
+            if full_repeats < 3:
+                continue
+            keep_length = remainder if remainder else unit_length
+            candidate = tokens[:start] + tokens[start : start + keep_length]
+            if start < best_start or (start == best_start and best_candidate is not None and len(candidate) < len(best_candidate)):
+                best_candidate = candidate
+                best_start = start
+
+    if best_candidate is None:
+        return (sentence + trailing_punctuation).strip()
+    collapsed = " ".join(best_candidate).strip()
+    return f"{collapsed}{trailing_punctuation}".strip()
+
+
+def _tail_matches_repeating_unit(tail: list[str], unit: list[str]) -> bool:
+    if len(tail) < len(unit) * 3:
+        return False
+    for index, token in enumerate(tail):
+        if token != unit[index % len(unit)]:
+            return False
+    return True

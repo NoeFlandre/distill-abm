@@ -51,10 +51,34 @@ def test_run_summarizer_smoke_writes_bundle_outputs(tmp_path: Path) -> None:
     assert combined_input == "Valid context output.\n\nTrend one output.\n\nTrend two output."
     assert (bundle_dir / "02_summaries" / "none.txt").read_text(encoding="utf-8") == combined_input
     assert (bundle_dir / "02_summaries" / "bart.txt").read_text(encoding="utf-8").startswith("bart::")
+    assert (bundle_dir / "03_metadata" / "raw_summaries" / "bart.txt").read_text(encoding="utf-8").startswith("bart::")
     rows = list(csv.DictReader(result.review_csv_path.open(encoding="utf-8")))
     assert len(rows) == 5
     assert {row["mode"] for row in rows} == {"none", "bart", "bert", "t5", "longformer_ext"}
     assert json.loads(result.validated_sources_path.read_text(encoding="utf-8"))[0]["bundle_id"] == "bundle_one"
+
+
+def test_run_summarizer_smoke_cleans_repetition_and_keeps_raw_text(tmp_path: Path) -> None:
+    repeated = "Trend repeats. Trend repeats."
+    result = run_summarizer_smoke(
+        source_root=tmp_path,
+        output_root=tmp_path / "smoke",
+        validated_bundles=(_bundle(tmp_path),),
+        summarizer_fns={
+            "bart": lambda _text: repeated,
+            "bert": lambda text: f"bert::{text}",
+            "t5": lambda text: f"t5::{text}",
+            "longformer_ext": lambda text: f"longformer::{text}",
+        },
+    )
+
+    bundle_dir = result.bundles[0].bundle_dir
+    assert (bundle_dir / "02_summaries" / "bart.txt").read_text(encoding="utf-8") == "Trend repeats."
+    assert (bundle_dir / "03_metadata" / "raw_summaries" / "bart.txt").read_text(encoding="utf-8") == repeated
+    mode_results = json.loads((bundle_dir / "03_metadata" / "mode_results.json").read_text(encoding="utf-8"))
+    bart_mode = next(mode for mode in mode_results["modes"] if mode["mode"] == "bart")
+    assert bart_mode["postprocess_changed"] is True
+    assert bart_mode["raw_output_path"].endswith("03_metadata/raw_summaries/bart.txt")
 
 
 def test_run_summarizer_smoke_rejects_generic_unavailable_text(tmp_path: Path) -> None:

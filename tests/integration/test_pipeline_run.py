@@ -181,6 +181,68 @@ def test_run_pipeline_summary_only_uses_all_requested_summarizers(
     assert metadata["summarizers"]["longformer_ext"]["enabled"] is True
 
 
+def test_run_pipeline_summary_only_scores_and_traces_cleaned_summary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    csv_path, parameters_path, documentation_path = _write_inputs(tmp_path)
+    repeated = "Signal rises steadily. Signal rises steadily."
+    scored_candidates: list[str] = []
+
+    monkeypatch.setattr(run_module.helpers, "summarize_with_bart", lambda _text: repeated)
+
+    def capture_score(reference: str, candidate: str) -> SummaryScores:
+        _ = reference
+        scored_candidates.append(candidate)
+        return SummaryScores(
+            token_f1=0.5,
+            precision=0.5,
+            recall=0.5,
+            bleu=0.5,
+            meteor=0.5,
+            rouge1=0.5,
+            rouge2=0.5,
+            rouge_l=0.5,
+            flesch_reading_ease=50.0,
+            reference_length=1,
+            candidate_length=len(candidate.split()),
+        )
+
+    monkeypatch.setattr(run_module, "score_summary", capture_score)
+
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=parameters_path,
+            documentation_path=documentation_path,
+            output_dir=tmp_path / "out",
+            model="fake-model",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            text_source_mode="summary_only",
+            evidence_mode="plot",
+            summarizers=("bart",),
+        ),
+        prompts=_prompts(),
+        adapter=FakeAdapter(),
+    )
+
+    assert result.trend_summary_response == "Signal rises steadily."
+    assert scored_candidates[0] == "Signal rises steadily."
+    assert scored_candidates[-1] == "Signal rises steadily."
+
+    metadata = json.loads(result.metadata_path.read_text(encoding="utf-8"))
+    summarization_trace = json.loads(Path(metadata["debug_trace"]["summarization_trace_path"]).read_text(encoding="utf-8"))
+    assert summarization_trace["trend_summary_text"] == "Signal rises steadily."
+    assert summarization_trace["summarizer_outputs"] == [
+        {
+            "summarizer": "bart",
+            "raw_text": repeated,
+            "cleaned_text": "Signal rises steadily.",
+            "postprocess_changed": True,
+        }
+    ]
+
+
 def test_run_pipeline_full_text_only_bypasses_summarizers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     csv_path, parameters_path, documentation_path = _write_inputs(tmp_path)
 
