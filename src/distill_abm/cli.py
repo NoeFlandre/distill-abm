@@ -86,6 +86,8 @@ from distill_abm.viz.viz_smoke import run_viz_smoke_suite
 
 app = typer.Typer(help="Run ABM distillation workflows.")
 
+ARCHIVE_RESULTS_ROOT = Path("results/archive")
+
 # Backward-compatible helper aliases kept for tests and local call sites.
 _resolve_scoring_reference_path = resolve_scoring_reference_path
 _resolve_additional_scoring_reference_paths = resolve_additional_scoring_reference_paths
@@ -475,11 +477,11 @@ def smoke_doe(
     ingest_root: Annotated[
         Path,
         typer.Option(help="Root directory containing ingest smoke outputs."),
-    ] = Path("results/ingest_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "ingest_smoke_latest",
     viz_root: Annotated[
         Path,
         typer.Option(help="Root directory containing visualization smoke outputs."),
-    ] = Path("results/viz_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "viz_smoke_latest",
     prompts_path: Annotated[
         Path,
         typer.Option(exists=True),
@@ -501,7 +503,7 @@ def smoke_doe(
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for DOE smoke reports, shared artifacts, and compact case indexes."),
-    ] = Path("results/doe_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "doe_smoke_latest",
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Inspect the full pre-LLM DOE design and materialize shared artifacts plus compact case indexes."""
@@ -540,11 +542,11 @@ def smoke_local_qwen(
     ingest_root: Annotated[
         Path,
         typer.Option(help="Root directory containing ingest smoke outputs."),
-    ] = Path("results/ingest_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "ingest_smoke_latest",
     viz_root: Annotated[
         Path,
         typer.Option(help="Root directory containing visualization smoke outputs."),
-    ] = Path("results/viz_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "viz_smoke_latest",
     models_path: Annotated[
         Path,
         typer.Option(exists=True, help="Model registry YAML path."),
@@ -556,7 +558,7 @@ def smoke_local_qwen(
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for the sampled local-Qwen smoke artifacts."),
-    ] = Path("results/local_qwen_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "local_qwen_smoke_latest",
     max_tokens: Annotated[
         int,
         typer.Option(help="Override max output tokens for the sampled LLM smoke."),
@@ -613,7 +615,7 @@ def smoke_summarizers(
     source_root: Annotated[
         Path,
         typer.Option(help="Root directory containing the vetted full-case LLM smoke outputs."),
-    ] = Path("results/full_case_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "full_case_smoke_latest",
     abm: Annotated[
         list[str] | None,
         typer.Option(
@@ -624,7 +626,7 @@ def smoke_summarizers(
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for summarizer smoke artifacts."),
-    ] = Path("results/summarizer_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "summarizer_smoke_latest",
     resume: Annotated[
         bool,
         typer.Option(
@@ -663,11 +665,11 @@ def smoke_quantitative(
     source_root: Annotated[
         Path,
         typer.Option(help="Root directory containing a completed summarizer smoke run."),
-    ] = Path("results/summarizer_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "summarizer_smoke_latest",
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for quantitative smoke artifacts."),
-    ] = Path("results/quantitative_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "quantitative_smoke_latest",
     resume: Annotated[
         bool,
         typer.Option(
@@ -705,7 +707,7 @@ def smoke_quantitative_multi_llm(
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for multi-LLM quantitative smoke artifacts."),
-    ] = Path("results/quantitative_smoke_multi_llm_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "quantitative_smoke_multi_llm_latest",
     resume: Annotated[
         bool,
         typer.Option("--resume/--no-resume", help="Reuse valid quantitative rows from the latest run."),
@@ -732,11 +734,11 @@ def smoke_full_case(
     ingest_root: Annotated[
         Path,
         typer.Option(help="Root directory containing ingest smoke outputs."),
-    ] = Path("results/ingest_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "ingest_smoke_latest",
     viz_root: Annotated[
         Path,
         typer.Option(help="Root directory containing visualization smoke outputs."),
-    ] = Path("results/viz_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "viz_smoke_latest",
     models_path: Annotated[
         Path,
         typer.Option(exists=True, help="Model registry YAML path."),
@@ -748,7 +750,7 @@ def smoke_full_case(
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for full-case smoke artifacts."),
-    ] = Path("results/full_case_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "full_case_smoke_latest",
     evidence_mode: Annotated[EvidenceMode, typer.Option()] = "table",
     prompt_variant: Annotated[
         str,
@@ -801,11 +803,11 @@ def smoke_full_case_matrix(
     ingest_root: Annotated[
         Path,
         typer.Option(help="Root directory containing ingest smoke outputs."),
-    ] = Path("results/ingest_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "ingest_smoke_latest",
     viz_root: Annotated[
         Path,
         typer.Option(help="Root directory containing visualization smoke outputs."),
-    ] = Path("results/viz_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "viz_smoke_latest",
     models_path: Annotated[
         Path,
         typer.Option(exists=True, help="Model registry YAML path."),
@@ -817,7 +819,7 @@ def smoke_full_case_matrix(
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for full-case matrix smoke artifacts."),
-    ] = Path("results/nemotron_abm_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "nemotron_abm_smoke_latest",
     evidence_mode: Annotated[
         list[str] | None,
         typer.Option(
@@ -890,11 +892,11 @@ def smoke_full_case_suite(
     ingest_root: Annotated[
         Path,
         typer.Option(help="Root directory containing ingest smoke outputs."),
-    ] = Path("results/ingest_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "ingest_smoke_latest",
     viz_root: Annotated[
         Path,
         typer.Option(help="Root directory containing visualization smoke outputs."),
-    ] = Path("results/viz_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "viz_smoke_latest",
     models_path: Annotated[
         Path,
         typer.Option(exists=True, help="Model registry YAML path."),
@@ -906,7 +908,7 @@ def smoke_full_case_suite(
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for full-case suite smoke artifacts."),
-    ] = Path("results/full_case_suite_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "full_case_suite_smoke_latest",
     evidence_mode: Annotated[
         list[str] | None,
         typer.Option(
@@ -980,7 +982,7 @@ def monitor_local_qwen(
     output_root: Annotated[
         Path,
         typer.Option(help="Directory containing local-Qwen smoke artifacts."),
-    ] = Path("results/local_qwen_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "local_qwen_smoke_latest",
     watch: Annotated[
         bool,
         typer.Option(help="Continuously refresh the dashboard until the run reaches a terminal state."),
@@ -1016,7 +1018,7 @@ def monitor_run(
     output_root: Annotated[
         Path,
         typer.Option(help="Directory containing a case-based smoke run or a latest_run.txt pointer."),
-    ] = Path("results/nemotron_abm_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "nemotron_abm_smoke_latest",
     watch: Annotated[
         bool,
         typer.Option(help="Continuously refresh the dashboard until the run reaches a terminal state."),
@@ -1065,7 +1067,7 @@ def smoke_ingest_netlogo(
     output_root: Annotated[
         Path,
         typer.Option(help="Root directory for ingestion smoke artifacts."),
-    ] = Path("results/ingest_smoke"),
+    ] = ARCHIVE_RESULTS_ROOT / "ingest_smoke",
     stage: Annotated[
         list[str] | None,
         typer.Option("--stage", help="Optional ingest stage filter. Repeat to focus the smoke report."),
@@ -1121,7 +1123,7 @@ def smoke_viz(
     output_root: Annotated[
         Path,
         typer.Option(help="Root directory for visualization smoke artifacts."),
-    ] = Path("results/viz_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "viz_smoke_latest",
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
     """Run NetLogo simulations and generate the ordered plot PNGs used before LLM inference."""
@@ -1171,7 +1173,7 @@ def validate_workspace(
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for structured validation reports and nested artifacts."),
-    ] = Path("results/agent_validation/latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "agent_validation/latest",
     json_output: Annotated[
         bool,
         typer.Option("--json", help="Print the full validation report JSON to stdout."),
@@ -1227,7 +1229,7 @@ def quality_gate(
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for structured validation reports and nested artifacts."),
-    ] = Path("results/agent_validation/latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "agent_validation/latest",
     json_output: Annotated[
         bool,
         typer.Option("--json", help="Print the full validation report JSON to stdout."),
@@ -1298,11 +1300,11 @@ def health_check(
     ingest_root: Annotated[
         Path,
         typer.Option(help="Expected ingest smoke output root."),
-    ] = Path("results/ingest_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "ingest_smoke_latest",
     viz_root: Annotated[
         Path,
         typer.Option(help="Expected visualization smoke output root."),
-    ] = Path("results/viz_smoke_latest"),
+    ] = ARCHIVE_RESULTS_ROOT / "viz_smoke_latest",
     models_path: Annotated[
         Path,
         typer.Option(exists=True, help="Model registry YAML path."),

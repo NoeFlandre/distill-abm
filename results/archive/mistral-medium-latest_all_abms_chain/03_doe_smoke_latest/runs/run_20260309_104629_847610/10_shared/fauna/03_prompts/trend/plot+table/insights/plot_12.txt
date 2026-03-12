@@ -1,0 +1,26 @@
+We have a plot and a data table from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot and the data table, mentioning key time steps and values taken by the metric in the plot and the data table, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot and the data table or any visual in your description. If the plot and data table have very simple dynamics, simply state them without expanding.
+
+The context and goals of the model are as follows. <<context_response_from_context_llm>>
+
+When summarizing trends, provide brief insights about their implications for decision makers.
+
+This plot and data table represent the combined total energy available in the population of female prey animals.
+
+Statistical summary of the relevant simulation output:
+Statistical evidence for simulation series matching `sum [energy] of animals with [species = 2]`.
+Compression tier: 0.
+Matched series count: 40. Detailed signal analysis below is computed on the tick-wise mean of the matched series.
+
+Series: aggregate_mean_of_40_matched_series
+- samples: 2312
+- valid numeric samples: 2312
+- dropped non-numeric samples: 0
+- start/end values: 12500.0000 -> 0.0000
+- mean/median/std/variance: 1569.0258, 100.0000, 3083.0215, 9505021.7186
+- min/max: 0.0000 at index 2311; 12500.0000 at index 0
+- peaks: index 376 value 2232.6625 prominence 0.0000; index 381 value 2204.0875 prominence 0.0000; index 385 value 2178.5250 prominence 0.0000; index 392 value 2147.9500 prominence 0.0000; index 395 value 2134.8375 prominence 0.0000; index 402 value 2114.1375 prominence 0.0000; index 410 value 2097.9125 prominence 0.0000; index 405 value 2097.2750 prominence 0.0000
+- valleys: index 375 value 2231.6000 prominence 0.0000; index 380 value 2201.5875 prominence 0.0000; index 384 value 2177.7625 prominence 0.0000; index 391 value 2146.4250 prominence 0.0000; index 394 value 2130.4750 prominence 0.0000; index 399 value 2106.3875 prominence 0.0000; index 404 value 2096.2625 prominence 0.0000; index 409 value 2094.1500 prominence 0.0000
+- inflection indices: 299, 472, 506, 744, 836, 1308, 1407, 1470, 1594, 1679, 1763, 1886, 1933, 2040, 2156, 2194
+- rolling Mann-Kendall: 0-231: decreasing (tau=-1.000, slope=-22.616, p=0.000, significant=True); 232-463: decreasing (tau=-0.997, slope=-26.687, p=0.000, significant=True); 464-695: decreasing (tau=-0.999, slope=-5.738, p=0.000, significant=True); 696-927: decreasing (tau=-0.848, slope=-1.887, p=0.000, significant=True); 928-1159: decreasing (tau=-0.889, slope=-0.561, p=0.000, significant=True); 1160-1391: increasing (tau=0.113, slope=0.019, p=0.011, significant=True); 1392-1623: decreasing (tau=-0.288, slope=-0.024, p=0.000, significant=True); 1624-1855: decreasing (tau=-0.552, slope=-0.167, p=0.000, significant=True); 1856-2087: increasing (tau=0.453, slope=0.000, p=0.000, significant=True)
+- change points: 375, 500, 625, 875, 2310
+- oscillation summary: dominant period 63.00, strong oscillation indices: 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145

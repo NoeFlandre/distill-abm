@@ -1,0 +1,8 @@
+{
+  "abm": "grazing",
+  "case_id": "48_grazing_all_three_plot_plus_table_rep2",
+  "evidence_mode": "plot+table",
+  "model": "nvidia/nemotron-nano-12b-v2-vl:free",
+  "prompt_variant": "all_three",
+  "repetition": 2
+}

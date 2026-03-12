@@ -1,0 +1,17 @@
+Feature,BLEU,METEOR,R-1,R-2,R-L,Reading ease
+Example,0.00,0.00,0.00,0.00,0.00,0.00
+Example_AND_Insight,0.00,0.00,0.00,0.00,0.00,0.00
+Evidence,1.19,0.06,0.19,7.69,0.57,3.46
+Evidence_AND_Example,0.00,0.00,0.00,0.00,0.00,0.00
+Evidence_AND_Insight,0.00,0.00,0.00,0.00,0.00,0.00
+Evidence_AND_Role,0.00,0.00,0.00,0.00,0.00,0.00
+Insight,0.00,0.00,0.00,0.00,0.00,0.00
+Role,0.00,0.00,0.00,0.00,0.00,0.00
+Role_AND_Example,0.00,0.00,0.00,0.00,0.00,0.00
+Role_AND_Insight,0.00,0.00,0.00,0.00,0.00,0.00
+Summarizer,47.58,49.52,49.64,40.77,49.15,43.91
+Summarizer_AND_Example,0.00,0.00,0.00,0.00,0.00,0.00
+Summarizer_AND_Evidence,51.22,50.42,50.17,51.54,50.28,52.63
+Summarizer_AND_Insight,0.00,0.00,0.00,0.00,0.00,0.00
+Summarizer_AND_Role,0.00,0.00,0.00,0.00,0.00,0.00
+Evidence_AND_Summarizer,0.00,0.00,0.00,0.00,0.00,0.00

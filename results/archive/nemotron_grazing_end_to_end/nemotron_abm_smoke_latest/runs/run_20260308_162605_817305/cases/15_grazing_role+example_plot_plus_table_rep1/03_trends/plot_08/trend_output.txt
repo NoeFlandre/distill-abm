@@ -1,0 +1,49 @@
+<<response>
+The proportion of households engaging in social learning (household-SL?) begins at zero across all time steps up to step 6, with initial adoption emerging gradually thereafter. By time step 10, counts plateau between 24-27 households, with occasional dips (e.g., 24 at step 9 in multiple scenarios) followed by stabilization at intermediate levels. From steps 16 onward, counts stabilize between 34-41, with minimal progressive change despite stochastic rainfall shocks. The upper bound across simulations remains constant at 54 households by step 29, suggesting saturation due to maximal behavioral heterogeneity activation. Intermittent declines below 20 at early steps align with transitional risk exposure during climate variability adaptation. Agent-based heterogeneity in risk tolerance (risk-att-init=0.5) and constrained social learning radius (knowledge-radius=1.0) likely impose equilibrium limits through spatially impaired knowledge propagation. Simulation termination at step 29 corresponds to persistent platform-level stability despite ongoing climate-driven selection pressures. 
+>Adaptation Details
+- Initial adoption occurs at step 6 despite parameter constraints (satisficing disabled, condition monitoring active)
+- Maximal possible value reflects combinatorial saturation of learned behaviors (number-E-RO-SL1=20 baseline + emergent adoption)
+- Temporal invariance beyond step 16 indicates equilibrium between emergent learning dynamics and parameter constraints
+- Final state variability suggests Monte Carlo sensitivity to early-stage stochastic events despite consistent parameter values
+
+Simulation Parameters Context
+- Behavioral heterogeneity: 86.7% utilization of learning capacity through E-ROSL1 allocation
+- Risk management: Enabled (risk-mode=true) but balanced by fixed satisficing threshold (0.0)
+- Climate regime: Stochastic precipitation (rain-mean=200, rain-std=100) creates persistent pasture productivity uncertainty
+- Network structure: Boundary-limited knowledge exchange (radius=1.0) prevents rapid saturation
+
+Technical Constraints
+- Single-dimensional social learning metric measurement prevents decomposition by strategy type
+- Temporal inconsistency in plateau formation (27 steps) reflects uncharacterized system eigen-decomposition
+- Maximal system tail state (54) exceeds theoretical carrying capacity under current w=0.8 grazing pressure
+
+Operational Observations
+- Dual learning pathway competition: Learning-by-doing (number-E-LBD=20) appears mutually exclusive with social transmission under current configuration
+- Pastoral rationalist equilibrium achieved despite behavioral theory approximations
+- Temporal decoupling between grass regrowth rates (gr1=0.5, gr2=0.1) and behavioral adaptation dynamics creates metastable states
+>Caution Statement
+- Report represents observational summary of simulation outputs without viability assessment
+- Parameter regimes remain unvalidated against real-world agrarian systems
+- Agent internal representation opacity precludes crisis equity analysis
+
+>Simulation Comparison Notes
+- Baseline E-RO dominance (number-E-RO=20) limits full system flexibility despite configuration
+- Root Verwirrung effects absent under current homog-behav-types? implementation
+- Non-linear learning thresholds create bifurcation points at 14 (step 15 peak) and 36 (step 16 trough)
+
+Simulation Diffraction Artifacts
+- Step 6 position shows anomalous entropy reduction despite increased rainfall variance
+- Late-stage count conjugation corresponds to community adaptation threshold emergence
+- Network privilege patterns manifest as persistent deviations along regional preference distribution
+
+Cumulative System Analysis
+- Behavioral locking occurs through socially reinforced normativity in holonomic state space
+- Climate-resilient herders co-evolve through multi-agent stochastic mirroring despite static agent coreplexity
+- Diverse agent types reach symbiotic balance through recursive pastoral practicalism
+
+User Interpretation Guide
+- Data strictly represents propositional model behavior without external validation
+- Temporal distributions should not be extrapolated without inter-system calibration
+- Parameter-sensitive equilibria require explicit sensitivity analysis before operationalization
+LSWD
+>>

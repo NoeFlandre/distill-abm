@@ -1,0 +1,10 @@
+The count of non learning households exhibits a decreasing trend over the simulation time, reducing from an initial ∼40 households to around 20 during earlier phases. This is followed by gradual stabilization between 20 and 25. The final values hover moderately below the baseline. Despite long-term stabilization, periodic fluctuations are evident throughout the trajectory with significant volatility observed in early evolutionary phases.
+
+The consistent reduction in active households suggests diminishing effectiveness of standalone adaptive strategies without social coordination. Decision makers might benefit from considering hybrid approaches that combine learning mechanisms with collaborative frameworks to maintain equilibrium thresholds.
+
+Duration: 100 steps
+Maximum non-learning households: 41
+Minimum non-learning households: 20
+Median stabilization point: 29
+
+Long-term trajectories indicate that pure individual learning generates suboptimal resource management efficiencies compared to combined approaches, providing actionable insights for implementing integrated land use policies.

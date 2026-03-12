@@ -1,0 +1,22 @@
+{
+  "bundle_id": "03_grazing_none_plot_plus_table_rep1",
+  "case_id": "03_grazing_none_plot_plus_table_rep1",
+  "abm": "grazing",
+  "context_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_104548_176988/cases/03_grazing_none_plot_plus_table_rep1/02_context/context_output.txt",
+  "trend_output_paths": [
+    "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_104548_176988/cases/03_grazing_none_plot_plus_table_rep1/03_trends/plot_01/trend_output.txt",
+    "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_104548_176988/cases/03_grazing_none_plot_plus_table_rep1/03_trends/plot_02/trend_output.txt",
+    "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_104548_176988/cases/03_grazing_none_plot_plus_table_rep1/03_trends/plot_03/trend_output.txt",
+    "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_104548_176988/cases/03_grazing_none_plot_plus_table_rep1/03_trends/plot_04/trend_output.txt",
+    "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_104548_176988/cases/03_grazing_none_plot_plus_table_rep1/03_trends/plot_05/trend_output.txt",
+    "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_104548_176988/cases/03_grazing_none_plot_plus_table_rep1/03_trends/plot_06/trend_output.txt",
+    "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_104548_176988/cases/03_grazing_none_plot_plus_table_rep1/03_trends/plot_07/trend_output.txt",
+    "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_104548_176988/cases/03_grazing_none_plot_plus_table_rep1/03_trends/plot_08/trend_output.txt",
+    "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_104548_176988/cases/03_grazing_none_plot_plus_table_rep1/03_trends/plot_09/trend_output.txt",
+    "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_104548_176988/cases/03_grazing_none_plot_plus_table_rep1/03_trends/plot_10/trend_output.txt"
+  ],
+  "validation_note": "Bundle discovered from an accepted case in a live full-case suite run. Used to summarize outputs as soon as a case finishes.",
+  "context_length": 3845,
+  "trend_count": 10,
+  "combined_input_length": 12502
+}

@@ -1,0 +1,11 @@
+The cumulative number of births among the prey animal population in the Megaherbivore Hunting Pressure Model (MHPM) shows distinct trends over the simulation period. Initially, the number of births starts at 0 and gradually increases. The mean number of births across the simulation is approximately 2.18, with a median of 2.49, indicating a slightly right-skewed distribution. The standard deviation of 1.83 suggests moderate variability in the number of births over time. 
+
+The simulation exhibits several key phases. From the start up to around tick 1850, there is a general increasing trend in the number of births. This period can be further divided into sub-phases where the rate of increase varies. For instance, between ticks 696 and 927, the number of births increases with a Kendall tau of 0.833, indicating a strong upward trend. This trend continues with varying strengths until around tick 1391. Between ticks 1392 and 1623, the increase becomes more pronounced with a Kendall tau of 0.784. 
+
+After reaching a peak, the trend reverses, and the number of births starts to decrease. From tick 1624 to 1855, there is a significant decreasing trend with a Kendall tau of -0.495. This downward trend continues, albeit with a slightly reduced strength, from tick 1856 to 2087. 
+
+The simulation also exhibits oscillatory behavior with a dominant period of 50 ticks, indicating regular fluctuations in the number of births. These oscillations are particularly strong around ticks 625 to 810. 
+
+Key change points are identified at ticks 725, 1325, 1850, 2050, and 2310, marking significant shifts in the trend of the number of births. The maximum number of births, 5.6, occurs around tick 1673, after which the decreasing trend begins. 
+
+For decision-makers, these trends suggest that the prey population experiences initial growth followed by a decline, possibly due to increasing hunting pressure or environmental factors. The oscillatory behavior indicates periodic fluctuations in birth rates, which could be influenced by seasonal variations or other cyclic factors in the model. Understanding these trends can help in designing interventions to manage prey populations and ensure their sustainability.

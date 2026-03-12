@@ -1,0 +1,5 @@
+The mean percentage difference between the maximum and minimum choice function scores among agents begins at 0.00 and increases to 0.75 by the end of the simulation. This linear growth indicates that consumer decision-making criteria become increasingly diverse over time. The mean value across the period is 0.63, with a standard deviation of 0.15.
+
+Inflection points are observed at time steps 7, 12, and 28, marking adjustments in the rate of divergence. A change point occurs at the final step, corresponding to the maximum recorded value. Despite minor oscillations throughout the later period, the trend remains consistently upward.
+
+In the context of milk consumption, this suggests that initial uniformity in consumer perception evolves into distinct preferences driven by social influence and habit. Decision makers should recognize that market homogeneity decreases as the simulation progresses, requiring strategies that cater to a segmented audience rather than a single demographic profile.

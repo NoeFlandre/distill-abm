@@ -1,0 +1,65 @@
+{
+  "bundle_id": "07_milk_consumption_insights_plot_rep1",
+  "case_id": "07_milk_consumption_insights_plot_rep1",
+  "abm": "milk_consumption",
+  "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/07_milk_consumption_insights_plot_rep1",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/07_milk_consumption_insights_plot_rep1/02_summaries/none.txt",
+      "raw_output_path": null,
+      "postprocess_changed": false,
+      "error": null,
+      "duration_seconds": 2.9199873097240925e-7,
+      "input_length": 14996,
+      "output_length": 14996
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/07_milk_consumption_insights_plot_rep1/02_summaries/bart.txt",
+      "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/07_milk_consumption_insights_plot_rep1/03_metadata/raw_summaries/bart.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 23.04051154100307,
+      "input_length": 14996,
+      "output_length": 1029
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/07_milk_consumption_insights_plot_rep1/02_summaries/bert.txt",
+      "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/07_milk_consumption_insights_plot_rep1/03_metadata/raw_summaries/bert.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 5.450988290998794,
+      "input_length": 14996,
+      "output_length": 4416
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/07_milk_consumption_insights_plot_rep1/02_summaries/t5.txt",
+      "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/07_milk_consumption_insights_plot_rep1/03_metadata/raw_summaries/t5.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 9.483994916001393,
+      "input_length": 14996,
+      "output_length": 1106
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/07_milk_consumption_insights_plot_rep1/02_summaries/longformer_ext.txt",
+      "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/07_milk_consumption_insights_plot_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+      "postprocess_changed": false,
+      "error": null,
+      "duration_seconds": 22.33524899999611,
+      "input_length": 14996,
+      "output_length": 2561
+    }
+  ]
+}

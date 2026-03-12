@@ -1,0 +1,95 @@
+We have a plot and a data table from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot and the data table, mentioning key time steps and values taken by the metric in the plot and the data table, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot and the data table or any visual in your description. If the plot and data table have very simple dynamics, simply state them without expanding.
+
+The context and goals of the model are as follows. <<context_response_from_context_llm>>
+
+When summarizing trends, provide brief insights about their implications for decision makers.
+
+This plot and data table represent the cumulative number of male prey animals hunted and killed by forager bands.
+
+Statistical summary of the relevant simulation output:
+Statistical evidence for simulation series matching `males-killed`.
+Compression tier: 0.
+Matched series count: 80. Detailed signal analysis below is computed on the tick-wise mean of the matched series.
+
+Series: aggregate_mean_of_80_matched_series
+- samples: 2312
+- valid numeric samples: 2312
+- dropped non-numeric samples: 0
+- start value: 0.0000
+- end value: 117.5000
+- mean: 100.3948
+- median: 116.5000
+- std: 32.5163
+- variance: 1057.3078
+- minimum value: 0.0000
+- minimum index: 0
+- maximum value: 120.1667
+- maximum index: 1876
+- peaks:
+  - peak 1: index 1876 value 120.1667 prominence 0.0000
+  - peak 2: index 2040 value 119.7500 prominence 0.0000
+  - peak 3: index 1672 value 119.4167 prominence 0.0000
+  - peak 4: index 1732 value 119.4000 prominence 0.0000
+  - peak 5: index 1208 value 118.5714 prominence 0.0000
+  - peak 6: index 1395 value 118.5000 prominence 0.0000
+  - peak 7: index 1516 value 118.5000 prominence 0.0000
+  - peak 8: index 1166 value 118.4783 prominence 0.0000
+- valleys:
+  - valley 1: index 1958 value 119.5000 prominence 0.0000
+  - valley 2: index 1696 value 119.2000 prominence 0.0000
+  - valley 3: index 1167 value 118.4545 prominence 0.0000
+  - valley 4: index 1212 value 118.3750 prominence 0.0000
+  - valley 5: index 1171 value 118.3571 prominence 0.0000
+  - valley 6: index 1757 value 118.2500 prominence 0.0000
+  - valley 7: index 1546 value 118.2143 prominence 0.0000
+  - valley 8: index 1224 value 118.1842 prominence 0.0000
+- inflection index 1: 362
+- inflection index 2: 1241
+- inflection index 3: 1330
+- inflection index 4: 1397
+- inflection index 5: 1402
+- inflection index 6: 1419
+- inflection index 7: 1455
+- inflection index 8: 1474
+- inflection index 9: 1595
+- inflection index 10: 1713
+- inflection index 11: 1828
+- inflection index 12: 2040
+- rolling Mann-Kendall status: ok
+- rolling Mann-Kendall window 1: start=0 end=231 trend=increasing tau=1.000 slope=0.173 p=0.000 significant=True
+- rolling Mann-Kendall window 2: start=232 end=463 trend=increasing tau=1.000 slope=0.219 p=0.000 significant=True
+- rolling Mann-Kendall window 3: start=464 end=695 trend=increasing tau=1.000 slope=0.085 p=0.000 significant=True
+- rolling Mann-Kendall window 4: start=696 end=927 trend=increasing tau=0.997 slope=0.030 p=0.000 significant=True
+- rolling Mann-Kendall window 5: start=928 end=1159 trend=increasing tau=0.954 slope=0.008 p=0.000 significant=True
+- rolling Mann-Kendall window 6: start=1160 end=1391 trend=no trend tau=-0.076 slope=-0.000 p=0.084 significant=False
+- rolling Mann-Kendall window 7: start=1392 end=1623 trend=increasing tau=0.453 slope=0.002 p=0.000 significant=True
+- rolling Mann-Kendall window 8: start=1624 end=1855 trend=no trend tau=-0.066 slope=0.000 p=0.127 significant=False
+- rolling Mann-Kendall window 9: start=1856 end=2087 trend=decreasing tau=-0.446 slope=0.000 p=0.000 significant=True
+- change point 1: 125
+- change point 2: 250
+- change point 3: 375
+- change point 4: 500
+- change point 5: 625
+- change point 6: 850
+- change point 7: 2310
+- oscillation dominant period: 63.00
+- oscillation index 1: 2170
+- oscillation index 2: 2175
+- oscillation index 3: 2180
+- oscillation index 4: 2185
+- oscillation index 5: 2190
+- oscillation index 6: 2195
+- oscillation index 7: 2200
+- oscillation index 8: 2205
+- oscillation index 9: 2210
+- oscillation index 10: 2215
+- oscillation index 11: 2220
+- oscillation index 12: 2225
+- oscillation index 13: 2230
+- oscillation index 14: 2235
+- oscillation index 15: 2240
+- oscillation index 16: 2245
+- oscillation index 17: 2250
+- oscillation index 18: 2255
+- oscillation index 19: 2260
+- oscillation index 20: 2265

@@ -1,0 +1,1 @@
+The number of human hunter-gatherer bands remains constant throughout the simulation. It starts at 20 and does not change over the entire duration of 73000 ticks. This indicates that the number of foragers is stable and does not fluctuate, suggesting a steady state in the population of human hunters within the model's parameters and conditions.

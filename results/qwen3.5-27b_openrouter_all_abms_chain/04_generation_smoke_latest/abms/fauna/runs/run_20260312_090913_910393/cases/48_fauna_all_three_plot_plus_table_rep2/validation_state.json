@@ -1,0 +1,7 @@
+{
+  "context": {
+    "error": "model did not return valid structured JSON for the smoke output",
+    "status": "retry"
+  },
+  "trends": {}
+}

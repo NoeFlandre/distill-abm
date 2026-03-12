@@ -1,1 +1,0 @@
-The number of human hunter-gatherer bands in the simulation remains constant at 20 throughout the duration of the simulation. This stability indicates that the forager population is maintained at a steady level, consistent with the configuration parameter 'imortal-foragers' set to True, which prevents foragers from dying over time.

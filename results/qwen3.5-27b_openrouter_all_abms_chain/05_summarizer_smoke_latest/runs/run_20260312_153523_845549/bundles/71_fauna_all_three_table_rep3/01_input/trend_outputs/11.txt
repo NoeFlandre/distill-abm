@@ -1,0 +1,9 @@
+The total energy available in the male prey population initiates at 12,500 units at time step zero. A sharp decline occurs immediately, with values dropping to approximately 11,608 units by time step 65. This initial reduction likely reflects the immediate impact of human foraging pressure and the energy expenditure required for movement and survival in the dynamic environment.
+
+Between time steps 377 and 408, the energy levels stabilize within a range of approximately 3,847 to 4,002 units. This plateau indicates a temporary equilibrium where birth rates or food acquisition might have briefly offset mortality and consumption costs. However, statistical trend analysis confirms a significant decreasing trajectory across the majority of the simulation timeline.
+
+Notable oscillations with a dominant period of 63 ticks are observed throughout the series, corresponding to environmental seasonality and resource regeneration cycles. Despite these cyclical fluctuations, the population energy continues to degrade. Multiple change points are identified at time steps 125, 350, 500, 625, and 875, marking shifts in the rate of energy loss.
+
+The simulation concludes with the total male energy reaching zero at time step 2284. This final value signifies the complete extinction of the male prey population. The progressive depletion from 12,500 to 0 over 2,312 steps demonstrates that the combined stressors of hunting and environmental constraints were unsustainable for the long-term survival of this demographic.
+
+For decision makers, this trend highlights a critical window between time steps 350 and 500 where the population showed temporary stability. Intervention strategies focused on reducing hunting pressure or enhancing resource availability during this specific phase might have prolonged population viability. The eventual collapse underscores the necessity of maintaining predator-prey ratios below a critical threshold to prevent total biomass loss.

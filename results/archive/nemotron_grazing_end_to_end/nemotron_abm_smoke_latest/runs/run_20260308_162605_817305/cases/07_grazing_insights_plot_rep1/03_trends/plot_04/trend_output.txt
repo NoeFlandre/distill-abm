@@ -1,0 +1,22 @@
+The plot demonstrates the evolution of mean green biomass across multiple behavioral treatment scenarios in an extension of the RAGE agent-based model. Key features include:
+
+1. **Initial Phase (Steps 1-20):** All lines begin at approximately the same green biomass level around 45,000, showing homogeneous initial conditions where management decisions have not yet impacted resource levels.
+
+2. **Stress Period (Steps 20-40):** A rapid decline occurs across all treatments, reaching approximately 42,000 to 43,000. This reflects exogenous climatic variability (rainfall with mean 200, std 100) pushing pasture systems below households' capacity, triggering various behavioral responses.
+
+3. **Behavioral Divergence (Steps 40-60):** After step 40, lines begin to separate based on treatments:
+   - Early adopters (like mean-green-biomass_11) show quick recovery through stocking reduction
+   - Conservative strategies (mean-green-biomass_7, mean-green-biomass_8) demonstrate slower but steadier recovery
+   - High-resting threshold strategies (mean-green-biomass_23) show accelerated recovery
+
+4. **Stabilization Phase (Steps 60-100):** By step 60, lines converge into three distinct trajectories:
+   - Optimized grazing (mean-green-biomass_1.1, mean-green-biomass_14) plateau at ~63,000-64,000, suggesting idealized equilibrium
+   - Regular grazing patterns (mean-green-biomass_4, mean-green-biomass_12) reach ~61,000-62,000
+   - Resting treatments (mean-green-biomass_24 to mean-green-biomass_28) achieve highest sustained levels at ~63,500-64,500, demonstrating resting's effectiveness under climatic stresses.
+
+5. **Long-term Dynamics:** Over the 100-year simulation period:
+   - All treatments show increased biomass resilience compared to initial conditions
+   - Social learning components (though inactive in homogeneous setup) would likely exacerbate these divergences in heterogeneous populations
+   - Climatic stability becomes apparent by step 70, with all lines showing gentle slopes toward equilibrium
+
+This suggests decoupling grazing intensity from rainfall extremes (mean 200, std 100) and implementing moderate resting regimes yields best long-term outcomes. The data demonstrates that even small changes in management thresholds (e.g., resting threshold adjustments) can lead to substantially different equilibrium biomass levels, implying careful parameter tuning enables targeted preservation outcomes while maintaining grazing productivity.

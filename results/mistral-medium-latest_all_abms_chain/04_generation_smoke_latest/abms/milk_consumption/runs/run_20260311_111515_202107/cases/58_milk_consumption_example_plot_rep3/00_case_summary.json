@@ -1,0 +1,8 @@
+{
+  "abm": "milk_consumption",
+  "case_id": "58_milk_consumption_example_plot_rep3",
+  "evidence_mode": "plot",
+  "model": "mistral-medium-latest",
+  "prompt_variant": "example",
+  "repetition": 3
+}

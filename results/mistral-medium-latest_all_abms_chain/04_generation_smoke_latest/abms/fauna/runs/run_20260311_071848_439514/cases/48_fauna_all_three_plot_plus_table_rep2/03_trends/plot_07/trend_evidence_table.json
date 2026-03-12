@@ -1,0 +1,319 @@
+{
+  "reporter_pattern": "death-count",
+  "time_column": null,
+  "matched_columns": [
+    "death-count",
+    "death-count.1",
+    "death-count.2",
+    "death-count.3",
+    "death-count.4",
+    "death-count.5",
+    "death-count.6",
+    "death-count.7",
+    "death-count.8",
+    "death-count.9",
+    "death-count.10",
+    "death-count.11",
+    "death-count.12",
+    "death-count.13",
+    "death-count.14",
+    "death-count.15",
+    "death-count.16",
+    "death-count.17",
+    "death-count.18",
+    "death-count.19",
+    "death-count.20",
+    "death-count.21",
+    "death-count.22",
+    "death-count.23",
+    "death-count.24",
+    "death-count.25",
+    "death-count.26",
+    "death-count.27",
+    "death-count.28",
+    "death-count.29",
+    "death-count.30",
+    "death-count.31",
+    "death-count.32",
+    "death-count.33",
+    "death-count.34",
+    "death-count.35",
+    "death-count.36",
+    "death-count.37",
+    "death-count.38",
+    "death-count.39"
+  ],
+  "matched_series_count": 40,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_40_matched_series",
+      "sample_count": 2312,
+      "valid_sample_count": 2312,
+      "dropped_non_numeric_count": 0,
+      "start_value": 0.0,
+      "end_value": 235.0,
+      "mean": 200.7895984578097,
+      "median": 233.0,
+      "std": 65.0325391284798,
+      "variance": 4229.231145497256,
+      "minimum": 0.0,
+      "minimum_index": 0,
+      "maximum": 240.33333333333334,
+      "maximum_index": 1876,
+      "peaks": [
+        {
+          "index": 1876.0,
+          "source_index": 1876.0,
+          "time": 1876.0,
+          "value": 240.33333333333334,
+          "prominence": 0.0
+        },
+        {
+          "index": 2040.0,
+          "source_index": 2040.0,
+          "time": 2040.0,
+          "value": 239.5,
+          "prominence": 0.0
+        },
+        {
+          "index": 1672.0,
+          "source_index": 1672.0,
+          "time": 1672.0,
+          "value": 238.83333333333334,
+          "prominence": 0.0
+        },
+        {
+          "index": 1732.0,
+          "source_index": 1732.0,
+          "time": 1732.0,
+          "value": 238.8,
+          "prominence": 0.0
+        },
+        {
+          "index": 1208.0,
+          "source_index": 1208.0,
+          "time": 1208.0,
+          "value": 237.14285714285714,
+          "prominence": 0.0
+        },
+        {
+          "index": 1395.0,
+          "source_index": 1395.0,
+          "time": 1395.0,
+          "value": 237.0,
+          "prominence": 0.0
+        },
+        {
+          "index": 1516.0,
+          "source_index": 1516.0,
+          "time": 1516.0,
+          "value": 237.0,
+          "prominence": 0.0
+        },
+        {
+          "index": 1166.0,
+          "source_index": 1166.0,
+          "time": 1166.0,
+          "value": 236.95652173913044,
+          "prominence": 0.0
+        }
+      ],
+      "valleys": [
+        {
+          "index": 1958.0,
+          "source_index": 1958.0,
+          "time": 1958.0,
+          "value": 239.0,
+          "prominence": 0.0
+        },
+        {
+          "index": 1696.0,
+          "source_index": 1696.0,
+          "time": 1696.0,
+          "value": 238.4,
+          "prominence": 0.0
+        },
+        {
+          "index": 1167.0,
+          "source_index": 1167.0,
+          "time": 1167.0,
+          "value": 236.9090909090909,
+          "prominence": 0.0
+        },
+        {
+          "index": 1212.0,
+          "source_index": 1212.0,
+          "time": 1212.0,
+          "value": 236.75,
+          "prominence": 0.0
+        },
+        {
+          "index": 1171.0,
+          "source_index": 1171.0,
+          "time": 1171.0,
+          "value": 236.71428571428572,
+          "prominence": 0.0
+        },
+        {
+          "index": 1757.0,
+          "source_index": 1757.0,
+          "time": 1757.0,
+          "value": 236.5,
+          "prominence": 0.0
+        },
+        {
+          "index": 1546.0,
+          "source_index": 1546.0,
+          "time": 1546.0,
+          "value": 236.42857142857142,
+          "prominence": 0.0
+        },
+        {
+          "index": 1224.0,
+          "source_index": 1224.0,
+          "time": 1224.0,
+          "value": 236.3684210526316,
+          "prominence": 0.0
+        }
+      ],
+      "inflection_indices": [
+        362,
+        1241,
+        1330,
+        1397,
+        1402,
+        1419,
+        1455,
+        1474,
+        1595,
+        1713,
+        1828,
+        2040
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 232,
+        "windows": [
+          {
+            "start_index": 0,
+            "end_index": 231,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.3455357142857142,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 232,
+            "end_index": 463,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.43808335926041164,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 464,
+            "end_index": 695,
+            "trend": "increasing",
+            "tau": 0.9999626809971638,
+            "slope": 0.1704977477477477,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 696,
+            "end_index": 927,
+            "trend": "increasing",
+            "tau": 0.9967532467532467,
+            "slope": 0.05914515113599816,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 928,
+            "end_index": 1159,
+            "trend": "increasing",
+            "tau": 0.9539110314972384,
+            "slope": 0.01685271626739116,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 1160,
+            "end_index": 1391,
+            "trend": "no trend",
+            "tau": -0.07601880877742946,
+            "slope": -0.0009233613175760583,
+            "p": 0.08422787030291556,
+            "significant": false
+          },
+          {
+            "start_index": 1392,
+            "end_index": 1623,
+            "trend": "increasing",
+            "tau": 0.4533512464546947,
+            "slope": 0.003246753246753316,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 1624,
+            "end_index": 1855,
+            "trend": "no trend",
+            "tau": -0.06624123003433348,
+            "slope": 0.0,
+            "p": 0.1272829462976084,
+            "significant": false
+          },
+          {
+            "start_index": 1856,
+            "end_index": 2087,
+            "trend": "decreasing",
+            "tau": -0.44618599791013586,
+            "slope": 0.0,
+            "p": 0.0,
+            "significant": true
+          }
+        ]
+      },
+      "change_points": [
+        125,
+        250,
+        375,
+        500,
+        625,
+        850,
+        2310
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 63.0,
+        "oscillation_indices": [
+          2170,
+          2175,
+          2180,
+          2185,
+          2190,
+          2195,
+          2200,
+          2205,
+          2210,
+          2215,
+          2220,
+          2225,
+          2230,
+          2235,
+          2240,
+          2245,
+          2250,
+          2255,
+          2260,
+          2265
+        ]
+      }
+    }
+  ]
+}

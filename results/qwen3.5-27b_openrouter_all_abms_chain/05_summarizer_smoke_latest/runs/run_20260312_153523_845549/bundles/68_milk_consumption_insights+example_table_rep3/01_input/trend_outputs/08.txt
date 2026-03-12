@@ -1,0 +1,5 @@
+The mean habit factor for the incumbent whole milk choice function begins at 1.0000 at time step 0 and rises steadily to 1.0502 by time step 32. This upward trend is consistent across all simulation runs, with inflection points noted at time steps 7 and 12 marking minor shifts in the growth rate. The metric shows low variance, indicating a stable increase in the influence of habit over the simulation duration.
+
+In the context of the model, this gradual rise suggests that the inertia associated with existing whole milk consumption habits strengthens slightly over time. Despite mechanisms for social influence and perception updates, the habitual weight on the incumbent choice grows, potentially slowing the rate of substitution toward skimmed or semi-skimmed varieties.
+
+For decision makers, this implies that long-term habits become more entrenched as time progresses. Strategies to alter milk consumption patterns should focus on disrupting these accumulating habits early, as the resistance to change increases slightly with the duration of established consumption.

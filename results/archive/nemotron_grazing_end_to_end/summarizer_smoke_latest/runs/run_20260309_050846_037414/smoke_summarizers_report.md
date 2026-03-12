@@ -1,0 +1,81 @@
+# Summarizer Smoke Report
+
+- success: `true`
+- bundle_count: `72`
+- failed_bundle_count: `0`
+- review_csv_path: `results/summarizer_smoke_latest/runs/run_20260309_050846_037414/review.csv`
+
+| bundle_id | case_id | abm | success |
+| --- | --- | --- | --- |
+| 01_grazing_none_plot_rep1 | 01_grazing_none_plot_rep1 | grazing | true |
+| 02_grazing_none_table_rep1 | 02_grazing_none_table_rep1 | grazing | true |
+| 03_grazing_none_plot_plus_table_rep1 | 03_grazing_none_plot_plus_table_rep1 | grazing | true |
+| 04_grazing_role_plot_rep1 | 04_grazing_role_plot_rep1 | grazing | true |
+| 05_grazing_role_table_rep1 | 05_grazing_role_table_rep1 | grazing | true |
+| 06_grazing_role_plot_plus_table_rep1 | 06_grazing_role_plot_plus_table_rep1 | grazing | true |
+| 07_grazing_insights_plot_rep1 | 07_grazing_insights_plot_rep1 | grazing | true |
+| 08_grazing_insights_table_rep1 | 08_grazing_insights_table_rep1 | grazing | true |
+| 09_grazing_insights_plot_plus_table_rep1 | 09_grazing_insights_plot_plus_table_rep1 | grazing | true |
+| 10_grazing_example_plot_rep1 | 10_grazing_example_plot_rep1 | grazing | true |
+| 11_grazing_example_table_rep1 | 11_grazing_example_table_rep1 | grazing | true |
+| 12_grazing_example_plot_plus_table_rep1 | 12_grazing_example_plot_plus_table_rep1 | grazing | true |
+| 13_grazing_role+example_plot_rep1 | 13_grazing_role+example_plot_rep1 | grazing | true |
+| 14_grazing_role+example_table_rep1 | 14_grazing_role+example_table_rep1 | grazing | true |
+| 15_grazing_role+example_plot_plus_table_rep1 | 15_grazing_role+example_plot_plus_table_rep1 | grazing | true |
+| 16_grazing_role+insights_plot_rep1 | 16_grazing_role+insights_plot_rep1 | grazing | true |
+| 17_grazing_role+insights_table_rep1 | 17_grazing_role+insights_table_rep1 | grazing | true |
+| 18_grazing_role+insights_plot_plus_table_rep1 | 18_grazing_role+insights_plot_plus_table_rep1 | grazing | true |
+| 19_grazing_insights+example_plot_rep1 | 19_grazing_insights+example_plot_rep1 | grazing | true |
+| 20_grazing_insights+example_table_rep1 | 20_grazing_insights+example_table_rep1 | grazing | true |
+| 21_grazing_insights+example_plot_plus_table_rep1 | 21_grazing_insights+example_plot_plus_table_rep1 | grazing | true |
+| 22_grazing_all_three_plot_rep1 | 22_grazing_all_three_plot_rep1 | grazing | true |
+| 23_grazing_all_three_table_rep1 | 23_grazing_all_three_table_rep1 | grazing | true |
+| 24_grazing_all_three_plot_plus_table_rep1 | 24_grazing_all_three_plot_plus_table_rep1 | grazing | true |
+| 25_grazing_none_plot_rep2 | 25_grazing_none_plot_rep2 | grazing | true |
+| 26_grazing_none_table_rep2 | 26_grazing_none_table_rep2 | grazing | true |
+| 27_grazing_none_plot_plus_table_rep2 | 27_grazing_none_plot_plus_table_rep2 | grazing | true |
+| 28_grazing_role_plot_rep2 | 28_grazing_role_plot_rep2 | grazing | true |
+| 29_grazing_role_table_rep2 | 29_grazing_role_table_rep2 | grazing | true |
+| 30_grazing_role_plot_plus_table_rep2 | 30_grazing_role_plot_plus_table_rep2 | grazing | true |
+| 31_grazing_insights_plot_rep2 | 31_grazing_insights_plot_rep2 | grazing | true |
+| 32_grazing_insights_table_rep2 | 32_grazing_insights_table_rep2 | grazing | true |
+| 33_grazing_insights_plot_plus_table_rep2 | 33_grazing_insights_plot_plus_table_rep2 | grazing | true |
+| 34_grazing_example_plot_rep2 | 34_grazing_example_plot_rep2 | grazing | true |
+| 35_grazing_example_table_rep2 | 35_grazing_example_table_rep2 | grazing | true |
+| 36_grazing_example_plot_plus_table_rep2 | 36_grazing_example_plot_plus_table_rep2 | grazing | true |
+| 37_grazing_role+example_plot_rep2 | 37_grazing_role+example_plot_rep2 | grazing | true |
+| 38_grazing_role+example_table_rep2 | 38_grazing_role+example_table_rep2 | grazing | true |
+| 39_grazing_role+example_plot_plus_table_rep2 | 39_grazing_role+example_plot_plus_table_rep2 | grazing | true |
+| 40_grazing_role+insights_plot_rep2 | 40_grazing_role+insights_plot_rep2 | grazing | true |
+| 41_grazing_role+insights_table_rep2 | 41_grazing_role+insights_table_rep2 | grazing | true |
+| 42_grazing_role+insights_plot_plus_table_rep2 | 42_grazing_role+insights_plot_plus_table_rep2 | grazing | true |
+| 43_grazing_insights+example_plot_rep2 | 43_grazing_insights+example_plot_rep2 | grazing | true |
+| 44_grazing_insights+example_table_rep2 | 44_grazing_insights+example_table_rep2 | grazing | true |
+| 45_grazing_insights+example_plot_plus_table_rep2 | 45_grazing_insights+example_plot_plus_table_rep2 | grazing | true |
+| 46_grazing_all_three_plot_rep2 | 46_grazing_all_three_plot_rep2 | grazing | true |
+| 47_grazing_all_three_table_rep2 | 47_grazing_all_three_table_rep2 | grazing | true |
+| 48_grazing_all_three_plot_plus_table_rep2 | 48_grazing_all_three_plot_plus_table_rep2 | grazing | true |
+| 49_grazing_none_plot_rep3 | 49_grazing_none_plot_rep3 | grazing | true |
+| 50_grazing_none_table_rep3 | 50_grazing_none_table_rep3 | grazing | true |
+| 51_grazing_none_plot_plus_table_rep3 | 51_grazing_none_plot_plus_table_rep3 | grazing | true |
+| 52_grazing_role_plot_rep3 | 52_grazing_role_plot_rep3 | grazing | true |
+| 53_grazing_role_table_rep3 | 53_grazing_role_table_rep3 | grazing | true |
+| 54_grazing_role_plot_plus_table_rep3 | 54_grazing_role_plot_plus_table_rep3 | grazing | true |
+| 55_grazing_insights_plot_rep3 | 55_grazing_insights_plot_rep3 | grazing | true |
+| 56_grazing_insights_table_rep3 | 56_grazing_insights_table_rep3 | grazing | true |
+| 57_grazing_insights_plot_plus_table_rep3 | 57_grazing_insights_plot_plus_table_rep3 | grazing | true |
+| 58_grazing_example_plot_rep3 | 58_grazing_example_plot_rep3 | grazing | true |
+| 59_grazing_example_table_rep3 | 59_grazing_example_table_rep3 | grazing | true |
+| 60_grazing_example_plot_plus_table_rep3 | 60_grazing_example_plot_plus_table_rep3 | grazing | true |
+| 61_grazing_role+example_plot_rep3 | 61_grazing_role+example_plot_rep3 | grazing | true |
+| 62_grazing_role+example_table_rep3 | 62_grazing_role+example_table_rep3 | grazing | true |
+| 63_grazing_role+example_plot_plus_table_rep3 | 63_grazing_role+example_plot_plus_table_rep3 | grazing | true |
+| 64_grazing_role+insights_plot_rep3 | 64_grazing_role+insights_plot_rep3 | grazing | true |
+| 65_grazing_role+insights_table_rep3 | 65_grazing_role+insights_table_rep3 | grazing | true |
+| 66_grazing_role+insights_plot_plus_table_rep3 | 66_grazing_role+insights_plot_plus_table_rep3 | grazing | true |
+| 67_grazing_insights+example_plot_rep3 | 67_grazing_insights+example_plot_rep3 | grazing | true |
+| 68_grazing_insights+example_table_rep3 | 68_grazing_insights+example_table_rep3 | grazing | true |
+| 69_grazing_insights+example_plot_plus_table_rep3 | 69_grazing_insights+example_plot_plus_table_rep3 | grazing | true |
+| 70_grazing_all_three_plot_rep3 | 70_grazing_all_three_plot_rep3 | grazing | true |
+| 71_grazing_all_three_table_rep3 | 71_grazing_all_three_table_rep3 | grazing | true |
+| 72_grazing_all_three_plot_plus_table_rep3 | 72_grazing_all_three_plot_plus_table_rep3 | grazing | true |

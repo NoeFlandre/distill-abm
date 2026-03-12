@@ -1,0 +1,15 @@
+The data shows a decline in mean livestock stock from an initial value of 90 households to approximately 45-50 households by step 100, with six distinct phases of change:
+
+1. **Initial Stability (Steps 0-16): Mean stock remained constant at 90 households, indicating herd sizes stayed unchanged during this early phase.
+
+2. **First Decline Phase (Steps 17-20): Stock fell to 84-85 households, representing the earliest detectable response to grazing dynamics.
+
+3. **Accelerated Reduction (Steps 21-29): Herds dropped to 73-75 households, showing heightened sensitivity to pasture pressures.
+
+4. **Increased Press (Steps 30-39): Stock stabilized around 70-71 households, suggesting resource limitations became binding.
+
+5. **Moderation Phase (Steps 40-59): Gradual increase to 65-80 households, reflecting potential adaptive responses to resource scarcity.
+
+6. **Final Stabilization (Steps 60-100): Stock settled between 45-50 households, with minor fluctuations below the initial threshold of 72 households.
+
+These patterns align with the model's focus on pasture carrying capacity and adaptive management. The initial drop suggests rapid resource depletion under high grazing pressure, followed by equilibrium at levels consistent with ecological limits. The subsequent stabilization at reduced stocks implies either natural resource recovery limits or successful adjustment to sustainable stocking rates. This supports the model's objectives of quantifying long-term adaptation in heterogeneous behavioral strategies and risk sensitivity, particularly among learning-capable agents (E-RO-SL1 and E-LBD) interacting in common property systems where knowledge sharing is constrained by proximity (**knowledge-radius=1.0**).The documentation does not demonstrate keep-alive behavior within the requested parameters.

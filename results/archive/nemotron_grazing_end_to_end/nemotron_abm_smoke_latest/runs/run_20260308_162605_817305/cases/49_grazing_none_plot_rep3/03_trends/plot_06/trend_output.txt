@@ -1,0 +1,19 @@
+The provided Python script interprets a trained Keras model and generates two types of visualizations: a summary plot and a connectivity plot, which assists in understanding and evaluating the model's architecture and performance.
+
+**Summary Plot:**
+This visualization displays the trainable parameters and the cumulative sum of these parameters up to the current layer. By analyzing these plots, one can look for signs of overfitting.
+above when the trainable weights exceed 1 million, and it’s permissible to look for overfitting for those models.
+
+**Connectivity Plot:** Portrays
+ the deep neural network in graph form, illustrating how each type of layer is connected.
+
+The code leverages the following Python libraries:
+
+1. **Keras**: A high-level neural networks API, used to interact with the trained model.
+2. **Graphviz**: A tool for visualizing graph data, employed for creating the connectivity plot.
+3. **Matplotlib**: A plotting library for generating the summary plot.
+4. **pydot**: A Python interface to Graphviz, used for rendering the connectivity diagram.
+
+The script processes the model's layers, retrieves weights, and visualizes their relationships and magnitudes. The connectivity diagram aids in understanding the model structure and identifying potential errors.
+
+In essence, this script serves as a valuable tool for model evaluation, offering insights into overfitting and model structure.

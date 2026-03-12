@@ -1,0 +1,19 @@
+The provided chart tracks various simulations of the Mean Livestock + Destock of Households in an agent-based model with several different behavioral types of agents. The following observations can be made from this chart:
+Unit conversions: Steps of 40 can be treated as equivalent to 40 years, or simply years for the purposes of this analysis. X-axis: Steps - Identifies the number of time steps each iteration. Y-axis: Mean Livestock + Destock of Households - The total number of livestock, including both healthy livestock and destocked livestock across the simulation.
+
+General Trends:
+
+Initial State: All simulations start approximately at 90 livestock per household, indicating they all begin with a standardized point of entry.
+
+Decline Phase (0 to 40 years): All households show a rapid decline in livestock and destocking within the first 20-30 years, with all values reaching their minimum of 40 approximately at 40 years. This indicates that livestock pressures exceed sustainable levels within this time frame given these parameters. This trend is identical in all simulations during the decline phase.
+
+Post-40 Year Simulation: After year 40, there is approximately a reaction-like curve of stability and stabilization in most simulations.
+- The Research & Development (R&D) Simulation is by far the golden child simulation, and experiences the fastest recovery and return to ~50 livestock units.
+- Some other simulations follow like so:
+- Reference (Likely E-RO): Restores to around 51 livestock units.
+- Lipstick (Likely E-LBD): Behaves similarly in line to baseline (Reference) simulation, indicating similar performance.
+- Blue-green (Likely E-RO-SL1): Shows a slight difference between the Reference and R&D, plateauing around 47.
+- Dark Electric Blue, Sea Green, & Brown (Informing Legacy departures): Low initial slopes suggest that these simulations have slower and less desirable outcomes.
+- Green (Likely Locational Influences): Growth is slow to begin, but follows the curve of Reference and R&D simulations. Some errantism can be observed beginning at 90 years where this simulation recovers some ground. It appears to plateau slightly.
+
+These trends indicate different levels of sustained growth and levels of long-term stability in the post-40 year simulation, indicating that the behavioral types and dynamics of each simulation impact the stabilization and recovery, with the R&D behavioral type having the strongest performance.

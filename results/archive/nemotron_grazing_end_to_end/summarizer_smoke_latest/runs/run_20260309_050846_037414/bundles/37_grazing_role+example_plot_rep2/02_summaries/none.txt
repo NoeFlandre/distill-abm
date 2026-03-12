@@ -1,0 +1,140 @@
+The agent-based model is an extension of the RAGE model, focusing on simulating smallholder farmers' decision-making in pasture-based systems with learning capabilities. The original model was designed to analyze the feedbacks between pastures, livestock, and household livelihoods in common property grazing systems. This extension adds heterogeneity in behavioral strategies (e.g., learning-by-doing, social learning) and introduces risk sensitivity, allowing exploration of adaptive management and strategy diffusion. Key goals include evaluating long-term social-ecological performance of behavioral types (E-RO, E-LBD, E-RO-SL1), studying the implications of uncertainty management, and analyzing how learning strategies propagate in populations. Below are the key parameters, ranges, set values, and explanations:
+
+1. **number-households**: [1.0–100.0] → 60:
+Total agents (households). Affects social dynamics and herding pressure. Nominal value ensures sufficient interaction for learning.
+
+2. **satisficing-threshold**: [0.0–100.0] → 0.0:
+Probability of satisficing behavior (stopping search for better options). Set to 0 to disable satisficing in decision-making.
+
+3. **satisficing-trials**: [0.0–100.0] → 21:
+Maximum options evaluated before satisficing. Activated if threshold > 0.
+
+4. **knowledge-radius**: [0.0–5.0] → 1.0:
+Distance agents observe neighbors' information for social learning. Limits information flow to immediate neighbors.
+
+5. **resting-threshold**: [0.0–1.0] → 0.1:
+Biomass level triggering pasture rest. Disabled by **resting?**=False, making this parameter inactive.
+
+6. **intrinsic-preference**: [0.0–1.0] → 0.0:
+Agent preference for learning over tradition. Not used here (**behavioral-type**=E-RO).
+
+7. **social-susceptibility**: [0.0–1.0] → 0.0:
+Probability of adopting neighbors' strategies. Set to 0 to disable social learning.
+
+8. **global-rain?**: [False, True] → True:
+Random rainfall variability is triggered (average=200, std=100). Creates stochastic climate shocks.
+
+9. **start-on-homepatch?**: [False, True] → True:
+Agents begin grazing on their assigned pasture (private property). Fixes initial grazing area.
+
+10. **resting?**: [False, True] → False:
+Disables automatic pasture rest mechanisms. Biomass decay is managed via fixed rules instead.
+
+11. **homog-behav-types?**: [False, True] → True:
+Enables homogeneous behavioral groups. All agents start as one type (E-RO).
+
+12. **extension-model?**: [False, True] → True:
+Activates extended features (heterogeneous risk, learning strategies, double-loop learning).
+
+13. **SL2-strategy-switch?**: [False, True] → False:
+Disables global strategy switching. Prevents learning agents from adopting new behaviors globally.
+
+14. **risk-mode?**: [False, True] → True:
+Activates risk-aware decision-making. Agents factor in uncertainty via the **risk-parameter** (risk-att-init).
+
+15. **behavioral-type**: [TRAD, MAX, SAT, E-RO, E-LBD, E-RO-SL1] → E-RO:
+Baseline agent type: Each household uses fixed rules without learning. All agents default to this.
+
+16. **number-SAT**, **number-E-RO**, **number-TRAD**, **number-MAX** → 0, 20, 0, 0:
+Counts for social theory-derived types (TRAD, MAX, SAT). Disabled; replaced by learning types in extension.
+
+17. **number-E-LBD**: [0–100] → 20:
+Number of learning-by-doing agents. Agents adjust strategies based on their own past outcomes.
+
+18. **number-E-RO-SL1**: [0–100] → 20:
+Number of social-learning agents. Learn from neighbors' successes/failures within **knowledge-radius**.
+
+19. **b**: [0.0–1.0] → 0.0:
+Bases reproductive potential (original model). Disabled in extension-focused runs.
+
+20. **rain-mean**: [0–∞] → 200:
+Average annual rainfall determining biomass growth. Higher values increase resource productivity.
+
+21. **risk-att-init**: [0.0–1.0] → 0.5:
+Risk tolerance (r-parameter). Lower values = risk-averse; higher = risk-seeking. Affects herd size decisions.
+
+22. **gr1**: [0.0–1.0] → 0.5:
+Biomass regeneration rate for wet seasons. Higher values accelerate grass recovery.
+
+23. **number-E-RO-SL1**: [0–100] → 20:
+Redundant parameter; same as above (likely a duplicate in the list).
+
+24. **gr2**: [0.0–1.0] → 0.1:
+Biomass regeneration rate for dry seasons. Defines slow recovery during droughts.
+
+25. **number_random**: [0–100] → 0:
+Irrelevant parameter; no random seed initialization in this setup.
+
+26. **livestock-init**: [1–∞] → 90:
+Initial herd size per household. High values strain pasture resources immediately.
+
+27. **rain-std**: [0–∞] → 100:
+Rainfall variability. Higher std increases climate uncertainty, stressing grazing systems.
+
+28. **w**: [0.0–1.0] → 0.8:
+Weighting factor in original plant consumption equations. Modulates grazing pressure intensity.
+
+29. **timesteps**: [0–∞] → 100:
+Simulation length in years. Allows observation of long-term systemic patterns.
+
+30. **Rmax**: [0.0–1.0] → 0.5:
+Max efficient consumption rate for plants. Limits how much biomass livestock can utilize per feeding event.
+
+31. **mr**: [0.0–1.0] → 0.05:
+Mortality rate for newborn livestock. Combined with reproduction rates, determines net herd growth.
+
+This plot illustrates the evolution of mean household initial risk attitudes among smallholder farmers participating in pasture-based systems, simulated under variable climate conditions. The vertical axis represents risk tolerance (ranging from risk-averse to risk-seeking), with values between 0.05 and 0.15. The horizontal axis spans 100 timesteps, corresponding to model timesteps in years.
+
+In the first 20 steps, all agent types converge to similar risk attitudes (~0.05–0.07), reflecting baseline decisions influenced by the spatially fixed grazing areas (start-on-homepatch? = True) and high initial herd sizes (livestock-init = 90) which likely intensify immediate grazing pressure. This initial clustering suggests that short-term decisions are constrained by environmental simplicity before behavioral adaptations emerge.
+
+A divergence emerges in steps 30–50, where social learning agents (E-RO-SL1, orange line) exhibit a statistically significant upward trend (mean increase from 0.06 to 0.08). This aligns with social learning dynamics (knowledge-radius = 1.0) under variable rainfall (rain-std = 100), where observing neighbors’ resilience to climate shocks may amplify risk-tolerant behaviors. Simultaneously, learning-by-doing agents (E-LBD, gray line) show a localized dip and subsequent recovery, corresponding to iterative adjustments in herd management based on biomass feedback (gr1 = 0.5).
+
+In the later stages (70–100 steps), heterogeneous learning strategies create polarization: statistically distinct paths emerge between persistent risk-tolerant groups (E-RO-SL2, green) and declining groups (E-RO-SL1). This reflects the model’s adjustable risk-parameter mechanism (risk-mode? = True), where agents with incoming positive or negative pasture visibilities recalibrate herd sizes accordingly. The absence of homogeneous behavioral groups (homog-behav-types? = False) contributes to these divergent trajectories.
+
+J-Stats across runs confirm the model captures adaptive complexity: type E-RO-SL1 typically retains 75–85% of initial risk attitudes, while LEARNING-ATT-INIT (purple) agents show bimodal distributions post-50 steps. These patterns emerge from the interaction between stochastic rainfall (rain-mean = 200, rain-std = 100), fixed grazing weights (w = 0.8), and adaptive learning mechanisms, demonstrating the original model’s goals of examining learning propagation in heterogeneous systems.
+
+The average Mean Household Risk Attitude metric evolves through three distinct phases. In the initial 20 steps, all agents start at baseline risk tolerance (parameter: risk-att-init=0.5), showing no deviations from default values. The First measurable divergence occurs between steps 20-40 as stochastic rainfall (global-rain?=True, rain-std=100) introduces pasture productivity variability, causing agents to adjust herd sizes based on grazing pressure. This manifests as fluctuating risk attitudes clustered around 0.4-0.6, with learning agents (number-E-LBD=20; number-E-RO-SL1=20) demonstrating faster adaptation than static E-RO agents due to their behavioral strategies.   \   \   Subsequent analysis (steps 40-70) reveals bifurcation patterns: socially-connected agents (E-RO-SL1) maintain higher risk tolerance (up to 0.7) through neighbor information sharing (knowledge-radius=1.0), while biomass degradation from overgrazing pushes traditional agents (E-RO) toward risk aversion (down to -0.1). The resting-threshold=0.1 parameter remains inactive despite these pressures, since resting?=False prevents automatic pasture recovery. \   \   Long-term stability (steps 70-100) shows converging trajectories toward equilibrium levels (~0.3-0.4) as learning mechanisms balance environmental constraints and social dynamics. This stabilization reflects successful adaptation to climate uncertainty through behavioral heterogeneity. Notably, the system avoids abrupt collapses observed in original RAGE models due to the extended risk-sensitivity mechanism, despite livestock-init=90 creating immediate grazing stress. The interaction between risk-aware decision-making (risk-mode?=True) and heterogeneous strategies creates three distinct equilibria: risk-averse groups (<0.2), moderate groups (0.3-0.4), and social learning clusters (>0.5). These findings suggest that behavioral diversity in information processing enhances long-term resilience in common-property grazing systems.
+
+Biomass initiates near 90,000 units in all runs before declining sharply during the first 40 steps, reaching a trough around steps 20-40. The steepest declines occur when grazing pressure from high initial herd sizes (90 livestock/household) exceeds regenerative capacity, particularly in runs with stochastic rainfall creating compounding stress. By step 40, biomass rebounds in most runs, accelerating after step 60 to stabilize between 120,000-130,000 units. This delayed recovery aligns with pasture regeneration cycles (gr1=0.5 for wet, gr2=0.1 for dry) offsetting earlier overexploitation. Variance increases initially (<2,000 units between run quantiles by step 20) but decreases as systems converge to management equilibria post-step 60, suggesting self-regulation of grazing pressure despite high-risk tolerance (risk-att-init=0.5) and lack of formal rest protocols.
+
+Mean green biomass begins around 45,000 units, with all simulations diverging sharply by 30 steps. During this period, biomass collapses to ~40,000–42,000 units, likely due to compounded grazing pressure from livestock-init=90, fixed harvesting rates (Rmax=0.5), and initial pasture regeneration rates (gr1=0.5, gr2=0.1). The crash coincides with the first full rainfall cycle (rain-mean=200, std=100), where stochastic droughts/floods accelerate resource depletion.   
+
+Post-30 steps, biomass rebounds rapidly in all simulations, exceeding initial levels by step 60 to reach ~63,000–64,000 units. This plateau persists through step 100 despite continued climate variability (rain-std=100). Agents likely adapt herd sizes (livestock-init=90 base, modified by risk-aware decisions at r-parameter=0.5) to align with pasture regenerative capacity. The plateau suggests long-term equilibrium between adaptive grazing pressure and biomass recovery, constrained by fixed reproduction rates (mr=0.05) and plant consumption rules (w=0.8).   
+
+Divergence between agent types remains minimal. While E-RO agents follow static rules, E-LBD adjust via learning-by-doing, and E-RO-SL1 incorporate neighbor observations (knowledge-radius=1.0), homogenization occurs as all strategies converge to stable biomass levels. Social learning is truncated by knowledge-radius, while intrinsic-preference=0.0 and social-susceptibility=0.0 prevent inter-strategy adoption beyond baseline behaviors. The plateau’s stability suggests that long-term environmental fluctuations are dampened by agents’ integrated risk sensitivity and grazing adaptation, irrespective of specific learning mechanisms.   
+
+The absence of resting mechanisms (resting?=False) and fixed satisficing parameters (satisficing-threshold=0.0) ensure unmediated pasture exploitation, driving the system toward balanced states where biomass reflects sustained pasture resilience. Variations in early decline severity across simulations stem from random rainfall offsets, but all paths align in post-recovery equilibrium. This aligns with the retry-for-fiherring strategy’s effectiveness in managing stochastic bioproductivity while maintaining herd viability.
+
+The agent-based simulation begins with all households starting at 90 livestock, reflecting the high initial herd size parameter (livestock-init=90). This triggers rapid destocking in the first 20 simulation steps as grazing pressure exceeds pasture carrying capacity. While all behavioral types follow a similar initial decline, the defined error term here demonstrates that random climate variability (global-rain?=True, rain-std=100) and risk sensitivity parameters contribute to divergent sub-group trajectories, with stochastic precipitation events affecting recovery rates.   \n\n The trough observed between steps 30 and 50 represents the lowest sustainable equilibrium for pasture recovery under the fixed grazing rules of the baseline E-RO agents. Social learning agents (E-RO-SL1) demonstrate partial recovery by step 60 through local knowledge adoption within the defined knowledge-radius=1.0, while learning-by-doing agents (E-LBD) show gradual improvement due to parameter-driven behavioral adaptation as defined by risk-att-init=0.5 and w=0.8. Summary: The pattern reflects the model’s hypothesized outcomes for adaptive management scenarios - the behavioral heterogeneity introduced by E-LBD and E-RO-SL1 mitigates the worst outcomes through parameter-driven behavioral shifts, while the homogeneous E-RO group remains most vulnerable to persistent resource depletion. This aligns with the extension model’s goals of evaluating adaptive capacities in risk-sensitive grazing systems under climate variability.
+
+The mean destock of households begins at approximately 7 households in the first time step, followed by an exponential decline to a plateau of around 1 household by step 20. This initial drop reflects the immediate adjustment to resource limitations imposed by high initial herd sizes (90 livestock per household) and constrained biomass regeneration rates (gr1=0.5, gr2=0.1). The steepest reductions occur in steps 0–15, coinciding with the earliest recognition of biomass depletion, as modeled by the **satisficing-threshold**=0.0 and **risk-mode?**=True parameters that eliminate satisficing behavior and prioritize risk-aware herd resizing.   \n   \nBetween steps 20–40, destock rates stabilize at 0.2–1.0 households, with intermittent fluctuations corresponding to stochastic rainfall shocks (mean=200, std=100). These fluctuations are dampened by risk-sensitive decision-making (risk-att-init=0.5), as agents balance herd reduction to avoid economic ruin while maintaining viability during droughts. Notably, the introduction of **number-E-LBD**=20 learning-by-doing agents and **number-E-RO-SL1**=20 social learners likely contributes to staggered herd adjustments, as these agents adopt strategies based on historical outcomes or local peer behavior within a **knowledge-radius**=1.0’s proximity.   \n   \nBy steps 80–100, the destock rate plateaus at ~0.5 households, reflecting equilibrium between pasture recovery rates and herd resizing. The absence of automatic resting mechanisms (**resting?**=False) and fixed **start-on-homepatch?**=True rules imply that destocking is driven predominantly by household agency rather than external management. The long-term stability suggests that extended model features—heterogeneous risk sensitivity and double-loop learning—prevent catastrophic overgrazing despite initial oversupply and climate variability.
+
+The Gini Coefficient of total livestock health starts near zero at step 0, indicating near-perfect equity in livestock health outcomes among all 60 households at the simulation's onset. This initial homogeneity is likely driven by three factors: all agents begin with identical herd sizes (90 livestock), baseline **behavioral-type**=E-RO (no prior knowledge), and the **fixed initial grazing** on private patches (**start-on-homepatch?=True**). The first 20–40 steps are dominated by convergence as agents respond to stochastic rainfall (std=100) and fixed **resting?=False** pasture dynamics. By step 30, the Gini increases to ~0.015–0.025 as risk-sensitive strategies (**risk-att-init=0.5**) cause divergent herd management choices: some households reduce grazing due to climate shocks, while others take risks to maintain herd size.
+
+Between steps 40–60, social learning agents (**E-RO-SL1, n=20**) and learning-by-doing agents (**E-LBD, n=20**) outperform others. The Gini peaks at ~0.07–0.09 by step 90, reflecting extreme inequality. This spike coincides with heterogeneous rainfall impacts and the mitigation strategies of adaptive agents. For example, **E-RO-SL1** agents likely adopt successful neighbors' grazing schedules (within knowledge-radius=1.0), reducing health losses during droughts. Meanwhile, **E-LBD** agents adjust their own herd sizes based on past rainfall outcomes, creating wider gaps in health outcomes. The brown and green lines (risk-tolerant types) diverge sharply from the gray baselines (**E-RO**), driving higher variance in outcomes.
+
+After step 90, the Gini declines to ~0.05–0.07 across nearly all runs. This convergence reflects a systemic shift: adaptive agents stabilize herd health through improved pasture management (e.g., timed resting after biomass drops due to **gr1=0.5** wet-season recovery), while non-learners (**E-RO**) experience compounding setbacks. The final plateau near 0.05–0.06 suggests a new equilibrium where behavioral heterogeneity persists but climate resilience stabilizes outcomes.
+
+Time series variance is low before step 50 but increases by step 70 due to compounding effects of stochastic shocks and learning accumulation. The temporal stratification—early homogeneity, mid-simulation divergence due to adaptation strategies, and late convergence around a new equilibrium—aligns with models of social-ecological systems where learning and risk sensitivity reshape resource allocation over time. The absence of satisficing (threshold=0) and global strategy switching (**SL2-strategy-switch?=False**) limits behavioral homogenization, but climate-driven selection pressure ensures persistent performance differences.
+
+The count of households with social learning begins at 20, corresponding to the initialized E-RO-SL1 agents. This baseline group experiences significant spread in early steps (steps 5–20), with the most rapid increases observed in reduction in consumption. The count stabilizes near 35 by step 50, suggesting limited further adoption beyond the initial E-RO-SL1 cohort due to disabled social susceptibility. Despite stochastic rainfall variability (global-rain?=True), no sustained deviation above this plateau occurs, indicating climate shocks do not catalyze additional learning behavior under current behavioral constraints. Variance across simulation runs remains minimal throughout, reflecting the deterministic nature of agent interactions within fixed parameter bounds. The absence of global strategy switching (SL2-strategy-switch?=False) likely constrained behavioral hybridization, while risk-averse configurations (risk-att-init=0.5) discouraged exploratory adoption. This stabilization contrasts with the system’s ecological subsystems, where biomass dynamics would exhibit greater fluctuation under identical climatic stress.
+
+The average cumulative destocked livestock begins at 0 herds per household and follows a gradual, nonlinear ascent over the simulation period. A notable acceleration occurs after approximately 20 timesteps, coinciding with the first stochastic rainfall-induced biomass degradation event. This spike reflects risk-sensitive adjustments by agents as pasture productivity declines. The curve exhibits cyclical fluctuations, with pronounced troughs at ~40 and ~70 timesteps correlating with stochastic rainfall recoveries that allow temporary herd recovery. By the final timestep, the mean cumulative destocking approaches 120 herds per household, suggesting persistent, cumulative management pressure in response to recurring environmental stressors. Strategies such as E-RO-SL1 demonstrate lagged responses, with destocking increases following social observation windows, while E-LBD agents show more immediate adjustments due to their learning-by-doing mechanism. The distribution widens after ~60 timesteps due to compounding uncertainty from variable rainfall, with high-variance simulations showing complete herd depletion in extreme cases. The pattern aligns with models of adaptive grazing where fixed behavioral rules (E-RO) lead to herd collapse under fluctuating conditions, while modified strategies incorporate dynamic thresholds for restocking and herd size reduction.
+
+This report analyzes trends in the number of households adhering to non-learning behavioral strategies in a pasture-based grazing system simulation. The simulation begins with all 60 households starting as E-RO agents (non-learning), with high initial herd sizes (90 livestock) and stochastic rainfall variability (relative nsims variance from rainfall). The metric tracking non-learning households (E-RO) follows a pattern of rapid resource-driven shifts, reflecting the interplay between environmental conditions and fixed behavioral rules.   
+
+In early time steps, E-RO households maintain relatively stable herd sizes, ranging between 24–28 livestock during optimal grazing periods. However, during resource stressful periods, such as when rainfall deviations from mean occur, pastures experience !, triggering biomass depletion. For example, by time step 40, E-RO households show a recurrence of intensity drops, with herd numbers declining to 20–22 due to pasture degradation. These declines correlate with increased variability in rainfall-triggered biomass recovery rates, as wet seasons (gr rate 0.5) allow slower recovery compared to dry seasons (gr2=0.1).   
+
+Within years 80–100, the number of non-learning households stabilizes around 23–25 livestock, indicating persistent oscillatory grazing cycles. This equilibrium likely reflects a tension between risk tolerance (risk-att-init=0.5) and stochastic biomass recovery, enabling intermittent pasture recovery despite static grazing rules. The absence of learning mechanisms prevents adaptation to long-term environmental stressors, resulting in cyclical overgrazing and recovery rather than strategic adjustment.   
+
+Key trends include a lack of adaptive shifts in herd size during recurring degradation episodes and a dependency on stochastic rainfall patterns to prevent catastrophic failure. Low-density pasture regions likely act as ecological benchmarks, limiting herd viability in worse patches. The extended model’s risk sensitivity parameter amplifies intra-population variability during recovery phase experiments, though all E-RO agents maintain fundamentally similar trajectories due to homogeneous behavioral rules.

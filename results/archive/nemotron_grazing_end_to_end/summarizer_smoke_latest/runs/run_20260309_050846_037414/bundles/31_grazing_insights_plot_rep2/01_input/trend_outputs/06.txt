@@ -1,0 +1,1 @@
+This plot shows the average number of households that have been destocked due to insufficient resources from year 0-100. Each line is a representation of a specific simulation run. The first lines that are shown in bold, start at the top y-axis value 7 at start of the plot, and some remain 0. Most lines immediately start to increase.

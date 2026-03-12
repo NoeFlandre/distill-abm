@@ -39,9 +39,9 @@ Use the narrowest command that proves the point, then widen.
 
 ### Manual Pre-LLM Validation
 
-- `uv run distill-abm smoke-ingest-netlogo --models-root data --output-root results/ingest_smoke_latest`
-- `uv run distill-abm smoke-viz --models-root data --output-root results/viz_smoke_latest --netlogo-home /path/to/NetLogo`
-- `uv run distill-abm smoke-doe --ingest-root results/ingest_smoke_latest --viz-root results/viz_smoke_latest --output-root results/doe_smoke_latest`
+- `uv run distill-abm smoke-ingest-netlogo --models-root data --output-root results/archive/ingest_smoke_latest`
+- `uv run distill-abm smoke-viz --models-root data --output-root results/archive/viz_smoke_latest --netlogo-home /path/to/NetLogo`
+- `uv run distill-abm smoke-doe --ingest-root results/archive/ingest_smoke_latest --viz-root results/archive/viz_smoke_latest --output-root results/archive/doe_smoke_latest`
 
 ### Canonical Agent Verification
 
@@ -56,10 +56,10 @@ Use `quality-gate` when the change scope is obvious and you want the CLI to choo
 
 The repository already preserves several evidence-producing surfaces:
 
-- `results/ingest_smoke_latest/`
-- `results/viz_smoke_latest/`
-- `results/doe_smoke_latest/`
-- `results/agent_validation/latest/`
+- `results/archive/ingest_smoke_latest/`
+- `results/archive/viz_smoke_latest/`
+- `results/archive/doe_smoke_latest/`
+- `results/archive/agent_validation/latest/`
 
 When a task changes one of these workflows, the agent should leave the refreshed artifacts behind and reference them in the final report instead of only claiming that the workflow was run.
 

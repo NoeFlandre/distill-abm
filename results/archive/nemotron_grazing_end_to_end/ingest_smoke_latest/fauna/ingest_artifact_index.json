@@ -1,0 +1,12 @@
+{
+  "cleaned_documentation_json": "/Users/noeflandre/.openclaw/sandboxes/agent-main-telegram-direct-85634-a16a4225/distill-abm/results/ingest_smoke_latest/fauna/JSON/cleaned_documentation.json",
+  "documentation_json": "/Users/noeflandre/.openclaw/sandboxes/agent-main-telegram-direct-85634-a16a4225/distill-abm/results/ingest_smoke_latest/fauna/JSON/documentation.json",
+  "documentation_without_default_json": "/Users/noeflandre/.openclaw/sandboxes/agent-main-telegram-direct-85634-a16a4225/distill-abm/results/ingest_smoke_latest/fauna/JSON/documentation_without_default.json",
+  "experiment_parameters_json": "/Users/noeflandre/.openclaw/sandboxes/agent-main-telegram-direct-85634-a16a4225/distill-abm/results/ingest_smoke_latest/fauna/JSON/experiment_parameters.json",
+  "extracted_code_txt": "/Users/noeflandre/.openclaw/sandboxes/agent-main-telegram-direct-85634-a16a4225/distill-abm/results/ingest_smoke_latest/fauna/TXT/extracted_code.txt",
+  "final_documentation_txt": "/Users/noeflandre/.openclaw/sandboxes/agent-main-telegram-direct-85634-a16a4225/distill-abm/results/ingest_smoke_latest/fauna/TXT/final_documentation.txt",
+  "gui_parameters_json": "/Users/noeflandre/.openclaw/sandboxes/agent-main-telegram-direct-85634-a16a4225/distill-abm/results/ingest_smoke_latest/fauna/JSON/gui_parameters.json",
+  "narrative_txt": "/Users/noeflandre/.openclaw/sandboxes/agent-main-telegram-direct-85634-a16a4225/distill-abm/results/ingest_smoke_latest/fauna/TXT/narrative_combined.txt",
+  "updated_experiment_parameters_json": "/Users/noeflandre/.openclaw/sandboxes/agent-main-telegram-direct-85634-a16a4225/distill-abm/results/ingest_smoke_latest/fauna/JSON/updated_experiment_parameters.json",
+  "updated_gui_parameters_json": "/Users/noeflandre/.openclaw/sandboxes/agent-main-telegram-direct-85634-a16a4225/distill-abm/results/ingest_smoke_latest/fauna/JSON/updated_gui_parameters.json"
+}

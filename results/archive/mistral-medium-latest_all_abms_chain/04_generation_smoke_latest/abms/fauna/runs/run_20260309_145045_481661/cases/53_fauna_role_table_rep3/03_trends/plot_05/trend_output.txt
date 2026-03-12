@@ -1,0 +1,11 @@
+The cumulative number of postpartum female prey animals hunted and killed by forager bands in the Megaherbivore Hunting Pressure Model (MHPM) shows a distinct trend over the simulation period. Initially, the count starts at zero and exhibits a rapid increase. This upward trend is particularly notable in the early stages, with significant growth observed up to around the 927th tick. During this phase, the rate of increase is substantial, as indicated by the high Kendall tau values close to 1 and positive slopes in the rolling Mann-Kendall analysis. 
+
+Following this initial rapid increase, the rate of growth begins to slow down. Between the 928th and 1391st ticks, the trend continues to be upward but at a much reduced rate, with lower Kendall tau values and slopes approaching zero. This suggests a deceleration in the accumulation of hunted postpartum females. 
+
+From the 1392nd to 1623rd ticks, the trend stabilizes, showing no significant increase or decrease, as evidenced by a non-significant Mann-Kendall test. This period marks a plateau in the cumulative count, hovering around the maximum values observed. 
+
+Subsequently, there is a slight resurgence in the increasing trend from the 1624th to 1855th ticks, although the growth rate remains minimal. This is followed by a decreasing trend from the 1856th tick onwards, indicating a slight reduction in the cumulative count of hunted postpartum females towards the end of the simulation period. 
+
+The data also exhibits some oscillatory behavior with a dominant period of approximately 63 ticks, particularly noticeable towards the latter part of the simulation. The peaks and valleys identified in the series suggest minor fluctuations around the plateau, with the cumulative count reaching its highest values around the 1826th tick. 
+
+Overall, the trend demonstrates an initial rapid accumulation of hunted postpartum females, followed by a deceleration and stabilization, with minor oscillations and a slight decrease towards the end of the simulation period.

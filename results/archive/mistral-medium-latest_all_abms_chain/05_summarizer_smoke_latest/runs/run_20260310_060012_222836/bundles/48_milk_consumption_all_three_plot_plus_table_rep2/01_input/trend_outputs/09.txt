@@ -1,0 +1,9 @@
+The mean habit factor for skimmed and semi-skimmed milk starts at a baseline value of 1.0000. It remains relatively stable with minor fluctuations around this value for the initial steps. This stability suggests that initially, the habit factor does not significantly influence the choice of skimmed or semi-skimmed milk among the agents. 
+
+Starting around step 5, there is a noticeable shift as the mean habit factor begins to increase steadily. This upward trend becomes more pronounced and statistically significant from step 5 onwards, indicating a growing influence of habit formation on the choice of skimmed and semi-skimmed milk. The trend continues to rise consistently through subsequent steps, reflecting an increasing propensity among agents to choose these milk types due to habit formation. 
+
+The mean habit factor reaches its peak value of 1.5879 at the final step, indicating a strong habit influence by the end of the simulation period. The consistent increase in the mean habit factor, particularly after the initial stable phase, suggests that over time, agents are increasingly likely to choose skimmed or semi-skimmed milk due to the reinforcement of habits. 
+
+The presence of strong oscillations in the latter part of the simulation, particularly around steps 17 to 30, indicates periodic fluctuations in the habit factor. These oscillations suggest that while the overall trend is increasing, there are intervals where the habit factor experiences temporary variations, potentially due to interactions between agents or external influences. 
+
+For decision-makers, the steady increase in the mean habit factor for skimmed and semi-skimmed milk implies that interventions aimed at promoting these milk types could benefit from strategies that reinforce habit formation. Understanding the periods of oscillation could help in timing these interventions to maximize their effectiveness during phases of lower habit influence.

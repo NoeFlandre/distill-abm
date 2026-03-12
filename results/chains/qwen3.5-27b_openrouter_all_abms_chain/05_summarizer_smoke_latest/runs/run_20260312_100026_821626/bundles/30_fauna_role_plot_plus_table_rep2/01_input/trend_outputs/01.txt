@@ -1,1 +1,0 @@
-Throughout the simulation, the number of human hunter-gatherer bands remained consistently at 20. This stability persisted from the initial time step through the final recorded observation. No fluctuations, peaks, valleys, or trends were observed, indicating an unchanging population of forager bands across the entire duration.

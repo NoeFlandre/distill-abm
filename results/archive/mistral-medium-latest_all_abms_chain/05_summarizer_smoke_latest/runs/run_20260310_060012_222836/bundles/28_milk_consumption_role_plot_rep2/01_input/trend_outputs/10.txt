@@ -1,0 +1,9 @@
+The mean choice function deviation in the agent-based model exhibits distinct trends over the simulated time steps. Initially, the deviation starts at a very low value close to zero. This indicates that at the beginning of the simulation, agents have very similar choice function scores, suggesting a high level of uniformity in their decision-making processes regarding milk consumption. 
+
+As the simulation progresses, the deviation increases rapidly within the first few steps. By around the fifth step, the deviation reaches approximately 0.5. This sharp rise indicates a growing diversity in the choice function scores among agents, reflecting increasing variability in their preferences and behaviors towards different types of milk. 
+
+Following this rapid increase, the rate of change in the deviation begins to slow down. Between steps 5 and 10, the deviation continues to rise but at a more gradual pace, reaching around 0.6. This period suggests a stabilization phase where the diversity in choice function scores is still increasing but not as dramatically as in the initial steps. 
+
+From step 10 onwards, the deviation continues to increase but at an even slower rate. By step 15, the deviation is slightly above 0.6, and it continues to rise incrementally, approaching a value close to 0.7 by the end of the simulation at step 30. This trend indicates that while the diversity in choice function scores among agents is still growing, it is doing so at a very slow pace, suggesting a near-saturation point where the deviation levels off. 
+
+Overall, the mean choice function deviation shows an initial phase of rapid diversification in agent behaviors, followed by a gradual increase and eventual stabilization, indicating a complex interplay of factors influencing the agents' decision-making processes over time.

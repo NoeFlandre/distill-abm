@@ -1,0 +1,5 @@
+The line chart shows the mean household risk attitude from 0 to 100 steps, ranging from approximately -0.4 to 0.8 for six agents.
+The steps up to 10 show a sharp increase from below 0 to nearly 0.8.
+In steps 15, 16, and 25, the speed of increase decreases, but the metric still rises above 0.8.
+In steps 45 to 50 and again from 65 to 70, the metric experiences minor dips, before rising steadily beyond 0.8 in step 85.
+By steps 90 to 100, the metric stays nearly steady at just below 0.8, except for Agent 5, which is almost steady at around 0.45. Agents 1, 4, and 6 are below 0 at times.

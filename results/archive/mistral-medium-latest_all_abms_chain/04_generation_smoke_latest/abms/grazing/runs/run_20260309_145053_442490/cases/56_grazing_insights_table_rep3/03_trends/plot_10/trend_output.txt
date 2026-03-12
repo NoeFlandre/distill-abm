@@ -1,0 +1,7 @@
+The number of households following the E-RO strategy, which represents non-learning agents, exhibits a general decreasing trend over the observed time steps. Initially, the count starts at 20 households and experiences slight fluctuations in the early stages. The most notable peak occurs at time step 8 with a value of 21.1 households, followed by a series of smaller peaks and valleys. 
+
+From time step 20 onwards, there is a significant and consistent decline in the number of E-RO households. This decreasing trend is statistically significant in multiple intervals, particularly between time steps 11-21, 22-32, 33-43, 44-54, and 55-65. The rate of decline varies, with the steepest drop observed between time steps 11-21, where the slope of the decrease is -0.221. 
+
+After time step 65, the trend stabilizes, and no significant trends are observed from time steps 66-98. The number of E-RO households eventually settles around a lower value, with the minimum count of approximately 14.6667 households observed at time step 92. 
+
+The implications for decision makers include recognizing the gradual shift away from the E-RO strategy among households. This trend suggests that over time, households may be adopting different strategies, potentially influenced by learning and adaptation mechanisms within the model. Understanding this shift can help in designing interventions or policies that support sustainable livestock management practices and improve household livelihoods in common property grazing systems.

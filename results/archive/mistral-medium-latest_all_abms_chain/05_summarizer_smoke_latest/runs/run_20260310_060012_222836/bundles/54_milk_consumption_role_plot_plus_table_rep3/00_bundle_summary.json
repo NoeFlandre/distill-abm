@@ -1,0 +1,24 @@
+{
+  "bundle_id": "54_milk_consumption_role_plot_plus_table_rep3",
+  "case_id": "54_milk_consumption_role_plot_plus_table_rep3",
+  "abm": "milk_consumption",
+  "context_output_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/02_context/context_output.txt",
+  "trend_output_paths": [
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_01/trend_output.txt",
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_02/trend_output.txt",
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_03/trend_output.txt",
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_04/trend_output.txt",
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_05/trend_output.txt",
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_06/trend_output.txt",
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_07/trend_output.txt",
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_08/trend_output.txt",
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_09/trend_output.txt",
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_10/trend_output.txt",
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_11/trend_output.txt",
+    "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/cases/54_milk_consumption_role_plot_plus_table_rep3/03_trends/plot_12/trend_output.txt"
+  ],
+  "validation_note": "Bundle discovered from a completed full-case matrix smoke run. Used to exercise the summarizer pipeline over one context output plus all trend outputs.",
+  "context_length": 3475,
+  "trend_count": 12,
+  "combined_input_length": 21662
+}

@@ -1,0 +1,86 @@
+# Full Case Matrix Smoke Report
+
+- success: `true`
+- case_count: `72`
+- failed_case_count: `0`
+- run_log_path: `/Users/noeflandre/distill-abm/results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_105437_842508/run.log.jsonl`
+- viewer_html_path: `results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_105437_842508/review.html`
+- prompt_compression_summary_path: `results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_105437_842508/prompt_compression_summary.json`
+- observability_csv_path: `results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_105437_842508/run_observability.csv`
+- observability_summary_json_path: `results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_105437_842508/run_observability_summary.json`
+- observability_summary_markdown_path: `results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260312_105437_842508/run_observability_summary.md`
+
+| case_id | evidence_mode | prompt_variant | repetition | success | reused |
+| --- | --- | --- | --- | --- | --- |
+| 01_grazing_none_plot_rep1 | plot | none | 1 | true | true |
+| 02_grazing_none_table_rep1 | table | none | 1 | true | true |
+| 03_grazing_none_plot_plus_table_rep1 | plot+table | none | 1 | true | true |
+| 04_grazing_role_plot_rep1 | plot | role | 1 | true | true |
+| 05_grazing_role_table_rep1 | table | role | 1 | true | true |
+| 06_grazing_role_plot_plus_table_rep1 | plot+table | role | 1 | true | true |
+| 07_grazing_insights_plot_rep1 | plot | insights | 1 | true | true |
+| 08_grazing_insights_table_rep1 | table | insights | 1 | true | true |
+| 09_grazing_insights_plot_plus_table_rep1 | plot+table | insights | 1 | true | true |
+| 10_grazing_example_plot_rep1 | plot | example | 1 | true | true |
+| 11_grazing_example_table_rep1 | table | example | 1 | true | true |
+| 12_grazing_example_plot_plus_table_rep1 | plot+table | example | 1 | true | true |
+| 13_grazing_role+example_plot_rep1 | plot | role+example | 1 | true | true |
+| 14_grazing_role+example_table_rep1 | table | role+example | 1 | true | true |
+| 15_grazing_role+example_plot_plus_table_rep1 | plot+table | role+example | 1 | true | true |
+| 16_grazing_role+insights_plot_rep1 | plot | role+insights | 1 | true | true |
+| 17_grazing_role+insights_table_rep1 | table | role+insights | 1 | true | true |
+| 18_grazing_role+insights_plot_plus_table_rep1 | plot+table | role+insights | 1 | true | true |
+| 19_grazing_insights+example_plot_rep1 | plot | insights+example | 1 | true | true |
+| 20_grazing_insights+example_table_rep1 | table | insights+example | 1 | true | true |
+| 21_grazing_insights+example_plot_plus_table_rep1 | plot+table | insights+example | 1 | true | true |
+| 22_grazing_all_three_plot_rep1 | plot | all_three | 1 | true | true |
+| 23_grazing_all_three_table_rep1 | table | all_three | 1 | true | true |
+| 24_grazing_all_three_plot_plus_table_rep1 | plot+table | all_three | 1 | true | true |
+| 25_grazing_none_plot_rep2 | plot | none | 2 | true | true |
+| 26_grazing_none_table_rep2 | table | none | 2 | true | true |
+| 27_grazing_none_plot_plus_table_rep2 | plot+table | none | 2 | true | true |
+| 28_grazing_role_plot_rep2 | plot | role | 2 | true | true |
+| 29_grazing_role_table_rep2 | table | role | 2 | true | true |
+| 30_grazing_role_plot_plus_table_rep2 | plot+table | role | 2 | true | true |
+| 31_grazing_insights_plot_rep2 | plot | insights | 2 | true | true |
+| 32_grazing_insights_table_rep2 | table | insights | 2 | true | true |
+| 33_grazing_insights_plot_plus_table_rep2 | plot+table | insights | 2 | true | true |
+| 34_grazing_example_plot_rep2 | plot | example | 2 | true | true |
+| 35_grazing_example_table_rep2 | table | example | 2 | true | true |
+| 36_grazing_example_plot_plus_table_rep2 | plot+table | example | 2 | true | true |
+| 37_grazing_role+example_plot_rep2 | plot | role+example | 2 | true | true |
+| 38_grazing_role+example_table_rep2 | table | role+example | 2 | true | true |
+| 39_grazing_role+example_plot_plus_table_rep2 | plot+table | role+example | 2 | true | true |
+| 40_grazing_role+insights_plot_rep2 | plot | role+insights | 2 | true | true |
+| 41_grazing_role+insights_table_rep2 | table | role+insights | 2 | true | true |
+| 42_grazing_role+insights_plot_plus_table_rep2 | plot+table | role+insights | 2 | true | true |
+| 43_grazing_insights+example_plot_rep2 | plot | insights+example | 2 | true | true |
+| 44_grazing_insights+example_table_rep2 | table | insights+example | 2 | true | true |
+| 45_grazing_insights+example_plot_plus_table_rep2 | plot+table | insights+example | 2 | true | true |
+| 46_grazing_all_three_plot_rep2 | plot | all_three | 2 | true | true |
+| 47_grazing_all_three_table_rep2 | table | all_three | 2 | true | true |
+| 48_grazing_all_three_plot_plus_table_rep2 | plot+table | all_three | 2 | true | true |
+| 49_grazing_none_plot_rep3 | plot | none | 3 | true | true |
+| 50_grazing_none_table_rep3 | table | none | 3 | true | true |
+| 51_grazing_none_plot_plus_table_rep3 | plot+table | none | 3 | true | true |
+| 52_grazing_role_plot_rep3 | plot | role | 3 | true | true |
+| 53_grazing_role_table_rep3 | table | role | 3 | true | true |
+| 54_grazing_role_plot_plus_table_rep3 | plot+table | role | 3 | true | true |
+| 55_grazing_insights_plot_rep3 | plot | insights | 3 | true | true |
+| 56_grazing_insights_table_rep3 | table | insights | 3 | true | true |
+| 57_grazing_insights_plot_plus_table_rep3 | plot+table | insights | 3 | true | true |
+| 58_grazing_example_plot_rep3 | plot | example | 3 | true | true |
+| 59_grazing_example_table_rep3 | table | example | 3 | true | true |
+| 60_grazing_example_plot_plus_table_rep3 | plot+table | example | 3 | true | true |
+| 61_grazing_role+example_plot_rep3 | plot | role+example | 3 | true | true |
+| 62_grazing_role+example_table_rep3 | table | role+example | 3 | true | true |
+| 63_grazing_role+example_plot_plus_table_rep3 | plot+table | role+example | 3 | true | true |
+| 64_grazing_role+insights_plot_rep3 | plot | role+insights | 3 | true | true |
+| 65_grazing_role+insights_table_rep3 | table | role+insights | 3 | true | true |
+| 66_grazing_role+insights_plot_plus_table_rep3 | plot+table | role+insights | 3 | true | true |
+| 67_grazing_insights+example_plot_rep3 | plot | insights+example | 3 | true | true |
+| 68_grazing_insights+example_table_rep3 | table | insights+example | 3 | true | true |
+| 69_grazing_insights+example_plot_plus_table_rep3 | plot+table | insights+example | 3 | true | true |
+| 70_grazing_all_three_plot_rep3 | plot | all_three | 3 | true | true |
+| 71_grazing_all_three_table_rep3 | table | all_three | 3 | true | true |
+| 72_grazing_all_three_plot_plus_table_rep3 | plot+table | all_three | 3 | true | true |

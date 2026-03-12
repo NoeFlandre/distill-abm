@@ -1,0 +1,18 @@
+{
+    "number-of-agents": 1000,
+    "habit-on?": true,
+    "network-type": "watts-strogatz",
+    "norms": true,
+    "network-parameter": 8,
+    "memory-lifetime": 5,
+    "habit-threshold": 2,
+    "cognitive-dissonance-threshold": 0.15,
+    "p-interact": 0.3,
+    "social-blindness": 0.51,
+    "social-conformity": 0.28,
+    "social-susceptibility": 0.2,
+    "alt-health-mean-initial": 1.69,
+    "alt-env-mean-initial": 1.12,
+    "incumbent-initial-habit": 10,
+    "justification": 0.61
+}

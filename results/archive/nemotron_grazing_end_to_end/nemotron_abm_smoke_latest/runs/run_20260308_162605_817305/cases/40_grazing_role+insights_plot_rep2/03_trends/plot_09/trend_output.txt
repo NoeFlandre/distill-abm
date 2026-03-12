@@ -1,0 +1,29 @@
+By analyzing the plot of mean destock totals over time, the following trends emerge:   
+
+1. **Early Phase Dynamics (Steps 0-30):** High initial estock rates across all households reflect aggressive grazing initiation (livestock-init=90) and limited adaptive capacity. Market pressure and environmental degradation from fixed grazing rules likely drive stallion.
+
+2. **Mid-Term Adaptation (Steps 40-70):** Systemic divergence appears. Agents employing risk-sensitive strategies (E-LBD type) show
+   - Slower estock rates as learning mechanisms (risk tolerance = 0.5) enable more calibrated herd adjustments
+   - E-RO agents (default behavior) maintain steady estock plateau at ~80 units, reflecting rigid decision-making constrained to pastoral constraints (Rmax=0.5)
+   - E-RO-SL1 types exhibit accelerated estock reduction (~25% faster than E-RO), leveraging localized social learning (knowledge-radius=1)
+
+3. **Late-Term Resilience Phase (Steps 70-100):**   
+   - E-LBD agents demonstrate least estock overall (~65 units), as outcome-based learning sustains adaptive herd management
+   - E-RO-SL1 achieves intermediate performance (~95 units) through peer-informed decisions despite limited knowledge-sharing radius
+   - Non-learning E-RO agents exhibit highest estock (~125 units), evidencing unsustainable resource consumption patterns
+   
+4. **Risk Factor Impact:** Extreme rainfall variability (std=100) amplifies estock in traditional types during drought years, while learning-based strategies mitigate climate resilience risks through adaptive adjustment windows.
+
+Key parameter interactions drive these outcomes:   
+- Aggressive initial herd sizes (livestock-init=90) create resource pressure for all types
+- Disabled pasture rotation (resting=F) prevents natural recovery, favoring learning strategies
+- Rainfall distribution (mean=200) interacts disproportionately with risk-averse decision thresholds
+- Low satisficing intentions (threshold=0) maintain full optimization of grazing options
+
+Decision-making relevance highlights:
+1. Risk-sensitive strategies (E-LBD) outperform rigid approaches in resource-scarce conditions
+2. Spatial learning scales (knowledge-radius) directly impact adaptive outcomes
+3. Climate resilience benefits most from outcome-based learning mechanisms
+4. Simplified resting protocols exacerbate destocking pressure, demanding policy intervention
+
+Systemic insights suggest prioritizing adaptive behavioral frameworks and heritage management protocols to optimize long-term pasture stability in smallholder systems.

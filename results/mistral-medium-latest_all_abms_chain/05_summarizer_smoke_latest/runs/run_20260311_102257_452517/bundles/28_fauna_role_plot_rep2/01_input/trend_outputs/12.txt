@@ -1,0 +1,7 @@
+The total energy of female animals in the Megaherbivore Hunting Pressure Model (MHPM) exhibits a clear and consistent trend across simulations. Initially, the total energy of female animals is high, starting around 12,000 units. This high energy level indicates a healthy and abundant population of female prey at the beginning of the simulation. 
+
+In the early stages, up to approximately 500 steps, there is a sharp decline in the total energy. This rapid decrease suggests a significant reduction in the population or energy reserves of female animals, potentially due to high hunting pressure, environmental stress, or a combination of both. By around 500 steps, the total energy drops to about 2,000 units, indicating a substantial decline in the female population's energy levels. 
+
+Following this sharp decline, the rate of decrease in total energy slows down considerably. From approximately 500 to 2,000 steps, the total energy continues to decline but at a much slower rate, eventually approaching zero. This gradual decline suggests that the remaining female animals are either being hunted to extinction or succumbing to environmental pressures at a slower pace. 
+
+By the end of the simulation at 2,000 steps, the total energy of female animals approaches zero, indicating that the population has been nearly or completely depleted. This trend highlights the severe impact of the modeled factors on the female prey population over time.

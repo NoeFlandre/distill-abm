@@ -1,0 +1,16 @@
+ABM,Summary,LLM,BLEU,METEOR,R-1,R-2,R-L,Reading ease
+fauna,bart,mistral-medium-latest,0.06,0.29,0.51,0.17,0.21,38.99
+fauna,bert,mistral-medium-latest,0.04,0.29,0.50,0.13,0.22,43.32
+fauna,longformer_ext,mistral-medium-latest,0.05,0.28,0.47,0.13,0.19,47.51
+fauna,none,mistral-medium-latest,0.01,0.25,0.19,0.06,0.10,47.04
+fauna,t5,mistral-medium-latest,0.03,0.28,0.46,0.13,0.21,44.27
+grazing,bart,mistral-medium-latest,0.05,0.24,0.53,0.17,0.23,45.80
+grazing,bert,mistral-medium-latest,0.04,0.25,0.56,0.17,0.26,44.59
+grazing,longformer_ext,mistral-medium-latest,0.07,0.29,0.53,0.19,0.25,52.91
+grazing,none,mistral-medium-latest,0.02,0.31,0.27,0.12,0.15,46.96
+grazing,t5,mistral-medium-latest,0.03,0.21,0.48,0.15,0.22,46.95
+milk_consumption,bart,mistral-medium-latest,0.07,0.23,0.51,0.21,0.25,51.02
+milk_consumption,bert,mistral-medium-latest,0.06,0.23,0.51,0.22,0.25,48.34
+milk_consumption,longformer_ext,mistral-medium-latest,0.13,0.27,0.56,0.23,0.26,62.06
+milk_consumption,none,mistral-medium-latest,0.07,0.35,0.45,0.19,0.21,52.81
+milk_consumption,t5,mistral-medium-latest,0.05,0.18,0.45,0.19,0.22,59.63

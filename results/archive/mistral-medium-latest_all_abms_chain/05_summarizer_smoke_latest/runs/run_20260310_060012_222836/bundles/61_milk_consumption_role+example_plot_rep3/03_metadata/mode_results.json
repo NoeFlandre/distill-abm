@@ -1,0 +1,55 @@
+{
+  "bundle_id": "61_milk_consumption_role+example_plot_rep3",
+  "case_id": "61_milk_consumption_role+example_plot_rep3",
+  "abm": "milk_consumption",
+  "bundle_dir": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/61_milk_consumption_role+example_plot_rep3",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/61_milk_consumption_role+example_plot_rep3/02_summaries/none.txt",
+      "error": null,
+      "duration_seconds": 9.579816833138466e-7,
+      "input_length": 16965,
+      "output_length": 16965
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/61_milk_consumption_role+example_plot_rep3/02_summaries/bart.txt",
+      "error": null,
+      "duration_seconds": 34.04266674997052,
+      "input_length": 16965,
+      "output_length": 1798
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/61_milk_consumption_role+example_plot_rep3/02_summaries/bert.txt",
+      "error": null,
+      "duration_seconds": 117.58963166701142,
+      "input_length": 16965,
+      "output_length": 1997
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/61_milk_consumption_role+example_plot_rep3/02_summaries/t5.txt",
+      "error": null,
+      "duration_seconds": 52.259154375002254,
+      "input_length": 16965,
+      "output_length": 1463
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/61_milk_consumption_role+example_plot_rep3/02_summaries/longformer_ext.txt",
+      "error": null,
+      "duration_seconds": 27.53451587498421,
+      "input_length": 16965,
+      "output_length": 1883
+    }
+  ]
+}

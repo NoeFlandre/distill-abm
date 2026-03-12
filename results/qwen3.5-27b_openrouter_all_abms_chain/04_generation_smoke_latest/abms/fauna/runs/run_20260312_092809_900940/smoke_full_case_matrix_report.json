@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "abm": "fauna",
+      "case_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_092809_900940/cases/01_fauna_none_plot_rep1",
+      "case_id": "01_fauna_none_plot_rep1",
+      "error": "model did not return valid structured JSON for the smoke output",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "resumed_from_existing": true,
+      "success": false
+    }
+  ],
+  "failed_case_ids": [
+    "01_fauna_none_plot_rep1"
+  ],
+  "finished_at_utc": "2026-03-12T09:28:17.255095+00:00",
+  "observability_csv_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_092809_900940/run_observability.csv",
+  "observability_summary_json_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_092809_900940/run_observability_summary.json",
+  "observability_summary_markdown_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_092809_900940/run_observability_summary.md",
+  "output_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_092809_900940",
+  "prompt_compression_summary_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_092809_900940/prompt_compression_summary.json",
+  "report_json_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_092809_900940/smoke_full_case_matrix_report.json",
+  "report_markdown_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_092809_900940/smoke_full_case_matrix_report.md",
+  "review_csv_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_092809_900940/request_review.csv",
+  "run_id": "run_20260312_092809_900940",
+  "run_log_path": "/Users/noeflandre/distill-abm/results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_092809_900940/run.log.jsonl",
+  "started_at_utc": "2026-03-12T09:28:09.900940+00:00",
+  "success": false,
+  "viewer_html_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_092809_900940/review.html"
+}

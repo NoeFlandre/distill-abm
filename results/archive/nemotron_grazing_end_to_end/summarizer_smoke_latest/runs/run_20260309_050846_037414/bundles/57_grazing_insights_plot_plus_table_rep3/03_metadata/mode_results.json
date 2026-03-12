@@ -1,0 +1,55 @@
+{
+  "bundle_id": "57_grazing_insights_plot_plus_table_rep3",
+  "case_id": "57_grazing_insights_plot_plus_table_rep3",
+  "abm": "grazing",
+  "bundle_dir": "results/summarizer_smoke_latest/runs/run_20260309_050846_037414/bundles/57_grazing_insights_plot_plus_table_rep3",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/summarizer_smoke_latest/runs/run_20260309_050846_037414/bundles/57_grazing_insights_plot_plus_table_rep3/02_summaries/none.txt",
+      "error": null,
+      "duration_seconds": 3.7497375160455704e-7,
+      "input_length": 21174,
+      "output_length": 21174
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/summarizer_smoke_latest/runs/run_20260309_050846_037414/bundles/57_grazing_insights_plot_plus_table_rep3/02_summaries/bart.txt",
+      "error": null,
+      "duration_seconds": 25.259697499976028,
+      "input_length": 21174,
+      "output_length": 1976
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/summarizer_smoke_latest/runs/run_20260309_050846_037414/bundles/57_grazing_insights_plot_plus_table_rep3/02_summaries/bert.txt",
+      "error": null,
+      "duration_seconds": 13.008655500016175,
+      "input_length": 21174,
+      "output_length": 2203
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/summarizer_smoke_latest/runs/run_20260309_050846_037414/bundles/57_grazing_insights_plot_plus_table_rep3/02_summaries/t5.txt",
+      "error": null,
+      "duration_seconds": 12.57555616699392,
+      "input_length": 21174,
+      "output_length": 1501
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/summarizer_smoke_latest/runs/run_20260309_050846_037414/bundles/57_grazing_insights_plot_plus_table_rep3/02_summaries/longformer_ext.txt",
+      "error": null,
+      "duration_seconds": 30.969945958000608,
+      "input_length": 21174,
+      "output_length": 3421
+    }
+  ]
+}

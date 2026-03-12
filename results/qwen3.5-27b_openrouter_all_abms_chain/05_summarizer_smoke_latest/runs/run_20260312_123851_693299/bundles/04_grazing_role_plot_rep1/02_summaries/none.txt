@@ -1,0 +1,57 @@
+Context and Goals
+
+This simulation extends the RAGE model to study how smallholder farmers manage grazing land when they can learn from their own experience or from neighbors. In this version, each farmer stays on their own plot of land. They decide how many animals to keep based on how the grass is doing and what others are doing. The goal is to see how different learning styles affect the health of the pasture and the farmers' success over time. There are three main ways farmers behave: baseline (E-RO), learning from their own results (E-LBD), and learning from neighbors (E-RO-SL1). The model runs for a set number of years to track changes in grass and livestock.
+
+Key Parameters and Settings
+
+- number-households: Range from 1.0 to 100.0. We set it to 60.
+- satisficing-threshold: Range from 0.0 to 100.0. We set it to 0.
+- satisficing-trials: Range from 0.0 to 100.0. We set it to 21.
+- knowledge-radius: Range from 0.0 to 5.0. We set it to 1.
+- resting-threshold: Range from 0.0 to 1.0. We set it to 0.1.
+- intrinsic-preference: Range from 0.0 to 1.0. We set it to 0.
+- social-susceptibility: Range from 0.0 to 1.0. We set it to 0.
+- global-rain?: We set it to True.
+- start-on-homepatch?: We set it to True.
+- resting?: We set it to False.
+- homog-behav-types?: We set it to True.
+- extension-model?: We set it to True.
+- SL2-strategy-switch?: We set it to False.
+- risk-mode?: We set it to True.
+- behavioral-type: We set it to E-RO.
+- number-SAT: We set it to 0.
+- number-E-RO: We set it to 20.
+- number-TRAD: We set it to 0.
+- b: We set it to 0.
+- number-MAX: We set it to 0.
+- rain-mean: We set it to 200.
+- risk-att-init: We set it to 0.5.
+- gr1: We set it to 0.5.
+- number-E-LBD: We set it to 20.
+- gr2: We set it to 0.1.
+- number-E-RO-SL1: We set it to 20.
+- timesteps: We set it to 100.
+- w: We set it to 0.8.
+- number-random: We set it to 0.
+- livestock-init: We set it to 90.
+- rain-std: We set it to 100.
+
+The mean household initial risk attitude for social learning agents remains constant across all simulation steps, ranging from 0 to 100. The values observed span from approximately -0.12 to 0.18, with most values clustered around the neutral point of 0. The highest value remains steady at 0.18, while the lowest value stays at -0.12 throughout the simulation period. This indicates that the initial risk attitudes of the social learning agents do not change over time, reflecting a stable disposition to deviate from the recommended number of livestock.
+
+The mean household risk attitude exhibits significant divergence among agents over time. Initially, risk attitudes cluster between 0.0 and 0.2 at step 0. From step 0 to 10, most agents experience a rapid increase in risk attitude, with values ranging from approximately 0.1 to 0.4. By step 20, the majority of agents have stabilized their risk attitudes, with values distributed across the range of 0.1 to 0.7. A notable trend is observed around step 40, where some agents begin to reduce their risk attitudes significantly, leading to a divergence in risk attitudes by step 60. By step 60, the risk attitudes of agents are spread between -0.4 and 0.8, with some agents maintaining high risk attitudes while others have lowered their risk attitudes to negative values. This trend continues through step 100, with the final risk attitudes of agents remaining widely dispersed.
+
+The mean reserve biomass initially decreases from approximately 90,000 at the start to a range between 80,000 and 85,000 by the 20th time step. This decline continues slightly, reaching values around 80,000 to 85,000 by the 40th time step. From the 40th to the 60th time step, a sharp increase in mean reserve biomass occurs, with values rising from approximately 80,000 to around 120,000. After the 60th time step, the mean reserve biomass stabilizes, with values plateauing between 110,000 and 125,000 until the end of the simulation at the 100th time step.
+
+Initially, at step 0, the average green biomass is approximately 45,000 units. In the early stages, specifically between steps 5 and 15, there is a noticeable decline in green biomass, reaching its lowest point around step 15 with values dipping near 41,000 units. Following this initial decline, the biomass values begin to stabilize slightly before initiating a substantial increase starting around step 40. By step 60, the green biomass has risen significantly, reaching levels around 60,000 units for most trajectories. From step 60 to step 100, the average green biomass continues to grow, albeit at a slower rate, and plateaus towards the end of the simulation. At step 100, the average green biomass for all trajectories settles between approximately 61,000 and 63,500 units, indicating a general trend of recovery and growth after the initial period of decline.
+
+The average total number of livestock, including both healthy livestock and those that have been destocked, starts at an initial value of 90. A sharp decline occurs within the first 20 time steps, reaching a low of approximately 40 to 41 by time step 40. After this minimum, a divergence in trends is observed among the different simulation runs. Some trajectories show a steady recovery, climbing back up to levels between 50 and 62 by time step 100, while others remain relatively flat near the minimum value of 40 to 43 for the remainder of the simulation period.
+
+The average number of livestock destocked across all households begins at 0 at the initial step, then rapidly increases to a peak between 6 and 7 during the early time steps (around 2 to 10). This initial surge indicates a period of significant resource stress leading to substantial livestock removal. Following this peak, the average destocking rate demonstrates a sharp and consistent decline, dropping below 2 by approximately time step 20. As the simulation progresses past time step 30, the metric stabilizes at a low level, fluctuating generally between 0 and 1 for the remainder of the period up to time step 100. This long-term trend suggests that after an initial adjustment phase, the system reaches a more stable state with minimal forced livestock removal.
+
+The Gini coefficient for the distribution of healthy livestock across all households begins at a value of zero at timestep 0, indicating perfect equality at the start of the simulation. Between timesteps 0 and 40, the coefficient exhibits a slow, gradual increase, rising from 0.000 to an average range of approximately 0.010 to 0.020. During this initial phase, the dispersion among simulation runs remains relatively tight, suggesting a uniform response across the different behavioral types initially. From timestep 40 to 60, the rate of increase accelerates significantly. The coefficient climbs rapidly, reaching a spread between 0.020 and 0.050 by timestep 60. This period marks a divergence in outcomes, where some simulation paths begin to show steeper increases in inequality compared to others. In the final phase, from timestep 60 to 100, the inequality continues to rise for all simulation runs, culminating in a wide range of values at timestep 100. The final Gini coefficients vary from approximately 0.030 at the lower bound to over 0.090 at the upper bound. The divergence in trajectories becomes most pronounced in this final interval, with a subset of simulations exhibiting a sharp upward trend in inequality, while others maintain a more moderate, steady increase. By the end of the simulation, the disparity in healthy livestock holdings has significantly increased from the initial state.
+
+The number of households engaging in social learning starts at zero for all simulation runs. Between timesteps 5 and 15, there is a rapid increase in the adoption of social learning, with the count rising to between 12 and 28 households. From timesteps 15 to 40, the rate of increase slows, with the number of households engaging in social learning reaching values between 18 and 50. After timestep 40, the number of households with social learning stabilizes for most runs, with values ranging from 16 to 54. By timestep 60, all simulations have reached their plateau, and no further changes occur in the number of households engaging in social learning up to timestep 100.
+
+The average cumulative number of livestock destocked across all households increases over the 100 timesteps. Initially, from timestep 0 to 20, there is a sharp increase, with values rising from approximately 0 to around 70. From timestep 20 to 60, the rate of increase slows, and the values range between 70 and 110. After timestep 60, the growth continues at a more steady and gradual pace, with values reaching approximately 130 to 170 by timestep 100. The spread among the simulated runs widens over time, indicating variability in the cumulative destocking among different household behaviors or conditions.
+
+The number of households following the E-RO strategy exhibits a range of behaviors across the simulation steps. Initially, all household counts start at 20 at step 0, reflecting the initial setup. By step 10, the counts diverge, with some increasing to peaks near 40 while others drop sharply to levels below 10. After this initial divergence, there are periods of stabilization and fluctuation. For example, around step 30, some household counts stabilize near 25, while others decline further or increase slightly. By step 60, most household counts remain between 10 and 30, though a few drop to near zero. The latter part of the simulation, from step 80 to 100, shows relatively stable but varied counts, with some household counts fluctuating within a narrow range, such as between 20 and 25, while others remain consistently low, below 5.

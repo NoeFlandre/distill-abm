@@ -1,0 +1,55 @@
+{
+  "bundle_id": "23_grazing_all_three_table_rep1",
+  "case_id": "23_grazing_all_three_table_rep1",
+  "abm": "grazing",
+  "bundle_dir": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/23_grazing_all_three_table_rep1",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/23_grazing_all_three_table_rep1/02_summaries/none.txt",
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 17885,
+      "output_length": 17885
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/23_grazing_all_three_table_rep1/02_summaries/bart.txt",
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 17885,
+      "output_length": 1545
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/23_grazing_all_three_table_rep1/02_summaries/bert.txt",
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 17885,
+      "output_length": 1840
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/23_grazing_all_three_table_rep1/02_summaries/t5.txt",
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 17885,
+      "output_length": 1325
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/23_grazing_all_three_table_rep1/02_summaries/longformer_ext.txt",
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 17885,
+      "output_length": 2778
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+**Trend Analysis of Mean Livestock + Destock of Households**  
+
+The average livestock + destock values across households follow a distinct pattern of collapse and recovery:  
+
+- **Initial Overstock and Collapse (Steps 0–30):**
+The system begins at a uniform high of 90 for all households. By step 10, livestock + destock begins a sharp decline, dropping to ~70. This steep reduction intensifies to a trough of ~40 between steps 20–30. This corresponds to a simulated overgrazing crisis, likely driven by (1) high initial livestock stocking (livestock-init=90) and (2) climatic variability (rain-mean=200, rain-std=100) reducing vegetation growth. The lack of resting practices (resting-setting=False) and satisficing-threshold=0 (no proactive conservation triggers) exacerbate resource depletion.
+
+- **Recovery Phase (Steps 40–60):**
+After the trough, livestock + destock rebounds between steps 40–60, peaking at ~60 by step 50. This recovery may reflect agents adapting stocking strategies in response to observed collapse, potentially leveraging social learning (though disabled in this run due to homog-behav-types=True) or risk aversion (risk-mode=True, risk-att-init=0.5). However, the absence of strategy switching (SL2-strategy-switch=False) suggests adaptation is limited to within-behavioral-type adjustments rather than systemic shifts.
+
+- **Stabilization (Steps 60–100):**
+The metric stabilizes between ~50–51 by step 60 and remains flat through step 100. This equilibrium suggests a sustainable balance achieved through reduced stocking rates, possibly due to learned risk aversion or iterative depletion. Variance across simulations increases during the recovery phase (steps 40–60) but declines in the final steps, indicating convergence of agent strategies.
+
+**Contextual Interpretation:**
+The dynamics align with the RAGE model’s focus on social-ecological balance. The initial collapse underscores the fragility of static stocking strategies under climatic stress, while stabilization highlights emergent resilience from agent-based adaptation. The model’s risk-mode and intrinsic- preference parameters (~0.5 risk-att-init, 0 intrinsic-preference) likely temper destructive grazing, preventing further overshoot. The absence of heterogeneous strategies (homog-behav-types=True) limits systemic diversification, resulting in a quasi-equilibrium rather than dynamic equilibrium.
+
+**Key Parameters Driving Dynamics:**
+1. High initial livestock levels (90) and low resting-threshold (0.1) create rapid depletion before adjustments can occur.  
+2. Rainfall variability (std=100) stresses pasture growth, accelerating livestock loss at low biomass.  
+3. Risk-mode enables agents to anticipate negative outcomes, moderate stocking post-collapse.  
+4. Learning-by-doing (E-LBD) and social learning (E-RO-SL1) are disabled, restricting response mechanisms.

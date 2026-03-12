@@ -1,0 +1,8 @@
+{
+  "abm": "grazing",
+  "case_id": "22_grazing_all_three_plot_rep1",
+  "evidence_mode": "plot",
+  "model": "qwen/qwen3.5-27b",
+  "prompt_variant": "all_three",
+  "repetition": 1
+}

@@ -10,8 +10,15 @@ __pycache__/
 .coverage
 coverage.xml
 htmlcov/
-results/
-Results/
+results/*
+!results/archive/
+!results/archive/**
+!results/eval_qwen_mistral/
+!results/eval_qwen_mistral/**
+!results/mistral-medium-latest_all_abms_chain/
+!results/mistral-medium-latest_all_abms_chain/**
+!results/qwen3.5-27b_openrouter_all_abms_chain/
+!results/qwen3.5-27b_openrouter_all_abms_chain/**
 !tests/fixtures/notebook_parity/archive_assets/**
 *.log
 data/paper/

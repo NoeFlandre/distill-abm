@@ -1,0 +1,7 @@
+The simulations show a variety of trends in the adoption of social learning among households over 100 steps. Initially, all simulations start with zero households engaging in social learning. By step 10, the number of households adopting social learning begins to diverge significantly across different simulations.  
+
+In several simulations, there is a rapid increase in the number of households engaging in social learning, reaching around 48 to 54 households by step 20. These simulations then show a plateau, maintaining this high level of adoption for the remainder of the steps. Another set of simulations shows a more gradual increase, reaching around 36 to 42 households by step 30, and then stabilizing. 
+
+A third group of simulations indicates a slower and more staggered adoption process. These simulations reach around 18 to 24 households by step 40 and then plateau. Finally, a few simulations show minimal adoption of social learning, with the number of households engaging in social learning remaining below 12 throughout the 100 steps. 
+
+Overall, the trends indicate varying rates and extents of social learning adoption among households, with some simulations showing rapid and widespread adoption, while others exhibit slower and more limited uptake.

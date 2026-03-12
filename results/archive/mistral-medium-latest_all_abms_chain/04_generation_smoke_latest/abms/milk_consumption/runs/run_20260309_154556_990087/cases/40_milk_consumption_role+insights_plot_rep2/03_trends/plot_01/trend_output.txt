@@ -1,0 +1,11 @@
+The average weekly consumption of whole milk per agent starts at approximately 2600 units at the initial time step. This high initial value indicates a strong preference or habit for whole milk consumption among the agents at the beginning of the simulation.  
+
+In the early stages, from time step 0 to around time step 5, there is a sharp decline in the mean whole milk consumption. The consumption drops steeply from about 2600 units to approximately 1000 units. This rapid decrease suggests a significant shift in consumer behavior, likely influenced by the introduction or increased awareness of alternative milk types and their perceived benefits. 
+
+From time step 5 to around time step 15, the decline continues but at a slower rate, stabilizing around 800 units. This period indicates a phase of adjustment where agents are gradually adopting new habits and preferences, possibly influenced by social interactions and changing perceptions about health and environmental impacts of different milk types. 
+
+Between time step 15 and time step 25, the consumption of whole milk remains relatively stable, fluctuating slightly around 800 units. This stability suggests that the agents have reached a new equilibrium in their consumption patterns, balancing their habits, social influences, and perceptions. 
+
+After time step 25, there is a slight decline followed by a minor increase, but the overall trend remains relatively flat with minor fluctuations. This indicates that the agents' consumption habits have largely stabilized, and the influence of initial habits, social interactions, and perceptions have been integrated into their decision-making processes. 
+
+For decision makers, the initial sharp decline highlights the impact of introducing alternative milk types and the importance of health and environmental perceptions in influencing consumer behavior. The subsequent stabilization suggests that while initial habits are strong, they can be significantly altered through sustained efforts in perception management and social influence. This insight can guide marketing strategies, public health campaigns, and policy interventions aimed at promoting healthier or more environmentally friendly choices.

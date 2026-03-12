@@ -1,0 +1,77 @@
+Context and Goals
+
+This simulation extends the RAGE model to study how smallholder farmers manage grazing land when they can learn from their own experience or from neighbors. In this version, each farmer stays on their own plot of land. They decide how many animals to keep based on how the grass is doing and what others are doing. The goal is to see how different learning styles affect the health of the pasture and the farmers' success over time. There are three main ways farmers behave: baseline (E-RO), learning from their own results (E-LBD), and learning from neighbors (E-RO-SL1). The model runs for a set number of years to track changes in grass and livestock.
+
+Key Parameters and Settings
+
+- number-households: Range from 1.0 to 100.0. We set it to 60.
+- satisficing-threshold: Range from 0.0 to 100.0. We set it to 0.
+- satisficing-trials: Range from 0.0 to 100.0. We set it to 21.
+- knowledge-radius: Range from 0.0 to 5.0. We set it to 1.
+- resting-threshold: Range from 0.0 to 1.0. We set it to 0.1.
+- intrinsic-preference: Range from 0.0 to 1.0. We set it to 0.
+- social-susceptibility: Range from 0.0 to 1.0. We set it to 0.
+- global-rain?: We set it to True.
+- start-on-homepatch?: We set it to True.
+- resting?: We set it to False.
+- homog-behav-types?: We set it to True.
+- extension-model?: We set it to True.
+- SL2-strategy-switch?: We set it to False.
+- risk-mode?: We set it to True.
+- behavioral-type: We set it to E-RO.
+- number-SAT: We set it to 0.
+- number-E-RO: We set it to 20.
+- number-TRAD: We set it to 0.
+- b: We set it to 0.
+- number-MAX: We set it to 0.
+- rain-mean: We set it to 200.
+- risk-att-init: We set it to 0.5.
+- gr1: We set it to 0.5.
+- number-E-LBD: We set it to 20.
+- gr2: We set it to 0.1.
+- number-E-RO-SL1: We set it to 20.
+- timesteps: We set it to 100.
+- w: We set it to 0.8.
+- number-random: We set it to 0.
+- livestock-init: We set it to 90.
+- rain-std: We set it to 100.
+
+The average initial risk attitude of the social learning agents remains constant at a value of 0.0074 for the entire duration of the simulation. From time step 0 to time step 100, the metric shows zero variance, indicating it functions as a fixed parameter rather than a dynamic state. In the context of the grazing model, this stability implies that the agents' initial disposition to deviate from recommended livestock numbers does not evolve through learning or experience, serving instead as a static baseline against which other dynamic factors like forage availability operate.
+
+The mean household risk attitude initiates at 0.0074 and rises consistently through the first 33 time steps, peaking at 0.3814. This early increase suggests farmers are initially increasing their risk tolerance, likely due to learning mechanisms or resource availability. Subsequently, the metric declines to an end value of 0.1911 at timestep 100, with a significant downward trend persisting until approximately timestep 65. This shift indicates a return to risk aversion, possibly as a result of observed degradation or social feedback. The average value across the simulation is 0.2333. A dominant oscillation period of 49 time steps is identified, reflecting cyclical adjustments in behavior. By the simulation's end, the system stabilizes with a moderate level of risk attitude.
+
+The average reserve biomass across the grazing system begins at 90,000 units at the start of the simulation. This initial level reflects the baseline carrying capacity before adaptive management strategies fully take effect. Over the first 26 time steps, the biomass declines steadily, reaching a minimum value of 84,114.07 units at time step 26. This initial decrease is consistent with early simulation phases where livestock pressure may exceed grass regrowth rates before farmers adjust their herd sizes based on environmental feedback. Trend analysis during this period indicates a statistically significant decrease, signaling a phase of pasture depletion.
+
+Following the minimum at step 26, the system enters a prolonged recovery phase. By time step 33, the trajectory shifts significantly upward, with trend analysis confirming a positive slope that persists through the remainder of the simulation. The biomass increases consistently, surpassing the initial starting value and culminating in a maximum of 121,072.59 units at time step 100. This sustained growth suggests that the learning mechanisms implemented, such as learning from own results or neighbors, successfully reduced grazing pressure over time. The final value represents a significant improvement in pasture health, indicating that the adaptive behaviors allowed the vegetation to regenerate beyond initial conditions. Throughout the simulation, while variability exists among runs, the aggregate directionality moves clearly from initial depletion to substantial accumulation of reserve biomass by the end of the 100 time steps.
+
+The average available green biomass initiates at 45,000 units. During the initial phase, the metric experiences a decline, reaching a minimum of 42,057 units at time step 27. This reduction suggests that initial livestock densities exerted pressure on the pasture that outpaced vegetation growth.
+
+A significant shift in dynamics occurs thereafter, with statistical evidence indicating a transition from a decreasing to an increasing trend beginning around time step 33. From this inflection point, the biomass recovers consistently, reaching a peak of 60,535 units by the final time step at 100. This recovery pattern implies that agents utilizing the experience-based outcome strategy adjusted their herd sizes following the initial period of resource depletion. The sustained increase indicates that grazing pressure was reduced to a level allowing for vegetation accumulation above initial conditions. Oscillatory behavior with a dominant period near 50 steps suggests cyclical influences, potentially linked to rainfall variability or management lag times, are present throughout the simulation.
+
+The average total number of livestock across all households initiates at 90 and undergoes a sharp decline over the initial 37 time steps, reaching a minimum value of approximately 41. This precipitous drop likely corresponds to an aggressive destocking phase as farmers adjust to perceived forage constraints and manage risk. Following this initial depletion, the trajectory flattens out between steps 33 and 43 before reversing into a sustained period of growth. By the final time step, the population recovers slightly to approximately 47.5, indicating a new equilibrium that remains significantly below initial levels, suggesting a structural shift in herd management strategies towards lower stock numbers for long-term sustainability.
+
+The average number of livestock destocked across households begins at zero at the initiation of the simulation. This metric experiences a sharp spike within the first few time steps, reaching a maximum value of 6.6144 animals at time step 3. This initial surge likely reflects an immediate adjustment period where the initial livestock load exceeds the carrying capacity of the pasture, necessitating rapid removal of animals to mitigate resource depletion.
+
+Following this peak, the metric exhibits a pronounced downward trend over the first 30 time steps. Trend analysis confirms a significant decreasing pattern from time steps 0 to 10, 11 to 21, and 22 to 32. During this phase, secondary peaks occur at time steps 9, 12, and 17, with values of 3.3733, 2.7406, and 1.4661 respectively, indicating fluctuating but diminishing pressure on the grazing land. This reduction suggests that farmers are effectively adjusting their herd sizes in response to pasture conditions, aligning livestock numbers with available forage.
+
+Between time steps 33 and 65, the trend stabilizes, with statistical tests indicating no significant trend in the windows from 33 to 43 and 55 to 65. The values continue to decline gradually, reaching low levels around time step 30 where a change point is identified. From time step 66 to 76, a statistically significant increasing trend is observed, though the values remain low compared to the initial phase.
+
+By the end of the simulation at time step 100, the average number of destocked livestock settles at 0.3111. The overall mean across the simulation is 0.9582, with a high standard deviation of 1.4331, highlighting significant variability in destocking events early in the simulation compared to the stable, low levels achieved later. The system converges towards a state where minimal livestock removal is required, indicating a balance has been reached between herd size and pasture regeneration under the specified learning behaviors.
+
+The inequality in the distribution of healthy livestock across households begins at effectively zero, reflecting an initial state of uniform asset distribution among the farming population. Over the course of the simulation, this metric demonstrates a consistent and statistically significant upward trajectory, culminating in a value of 0.0726 at the final time step. Rolling trend analysis indicates an uninterrupted increase across all ten-year windows, confirming that the disparity in livestock health grows continuously rather than fluctuating between stability and growth.
+
+Distinct shifts in the rate of inequality accumulation occur early in the timeline, with inflection points identified at time steps 8, 13, 15, 20, and 25. These early variations likely represent the initial divergence in management efficacy as agents with different learning capabilities begin to adjust their herd sizes based on grass availability and social information. A structural change in the trend is observed at time step 51, suggesting a systemic shift where the gap between successful and less successful household strategies widens. This is followed by another change point at time step 71, after which the distribution exhibits signs of cyclical behavior.
+
+Specifically, between time steps 78 and 93, the metric exhibits oscillatory patterns with a dominant period of approximately 49 steps. This rhythmic fluctuation near the end of the simulation may be driven by environmental cycles, such as rainfall variability, interacting with the farmers' grazing decisions. Despite these late-stage oscillations, the overall direction remains positive, ending at the maximum recorded value of 0.0726 at time step 100. This outcome signifies that while the absolute level of inequality remains low, the introduction of diverse behavioral strategies leads to a gradual but persistent stratification of livestock wealth within the community.
+
+The number of households engaging in social learning initiates at 0.0000 and demonstrates a consistent upward trajectory throughout the simulation window. This count climbs steadily from its origin, reaching a peak of approximately 32.07 around the 63rd time step, after which the value plateaus. This progression suggests that as farmers observe the outcomes of their peers, the strategy of social learning propagates through the community until reaching a saturation point involving roughly half of the population.
+
+Statistical analysis confirms a robust positive trend across all rolling time windows, with high levels of significance indicating a non-random adoption pattern. A structural change point is identified at the 40th time step, potentially marking the transition from early adopters to broader community integration. The stabilization of the count near 32 households by the end of the run implies the system has reached a new equilibrium in grazing management practices. The low variance in the latter stages of the simulation reflects a mature state where social influence on livestock decisions is fully established.
+
+The average cumulative number of livestock destocked across households initiates at zero and demonstrates a sustained upward trend over the entire simulation duration.
+
+In the early stages, extending to approximately timestep 25, the accumulation of destocked animals occurs at a rapid rate, with the slope nearing 5 units per time step. This sharp initial increase indicates a period of intensive herd adjustment, likely driven by farmers reducing animal numbers to match available forage resources. A notable change point emerges at timestep 25, marking a deceleration in the destocking rate.
+
+From timestep 25 to 60, the slope decreases significantly, ranging between 0.3 and 1.5 units, suggesting a shift toward more conservative livestock management as the system approaches equilibrium. Following timestep 60, the dynamics stabilize further, maintaining a consistent slope of approximately 0.311 per time step until the end of the run. Minor inflections detected between timesteps 45 and 75 indicate transient variations in management decisions, potentially influenced by stochastic rainfall patterns or differences in learning behaviors among the household types. The final cumulative value reaches approximately 96.8 at timestep 100, reflecting a total turnover of nearly 100 animals per household over the simulation period. Throughout all time windows, the upward trajectory remains statistically significant, confirming a persistent reduction in livestock inventory to manage grazing pressure.
+
+The population of households adhering to the E-RO strategy begins the simulation at a mean count of 20.0. During the initial phase, the number of agents following this strategy experiences a marginal rise, peaking at 21.1 households around time step 8. Following this early fluctuation, the metric enters a prolonged phase of decline. Statistical trend analysis identifies an initial increasing trend for the first 10 steps, which is immediately succeeded by a significant decreasing trend that persists from step 11 through step 65. By the conclusion of the 100-step simulation, the average count of E-RO households diminishes to approximately 14.7. In the final quarter of the run, the trajectory stabilizes, showing no significant directional change. This long-term downward movement suggests that within the grazing management context, the static non-learning behavior represented by E-RO becomes less prevalent over time, potentially as agents adapt or switch to other observed strategies in response to environmental and social pressures within the model.

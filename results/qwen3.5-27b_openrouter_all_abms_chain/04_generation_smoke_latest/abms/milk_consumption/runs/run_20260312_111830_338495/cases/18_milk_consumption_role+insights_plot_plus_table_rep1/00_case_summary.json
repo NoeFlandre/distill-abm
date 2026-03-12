@@ -1,0 +1,8 @@
+{
+  "abm": "milk_consumption",
+  "case_id": "18_milk_consumption_role+insights_plot_plus_table_rep1",
+  "evidence_mode": "plot+table",
+  "model": "qwen/qwen3.5-27b",
+  "prompt_variant": "role+insights",
+  "repetition": 1
+}

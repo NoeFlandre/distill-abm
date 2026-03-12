@@ -1,0 +1,34 @@
+<p><strong>Agent-Based Model Analysis: Behavioral Strategy, Risk Attitude, and Adaptation Across Households</strong></p>
+
+<p><em>a) Initial Phase (Step 0 to 20): Calibration and Baseline Behavior</em></p>
+<p>During the initial phase, all 60 households began with an identical initial risk attitude of 0, indicating no initial preference for risk-taking. However, by step 20, the model demonstrates initial deviations, with no households adopting risk-taking behaviors significantly (<i>i.e.</i>, none approached values near 1.0, close to maximal risk aversion). Up to this point, households consistently techrisk) around neutral values (median: 0.0–0.2). These early steps likely reflect baseline calibration as agents adjust to environmental dynamics (rainfall variability) and household-specific satisficing thresholds.</p>
+
+<p><em>b) Mid-Phase (Step 20 to 50): Increasing Experimentation and Cultural Diffusion</em></p>
+<p>From step 20 to 50, fluctuations in several households' risk attitudes begin to diversify. For</p>
+
+ 
+</p>
+
+\begin{tabular}{c|c}
+Step</td>
+Mean Risk Attitude (All Households) \\
+\hline
+20 & 0.1 \\
+30 & 0.3 \\
+40 & 0.5 \\
+50 & 0.6 \\
+\end{tabular}   
+
+
+ This shift might.</p>
+
+<p><em>c) Late Phase (Step 50 to 100): Stabilization and Cultural Inheritance</em></p>
+<p>By step 50, risk attitudes stabilize into distinct clusters based on behavioral type:</p>
+
+</p>
+
+ 
+
+4. <strong>E-RO-SL1 (20 households)</strong>: Lower risk aversion (0.80–0.88, avg. 0.84). As social learning implicitly overrides risk-aversion tendencies.</p>
+
+ <p>These results suggest that behavioral strategies with</p>

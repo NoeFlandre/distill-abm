@@ -1,0 +1,8 @@
+{
+  "abm": "grazing",
+  "case_id": "71_grazing_all_three_table_rep3",
+  "evidence_mode": "table",
+  "model": "mistral-medium-latest",
+  "prompt_variant": "all_three",
+  "repetition": 3
+}

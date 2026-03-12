@@ -17,9 +17,9 @@ uv run mypy src tests
 ## 3. Run Pre-LLM Verification First
 
 ```bash
-uv run distill-abm smoke-ingest-netlogo --models-root data --output-root results/ingest_smoke_latest
-uv run distill-abm smoke-viz --models-root data --netlogo-home /path/to/NetLogo --output-root results/viz_smoke_latest
-uv run distill-abm smoke-doe --ingest-root results/ingest_smoke_latest --viz-root results/viz_smoke_latest --output-root results/doe_smoke_latest
+uv run distill-abm smoke-ingest-netlogo --models-root data --output-root results/archive/ingest_smoke_latest
+uv run distill-abm smoke-viz --models-root data --netlogo-home /path/to/NetLogo --output-root results/archive/viz_smoke_latest
+uv run distill-abm smoke-doe --ingest-root results/archive/ingest_smoke_latest --viz-root results/archive/viz_smoke_latest --output-root results/archive/doe_smoke_latest
 ```
 
 These commands do not execute any benchmark LLM request. They exist to validate the ingest, visualization, and exact pre-LLM DOE payloads before a full run.

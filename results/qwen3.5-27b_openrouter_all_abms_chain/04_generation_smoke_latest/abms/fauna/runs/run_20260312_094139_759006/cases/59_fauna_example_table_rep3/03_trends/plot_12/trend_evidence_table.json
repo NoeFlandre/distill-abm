@@ -1,0 +1,321 @@
+{
+  "reporter_pattern": "sum [energy] of animals with [species = 2]",
+  "time_column": null,
+  "matched_columns": [
+    "sum [energy] of animals with [species = 2]",
+    "sum [energy] of animals with [species = 2].1",
+    "sum [energy] of animals with [species = 2].2",
+    "sum [energy] of animals with [species = 2].3",
+    "sum [energy] of animals with [species = 2].4",
+    "sum [energy] of animals with [species = 2].5",
+    "sum [energy] of animals with [species = 2].6",
+    "sum [energy] of animals with [species = 2].7",
+    "sum [energy] of animals with [species = 2].8",
+    "sum [energy] of animals with [species = 2].9",
+    "sum [energy] of animals with [species = 2].10",
+    "sum [energy] of animals with [species = 2].11",
+    "sum [energy] of animals with [species = 2].12",
+    "sum [energy] of animals with [species = 2].13",
+    "sum [energy] of animals with [species = 2].14",
+    "sum [energy] of animals with [species = 2].15",
+    "sum [energy] of animals with [species = 2].16",
+    "sum [energy] of animals with [species = 2].17",
+    "sum [energy] of animals with [species = 2].18",
+    "sum [energy] of animals with [species = 2].19",
+    "sum [energy] of animals with [species = 2].20",
+    "sum [energy] of animals with [species = 2].21",
+    "sum [energy] of animals with [species = 2].22",
+    "sum [energy] of animals with [species = 2].23",
+    "sum [energy] of animals with [species = 2].24",
+    "sum [energy] of animals with [species = 2].25",
+    "sum [energy] of animals with [species = 2].26",
+    "sum [energy] of animals with [species = 2].27",
+    "sum [energy] of animals with [species = 2].28",
+    "sum [energy] of animals with [species = 2].29",
+    "sum [energy] of animals with [species = 2].30",
+    "sum [energy] of animals with [species = 2].31",
+    "sum [energy] of animals with [species = 2].32",
+    "sum [energy] of animals with [species = 2].33",
+    "sum [energy] of animals with [species = 2].34",
+    "sum [energy] of animals with [species = 2].35",
+    "sum [energy] of animals with [species = 2].36",
+    "sum [energy] of animals with [species = 2].37",
+    "sum [energy] of animals with [species = 2].38",
+    "sum [energy] of animals with [species = 2].39"
+  ],
+  "matched_series_count": 40,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_40_matched_series",
+      "sample_count": 2312,
+      "valid_sample_count": 2312,
+      "dropped_non_numeric_count": 0,
+      "start_value": 12500.0,
+      "end_value": 0.0,
+      "mean": 1569.0258334260911,
+      "median": 100.0,
+      "std": 3083.0215241911756,
+      "variance": 9505021.718626078,
+      "minimum": 0.0,
+      "minimum_index": 2311,
+      "maximum": 12500.0,
+      "maximum_index": 0,
+      "peaks": [
+        {
+          "index": 376.0,
+          "source_index": 376.0,
+          "time": 376.0,
+          "value": 2232.6625,
+          "prominence": 0.0
+        },
+        {
+          "index": 381.0,
+          "source_index": 381.0,
+          "time": 381.0,
+          "value": 2204.0875,
+          "prominence": 0.0
+        },
+        {
+          "index": 385.0,
+          "source_index": 385.0,
+          "time": 385.0,
+          "value": 2178.525,
+          "prominence": 0.0
+        },
+        {
+          "index": 392.0,
+          "source_index": 392.0,
+          "time": 392.0,
+          "value": 2147.95,
+          "prominence": 0.0
+        },
+        {
+          "index": 395.0,
+          "source_index": 395.0,
+          "time": 395.0,
+          "value": 2134.8375,
+          "prominence": 0.0
+        },
+        {
+          "index": 402.0,
+          "source_index": 402.0,
+          "time": 402.0,
+          "value": 2114.1375,
+          "prominence": 0.0
+        },
+        {
+          "index": 410.0,
+          "source_index": 410.0,
+          "time": 410.0,
+          "value": 2097.9125,
+          "prominence": 0.0
+        },
+        {
+          "index": 405.0,
+          "source_index": 405.0,
+          "time": 405.0,
+          "value": 2097.275,
+          "prominence": 0.0
+        }
+      ],
+      "valleys": [
+        {
+          "index": 375.0,
+          "source_index": 375.0,
+          "time": 375.0,
+          "value": 2231.6,
+          "prominence": 0.0
+        },
+        {
+          "index": 380.0,
+          "source_index": 380.0,
+          "time": 380.0,
+          "value": 2201.5875,
+          "prominence": 0.0
+        },
+        {
+          "index": 384.0,
+          "source_index": 384.0,
+          "time": 384.0,
+          "value": 2177.7625,
+          "prominence": 0.0
+        },
+        {
+          "index": 391.0,
+          "source_index": 391.0,
+          "time": 391.0,
+          "value": 2146.425,
+          "prominence": 0.0
+        },
+        {
+          "index": 394.0,
+          "source_index": 394.0,
+          "time": 394.0,
+          "value": 2130.475,
+          "prominence": 0.0
+        },
+        {
+          "index": 399.0,
+          "source_index": 399.0,
+          "time": 399.0,
+          "value": 2106.3875,
+          "prominence": 0.0
+        },
+        {
+          "index": 404.0,
+          "source_index": 404.0,
+          "time": 404.0,
+          "value": 2096.2625,
+          "prominence": 0.0
+        },
+        {
+          "index": 409.0,
+          "source_index": 409.0,
+          "time": 409.0,
+          "value": 2094.15,
+          "prominence": 0.0
+        }
+      ],
+      "inflection_indices": [
+        299,
+        472,
+        506,
+        744,
+        836,
+        1308,
+        1407,
+        1470,
+        1594,
+        1679,
+        1763,
+        1886,
+        1933,
+        2040,
+        2156,
+        2194
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 232,
+        "windows": [
+          {
+            "start_index": 0,
+            "end_index": 231,
+            "trend": "decreasing",
+            "tau": -1.0,
+            "slope": -22.6155367811187,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 232,
+            "end_index": 463,
+            "trend": "decreasing",
+            "tau": -0.996939841767428,
+            "slope": -26.686563367252546,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 464,
+            "end_index": 695,
+            "trend": "decreasing",
+            "tau": -0.9985072398865502,
+            "slope": -5.737913414634146,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 696,
+            "end_index": 927,
+            "trend": "decreasing",
+            "tau": -0.8479623824451411,
+            "slope": -1.8867450864657953,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 928,
+            "end_index": 1159,
+            "trend": "decreasing",
+            "tau": -0.888752052545156,
+            "slope": -0.5608030540582593,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 1160,
+            "end_index": 1391,
+            "trend": "increasing",
+            "tau": 0.11262875055978504,
+            "slope": 0.019058392587805048,
+            "p": 0.010643229452690806,
+            "significant": true
+          },
+          {
+            "start_index": 1392,
+            "end_index": 1623,
+            "trend": "decreasing",
+            "tau": -0.28810270189580534,
+            "slope": -0.02399738371916257,
+            "p": 4.4154013778552326e-11,
+            "significant": true
+          },
+          {
+            "start_index": 1624,
+            "end_index": 1855,
+            "trend": "decreasing",
+            "tau": -0.551798775936707,
+            "slope": -0.16666666666666666,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 1856,
+            "end_index": 2087,
+            "trend": "increasing",
+            "tau": 0.45301537542916853,
+            "slope": 0.0,
+            "p": 0.0,
+            "significant": true
+          }
+        ]
+      },
+      "change_points": [
+        375,
+        500,
+        625,
+        875,
+        2310
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 63.0,
+        "oscillation_indices": [
+          50,
+          55,
+          60,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100,
+          105,
+          110,
+          115,
+          120,
+          125,
+          130,
+          135,
+          140,
+          145
+        ]
+      }
+    }
+  ]
+}

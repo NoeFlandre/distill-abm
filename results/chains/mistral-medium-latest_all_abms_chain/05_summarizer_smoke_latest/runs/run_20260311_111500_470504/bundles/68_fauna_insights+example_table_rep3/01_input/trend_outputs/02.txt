@@ -1,9 +1,0 @@
-The total energy available to all forager bands begins at 2000 units. Initially, there is a slight fluctuation with minor peaks and valleys, indicating small variations in hunting success and movement costs. For instance, there is a minor peak at around 55 ticks with an energy value of approximately 1263.3 units, followed by a slight decline. This initial phase suggests that the foragers are adapting to the environment and their hunting strategies are not yet optimized. 
-
-As the simulation progresses, the energy levels exhibit a consistent downward trend. Significant change points are observed at around 650, 1075, 1500, 1925, and 2310 ticks, indicating periods where the rate of energy decline shifts. These change points suggest critical phases where the balance between energy gain from hunting and energy expenditure on movement and processing costs becomes increasingly unfavorable for the foragers. 
-
-The energy levels reach several notable valleys, such as at around 2310 ticks where the energy drops to approximately -38233 units. This substantial decline highlights a critical phase where the foragers' energy reserves are severely depleted, potentially leading to a collapse in their hunting efficiency and overall energy status. 
-
-The consistent decreasing trend across all rolling Mann-Kendall windows, with significant negative slopes, underscores a continuous decline in forager energy over time. This trend implies that the foragers are unable to sustain their energy levels, likely due to a combination of high movement costs, processing costs, and insufficient hunting success. 
-
-For decision makers, these trends suggest that the current parameters and strategies within the model lead to an unsustainable scenario for the foragers. Adjustments in hunting strategies, movement costs, or energy gains from prey might be necessary to achieve a more balanced and sustainable energy status for the forager bands.

@@ -1,0 +1,59 @@
+Statistical evidence for simulation series matching `count households with [household-SL? = true]`.
+Compression tier: 0.
+Matched series count: 30. Detailed signal analysis below is computed on the tick-wise mean of the matched series.
+
+Series: aggregate_mean_of_30_matched_series
+- samples: 101
+- valid numeric samples: 101
+- dropped non-numeric samples: 0
+- start value: 0.0000
+- end value: 32.0667
+- mean: 27.4264
+- median: 31.9000
+- std: 8.9218
+- variance: 79.5978
+- minimum value: 0.0000
+- minimum index: 0
+- maximum value: 32.0667
+- maximum index: 63
+- peaks:
+  - peak none detected
+- valleys:
+  - valley none detected
+- inflection index 1: 7
+- inflection index 2: 28
+- inflection index 3: 30
+- inflection index 4: 33
+- inflection index 5: 38
+- inflection index 6: 57
+- inflection index 7: 60
+- rolling Mann-Kendall status: ok
+- rolling Mann-Kendall window 1: start=0 end=10 trend=increasing tau=0.818 slope=1.430 p=0.000 significant=True
+- rolling Mann-Kendall window 2: start=11 end=21 trend=increasing tau=1.000 slope=1.139 p=0.000 significant=True
+- rolling Mann-Kendall window 3: start=22 end=32 trend=increasing tau=1.000 slope=0.183 p=0.000 significant=True
+- rolling Mann-Kendall window 4: start=33 end=43 trend=increasing tau=0.927 slope=0.181 p=0.000 significant=True
+- rolling Mann-Kendall window 5: start=44 end=54 trend=increasing tau=0.891 slope=0.029 p=0.000 significant=True
+- rolling Mann-Kendall window 6: start=55 end=65 trend=increasing tau=0.709 slope=0.008 p=0.001 significant=True
+- change point 1: 40
+- change point 2: 100
+- oscillation dominant period: 49.00
+- oscillation index 1: 22
+- oscillation index 2: 23
+- oscillation index 3: 24
+- oscillation index 4: 25
+- oscillation index 5: 26
+- oscillation index 6: 27
+- oscillation index 7: 28
+- oscillation index 8: 29
+- oscillation index 9: 30
+- oscillation index 10: 31
+- oscillation index 11: 32
+- oscillation index 12: 51
+- oscillation index 13: 52
+- oscillation index 14: 53
+- oscillation index 15: 54
+- oscillation index 16: 55
+- oscillation index 17: 56
+- oscillation index 18: 57
+- oscillation index 19: 58
+- oscillation index 20: 59

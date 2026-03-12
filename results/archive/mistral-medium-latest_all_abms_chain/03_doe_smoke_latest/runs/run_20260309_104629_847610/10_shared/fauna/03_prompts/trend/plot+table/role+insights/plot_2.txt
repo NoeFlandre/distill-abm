@@ -1,0 +1,28 @@
+You are an expert in megaherbivore extinction with a statistic background.
+
+We have a plot and a data table from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot and the data table, mentioning key time steps and values taken by the metric in the plot and the data table, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot and the data table or any visual in your description. If the plot and data table have very simple dynamics, simply state them without expanding.
+
+The context and goals of the model are as follows. <<context_response_from_context_llm>>
+
+When summarizing trends, provide brief insights about their implications for decision makers.
+
+This plot and data table represent the total energy available to all forager bands, reflecting their energy status which is influenced by hunting success and movement costs.
+
+Statistical summary of the relevant simulation output:
+Statistical evidence for simulation series matching `sum [energy] of foragers`.
+Compression tier: 0.
+Matched series count: 40. Detailed signal analysis below is computed on the tick-wise mean of the matched series.
+
+Series: aggregate_mean_of_40_matched_series
+- samples: 2312
+- valid numeric samples: 2312
+- dropped non-numeric samples: 0
+- start/end values: 2000.0000 -> -38229.0000
+- mean/median/std/variance: -15983.7157, -15095.8625, 12169.6050, 148099284.9205
+- min/max: -38233.0000 at index 2310; 2000.0000 at index 0
+- peaks: index 2284 value -37713.0000 prominence 0.0000; index 1826 value -28403.0000 prominence 0.0000; index 1594 value -23807.0000 prominence 0.0000; index 394 value -2005.9500 prominence 0.0000; index 2 value 1989.9250 prominence 0.0000; index 370 value -1862.0250 prominence 0.0000; index 55 value 1263.3000 prominence 0.0000; index 295 value -1186.6500 prominence 0.0000
+- valleys: index 2310 value -38233.0000 prominence 0.0000; index 2283 value -37717.0000 prominence 0.0000; index 1825 value -28458.7500 prominence 0.0000; index 1593 value -23828.2857 prominence 0.0000; index 393 value -2006.7250 prominence 0.0000; index 1 value 1987.6500 prominence 0.0000; index 367 value -1875.6000 prominence 0.0000; index 54 value 1256.9000 prominence 0.0000
+- inflection indices: 358, 1238, 1329, 1397, 1402, 1422, 1452, 1477, 1597, 1713, 1828, 2040, 2156, 2167
+- rolling Mann-Kendall: 0-231: decreasing (tau=-0.999, slope=-11.070, p=0.000, significant=True); 232-463: decreasing (tau=-0.998, slope=-8.823, p=0.000, significant=True); 464-695: decreasing (tau=-1.000, slope=-15.729, p=0.000, significant=True); 696-927: decreasing (tau=-1.000, slope=-18.536, p=0.000, significant=True); 928-1159: decreasing (tau=-1.000, slope=-19.585, p=0.000, significant=True); 1160-1391: decreasing (tau=-1.000, slope=-20.011, p=0.000, significant=True); 1392-1623: decreasing (tau=-1.000, slope=-19.927, p=0.000, significant=True); 1624-1855: decreasing (tau=-0.999, slope=-20.000, p=0.000, significant=True); 1856-2087: decreasing (tau=-1.000, slope=-20.000, p=0.000, significant=True)
+- change points: 650, 1075, 1500, 1925, 2310
+- oscillation summary: dominant period 63.00, strong oscillation indices: 2170, 2175, 2180, 2185, 2190, 2195, 2200, 2205, 2210, 2215, 2220, 2225, 2230, 2235, 2240, 2245, 2250, 2255, 2260, 2265

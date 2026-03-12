@@ -1,0 +1,37 @@
+Statistical evidence for simulation series matching `alt-total-try`.
+Compression tier: 0.
+Matched series count: 30. Detailed signal analysis below is computed on the tick-wise mean of the matched series.
+
+Series: aggregate_mean_of_30_matched_series
+- samples: 33
+- valid numeric samples: 33
+- dropped non-numeric samples: 0
+- start value: 0.0000
+- end value: 25643.8333
+- mean: 11157.3545
+- median: 10679.4333
+- std: 8241.3209
+- variance: 67919370.3059
+- minimum value: 0.0000
+- minimum index: 0
+- maximum value: 25643.8333
+- maximum index: 32
+- peaks:
+  - peak none detected
+- valleys:
+  - valley none detected
+- inflection index 1: 31
+- rolling Mann-Kendall status: ok
+- rolling Mann-Kendall window 1: start=0 end=4 trend=increasing tau=1.000 slope=201.463 p=0.027 significant=True
+- rolling Mann-Kendall window 2: start=5 end=9 trend=increasing tau=1.000 slope=736.583 p=0.027 significant=True
+- rolling Mann-Kendall window 3: start=10 end=14 trend=increasing tau=1.000 slope=927.217 p=0.027 significant=True
+- rolling Mann-Kendall window 4: start=15 end=19 trend=increasing tau=1.000 slope=933.350 p=0.027 significant=True
+- rolling Mann-Kendall window 5: start=20 end=24 trend=increasing tau=1.000 slope=935.204 p=0.027 significant=True
+- rolling Mann-Kendall window 6: start=25 end=29 trend=increasing tau=1.000 slope=935.933 p=0.027 significant=True
+- change point 1: 32
+- oscillation dominant period: 15.00
+- oscillation index 1: 27
+- oscillation index 2: 28
+- oscillation index 3: 29
+- oscillation index 4: 30
+- oscillation index 5: 31

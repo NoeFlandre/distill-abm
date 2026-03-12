@@ -1,0 +1,98 @@
+We have a data table from repeated simulations of an agent based model. Your goal is to describe the trends in details from the data table, mentioning key time steps and values taken by the metric in the data table, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the data table or any visual in your description. If a data table has very simple dynamics, simply state them without expanding.
+
+The context and goals of the model are as follows. The agent-based model in question is an extension of the original RAGE (Rangeland Use and Adaptation) model, which simulates the interactions between pastures, livestock, and household livelihoods in a common property grazing system. The extension adds learning capabilities to the agents, specifically learning-by-doing and social learning, to study adaptive management strategies. The model's context is rooted in understanding the long-term social-ecological consequences of different household behavioral types and their decision-making processes under various ecological and climatic conditions. The goal is to evaluate how different behavioral types and learning strategies impact the resilience and sustainability of pastoral systems. The model allows for the adjustment of a range of parameters to observe their effects on social, ecological, and economic outcomes. The model is used to compare the performance of different behavioral types and learning strategies, as well as to study the diffusion of learning behaviors in a heterogeneous population of agents. The model consists of two main sub-models: Vegetation and Household decision-making, which are linked by a yearly sequence of processes. The model parameters are divided into extension model parameters and original model parameters used by the extension model. The extension model parameters include: extension-model?, risk-mode?, number-households, timesteps, b, knowledge-radius, homog-behav-types?, number-E-RO, number-E-LBD, number-E-RO-SL1, rain, SL2-strategy-switch?, and behavioral-type. The original model parameters used by the extension model include: w, gr1, gr2, rue, mg, mr, R0part, lambda, Rmax, and intake. The model is used to study the influence of demographic settings and herd size, the impact of various learning strategies, the impact of social learning double-loop (strategy switching), and the diffusion of learning behaviors. The model is based on the following references: Dressler et al. (2018), Dressler et al. (2012), Martin et al. (2014), Müller et al. (2007), and Schulze (2011). The parameters of the model are as follows: number-households is set to 60 with a range from 1.0 to 100.0, satisficing-threshold is set to 0 with a range from 0.0 to 100.0, satisficing-trials is set to 21 with a range from 0.0 to 100.0, knowledge-radius is set to 1 with a range from 0.0 to 5.0, resting-threshold is set to 0.1 with a range from 0.0 to 1.0, intrinsic-preference is set to 0 with a range from 0.0 to 1.0, social-susceptibility is set to 0 with a range from 0.0 to 1.0, global-rain? is set to True, start-on-homepatch? is set to True, resting? is set to False, homog-behav-types? is set to True, extension-model? is set to True, SL2-strategy-switch? is set to False, risk-mode? is set to True, behavioral-type is set to E-RO, number-SAT is set to 0, number-E-RO is set to 20, number-TRAD is set to 0, b is set to 0, number-MAX is set to 0, rain-mean is set to 200, risk-att-init is set to 0.5, gr1 is set to 0.5, number-E-LBD is set to 20, gr2 is set to 0.1, number-E-RO-SL1 is set to 20, timesteps is set to 100, w is set to 0.8, number-random is set to 0, livestock-init is set to 90, and rain-std is set to 100.
+
+Here is an example of the style of the report: “ The total number of earthquakes recorded in the region starts at 5,000 then it declines rapidly over the first 400 time steps. This initial decline could be attributed to the depletion of immediate stress points within the fault lines, as the most susceptible areas release their pent-up energy early in the simulation. It increases briefly at around 500 steps, likely due to the aftershocks and secondary stress points being triggered as the system seeks a new equilibrium. The simulation ends with the number of earthquakes near zero, indicating that the majority of the stress has been released and the system has stabilized.
+
+The total seismic activity follows the same pattern, starting at 10,000 events and declining steadily. This steady decline reflects a systematic reduction in seismic energy over time, as the energy distribution within the tectonic plates becomes more uniform. There is low variance across simulation runs in the first 100 steps, but deviations become noticeable afterward. This suggests that while the initial reactions to stress are highly predictable, as time progresses, the system's complexity introduces more variability. This variability could be due to differences in secondary stress points and the non-linear nature of seismic energy release over time.“
+
+When summarizing trends, provide brief insights about their implications for decision makers.
+
+This data table represents the number of households that follow the E-RO strategy, indicating households with non learning agents.
+
+Statistical summary of the relevant simulation output:
+Statistical evidence for simulation series matching `count households with [household-behavioral-type = "E-RO"]`.
+Compression tier: 0.
+Matched series count: 30. Detailed signal analysis below is computed on the tick-wise mean of the matched series.
+
+Series: aggregate_mean_of_30_matched_series
+- samples: 101
+- valid numeric samples: 101
+- dropped non-numeric samples: 0
+- start value: 20.0000
+- end value: 14.7000
+- mean: 16.3696
+- median: 15.2667
+- std: 1.9174
+- variance: 3.6762
+- minimum value: 14.6667
+- minimum index: 92
+- maximum value: 21.1000
+- maximum index: 8
+- peaks:
+  - peak 1: index 8 value 21.1000 prominence 0.0000
+  - peak 2: index 6 value 20.5000 prominence 0.0000
+  - peak 3: index 4 value 20.2333 prominence 0.0000
+  - peak 4: index 14 value 19.3000 prominence 0.0000
+  - peak 5: index 25 value 17.5000 prominence 0.0000
+  - peak 6: index 27 value 17.4667 prominence 0.0000
+  - peak 7: index 34 value 16.5667 prominence 0.0000
+  - peak 8: index 37 value 16.4667 prominence 0.0000
+- valleys:
+  - valley 1: index 7 value 20.1000 prominence 0.0000
+  - valley 2: index 5 value 20.0667 prominence 0.0000
+  - valley 3: index 13 value 19.2333 prominence 0.0000
+  - valley 4: index 26 value 17.4000 prominence 0.0000
+  - valley 5: index 24 value 17.3000 prominence 0.0000
+  - valley 6: index 33 value 16.4667 prominence 0.0000
+  - valley 7: index 36 value 16.4333 prominence 0.0000
+  - valley 8: index 44 value 15.5667 prominence 0.0000
+- inflection index 1: 5
+- inflection index 2: 12
+- inflection index 3: 17
+- inflection index 4: 18
+- inflection index 5: 25
+- inflection index 6: 30
+- inflection index 7: 35
+- inflection index 8: 41
+- inflection index 9: 53
+- inflection index 10: 60
+- inflection index 11: 71
+- inflection index 12: 76
+- inflection index 13: 82
+- inflection index 14: 90
+- inflection index 15: 95
+- rolling Mann-Kendall status: ok
+- rolling Mann-Kendall window 1: start=0 end=10 trend=increasing tau=0.636 slope=0.058 p=0.007 significant=True
+- rolling Mann-Kendall window 2: start=11 end=21 trend=decreasing tau=-0.964 slope=-0.221 p=0.000 significant=True
+- rolling Mann-Kendall window 3: start=22 end=32 trend=decreasing tau=-0.764 slope=-0.090 p=0.001 significant=True
+- rolling Mann-Kendall window 4: start=33 end=43 trend=decreasing tau=-0.873 slope=-0.078 p=0.000 significant=True
+- rolling Mann-Kendall window 5: start=44 end=54 trend=decreasing tau=-0.709 slope=-0.040 p=0.003 significant=True
+- rolling Mann-Kendall window 6: start=55 end=65 trend=decreasing tau=-0.800 slope=-0.040 p=0.001 significant=True
+- rolling Mann-Kendall window 7: start=66 end=76 trend=no trend tau=0.164 slope=0.010 p=0.525 significant=False
+- rolling Mann-Kendall window 8: start=77 end=87 trend=no trend tau=0.291 slope=0.008 p=0.236 significant=False
+- rolling Mann-Kendall window 9: start=88 end=98 trend=no trend tau=0.018 slope=0.000 p=1.000 significant=False
+- change point 1: 20
+- change point 2: 45
+- change point 3: 100
+- oscillation dominant period: 49.00
+- oscillation index 1: 8
+- oscillation index 2: 9
+- oscillation index 3: 10
+- oscillation index 4: 11
+- oscillation index 5: 12
+- oscillation index 6: 13
+- oscillation index 7: 14
+- oscillation index 8: 15
+- oscillation index 9: 16
+- oscillation index 10: 17
+- oscillation index 11: 18
+- oscillation index 12: 19
+- oscillation index 13: 20
+- oscillation index 14: 21
+- oscillation index 15: 22
+- oscillation index 16: 23
+- oscillation index 17: 24
+- oscillation index 18: 42
+- oscillation index 19: 43
+- oscillation index 20: 44

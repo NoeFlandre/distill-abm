@@ -1,0 +1,69 @@
+You are an expert in megaherbivore extinction with a statistic background.
+
+We have a plot from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot, mentioning key time steps and values taken by the metric in the plot, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot or any visual in your description. If a plot has very simple dynamics, simply state them without expanding.
+
+The context and goals of the model are as follows. The Megaherbivore Hunting Pressure Model (MHPM) is an agent-based model designed to test hypotheses related to the extinction of megaherbivores. The model considers various factors such as environmental change, human hunting behavior, herd demography, movement, sexual dimorphism, and life history of animals. The landscape is a simplified grassland environment with randomly generated patches of grass, male and female ungulates, and human hunters. The model allows users to manipulate various parameters to establish the socio-natural dynamics of the experiment matrix.
+
+The model's key parameters and their respective ranges and set values are as follows:
+
+- **init-foragers**: Represents the initial number of human hunters. Range: 0.0 to 100.0. Set value: 20.
+
+- **processing-cost-males**: The energy cost for hunters to process male prey. Range: 0.0 to 20.0. Set value: 6.
+
+- **food-value-males**: The energy hunters gain from eating male prey. Range: 5.0 to 100.0. Set value: 30.
+
+- **maximum-lifespan**: The maximum lifespan of animals in ticks. Range: 0.0 to 12000.0. Set value: 10220.
+
+- **processing-cost-females**: The energy cost for hunters to process female prey. Range: 0.0 to 20.0. Set value: 3.
+
+- **food-value-females**: The energy hunters gain from eating female prey. Range: 5.0 to 100.0. Set value: 27.
+
+- **init-prey**: The initial number of prey (ungulates). Range: 0.0 to 1000.0. Set value: 250.
+
+- **internal-mortality**: The probability of an animal dying from internal causes at each time step. Range: 0.0 to 0.2. Set value: 0.025.
+
+- **age-of-senescence**: The age at which animals start to experience increased mortality. Range: 0.0 to 10000.0. Set value: 7300.
+
+- **ticks-per-year**: The number of ticks per year. Range: 0.0 to 720.0. Set value: 365.
+
+- **animals-gain-from-food**: The energy animals gain from food. Range: 0.0 to 10.0. Set value: 1.5.
+
+- **animals-starvation-threshold**: The energy level below which animals starve. Range: 0.0 to 100.0. Set value: 25.
+
+- **animals-movement-cost**: The energy cost for animals to move. Range: 0.0 to 10.0. Set value: 1.
+
+- **foragers-movement-cost**: The energy cost for hunters to move. Range: 0.0 to 10.0. Set value: 1.
+
+- **grass-proportion**: The proportion of the landscape covered in grass. Range: 0.0 to 1.0. Set value: 0.33.
+
+- **external-mortality**: The probability of an animal dying from external causes at each time step. Range: 0.0 to 0.2. Set value: 0.0025.
+
+- **birth-spacing**: The minimum number of ticks between births for females. Range: 0.0 to 1000.0. Set value: 730.
+
+- **foraging-radius**: The radius within which hunters can detect prey. Range: 1.0 to 100.0. Set value: 6.
+
+- **food-value-calf**: The energy hunters gain from eating a calf. Range: 0.0 to 20.0. Set value: 3.
+
+- **seasonality**: The degree of seasonality in the environment. Range: 0.0 to 1.0. Set value: 0.8.
+
+- **regrowth-time**: The time it takes for grass to regrow after being grazed. Range: 0.0 to 365.0. Set value: 3.
+
+- **stop-at-max-ticks**: Determines whether the experiment stops when the maximum number of ticks is reached. Set value: True.
+
+- **stop-at-max-herd-size**: Determines whether the experiment stops when the maximum herd size is reached. Set value: False.
+
+- **grass-growth**: Determines whether grass regrows after being grazed. Set value: True.
+
+- **keep-initial-grass-pattern**: Determines whether grass regrowth is limited to initially vegetated areas. Set value: True.
+
+- **immortal-foragers**: Determines whether hunters are immortal. Set value: True.
+
+- **food-storage**: Determines whether hunters can store food energy. Set value: True.
+
+- **max-ticks**: The maximum number of ticks for the experiment. Set value: 73000.
+
+- **max-herd-size**: The maximum size of the herd. Set value: 500.
+
+The model's landscape consists of an abstract square universe that wraps at the edges, existing on a 211x211 patch matrix with a relative spatial scale. Hunters are embedded with logic approximating dynamic optimal foraging theory, making foraging decisions based on environmental feedback. Ungulate herds are sexually dimorphic, with distinct food values and processing costs for males and females. Animals can reproduce, and users can control sex ratios and reproduction probability. The environment can be controlled by changing the density of fodder and the time it takes for grass to regrow. The model allows users to conduct experiments to test how environmental conditions, human hunting, and animal life history interact to influence extinction dynamics.
+
+This plot represents the cumulative number of postpartum female prey animals (females with offspring) hunted and killed by forager bands.

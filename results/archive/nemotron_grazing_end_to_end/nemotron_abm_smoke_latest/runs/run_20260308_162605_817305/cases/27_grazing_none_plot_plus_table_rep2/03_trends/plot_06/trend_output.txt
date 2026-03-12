@@ -1,0 +1,39 @@
+**Trend Analysis:**  
+
+The mean destock of households across all simulations (representing households that removed livestock due to resource constraints) exhibits a sharp initial decline from nearly 8 households in the first step to contributions and stabilization around 0.4-0.7 households after ~20 steps. This trend reflects agents’ adaptive responses to climatic variability (mean rainfall: 200, std: 100) in a competitive equilibrium scenario where all agents adopt the E-RO behavioral type.   \\
+\\
+\\
+\\
+\\
+\\
+**Key Observations:**   \\
+\\
+\\
+\\
+\\
+1. **Initial Overcommitment and Resource Depletion (Steps 0-10):**
+
+Households began with high initial livestock (90 per household) and faced rapid vegetation degradation due to climatic instability and continuous grazing (resting disabled). This led to an immediate, universal destocking response, averaging 6.0-7.0 households in the first 10 steps. The rapid depletion suggests overgrazing pressure overwhelming adaptive capacity early in the simulation.
+
+2. **Steep Adjustment Phase (Steps 10-20):**
+
+Destocking rates peaked above 5 households in Step 6-8, indicating a critical turning point where agents began withdrawing livestock in response to resource shortages. By Step 20, destocking rates halved and began converging toward equilibrium, reflecting agents’ incremental adjustment to sustainable stocking levels
+
+3. **Stabilization Pattern (Steps 60+):**
+
+Destocking rates stabilized between 0.4-0.6 households per year after Step 60, demonstrating a quasi-steady state. This suggests that despite persistent climatic variability, agents achieved a balance between stocking decisions and resource recovery under E-RO decision-making rules. The narrow confidence interval (0.3-0.5 in later steps) implies consensus in adaptive strategies.
+
+4. **Impact of Disabled Learning Mechanisms:**
+
+With social learning (E-RO-SL1 disabled) and single-loop learning (SL2-strategy-switch disabled), the system’s resilience relied solely on reactive E-RO behavior. The absence of strategy diffusion limited systemic adaptability but did not prevent resource-level equilibrium through individual adjustments.
+
+5. **Role of Homogeneous Behavior:**
+
+Uniform E-RO behavior eliminated heterogeneity-driven dynamics (e.g., strategy diffusion, social learning spillovers). The stabilization reflects agents’ independent convergence to identical thresholds, constrained by the satisficing threshold (0) and absence of resting mechanisms.
+
+**Interpretation:**   \\
+\\
+\\
+\\
+\\
+The data patterns align with the model’s focus on E-RO resilience under uniform conditions. The steep initial decline mirrors the original RAGE model’s overcommitment dynamics, while the late-stage stabilization demonstrates the system’s capacity to achieve sustainable stocking levels without requiring behavioral adaptation. Environmental stochasticity ensured persistent pressure, preventing a collapse to zero livestock but enabling equilibrium resource management through continuous destocking adjustments.

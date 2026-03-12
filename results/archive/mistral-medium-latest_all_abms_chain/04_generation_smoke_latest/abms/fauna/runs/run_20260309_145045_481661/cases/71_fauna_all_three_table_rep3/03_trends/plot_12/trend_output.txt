@@ -1,0 +1,13 @@
+The combined total energy available in the population of female prey animals starts at 12,500 units. This high initial value indicates a healthy and well-sustained population at the beginning of the simulation. The energy levels then exhibit a rapid decline over the initial time steps, dropping significantly within the first few hundred ticks. This sharp decrease suggests a high rate of energy consumption or loss, potentially due to predation pressure, environmental factors, or a combination of both. 
+
+Around the 375th tick, the energy levels show minor fluctuations with small peaks and valleys, indicating brief periods of stabilization or slight recovery in the population's energy reserves. However, these fluctuations are not sustained, and the overall trend continues to decline. The peaks and valleys around this time step suggest temporary equilibria or minor recoveries, possibly due to brief reductions in predation pressure or slight improvements in environmental conditions. 
+
+The simulation data also indicates several inflection points, suggesting changes in the rate of energy decline. These inflection points could correspond to significant events or shifts in the dynamics of the model, such as changes in predator behavior, environmental conditions, or prey population demographics. 
+
+The rolling Mann-Kendall test results indicate a consistent decreasing trend in energy levels across various segments of the simulation. The significant decreasing trends in the initial segments highlight a robust decline in energy reserves, while the later segments show periods of slight increase or stabilization, albeit not sustained. 
+
+The change points identified at ticks 375, 500, 625, 875, and 2310 mark significant shifts in the energy dynamics. These points could be critical for decision-makers to understand the underlying causes of these shifts and to devise strategies to mitigate the decline in energy reserves. 
+
+The oscillation summary reveals a dominant period of 63 ticks, indicating a cyclical pattern in the energy levels. These oscillations could be due to seasonal variations, periodic changes in predation pressure, or other cyclical environmental factors. Understanding these oscillations can help in predicting future trends and in planning interventions to support the prey population. 
+
+Overall, the simulation ends with the energy levels approaching zero, indicating a near-complete depletion of energy reserves in the female prey population. This trend underscores the need for interventions to sustain the population and prevent extinction. Decision-makers should focus on identifying the key factors driving this decline and implementing measures to enhance the resilience and sustainability of the prey population.

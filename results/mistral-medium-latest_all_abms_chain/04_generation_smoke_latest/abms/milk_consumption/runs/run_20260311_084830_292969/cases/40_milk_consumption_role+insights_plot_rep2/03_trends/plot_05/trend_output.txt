@@ -1,0 +1,3 @@
+The total number of choices made by all agents combined increases linearly over time. Starting from 0 choices at step 0, the total number of choices rises steadily, reaching approximately 32,000 choices by step 30. This linear trend indicates a consistent and uniform rate of decision-making among the agents throughout the simulation period.
+
+For decision-makers, this trend implies a steady engagement of the agents in the decision-making process over time. The linear increase suggests that the agents are continuously active and making choices at a constant rate, which could be useful for predicting consumer behavior and planning interventions or marketing strategies accordingly.

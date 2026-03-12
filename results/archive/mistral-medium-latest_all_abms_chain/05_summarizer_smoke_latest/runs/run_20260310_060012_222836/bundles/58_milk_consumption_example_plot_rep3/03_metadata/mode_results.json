@@ -1,0 +1,55 @@
+{
+  "bundle_id": "58_milk_consumption_example_plot_rep3",
+  "case_id": "58_milk_consumption_example_plot_rep3",
+  "abm": "milk_consumption",
+  "bundle_dir": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/58_milk_consumption_example_plot_rep3",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/58_milk_consumption_example_plot_rep3/02_summaries/none.txt",
+      "error": null,
+      "duration_seconds": 7.500057108700275e-7,
+      "input_length": 13537,
+      "output_length": 13537
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/58_milk_consumption_example_plot_rep3/02_summaries/bart.txt",
+      "error": null,
+      "duration_seconds": 22.38082108402159,
+      "input_length": 13537,
+      "output_length": 1071
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/58_milk_consumption_example_plot_rep3/02_summaries/bert.txt",
+      "error": null,
+      "duration_seconds": 22.197561000008136,
+      "input_length": 13537,
+      "output_length": 1259
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/58_milk_consumption_example_plot_rep3/02_summaries/t5.txt",
+      "error": null,
+      "duration_seconds": 11.854125583020505,
+      "input_length": 13537,
+      "output_length": 961
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/58_milk_consumption_example_plot_rep3/02_summaries/longformer_ext.txt",
+      "error": null,
+      "duration_seconds": 28.97574133297894,
+      "input_length": 13537,
+      "output_length": 1979
+    }
+  ]
+}

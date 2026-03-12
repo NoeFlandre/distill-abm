@@ -1,0 +1,1 @@
+The average initial risk attitude of all social learning agents remained constant throughout the simulation at a value of 0.0074. This metric, representing the initial disposition to deviate from the recommended number of livestock, did not exhibit any trend or change over the 100 time steps.

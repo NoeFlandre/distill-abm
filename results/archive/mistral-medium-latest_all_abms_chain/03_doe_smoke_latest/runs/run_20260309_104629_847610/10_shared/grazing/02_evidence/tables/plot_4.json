@@ -1,0 +1,5 @@
+{
+  "reporter_pattern": "mean-green-biomass",
+  "series_path": "results/mistral_all_abms_chain/03_doe_smoke_latest/runs/run_20260309_104629_847610/10_shared/grazing/02_evidence/tables/plot_4_series.csv",
+  "summary_path": "results/mistral_all_abms_chain/03_doe_smoke_latest/runs/run_20260309_104629_847610/10_shared/grazing/02_evidence/tables/plot_4.txt"
+}
