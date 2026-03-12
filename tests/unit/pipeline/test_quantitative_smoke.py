@@ -5,21 +5,24 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.pipeline.quantitative_smoke import (
     _build_evidence_summary_rows,
     _build_factorial_input_frame,
+    _build_factorial_input_frame_with_llm,
     _build_structured_results_rows,
     _derive_prompt_flags,
     _normalize_factorial_table,
     _render_anova_markdown_table,
     _render_evidence_summary_markdown_table,
     _render_factorial_latex_table,
-    _render_overview_factorial_markdown_table,
     _render_optimal_latex_table,
     _render_optimal_markdown_table,
+    _render_overview_factorial_markdown_table,
     run_quantitative_smoke,
+    run_quantitative_smoke_multi_llm,
 )
 
 
@@ -29,9 +32,15 @@ def _write_text(path: Path, text: str) -> Path:
     return path
 
 
-def _build_source_roots(tmp_path: Path) -> tuple[Path, Path]:
-    matrix_root = tmp_path / "matrix" / "runs" / "run_1"
-    summarizer_root = tmp_path / "summ" / "runs" / "run_1"
+def _build_source_roots(
+    tmp_path: Path,
+    *,
+    root_name: str = "summ",
+    matrix_name: str = "matrix",
+    model: str = "nvidia/nemotron-nano-12b-v2-vl:free",
+) -> tuple[Path, Path]:
+    matrix_root = tmp_path / matrix_name / "runs" / "run_1"
+    summarizer_root = tmp_path / root_name / "runs" / "run_1"
     matrix_cases = []
     review_rows: list[dict[str, str]] = []
     prompt_variants = ["none", "role", "insights", "example"]
@@ -53,7 +62,7 @@ def _build_source_roots(tmp_path: Path) -> tuple[Path, Path]:
                     "evidence_mode": evidence_mode,
                     "prompt_variant": prompt_variant,
                     "repetition": 1,
-                    "model": "nvidia/nemotron-nano-12b-v2-vl:free",
+                    "model": model,
                 }
             ),
         )
@@ -403,7 +412,10 @@ def test_render_evidence_summary_markdown_table_groups_rows_by_reference_family(
     )
 
     assert markdown.startswith("# Evidence Mode Summary\n\n## author\n\n| Evidence | ABM | Avg BLEU | Avg METEOR |")
-    assert "| plot | grazing | 0.30 | 0.40 | 0.50 | 0.60 | 0.70 | 70.00 | 0.50 | 0.60 | 0.70 | 0.80 | 0.90 | 80.00 |" in markdown
+    assert (
+        "| plot | grazing | 0.30 | 0.40 | 0.50 | 0.60 | 0.70 | 70.00 | 0.50 | 0.60 | 0.70 | 0.80 | 0.90 | 80.00 |"
+        in markdown
+    )
     assert "\n## gpt5.2_short\n\n| Evidence | ABM | Avg BLEU | Avg METEOR |" in markdown
 
 
@@ -445,6 +457,21 @@ def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> Non
     assert rows[0]["summarizer"]
     report = json.loads(result.report_json_path.read_text(encoding="utf-8"))
     assert report["success"] is True
+
+
+def test_run_quantitative_smoke_single_llm_accepts_unlabeled_runs(tmp_path: Path) -> None:
+    summarizer_root, _matrix_root = _build_source_roots(tmp_path, model="")
+
+    result = run_quantitative_smoke(
+        source_root=summarizer_root,
+        output_root=tmp_path / "quant",
+        score_summary_fn=_fake_score_summary,
+    )
+
+    rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
+    assert result.success is True
+    assert rows
+    assert {row["llm"] for row in rows} == {""}
 
 
 def test_run_quantitative_smoke_writes_best_score_table(tmp_path: Path) -> None:
@@ -569,6 +596,30 @@ def test_build_factorial_input_frame_marks_prompt_flags_as_categorical_strings()
     )
     assert frame.loc[0, "Role"] == "on"
     assert frame.loc[0, "Insights"] == "off"
+    assert frame.loc[0, "Example"] == "on"
+
+
+def test_build_factorial_input_frame_with_llm_includes_llm_factor() -> None:
+    frame = _build_factorial_input_frame_with_llm(
+        [
+            {
+                "llm": "mistral-medium-latest",
+                "summarizer": "bart",
+                "evidence": "table",
+                "role": "True",
+                "insights": "False",
+                "example": "True",
+                "BLEU": "0.1",
+                "METEOR": "0.2",
+                "R-1": "0.3",
+                "R-2": "0.4",
+                "R-L": "0.5",
+                "Reading ease": "10.0",
+            }
+        ]
+    )
+    assert frame.loc[0, "LLM"] == "mistral-medium-latest"
+    assert frame.loc[0, "Role"] == "on"
     assert frame.loc[0, "Example"] == "on"
 
 
@@ -751,3 +802,108 @@ def test_run_quantitative_smoke_includes_modeler_only_for_supported_abms(tmp_pat
 
     assert by_abm["grazing"] == {"author", "gpt5.2_short", "gpt5.2_long"}
     assert by_abm["milk_consumption"] == {"author", "modeler", "gpt5.2_short", "gpt5.2_long"}
+
+
+def test_run_quantitative_smoke_multi_llm_merges_sources_without_record_id_collisions(tmp_path: Path) -> None:
+    mistral_root, _ = _build_source_roots(
+        tmp_path,
+        root_name="summ_mistral",
+        matrix_name="matrix_mistral",
+        model="mistral-medium-latest",
+    )
+    qwen_root, _ = _build_source_roots(
+        tmp_path,
+        root_name="summ_qwen",
+        matrix_name="matrix_qwen",
+        model="qwen/qwen3.5-27b",
+    )
+
+    result = run_quantitative_smoke_multi_llm(
+        source_roots=(mistral_root, qwen_root),
+        output_root=tmp_path / "quant_multi",
+        score_summary_fn=_fake_score_summary,
+    )
+
+    rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
+    assert result.success is True
+    assert len(rows) == 120
+    assert {row["llm"] for row in rows} == {"mistral-medium-latest", "qwen/qwen3.5-27b"}
+    assert len({row["record_id"] for row in rows}) == len(rows)
+    assert all("__llm_" in row["record_id"] for row in rows)
+
+    factorial_input_path = result.factorial_csv_path.parent / "factorial_input.csv"
+    factorial_rows = list(csv.DictReader(factorial_input_path.open(encoding="utf-8")))
+    assert "LLM" in factorial_rows[0]
+    assert {row["LLM"] for row in factorial_rows} == {"mistral-medium-latest", "qwen/qwen3.5-27b"}
+
+    assert "LLM" in result.anova_table_markdown_path.read_text(encoding="utf-8")
+
+
+def test_run_quantitative_smoke_multi_llm_keeps_distinct_ids_for_punctuation_variant_labels(tmp_path: Path) -> None:
+    first_root, _ = _build_source_roots(
+        tmp_path,
+        root_name="summ_first",
+        matrix_name="matrix_first",
+        model="alpha/model-a",
+    )
+    second_root, _ = _build_source_roots(
+        tmp_path,
+        root_name="summ_second",
+        matrix_name="matrix_second",
+        model="alpha_model_a",
+    )
+
+    result = run_quantitative_smoke_multi_llm(
+        source_roots=(first_root, second_root),
+        output_root=tmp_path / "quant_multi",
+        score_summary_fn=_fake_score_summary,
+    )
+
+    rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
+    assert result.success is True
+    assert {row["llm"] for row in rows} == {"alpha/model-a", "alpha_model_a"}
+    assert len({row["record_id"] for row in rows}) == len(rows)
+
+
+def test_run_quantitative_smoke_multi_llm_rejects_duplicate_llm_labels(tmp_path: Path) -> None:
+    first_root, _ = _build_source_roots(
+        tmp_path,
+        root_name="summ_first",
+        matrix_name="matrix_first",
+        model="mistral-medium-latest",
+    )
+    second_root, _ = _build_source_roots(
+        tmp_path,
+        root_name="summ_second",
+        matrix_name="matrix_second",
+        model="mistral-medium-latest",
+    )
+
+    with pytest.raises(ValueError, match="duplicate llm labels"):
+        run_quantitative_smoke_multi_llm(
+            source_roots=(first_root, second_root),
+            output_root=tmp_path / "quant_multi",
+            score_summary_fn=_fake_score_summary,
+        )
+
+
+def test_run_quantitative_smoke_multi_llm_rejects_missing_llm_labels(tmp_path: Path) -> None:
+    first_root, _ = _build_source_roots(
+        tmp_path,
+        root_name="summ_first",
+        matrix_name="matrix_first",
+        model="",
+    )
+    second_root, _ = _build_source_roots(
+        tmp_path,
+        root_name="summ_second",
+        matrix_name="matrix_second",
+        model="qwen/qwen3.5-27b",
+    )
+
+    with pytest.raises(ValueError, match="missing llm label"):
+        run_quantitative_smoke_multi_llm(
+            source_roots=(first_root, second_root),
+            output_root=tmp_path / "quant_multi",
+            score_summary_fn=_fake_score_summary,
+        )

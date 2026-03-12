@@ -27,6 +27,7 @@ from distill_abm.cli_actions import (
     execute_smoke_ingest_command,
     execute_smoke_local_qwen_command,
     execute_smoke_quantitative_command,
+    execute_smoke_quantitative_multi_llm_command,
     execute_smoke_qwen_command,
     execute_smoke_summarizers_command,
     execute_smoke_viz_command,
@@ -72,7 +73,10 @@ from distill_abm.pipeline.full_case_matrix_smoke import run_full_case_matrix_smo
 from distill_abm.pipeline.full_case_smoke import run_full_case_smoke
 from distill_abm.pipeline.full_case_suite_smoke import run_full_case_suite_smoke
 from distill_abm.pipeline.local_qwen_sample_smoke import run_local_qwen_sample_smoke
-from distill_abm.pipeline.quantitative_smoke import run_quantitative_smoke
+from distill_abm.pipeline.quantitative_smoke import (
+    run_quantitative_smoke,
+    run_quantitative_smoke_multi_llm,
+)
 from distill_abm.pipeline.run import EvidenceMode, TextSourceMode, run_pipeline
 from distill_abm.pipeline.smoke import (
     run_qwen_smoke_suite,
@@ -680,6 +684,38 @@ def smoke_quantitative(
         resume=resume,
         json_output=json_output,
         run_quantitative_smoke_fn=run_quantitative_smoke,
+    )
+
+
+@app.command("smoke-quantitative-multi-llm")
+def smoke_quantitative_multi_llm(
+    source_root: Annotated[
+        list[Path],
+        typer.Option(
+            "--source-root",
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            help="Completed summarizer smoke roots to merge. Repeat for one root per LLM.",
+        ),
+    ],
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for multi-LLM quantitative smoke artifacts."),
+    ] = Path("results/quantitative_smoke_multi_llm_latest"),
+    resume: Annotated[
+        bool,
+        typer.Option("--resume/--no-resume", help="Reuse valid quantitative rows from the latest run."),
+    ] = False,
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Score completed summarizer smokes jointly and add LLM as an explicit analysis factor."""
+    execute_smoke_quantitative_multi_llm_command(
+        source_roots=tuple(source_root),
+        output_root=output_root,
+        resume=resume,
+        json_output=json_output,
+        run_quantitative_smoke_multi_llm_fn=run_quantitative_smoke_multi_llm,
     )
 
 

@@ -4,6 +4,7 @@ from typing import cast
 
 import pytest
 
+import distill_abm.llm.adapters.openrouter_adapter as openrouter_adapter_module
 from distill_abm.llm.adapters.base import (
     LLMAdapter,
     LLMMessage,
@@ -191,6 +192,163 @@ def test_openrouter_adapter_forwards_structured_output_metadata() -> None:
             "schema": request.metadata["structured_output_schema"],
         },
     }
+    assert seen["extra_body"] == {"provider": {"require_parameters": True}}
+    assert "provider" not in seen
+
+
+def test_openrouter_adapter_leaves_unstructured_payload_unchanged() -> None:
+    seen: dict[str, object] = {}
+
+    def _create(**payload):  # type: ignore[no-untyped-def]
+        seen.update(payload)
+        return SimpleNamespace(
+            choices=[SimpleNamespace(message=SimpleNamespace(content="ok"), finish_reason="stop")],
+            model="google/gemini-3.1-pro-preview",
+        )
+
+    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=_create)))
+
+    OpenRouterAdapter(model="google/gemini-3.1-pro-preview", client=client).complete(make_request())
+
+    assert "response_format" not in seen
+    assert "provider" not in seen
+    assert "extra_body" not in seen
+
+
+def test_openrouter_adapter_enriches_runtime_precision_from_provider_endpoints() -> None:
+    completion = {
+        "choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}],
+        "model": "qwen/qwen3.5-27b",
+        "provider": "Alibaba",
+    }
+    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **_: completion)))
+    adapter = OpenRouterAdapter(
+        model="qwen/qwen3.5-27b",
+        client=client,
+        provider_quantization_resolver=lambda model, provider, **_: "int8"
+        if (model, provider) == ("qwen/qwen3.5-27b", "Alibaba")
+        else None,
+    )
+
+    response = adapter.complete(make_request().model_copy(update={"model": "qwen/qwen3.5-27b"}))
+
+    assert response.raw["provider"] == "Alibaba"
+    assert response.raw["provider_metadata"] == {"provider": "Alibaba", "quantization": "int8"}
+
+
+def test_openrouter_adapter_does_not_override_existing_runtime_precision() -> None:
+    completion = {
+        "choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}],
+        "model": "qwen/qwen3.5-27b",
+        "provider": {"name": "Alibaba", "precision": "fp8"},
+    }
+    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **_: completion)))
+    adapter = OpenRouterAdapter(
+        model="qwen/qwen3.5-27b",
+        client=client,
+        provider_quantization_resolver=lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            AssertionError("resolver should not run when precision already exists")
+        ),
+    )
+
+    response = adapter.complete(make_request().model_copy(update={"model": "qwen/qwen3.5-27b"}))
+
+    assert response.raw["provider"] == {"name": "Alibaba", "precision": "fp8"}
+
+
+def test_fetch_openrouter_endpoint_quantizations_caches_empty_results(monkeypatch: pytest.MonkeyPatch) -> None:
+    openrouter_adapter_module._ENDPOINT_QUANTIZATION_CACHE.clear()
+    calls = {"count": 0}
+
+    def _fake_request(**_: object) -> dict[str, str]:
+        calls["count"] += 1
+        return {}
+
+    monkeypatch.setattr(openrouter_adapter_module, "_request_openrouter_endpoint_quantizations", _fake_request)
+
+    first = openrouter_adapter_module._fetch_openrouter_endpoint_quantizations(
+        model="qwen/qwen3.5-27b",
+        api_key="secret",
+        base_url="https://openrouter.ai/api/v1",
+    )
+    second = openrouter_adapter_module._fetch_openrouter_endpoint_quantizations(
+        model="qwen/qwen3.5-27b",
+        api_key="secret",
+        base_url="https://openrouter.ai/api/v1",
+    )
+
+    assert first == {}
+    assert second == {}
+    assert calls["count"] == 1
+
+
+def test_fetch_openrouter_endpoint_quantizations_retries_after_auth_state_changes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    openrouter_adapter_module._ENDPOINT_QUANTIZATION_CACHE.clear()
+    openrouter_adapter_module._ENDPOINT_QUANTIZATION_FAILURE_CACHE.clear()
+    calls = {"count": 0}
+
+    def _fake_request(*, api_key: str | None, **_: object) -> dict[str, str]:
+        calls["count"] += 1
+        if api_key:
+            return {"alibaba": "fp8"}
+        return {}
+
+    monkeypatch.setattr(openrouter_adapter_module, "_request_openrouter_endpoint_quantizations", _fake_request)
+
+    first = openrouter_adapter_module._fetch_openrouter_endpoint_quantizations(
+        model="qwen/qwen3.5-27b",
+        api_key=None,
+        base_url="https://openrouter.ai/api/v1",
+    )
+    second = openrouter_adapter_module._fetch_openrouter_endpoint_quantizations(
+        model="qwen/qwen3.5-27b",
+        api_key="secret",
+        base_url="https://openrouter.ai/api/v1",
+    )
+
+    assert first == {}
+    assert second == {"alibaba": "fp8"}
+    assert calls["count"] == 2
+
+
+def test_fetch_openrouter_endpoint_quantizations_retries_after_failure_ttl_expires(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    openrouter_adapter_module._ENDPOINT_QUANTIZATION_CACHE.clear()
+    openrouter_adapter_module._ENDPOINT_QUANTIZATION_FAILURE_CACHE.clear()
+    clock = {"value": 100.0}
+    calls = {"count": 0}
+
+    def _fake_request(**_: object) -> dict[str, str]:
+        calls["count"] += 1
+        return {} if calls["count"] == 1 else {"alibaba": "bf16"}
+
+    monkeypatch.setattr(openrouter_adapter_module, "_request_openrouter_endpoint_quantizations", _fake_request)
+    monkeypatch.setattr(openrouter_adapter_module.time, "monotonic", lambda: clock["value"])
+
+    first = openrouter_adapter_module._fetch_openrouter_endpoint_quantizations(
+        model="qwen/qwen3.5-27b",
+        api_key="secret",
+        base_url="https://openrouter.ai/api/v1",
+    )
+    second = openrouter_adapter_module._fetch_openrouter_endpoint_quantizations(
+        model="qwen/qwen3.5-27b",
+        api_key="secret",
+        base_url="https://openrouter.ai/api/v1",
+    )
+    clock["value"] += openrouter_adapter_module._ENDPOINT_QUANTIZATION_FAILURE_TTL_SECONDS + 1.0
+    third = openrouter_adapter_module._fetch_openrouter_endpoint_quantizations(
+        model="qwen/qwen3.5-27b",
+        api_key="secret",
+        base_url="https://openrouter.ai/api/v1",
+    )
+
+    assert first == {}
+    assert second == {}
+    assert third == {"alibaba": "bf16"}
+    assert calls["count"] == 2
 
 
 def test_openrouter_adapter_timeout_is_wrapped() -> None:

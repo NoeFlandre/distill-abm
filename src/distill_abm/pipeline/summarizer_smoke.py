@@ -619,19 +619,19 @@ def _build_live_validated_bundle(case_dir: Path, *, fallback_abm: str) -> Valida
     context_payload = validation_payload.get("context", {})
     if not isinstance(context_payload, dict) or context_payload.get("status") != "accepted":
         return None
-    trend_output_paths = tuple(sorted((case_dir / "03_trends").glob("plot_*/trend_output.txt")))
-    if not trend_output_paths:
-        return None
     trend_payloads = validation_payload.get("trends", {})
     if not isinstance(trend_payloads, dict):
         return None
-    accepted_trends = {
-        key
-        for key, payload in trend_payloads.items()
-        if isinstance(payload, dict) and payload.get("status") == "accepted"
-    }
-    expected_trends = {path.parent.name.removeprefix("plot_").lstrip("0") or "0" for path in trend_output_paths}
-    if accepted_trends != expected_trends:
+    trend_output_paths: list[Path] = []
+    for key, payload in sorted(trend_payloads.items(), key=lambda item: int(item[0])):
+        if not isinstance(payload, dict) or payload.get("status") != "accepted":
+            return None
+        plot_index = int(key)
+        trend_output_path = case_dir / "03_trends" / f"plot_{plot_index:02d}" / "trend_output.txt"
+        if not trend_output_path.exists():
+            return None
+        trend_output_paths.append(trend_output_path)
+    if not trend_output_paths:
         return None
     case_summary_path = case_dir / "00_case_summary.json"
     case_id = case_dir.name
@@ -649,7 +649,7 @@ def _build_live_validated_bundle(case_dir: Path, *, fallback_abm: str) -> Valida
         case_id=case_id,
         abm=abm,
         context_output_path=context_output_path,
-        trend_output_paths=trend_output_paths,
+        trend_output_paths=tuple(trend_output_paths),
         validation_note=(
             "Bundle discovered from an accepted case in a live full-case suite run. "
             "Used to summarize outputs as soon as a case finishes."

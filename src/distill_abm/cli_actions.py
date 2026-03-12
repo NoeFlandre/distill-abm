@@ -732,6 +732,43 @@ def execute_smoke_quantitative_command(
     )
 
 
+def execute_smoke_quantitative_multi_llm_command(
+    *,
+    source_roots: tuple[Path, ...],
+    output_root: Path,
+    resume: bool,
+    json_output: bool,
+    run_quantitative_smoke_multi_llm_fn: Callable[..., Any],
+) -> None:
+    result: Any = run_quantitative_smoke_multi_llm_fn(
+        source_roots=source_roots,
+        output_root=output_root,
+        resume=resume,
+    )
+    command_result = SmokeCommandResult(
+        command="smoke-quantitative-multi-llm",
+        success=result.success,
+        report_json_path=result.report_json_path,
+        report_markdown_path=result.report_markdown_path,
+        failed_items=result.failed_record_ids,
+        nested_artifacts={
+            "review_csv": result.review_csv_path,
+            "quantitative_rows_csv": result.quantitative_rows_path,
+            "structured_results_csv": result.structured_results_path,
+            "anova_csv": result.anova_csv_path,
+            "factorial_csv": result.factorial_csv_path,
+            "optimal_csv": result.optimal_csv_path,
+        },
+    )
+    emit_smoke_command_result(
+        command_result=command_result,
+        json_output=json_output,
+        markdown_label="multi-llm quantitative smoke report (markdown)",
+        json_label="multi-llm quantitative smoke report (json)",
+        failure_label="multi-llm quantitative smoke failed",
+    )
+
+
 def execute_smoke_full_case_command(
     *,
     abm: str,

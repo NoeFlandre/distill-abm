@@ -19,6 +19,7 @@ Deliver **working, verified, minimal, maintainable changes**. Code is cheap to g
 5. **Don't hand off unreviewed code.** Before handoff: code works, you've reviewed it, the change is minimal, the description is accurate.
 6. **Stop and ask when ambiguity is material.** Don't guess on prompt semantics, evaluation criteria, data formats, or anything the human said not to guess about. Ask one concise question, wait, then continue.
 7. **New smoke runs must use the standard run scaffolding.** By default every smoke workflow should be run-separated and resumable, with `runs/run_<timestamp>/`, `latest_run.txt`, per-run logs, review artifacts, and reuse of previously successful work. Do not invent one-off layouts unless explicitly justified.
+8. **Read the technology documentation when behavior is provider- or framework-specific.** Before changing external API, SDK, model-provider, or framework integrations, check the relevant official docs so transport details and parameters are not guessed.
 
 ---
 
