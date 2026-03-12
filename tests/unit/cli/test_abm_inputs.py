@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 import typer
 
+import distill_abm.cli as cli_module
 from distill_abm.cli_abm_inputs import (
     apply_abm_metric_defaults,
     build_doe_plot_inputs,
@@ -72,21 +74,21 @@ def test_build_local_qwen_case_input_uses_first_plot() -> None:
     built = build_local_qwen_case_input(
         abm="milk_consumption",
         abm_config=_abm_config(),
-        ingest_root=Path("results/ingest_smoke_latest"),
-        viz_root=Path("results/viz_smoke_latest"),
+        ingest_root=Path("results/archive/ingest_smoke_latest"),
+        viz_root=Path("results/archive/viz_smoke_latest"),
     )
 
     assert built.reporter_pattern == "metric-a"
     assert built.plot_description == "First plot"
-    assert built.plot_path == Path("results/viz_smoke_latest/milk_consumption/plots/1.png")
+    assert built.plot_path == Path("results/archive/viz_smoke_latest/milk_consumption/plots/1.png")
 
 
 def test_build_full_case_smoke_input_builds_all_plot_inputs() -> None:
     built = build_full_case_smoke_input(
         abm="grazing",
         abm_config=_abm_config(),
-        ingest_root=Path("results/ingest_smoke_latest"),
-        viz_root=Path("results/viz_smoke_latest"),
+        ingest_root=Path("results/archive/ingest_smoke_latest"),
+        viz_root=Path("results/archive/viz_smoke_latest"),
     )
 
     assert len(built.plots) == 2
@@ -98,9 +100,25 @@ def test_build_doe_plot_inputs_builds_ordered_plot_specs() -> None:
     built = build_doe_plot_inputs(
         abm="fauna",
         abm_config=_abm_config(),
-        viz_root=Path("results/viz_smoke_latest"),
+        viz_root=Path("results/archive/viz_smoke_latest"),
     )
 
     assert [item.plot_index for item in built] == [1, 2]
     assert built[0].plot_description == "First plot"
-    assert built[1].plot_path == Path("results/viz_smoke_latest/fauna/plots/2.png")
+    assert built[1].plot_path == Path("results/archive/viz_smoke_latest/fauna/plots/2.png")
+
+
+def test_cli_archive_root_defaults_keep_results_root_flat() -> None:
+    assert cli_module.ARCHIVE_RESULTS_ROOT == Path("results/archive")
+    assert inspect.signature(cli_module.smoke_doe).parameters["ingest_root"].default == Path(
+        "results/archive/ingest_smoke_latest"
+    )
+    assert inspect.signature(cli_module.smoke_doe).parameters["viz_root"].default == Path(
+        "results/archive/viz_smoke_latest"
+    )
+    assert inspect.signature(cli_module.smoke_quantitative).parameters["output_root"].default == Path(
+        "results/archive/quantitative_smoke_latest"
+    )
+    assert inspect.signature(cli_module.validate_workspace).parameters["output_root"].default == Path(
+        "results/archive/agent_validation/latest"
+    )

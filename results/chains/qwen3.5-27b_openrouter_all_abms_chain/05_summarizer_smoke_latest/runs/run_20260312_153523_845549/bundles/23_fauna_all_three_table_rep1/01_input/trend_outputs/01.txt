@@ -1,5 +1,0 @@
-The number of human hunter-gatherer bands remains constant at 20 throughout the simulation duration. The metric exhibits zero variance, with no fluctuations or growth patterns observed from the initial to the final time step.
-
-This static trend reflects the configuration where foragers are immortal, eliminating natural mortality and reproduction from the human population dynamics. Consequently, hunting pressure remains a fixed variable within the socio-ecological system.
-
-For decision makers, this indicates that human predation intensity is stable over time. Extinction risks depend on the interaction between this constant pressure and environmental factors, rather than shifts in forager density.

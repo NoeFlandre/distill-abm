@@ -1,0 +1,16 @@
+The data shows a persistent decline in the average total livestock (healthy + destocked) per household over the simulation period, with values decreasing from ~90.0 to ~40.75 across time steps. The decline is gradual but consistent, with occasional fluctuations in the rate of decrease, following a general linear trend with slight deviations. Key observations include:  
+
+1. **Initial Stability (Time steps 1–3):** Livestock averages remain at 90.0, reflecting the baseline herd size set by \*livestock-init=90. This indicates no immediate resource constraints at the start, but pasture basins are likely fully allocated.   
+2. **Early Gradual Decline (Time steps 4–20):** A slow reduction begins (~90.0 → ~83.5), suggesting emerging grazing pressure on pastures despite buffereing from stochastic rainfall variability (§20, §21, §27). Stochastic rainfall extremes may not yet overwhelm adaptive capacity in household herds.   
+3. **Accelerated Decline (Time steps 21–61):** A sharper drop occurs post-time step 20 (~83.5 → ~40.75), coinciding with compounding effects of:     
+   - Unaddressed resource depletion from overgrazing (§28: high livestock-init, §30: inefficient consumption), exacerbated by stochastic droughts (§23: gr2=0.1, §5: resting thresholds disabled).   
+   - Risk-sensitive behavior (§14–16: risk-att-init=0.5, yet limited adaptive flexibility due to \*behavioral-type=E-RO).   
+
+The trajectory implies that fixed behavioral strategies (E-RO) and absence of social learning (§7–8: social-susceptibility=0, \*number-E-RO-SL1=20) reduce system resilience, as agents cannot shift toward sustainable adaptations. For decision-makers, this underscores the importance of integrating risk-responsive herd size management, pasture resting protocols, or learning mechanisms to mitigate long-term degradation in similar systems.   
+
+**| Time Step | Average Livestock | Key Dynamics** |   
+    |------------------|----------------|----------------|   
+    | 1                | 90.0           | Initial equilibrium. |   
+    | 4                | ~89.0          | First signs of overgrazing. |   
+    | 21               | ~80.0          | Stormwater thresholds engaged. |   
+    | 61               | ~40.8          | Sustained resource strain. |

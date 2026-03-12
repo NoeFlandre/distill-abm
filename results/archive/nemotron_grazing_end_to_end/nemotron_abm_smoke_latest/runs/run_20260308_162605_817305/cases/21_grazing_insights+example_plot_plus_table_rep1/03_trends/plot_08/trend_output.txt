@@ -1,0 +1,13 @@
+The trends in social learning adoption among households show a generally low and delayed engagement across most simulation runs. Key observations include:   
+
+- **Stagnant Engagement (Steps 0–4):** The majority of runs maintain zero social learning (SL) adoption throughout the first five steps, indicating minimal initial SL activity.   
+
+- **Early-Onset Variations (Steps 5–15):** By step 5, sporadic increases appear, with two runs peaking at 4–5 households before stabilizing. These limited engagements suffice to halt further growth in those simulations.  
+
+- **Mid-Step Acceleration (Steps 16–24):** A smaller subset of runs begins experiencing sharper increases, with some reaching 10–15 households by step 20. However, this fragile adoption fails to propagate beyond 20–25 households by step 25, peaking at 20 households.   
+
+- **Late-Cycle Plateaus (Steps 25–29):** Most runs plateau, with median metrics stabilizing at 10–15 households. Even among higher peaks, none exceed 50% of the household population (60 total), underscoring limited scalability.   
+
+- **Structural Constraints:** Despite the extended 100-step runtime, the median final count remains below 20 households, suggesting systemic barriers to widespread SL adoption. These barriers may stem from the homogenity-policy, which restricts agent diversity critical for social learning.   
+
+Through its step-function curves, the simulation illustrates a scenario where social learning struggles to gain traction in homogenous conditions, with heterogeneous outcomes concentrated among a minority of runs.

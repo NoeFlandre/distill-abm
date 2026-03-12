@@ -1,0 +1,11 @@
+The data shows a significant upward trend in the Gini coefficient for livestock health across all 100 timesteps, starting from near-zero values (2.6e-4) and reaching approximately 0.18 by the final timestep. This indicates a consistent increase in inequality in livestock outcomes among households over time. The trend appears to accelerate after ~50 timesteps, with the coefficient rising sharply from ~0.12 to 0.18 in the final 20 years.
+
+In the context of the model, this suggests that under homogeneous conditions (all agents using E-RO behavioral type), the interplay between climatic variability (fixed rainfall with 200 mean/100 standard deviation) and risk-averse decision-making (risk-att-init=0.5) leads to diverging livestock health outcomes. The lack of active social learning (social-susceptibility=0) and disabled strategy switching (SL2-strategy-switch?=False) prevents agents from adapting to emerging inequalities.
+
+Implications for decision-makers:
+- Passive social learning mechanisms (knowledge-radius=1) may be insufficient to mitigate inequality without explicit strategy adoption rules
+- Climatic variability exacerbates inequality when no behavioral flexibility exists
+- Long-term outcomes may require dynamic behavioral updating mechanisms to prevent persistent resource disparities
+
+Further investigation of heterogeneous configurations (E-LBD vs E-RO-SL1) and activated strategy switching could reveal how structural interventions might counteract this divergence pattern.
+Inequality in livestock outcomes suggests necessary portfolio diversification in risk management tools for rangeland communities.

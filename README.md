@@ -158,8 +158,8 @@ Run pre-LLM DOE smoke checks:
 
 ```bash
 uv run distill-abm smoke-doe \
-  --ingest-root results/ingest_smoke_latest \
-  --viz-root results/viz_smoke_latest \
+  --ingest-root results/archive/ingest_smoke_latest \
+  --viz-root results/archive/viz_smoke_latest \
   --json
 ```
 
@@ -167,8 +167,8 @@ Run a small real local-Qwen smoke for prompt/evidence/output inspection:
 
 ```bash
 uv run distill-abm smoke-local-qwen \
-  --ingest-root results/ingest_smoke_latest \
-  --viz-root results/viz_smoke_latest \
+  --ingest-root results/archive/ingest_smoke_latest \
+  --viz-root results/archive/viz_smoke_latest \
   --json
 ```
 
@@ -177,8 +177,8 @@ Run a lightweight repository health check:
 ```bash
 uv run distill-abm health-check \
   --models-root data \
-  --ingest-root results/ingest_smoke_latest \
-  --viz-root results/viz_smoke_latest \
+  --ingest-root results/archive/ingest_smoke_latest \
+  --viz-root results/archive/viz_smoke_latest \
   --json
 ```
 
@@ -188,7 +188,7 @@ Monitor a case-based smoke run live:
 uv run distill-abm monitor-local-qwen --watch --interval-seconds 2
 
 uv run distill-abm monitor-run \
-  --output-root results/nemotron_abm_smoke_latest \
+  --output-root results/archive/nemotron_abm_smoke_latest \
   --watch --interval-seconds 2
 ```
 
@@ -197,17 +197,17 @@ DOE smoke notes:
 - `smoke-doe` does not call any LLM.
 - It materializes the full pre-LLM DOE matrix across ABMs, benchmark models, evidence modes, summarization conditions, prompt variants, and repetitions.
 - It treats candidate models as design factors only, so local model availability does not affect DOE smoke success or failure.
-- It groups shared DOE factors under `results/doe_smoke_latest/10_shared/global/`, shared ABM artifacts under `results/doe_smoke_latest/10_shared/<abm>/`, and compact case/request indexes under `results/doe_smoke_latest/20_case_index/`.
+- It groups shared DOE factors under `results/archive/doe_smoke_latest/10_shared/global/`, shared ABM artifacts under `results/archive/doe_smoke_latest/10_shared/<abm>/`, and compact case/request indexes under `results/archive/doe_smoke_latest/20_case_index/`.
 - It writes the exact context prompt, the exact trend prompt for each plot, the per-request model and hyperparameter settings, the exact image/table evidence paths, and the unresolved context placeholder that would still exist before the first LLM call.
 - Table evidence is generated from the matched plot series only and includes descriptive statistics, extrema, inflection points, rolling Mann-Kendall, change points, and oscillation summaries.
 - It uses the latest ingest and visualization smoke outputs as the default pre-LLM inputs, so the report makes it easy to catch wrong documentation, wrong parameter narrative, wrong simulation CSV, wrong evidence image, wrong prompt composition, wrong model choice, or placeholder leakage before any model execution.
-- It writes `design_matrix.csv`, `request_matrix.csv`, `cases.jsonl`, `requests.jsonl`, and a grouped markdown/json report under `results/doe_smoke_latest/`.
+- It writes `design_matrix.csv`, `request_matrix.csv`, `cases.jsonl`, `requests.jsonl`, and a grouped markdown/json report under `results/archive/doe_smoke_latest/`.
 
 Visualization smoke caveat:
 
 - Unlike the older CSV-driven debug path, `smoke-viz` now resolves ABM-specific NetLogo settings from `configs/abms/<name>.yaml`.
 - Each ABM must define a `netlogo_viz` section in `configs/abms/<name>.yaml` with the experiment name, reporter list, and ordered plot list.
-- The command writes one simulation CSV plus ordered plot PNGs under `results/viz_smoke_latest/<abm>/`.
+- The command writes one simulation CSV plus ordered plot PNGs under `results/archive/viz_smoke_latest/<abm>/`.
 - The repository now preserves validated reference CSVs and plot images under `data/<abm>_abm/legacy/` so production smoke runs can emit deterministic debug artifacts without depending on the temporary notebook folder.
 - The report records the artifact source per ABM as either `simulated` or `fallback`.
 - The workflow depends on `pynetlogo` and a working NetLogo installation directory passed via `--netlogo-home` or `DISTILL_ABM_NETLOGO_HOME`.
@@ -232,7 +232,7 @@ Scope-oriented convenience wrapper:
 uv run distill-abm quality-gate --scope pre-llm --json
 ```
 
-This command is the current repository entrypoint for non-LLM local verification. It runs the standard local checks, emits a structured JSON report, and nests the NetLogo ingest-smoke report under `results/agent_validation/latest/` so agents can inspect outcomes without ad hoc artifact hunting. As with the testing report, treat the command output from the present workspace as authoritative rather than relying on a stale claimed status in documentation.
+This command is the current repository entrypoint for non-LLM local verification. It runs the standard local checks, emits a structured JSON report, and nests the NetLogo ingest-smoke report under `results/archive/agent_validation/latest/` so agents can inspect outcomes without ad hoc artifact hunting. As with the testing report, treat the command output from the present workspace as authoritative rather than relying on a stale claimed status in documentation.
 
 Repo workflow notes:
 

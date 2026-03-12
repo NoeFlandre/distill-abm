@@ -1,0 +1,14 @@
+The mean destocked households metric reveals three distinct phases and behavioral strategy dependencies:   
+ 1. **Early depletion (Steps 0-10):** All behavioral types experience rapid initial destocking, with mean values falling from ~7 to 4. This corresponds to the most productive pasture phase (pre-rainfall variability impacts) and the immediate effect of high livestock-init (90 animals) exceeding pasture capacity (Rmax=0.5 biomass consumption rate limitation). All strategies failed to self-regulate during this grace period.   
+  
+ 2. **Divergence/Convergence (Steps 10-50):**   
+ - **Stochastic rainfall correlation:** Lines reflect rainfall shocks (rain_mean=200, std=100), with sharper drops during simulated droughts (typically steps 12-30, 45-60).   
+ - **Risk-mode agents ([E-RO-SL1 + E-LBD]):** Demonstrate asymmetric responses - historically risk-averse types (closer to 0.5 risk-att-init) show gradual destocking, while risk-seeking types exhibit more volatile trajectories.   
+ - **Learning strategies:** E-LBD agents initially outperform others (higher mean destock by step 20) by adjusting herd bonds based on personal experience, while E-RO-SL1 agents show variable outcomes depending on local information flow (knowledge_radius=1.0 limits learning reach).   
+  
+ 3. **Asymptotic stabilization/extinction (Steps 50-100):**   
+ - **E-RO** agents: Maintain lowest average destock (≈0.3-0.5) through rigid grazing practices matching biome constraints (gr1=0.5 wet season regeneration vs. gr2=0.1 drought resilience).   
+ - **E-LBD** agents: Exhibit U-shaped trajectories - initial overstocking followed by aggressive destocking then partial recovery as reinforced learning adapts to pasture dynamics.   
+ - **E-RO-SL1** agents: Converge near E-RO levels but show bimodal outcomes (formation of local learning hotspots around 2-5 agent clusters in climate shocks).   
+ 
+Plateauing behavior in all phases confirms agent decisions reach carrying capacity despite stochastic elements, with risk sensitivity and learning strategies modulating adaptation speed and failure weathering.

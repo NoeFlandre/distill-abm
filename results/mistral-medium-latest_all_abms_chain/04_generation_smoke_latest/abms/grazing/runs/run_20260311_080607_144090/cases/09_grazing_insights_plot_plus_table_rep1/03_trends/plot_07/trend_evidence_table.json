@@ -1,0 +1,191 @@
+{
+  "reporter_pattern": "gini-coef-total-livestock-healthy",
+  "time_column": null,
+  "matched_columns": [
+    "gini-coef-total-livestock-healthy",
+    "gini-coef-total-livestock-healthy.1",
+    "gini-coef-total-livestock-healthy.2",
+    "gini-coef-total-livestock-healthy.3",
+    "gini-coef-total-livestock-healthy.4",
+    "gini-coef-total-livestock-healthy.5",
+    "gini-coef-total-livestock-healthy.6",
+    "gini-coef-total-livestock-healthy.7",
+    "gini-coef-total-livestock-healthy.8",
+    "gini-coef-total-livestock-healthy.9",
+    "gini-coef-total-livestock-healthy.10",
+    "gini-coef-total-livestock-healthy.11",
+    "gini-coef-total-livestock-healthy.12",
+    "gini-coef-total-livestock-healthy.13",
+    "gini-coef-total-livestock-healthy.14",
+    "gini-coef-total-livestock-healthy.15",
+    "gini-coef-total-livestock-healthy.16",
+    "gini-coef-total-livestock-healthy.17",
+    "gini-coef-total-livestock-healthy.18",
+    "gini-coef-total-livestock-healthy.19",
+    "gini-coef-total-livestock-healthy.20",
+    "gini-coef-total-livestock-healthy.21",
+    "gini-coef-total-livestock-healthy.22",
+    "gini-coef-total-livestock-healthy.23",
+    "gini-coef-total-livestock-healthy.24",
+    "gini-coef-total-livestock-healthy.25",
+    "gini-coef-total-livestock-healthy.26",
+    "gini-coef-total-livestock-healthy.27",
+    "gini-coef-total-livestock-healthy.28",
+    "gini-coef-total-livestock-healthy.29"
+  ],
+  "matched_series_count": 30,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_30_matched_series",
+      "sample_count": 101,
+      "valid_sample_count": 100,
+      "dropped_non_numeric_count": 1,
+      "start_value": -6.661338147750939e-16,
+      "end_value": 0.07259583117091281,
+      "mean": 0.030236731028042776,
+      "median": 0.022927169233273315,
+      "std": 0.02394045694813867,
+      "variance": 0.0005731454788856812,
+      "minimum": -6.661338147750939e-16,
+      "minimum_index": 1,
+      "maximum": 0.07259583117091281,
+      "maximum_index": 100,
+      "peaks": [],
+      "valleys": [],
+      "inflection_indices": [
+        8,
+        13,
+        15,
+        20,
+        25,
+        37,
+        57
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 10,
+        "windows": [
+          {
+            "start_index": 1,
+            "end_index": 10,
+            "trend": "increasing",
+            "tau": 0.9777777777777777,
+            "slope": 0.0003045942639277653,
+            "p": 0.00011268655674068206,
+            "significant": true
+          },
+          {
+            "start_index": 11,
+            "end_index": 20,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.0004085983060163576,
+            "p": 8.303070332638107e-05,
+            "significant": true
+          },
+          {
+            "start_index": 21,
+            "end_index": 30,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.0004100989321535198,
+            "p": 8.303070332638107e-05,
+            "significant": true
+          },
+          {
+            "start_index": 31,
+            "end_index": 40,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.00034935624379204546,
+            "p": 8.303070332638107e-05,
+            "significant": true
+          },
+          {
+            "start_index": 41,
+            "end_index": 50,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.0008740238789924949,
+            "p": 8.303070332638107e-05,
+            "significant": true
+          },
+          {
+            "start_index": 51,
+            "end_index": 60,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.0013070974748997557,
+            "p": 8.303070332638107e-05,
+            "significant": true
+          },
+          {
+            "start_index": 61,
+            "end_index": 70,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.0012392686750706387,
+            "p": 8.303070332638107e-05,
+            "significant": true
+          },
+          {
+            "start_index": 71,
+            "end_index": 80,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.0010099402850518718,
+            "p": 8.303070332638107e-05,
+            "significant": true
+          },
+          {
+            "start_index": 81,
+            "end_index": 90,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.0008090912163406349,
+            "p": 8.303070332638107e-05,
+            "significant": true
+          },
+          {
+            "start_index": 91,
+            "end_index": 100,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.0006574132577164049,
+            "p": 8.303070332638107e-05,
+            "significant": true
+          }
+        ]
+      },
+      "change_points": [
+        51,
+        71,
+        100
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 49.0,
+        "oscillation_indices": [
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93
+        ]
+      }
+    }
+  ]
+}

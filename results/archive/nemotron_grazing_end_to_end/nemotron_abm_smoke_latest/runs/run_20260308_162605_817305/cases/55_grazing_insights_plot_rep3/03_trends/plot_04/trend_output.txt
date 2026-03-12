@@ -1,0 +1,13 @@
+Key trends observed are:
+
+'mean-green-biomass.4' peaked first at step 30 with a value of 45000.0. *mean-green-Biomass.5' peaked at step 30 with a value of 39000.0. *mean-green-biomass.6 and 8' peaked at step 60, with values equal to 53000.0 and 46000.0, respectively. *mean-green-biomass.9' peaked at step 30 with a value of 44000.0. *mean-green-biomass.14' peaked at step 70 with a value of 49000.0. *mean-green-biomass.15' the only simulation that never exceeded 45,000-grazing data details. 
+
+Post step 70, all simulations show higher numbers. This is attributed to consistent higher rainfall. This rainfall increased as result performance across all simulations. *mean-green-biomass.1*'s peak value is at step 90, which is 63000.0. After step 90, most simulations become stable.
+
+The duration taken to maximum value for each simulation is having a significant impact on the final stable value almost doubling the mean value.
+
+Also, we can see that 'mean-green-biomass.6' and 'mean-green-biomass.8' stayed steady for steps 60–100 with min and max values remaining constant at 48000.0 and 53000.0.
+
+'mean-green-biomass.16' has the lowest stable mean at approximately 47000.0 between steps 80–100.
+
+These trends indicate how the mean green biomass reacts to climate variations and how the green grass growth influenced by weather could disrupt the availability of results. In total 19 simulations with survival rates more than 50% show strong resilience of pastures under the conditions presented.

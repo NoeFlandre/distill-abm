@@ -1,0 +1,9 @@
+# Best Score Across Dynamic Prompt Elements
+
+| Reference family | ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| modeler | milk_consumption | bart | qwen/qwen3.5-27b | 0.04 | 0.16 | 0.39 | 0.14 | 0.20 | 56.10 |
+| modeler | milk_consumption | bert | qwen/qwen3.5-27b | 0.06 | 0.27 | 0.53 | 0.17 | 0.22 | 39.97 |
+| modeler | milk_consumption | longformer_ext | qwen/qwen3.5-27b | 0.06 | 0.21 | 0.51 | 0.15 | 0.22 | 62.80 |
+| modeler | milk_consumption | none | qwen/qwen3.5-27b | 0.05 | 0.32 | 0.43 | 0.21 | 0.22 | 50.16 |
+| modeler | milk_consumption | t5 | qwen/qwen3.5-27b | 0.02 | 0.14 | 0.36 | 0.11 | 0.17 | 70.81 |

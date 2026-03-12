@@ -1,0 +1,1 @@
+Throughout the simulation, the number of human hunter-gatherer bands remains constant at 20 bands. This stability persists from the initial step to the final step, indicating that no changes in the number of foraging groups occur despite the varying environmental and hunting conditions modeled.

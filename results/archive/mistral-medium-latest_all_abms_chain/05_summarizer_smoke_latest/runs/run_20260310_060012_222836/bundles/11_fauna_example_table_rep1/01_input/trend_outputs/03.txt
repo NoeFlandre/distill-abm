@@ -1,0 +1,11 @@
+The cumulative number of male prey animals hunted and killed by forager bands begins at zero and exhibits a rapid increase in the early time steps. This initial rise can be attributed to the high initial density of prey and the optimal foraging behavior of hunters, who likely target the most accessible and valuable prey first. By around 231 time steps, the cumulative count reaches approximately 40, indicating a significant initial hunting pressure. 
+
+The trend continues to increase steadily, reaching around 80 by 463 time steps and approximately 100 by 695 time steps. This consistent rise suggests a sustained hunting effort and a relatively stable prey population that can support continuous hunting. The rate of increase slows down slightly but remains positive, reflecting a balance between hunting success and prey availability. 
+
+Around 928 time steps, the cumulative count is roughly 110, and the trend starts to plateau, indicating a potential stabilization in the number of males hunted. This plateau could be due to a reduction in prey density, making it harder for hunters to find and kill male prey, or a shift in hunter behavior due to changing environmental conditions or prey demographics. 
+
+Between 1160 and 1391 time steps, the trend shows no significant change, hovering around 116. This stagnation suggests a period of equilibrium where the number of males hunted stabilizes, possibly due to a balance between prey reproduction and hunting pressure. 
+
+After 1392 time steps, the trend resumes a slight increase, reaching around 117 by 1623 time steps. This minor uptick could be attributed to fluctuations in prey population dynamics or changes in hunter strategies. 
+
+From 1856 time steps onward, the trend exhibits a slight decrease, ending at around 117.5 by the final time step. This slight decline may indicate a reduction in the male prey population or a shift in hunter focus to other prey types. The overall pattern suggests a complex interplay between hunting pressure, prey demographics, and environmental factors, leading to dynamic but ultimately stabilizing trends in the cumulative number of male prey hunted.

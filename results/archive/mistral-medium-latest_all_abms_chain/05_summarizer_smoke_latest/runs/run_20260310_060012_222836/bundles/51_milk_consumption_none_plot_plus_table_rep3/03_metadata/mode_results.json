@@ -1,0 +1,55 @@
+{
+  "bundle_id": "51_milk_consumption_none_plot_plus_table_rep3",
+  "case_id": "51_milk_consumption_none_plot_plus_table_rep3",
+  "abm": "milk_consumption",
+  "bundle_dir": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/51_milk_consumption_none_plot_plus_table_rep3",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/51_milk_consumption_none_plot_plus_table_rep3/02_summaries/none.txt",
+      "error": null,
+      "duration_seconds": 6.660120561718941e-7,
+      "input_length": 14250,
+      "output_length": 14250
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/51_milk_consumption_none_plot_plus_table_rep3/02_summaries/bart.txt",
+      "error": null,
+      "duration_seconds": 26.401970375038218,
+      "input_length": 14250,
+      "output_length": 1222
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/51_milk_consumption_none_plot_plus_table_rep3/02_summaries/bert.txt",
+      "error": null,
+      "duration_seconds": 18.345890875032637,
+      "input_length": 14250,
+      "output_length": 1523
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/51_milk_consumption_none_plot_plus_table_rep3/02_summaries/t5.txt",
+      "error": null,
+      "duration_seconds": 13.98867995798355,
+      "input_length": 14250,
+      "output_length": 1091
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/mistral_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260310_060012_222836/bundles/51_milk_consumption_none_plot_plus_table_rep3/02_summaries/longformer_ext.txt",
+      "error": null,
+      "duration_seconds": 26.58711837499868,
+      "input_length": 14250,
+      "output_length": 1791
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+(using the attached python package)
+
+The following code retrieves and prints selected elements from the domestic_outcomes DataFrame:
+
+```python
+print(domestic_outcomes)
+print(domestic_outcomes[’pasture_biomass’].values)
+print(domestic_outcomes[’pasture_biomass’].wait())
+print(domestic_outcomes[’pasture_biomass’][domestic_outcomes[’pasture_biomass’].le(0).values])
+print(domestic_outcomes[’pasture_biomass’].prob(zapierPk, columnThreshold=0.05))
+print(domestic_outcomes[’pasture_biomass’][-BusinessOutcomesD0DatFwps[domestic_outcomes[’pasture_biomass’.le(0)].values])]
+print(domestic_outcomes[''pasture_biomass''][-BusinessOutcomesD0DatFwps[domestic_outcomes[’pasture_biomass’.le(0)].values]])]
+print(domestic_outcomes[''pasture_biomass''].iloc[ix[-BusinessOutcomesD0DatFwps[domestic_outcomes[’pasture_biomass’.le(0)].values]))])
+print(domestic_outcomes[’pasture_biomass’][-BusinessOutcomesD0DatFwps[domestic_outcomes[’pasture_biomass’.le(0)].values]])
+```

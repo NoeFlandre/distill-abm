@@ -1,0 +1,8 @@
+{
+  "abm": "grazing",
+  "case_id": "56_grazing_insights_table_rep3",
+  "evidence_mode": "table",
+  "model": "qwen/qwen3.5-27b",
+  "prompt_variant": "insights",
+  "repetition": 3
+}

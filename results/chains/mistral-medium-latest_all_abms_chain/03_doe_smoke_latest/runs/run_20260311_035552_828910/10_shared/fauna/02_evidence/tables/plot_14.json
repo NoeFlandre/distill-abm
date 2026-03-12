@@ -1,5 +1,0 @@
-{
-  "reporter_pattern": "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100",
-  "series_path": "results/chains/mistral-medium-latest_all_abms_chain/03_doe_smoke_latest/runs/run_20260311_035552_828910/10_shared/fauna/02_evidence/tables/plot_14_series.csv",
-  "summary_path": "results/chains/mistral-medium-latest_all_abms_chain/03_doe_smoke_latest/runs/run_20260311_035552_828910/10_shared/fauna/02_evidence/tables/plot_14.txt"
-}

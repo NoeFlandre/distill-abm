@@ -1,0 +1,75 @@
+{
+  "abms": [
+    {
+      "abm": "fauna",
+      "failed_case_ids": [
+        "abm_runner_failed"
+      ],
+      "observability_csv_path": null,
+      "observability_summary_json_path": null,
+      "observability_summary_markdown_path": null,
+      "planned_case_count": 72,
+      "prompt_compression_summary_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/prompt_compression_summary.json",
+      "report_json_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/smoke_full_case_matrix_report.json",
+      "report_markdown_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/smoke_full_case_matrix_report.md",
+      "review_csv_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/request_review.csv",
+      "review_html_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/review.html",
+      "run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna",
+      "success": false
+    },
+    {
+      "abm": "grazing",
+      "failed_case_ids": [
+        "abm_runner_failed"
+      ],
+      "observability_csv_path": null,
+      "observability_summary_json_path": null,
+      "observability_summary_markdown_path": null,
+      "planned_case_count": 72,
+      "prompt_compression_summary_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/prompt_compression_summary.json",
+      "report_json_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/smoke_full_case_matrix_report.json",
+      "report_markdown_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/smoke_full_case_matrix_report.md",
+      "review_csv_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/request_review.csv",
+      "review_html_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing/review.html",
+      "run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/grazing",
+      "success": false
+    },
+    {
+      "abm": "milk_consumption",
+      "failed_case_ids": [
+        "abm_runner_failed"
+      ],
+      "observability_csv_path": null,
+      "observability_summary_json_path": null,
+      "observability_summary_markdown_path": null,
+      "planned_case_count": 72,
+      "prompt_compression_summary_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/prompt_compression_summary.json",
+      "report_json_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/smoke_full_case_matrix_report.json",
+      "report_markdown_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/smoke_full_case_matrix_report.md",
+      "review_csv_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/request_review.csv",
+      "review_html_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/review.html",
+      "run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption",
+      "success": false
+    }
+  ],
+  "failed_abms": [
+    "fauna",
+    "grazing",
+    "milk_consumption"
+  ],
+  "finished_at_utc": "2026-03-12T09:08:09.533381+00:00",
+  "observability_csv_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/runs/run_20260312_090809_526361/run_observability.csv",
+  "observability_summary_json_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/runs/run_20260312_090809_526361/run_observability_summary.json",
+  "observability_summary_markdown_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/runs/run_20260312_090809_526361/run_observability_summary.md",
+  "output_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest",
+  "prompt_compression_summary_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/runs/run_20260312_090809_526361/prompt_compression_summary.json",
+  "report_json_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/runs/run_20260312_090809_526361/smoke_full_case_suite_report.json",
+  "report_markdown_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/runs/run_20260312_090809_526361/smoke_full_case_suite_report.md",
+  "review_csv_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/runs/run_20260312_090809_526361/review.csv",
+  "review_html_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/runs/run_20260312_090809_526361/review.html",
+  "run_id": "run_20260312_090809_526361",
+  "run_log_path": "/Users/noeflandre/distill-abm/results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/runs/run_20260312_090809_526361/run.log.jsonl",
+  "run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/runs/run_20260312_090809_526361",
+  "started_at_utc": "2026-03-12T09:08:09.526361+00:00",
+  "success": false
+}

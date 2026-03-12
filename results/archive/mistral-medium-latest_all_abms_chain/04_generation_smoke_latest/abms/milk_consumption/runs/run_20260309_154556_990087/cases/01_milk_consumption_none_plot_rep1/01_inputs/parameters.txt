@@ -1,0 +1,17 @@
+We have 16 parameters:
+  - memory-lifetime, from 1.0 to 10.0. We set it to 5.
+  - alt-health-mean-initial, from 1.0 to 3.0. We set it to 1.69.
+  - habit-threshold, from 1.0 to 10.0. We set it to 2.
+  - p-interact, from 0.0 to 1.0. We set it to 0.3.
+  - social-susceptibility, from 0.0 to 1.0. We set it to 0.2.
+  - incumbent-initial-habit, from 0.0 to 10.0. We set it to 10.
+  - alt-env-mean-initial, from 0.0 to 3.0. We set it to 1.12.
+  - social-blindness, from 0.0 to 1.0. We set it to 0.51.
+  - justification, from 0.0 to 1.0. We set it to 0.61.
+  - cognitive-dissonance-threshold, from 0.0 to 1.0. We set it to 0.15.
+  - network-parameter, from 2.0 to 10.0. We set it to 8.
+  - number-of-agents. We set it to 1000.
+  - habit-on?. We set it to True.
+  - network-type. We set it to "watts-strogatz".
+  - norms. We set it to True.
+  - social-conformity. We set it to 0.28.

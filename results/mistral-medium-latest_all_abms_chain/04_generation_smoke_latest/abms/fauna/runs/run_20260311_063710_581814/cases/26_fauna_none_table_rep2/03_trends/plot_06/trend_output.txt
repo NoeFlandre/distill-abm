@@ -1,0 +1,7 @@
+The cumulative number of births among the prey animal population in the Megafaunal Hunting Pressure Model (MHPM) exhibits several distinct trends over the simulation period. Initially, the number of births starts at zero and gradually increases. The early phase of the simulation, up to around tick 725, shows a slow and steady rise in the cumulative birth count. This period is marked by a gradual increase in the number of births, indicating a slow initial growth phase for the prey population. 
+
+Following this initial phase, there is a noticeable acceleration in the cumulative number of births. Between ticks 725 and 1325, the rate of increase becomes more pronounced, suggesting a period of more rapid population growth. This trend continues and peaks around tick 1673, where the highest value of 5.6 births per unit time is recorded. 
+
+After reaching this peak, the cumulative birth count begins to decline. From tick 1850 onwards, there is a significant decrease in the rate of births, indicating a slowdown in population growth. This declining trend continues until the end of the simulation period. 
+
+Throughout the simulation, there are several inflection points and oscillations, indicating periods of temporary stabilization or minor fluctuations in the birth rate. However, the overall trend is characterized by an initial slow increase, followed by a rapid rise to a peak, and then a subsequent decline in the cumulative number of births.

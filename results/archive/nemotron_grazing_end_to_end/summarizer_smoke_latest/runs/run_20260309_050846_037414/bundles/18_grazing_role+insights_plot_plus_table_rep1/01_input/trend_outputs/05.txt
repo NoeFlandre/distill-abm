@@ -1,0 +1,1 @@
+The data reveals six distinct phases across the 100-step simulation horizon. Initial steps exhibit perfect synchronization at 90 livestock units per household (steps 1–10), followed by a rapid collapse to ~40 units by step 15–20. This precipitous drop aligns with the model

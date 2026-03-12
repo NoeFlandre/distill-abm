@@ -1,0 +1,49 @@
+{
+  "abms": [
+    {
+      "abm": "fauna",
+      "failed_case_ids": [],
+      "planned_case_count": 72,
+      "report_json_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260309_145045_481661/smoke_full_case_matrix_report.json",
+      "report_markdown_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260309_145045_481661/smoke_full_case_matrix_report.md",
+      "review_csv_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260309_145045_481661/request_review.csv",
+      "review_html_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260309_145045_481661/review.html",
+      "run_root": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260309_145045_481661",
+      "success": true
+    },
+    {
+      "abm": "grazing",
+      "failed_case_ids": [],
+      "planned_case_count": 72,
+      "report_json_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260309_145053_442490/smoke_full_case_matrix_report.json",
+      "report_markdown_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260309_145053_442490/smoke_full_case_matrix_report.md",
+      "review_csv_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260309_145053_442490/request_review.csv",
+      "review_html_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260309_145053_442490/review.html",
+      "run_root": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/grazing/runs/run_20260309_145053_442490",
+      "success": true
+    },
+    {
+      "abm": "milk_consumption",
+      "failed_case_ids": [],
+      "planned_case_count": 72,
+      "report_json_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/smoke_full_case_matrix_report.json",
+      "report_markdown_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/smoke_full_case_matrix_report.md",
+      "review_csv_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/request_review.csv",
+      "review_html_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087/review.html",
+      "run_root": "results/mistral_all_abms_chain/04_generation_smoke_latest/abms/milk_consumption/runs/run_20260309_154556_990087",
+      "success": true
+    }
+  ],
+  "failed_abms": [],
+  "finished_at_utc": "2026-03-09T17:20:04.688563+00:00",
+  "output_root": "results/mistral_all_abms_chain/04_generation_smoke_latest",
+  "report_json_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/runs/run_20260309_145044_800140/smoke_full_case_suite_report.json",
+  "report_markdown_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/runs/run_20260309_145044_800140/smoke_full_case_suite_report.md",
+  "review_csv_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/runs/run_20260309_145044_800140/review.csv",
+  "review_html_path": "results/mistral_all_abms_chain/04_generation_smoke_latest/runs/run_20260309_145044_800140/review.html",
+  "run_id": "run_20260309_145044_800140",
+  "run_log_path": "/Users/noeflandre/.openclaw/sandboxes/agent-main-telegram-direct-85634-a16a4225/distill-abm/results/mistral_all_abms_chain/04_generation_smoke_latest/runs/run_20260309_145044_800140/run.log.jsonl",
+  "run_root": "results/mistral_all_abms_chain/04_generation_smoke_latest/runs/run_20260309_145044_800140",
+  "started_at_utc": "2026-03-09T14:50:44.800140+00:00",
+  "success": true
+}

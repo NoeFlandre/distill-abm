@@ -1,0 +1,358 @@
+{
+  "run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+  "total_entries": 14,
+  "triggered_entries": 0,
+  "total_compressions": 0,
+  "entries": [
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 1,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_01",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_01/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2950
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 2,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_02",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_02/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 3011
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 3,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_03",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_03/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2951
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 4,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_04",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_04/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2953
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 5,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_05",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_05/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2989
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 6,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_06",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_06/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2938
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 7,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_07",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_07/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2990
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 8,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_08",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_08/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2931
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 9,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_09",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_09/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2933
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 10,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_10",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_10/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2961
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 11,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_11",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_11/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2948
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 12,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_12",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_12/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2950
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 13,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_13",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_13/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 2951
+        }
+      ]
+    },
+    {
+      "source_run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548",
+      "scope": "full_case_matrix_plot",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "evidence_mode": "plot",
+      "prompt_variant": "none",
+      "repetition": 1,
+      "plot_index": 14,
+      "artifacts_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_14",
+      "compression_artifact_path": "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/fauna/runs/run_20260312_093651_163548/cases/01_fauna_none_plot_rep1/03_trends/plot_14/trend_prompt_compression.json",
+      "pre_compression_prompt_path": null,
+      "compressed_prompt_path": null,
+      "triggered": false,
+      "compression_count": 0,
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt_index": 1,
+          "table_downsample_stride": 1,
+          "compression_tier": 0,
+          "prompt_length": 3020
+        }
+      ]
+    }
+  ]
+}

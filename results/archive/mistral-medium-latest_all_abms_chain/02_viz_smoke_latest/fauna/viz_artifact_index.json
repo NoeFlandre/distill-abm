@@ -1,0 +1,19 @@
+{
+  "artifact_source": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/artifact_source.txt",
+  "generated_csv": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/simulation.csv",
+  "plot_1": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/1.png",
+  "plot_10": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/10.png",
+  "plot_11": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/11.png",
+  "plot_12": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/12.png",
+  "plot_13": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/13.png",
+  "plot_14": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/14.png",
+  "plot_2": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/2.png",
+  "plot_3": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/3.png",
+  "plot_4": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/4.png",
+  "plot_5": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/5.png",
+  "plot_6": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/6.png",
+  "plot_7": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/7.png",
+  "plot_8": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/8.png",
+  "plot_9": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/plots/9.png",
+  "resolved_parameters": "results/mistral_all_abms_chain/02_viz_smoke_latest/fauna/resolved_parameters.json"
+}

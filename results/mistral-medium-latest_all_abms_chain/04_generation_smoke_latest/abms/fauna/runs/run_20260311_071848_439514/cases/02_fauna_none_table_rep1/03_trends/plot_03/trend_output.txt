@@ -1,0 +1,9 @@
+The cumulative number of male prey animals hunted and killed by forager bands in the Megafaunal Hunting Pressure Model (MHPM) exhibits a general increasing trend over the simulation period. Initially, the count starts at zero and gradually rises, reflecting the initial hunting activities. The early phase of the simulation, up to around 1,200 ticks, shows a steady increase in the number of males killed, indicating consistent hunting pressure. 
+
+Following this initial phase, the trend continues to rise but at a slower rate, suggesting a potential stabilization in hunting success or a balance between hunting pressure and prey availability. The mean number of males killed is approximately 100, with a median of 116.5, indicating that the central tendency of the data is skewed towards higher values as the simulation progresses. The maximum value reached is around 120 males killed, observed at multiple peaks, notably around the 1,876th tick. 
+
+The data also shows several inflection points and change points, indicating shifts in the rate of increase. For instance, significant change points are noted at ticks 125, 250, 375, 500, 625, and 850, suggesting periods where the dynamics of hunting success may have shifted due to underlying model mechanisms or interactions between agents. 
+
+Towards the latter part of the simulation, the trend exhibits minor oscillations with a dominant period of approximately 63 ticks, indicating periodic fluctuations in hunting success. These oscillations are observed more prominently after the 2,170th tick, suggesting a potential cyclical pattern in the hunting dynamics or prey availability. 
+
+Overall, the simulation demonstrates a complex interplay between hunting pressure and prey dynamics, with periods of steady increase interspersed with phases of stabilization and minor oscillations.

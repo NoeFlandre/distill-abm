@@ -1,0 +1,9 @@
+The mean value health deviation starts at a low value close to 0 and exhibits a rapid increase in the early steps, reaching approximately 0.3 by step 5. This initial phase indicates a period where agents' health perceptions and their milk choices are becoming significantly misaligned, likely due to initial exposure to new information or social influences. 
+
+Following this rapid increase, the rate of deviation growth begins to slow down, entering a more gradual upward trend. By step 10, the mean value health deviation stabilizes around 0.5, suggesting that agents are adjusting their perceptions and choices more slowly, potentially as they integrate new habits and social norms into their decision-making processes. 
+
+From step 10 to step 25, the mean value health deviation remains relatively stable, fluctuating slightly around the 0.5 to 0.6 range. This period of stability implies a balance where the agents' health perceptions and milk choices are relatively consistent with each other, reflecting a steady state in their consumption patterns. 
+
+After step 25, there is a slight upward trend in the mean value health deviation, which continues until step 30, where it reaches a value slightly above 0.7. This final increase suggests a renewed divergence between health perceptions and milk choices, which could be due to evolving social influences or changes in the agents' justification processes. 
+
+For decision makers, the initial rapid increase in health deviation highlights the importance of early interventions to align health perceptions with consumption choices. The subsequent stabilization period suggests that once habits and social norms are established, changes in consumption patterns occur more gradually. The final slight increase indicates that continuous monitoring and periodic adjustments may be necessary to maintain alignment between health perceptions and actual consumption behaviors.

@@ -1,0 +1,8 @@
+{
+  "abm": "grazing",
+  "case_id": "18_grazing_role+insights_plot_plus_table_rep1",
+  "evidence_mode": "plot+table",
+  "model": "mistral-medium-latest",
+  "prompt_variant": "role+insights",
+  "repetition": 1
+}

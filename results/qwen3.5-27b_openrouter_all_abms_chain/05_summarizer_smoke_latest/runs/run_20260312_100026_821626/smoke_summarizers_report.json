@@ -1,0 +1,1901 @@
+{
+  "started_at_utc": "2026-03-12T10:00:26.821626+00:00",
+  "finished_at_utc": "2026-03-12T10:42:44.594737+00:00",
+  "output_root": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest",
+  "run_id": "run_20260312_100026_821626",
+  "run_root": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626",
+  "report_json_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/smoke_summarizers_report.json",
+  "report_markdown_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/smoke_summarizers_report.md",
+  "review_csv_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/review.csv",
+  "validated_sources_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/validated_bundles.json",
+  "run_log_path": "/Users/noeflandre/distill-abm/results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/run.log.jsonl",
+  "success": true,
+  "failed_bundle_ids": [],
+  "bundles": [
+    {
+      "bundle_id": "01_fauna_none_plot_rep1",
+      "case_id": "01_fauna_none_plot_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/01_fauna_none_plot_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/01_fauna_none_plot_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.9099464882165194e-7,
+          "input_length": 14191,
+          "output_length": 14191
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/01_fauna_none_plot_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/01_fauna_none_plot_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 20.060300707998977,
+          "input_length": 14191,
+          "output_length": 1218
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/01_fauna_none_plot_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/01_fauna_none_plot_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 5.434148542000912,
+          "input_length": 14191,
+          "output_length": 4088
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/01_fauna_none_plot_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/01_fauna_none_plot_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 10.832011165999575,
+          "input_length": 14191,
+          "output_length": 892
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/01_fauna_none_plot_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/01_fauna_none_plot_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 22.62426391599729,
+          "input_length": 14191,
+          "output_length": 2680
+        }
+      ]
+    },
+    {
+      "bundle_id": "03_fauna_none_plot_plus_table_rep1",
+      "case_id": "03_fauna_none_plot_plus_table_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/03_fauna_none_plot_plus_table_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/03_fauna_none_plot_plus_table_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.9200600693002343e-7,
+          "input_length": 14563,
+          "output_length": 14563
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/03_fauna_none_plot_plus_table_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/03_fauna_none_plot_plus_table_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 18.99162054200133,
+          "input_length": 14563,
+          "output_length": 1360
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/03_fauna_none_plot_plus_table_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/03_fauna_none_plot_plus_table_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 7.801685292004549,
+          "input_length": 14563,
+          "output_length": 4323
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/03_fauna_none_plot_plus_table_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/03_fauna_none_plot_plus_table_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.873939750003046,
+          "input_length": 14563,
+          "output_length": 1430
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/03_fauna_none_plot_plus_table_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/03_fauna_none_plot_plus_table_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 22.446415207996324,
+          "input_length": 14563,
+          "output_length": 2507
+        }
+      ]
+    },
+    {
+      "bundle_id": "04_fauna_role_plot_rep1",
+      "case_id": "04_fauna_role_plot_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/04_fauna_role_plot_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/04_fauna_role_plot_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 3.3299875212833285e-7,
+          "input_length": 12661,
+          "output_length": 12661
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/04_fauna_role_plot_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/04_fauna_role_plot_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 19.982254167000065,
+          "input_length": 12661,
+          "output_length": 1315
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/04_fauna_role_plot_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/04_fauna_role_plot_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.070126459002495,
+          "input_length": 12661,
+          "output_length": 4169
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/04_fauna_role_plot_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/04_fauna_role_plot_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 9.67501420899498,
+          "input_length": 12661,
+          "output_length": 742
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/04_fauna_role_plot_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/04_fauna_role_plot_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 25.50030029199843,
+          "input_length": 12661,
+          "output_length": 2749
+        }
+      ]
+    },
+    {
+      "bundle_id": "06_fauna_role_plot_plus_table_rep1",
+      "case_id": "06_fauna_role_plot_plus_table_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/06_fauna_role_plot_plus_table_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/06_fauna_role_plot_plus_table_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.500019036233425e-7,
+          "input_length": 18743,
+          "output_length": 18743
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/06_fauna_role_plot_plus_table_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/06_fauna_role_plot_plus_table_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 40.5374805409956,
+          "input_length": 18743,
+          "output_length": 1494
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/06_fauna_role_plot_plus_table_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/06_fauna_role_plot_plus_table_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 14.414649042002566,
+          "input_length": 18743,
+          "output_length": 5682
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/06_fauna_role_plot_plus_table_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/06_fauna_role_plot_plus_table_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 15.562367375001486,
+          "input_length": 18743,
+          "output_length": 1310
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/06_fauna_role_plot_plus_table_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/06_fauna_role_plot_plus_table_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 37.45188475000032,
+          "input_length": 18743,
+          "output_length": 2577
+        }
+      ]
+    },
+    {
+      "bundle_id": "07_fauna_insights_plot_rep1",
+      "case_id": "07_fauna_insights_plot_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/07_fauna_insights_plot_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/07_fauna_insights_plot_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.500019036233425e-7,
+          "input_length": 15284,
+          "output_length": 15284
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/07_fauna_insights_plot_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/07_fauna_insights_plot_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 33.922541334002744,
+          "input_length": 15284,
+          "output_length": 1154
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/07_fauna_insights_plot_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/07_fauna_insights_plot_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 22.011299167003017,
+          "input_length": 15284,
+          "output_length": 4316
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/07_fauna_insights_plot_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/07_fauna_insights_plot_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 11.531411832998856,
+          "input_length": 15284,
+          "output_length": 1212
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/07_fauna_insights_plot_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/07_fauna_insights_plot_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 32.653559833001054,
+          "input_length": 15284,
+          "output_length": 2776
+        }
+      ]
+    },
+    {
+      "bundle_id": "09_fauna_insights_plot_plus_table_rep1",
+      "case_id": "09_fauna_insights_plot_plus_table_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/09_fauna_insights_plot_plus_table_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/09_fauna_insights_plot_plus_table_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.090018824674189e-7,
+          "input_length": 17047,
+          "output_length": 17047
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/09_fauna_insights_plot_plus_table_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/09_fauna_insights_plot_plus_table_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 30.754195583002,
+          "input_length": 17047,
+          "output_length": 1413
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/09_fauna_insights_plot_plus_table_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/09_fauna_insights_plot_plus_table_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 14.756577375002962,
+          "input_length": 17047,
+          "output_length": 4815
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/09_fauna_insights_plot_plus_table_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/09_fauna_insights_plot_plus_table_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.049320707999868,
+          "input_length": 17047,
+          "output_length": 1316
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/09_fauna_insights_plot_plus_table_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/09_fauna_insights_plot_plus_table_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 30.407526957998925,
+          "input_length": 17047,
+          "output_length": 2556
+        }
+      ]
+    },
+    {
+      "bundle_id": "10_fauna_example_plot_rep1",
+      "case_id": "10_fauna_example_plot_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/10_fauna_example_plot_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/10_fauna_example_plot_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.4999462766572833e-7,
+          "input_length": 17814,
+          "output_length": 17814
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/10_fauna_example_plot_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/10_fauna_example_plot_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 26.552546124999935,
+          "input_length": 17814,
+          "output_length": 1692
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/10_fauna_example_plot_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/10_fauna_example_plot_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 10.827945375000127,
+          "input_length": 17814,
+          "output_length": 5064
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/10_fauna_example_plot_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/10_fauna_example_plot_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 9.852848458998778,
+          "input_length": 17814,
+          "output_length": 1138
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/10_fauna_example_plot_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/10_fauna_example_plot_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 24.19632316699426,
+          "input_length": 17814,
+          "output_length": 2755
+        }
+      ]
+    },
+    {
+      "bundle_id": "12_fauna_example_plot_plus_table_rep1",
+      "case_id": "12_fauna_example_plot_plus_table_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/12_fauna_example_plot_plus_table_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/12_fauna_example_plot_plus_table_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.090018824674189e-7,
+          "input_length": 19692,
+          "output_length": 19692
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/12_fauna_example_plot_plus_table_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/12_fauna_example_plot_plus_table_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 33.21215462499822,
+          "input_length": 19692,
+          "output_length": 1759
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/12_fauna_example_plot_plus_table_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/12_fauna_example_plot_plus_table_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 5.59226966699498,
+          "input_length": 19692,
+          "output_length": 5880
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/12_fauna_example_plot_plus_table_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/12_fauna_example_plot_plus_table_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.205233583001245,
+          "input_length": 19692,
+          "output_length": 1459
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/12_fauna_example_plot_plus_table_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/12_fauna_example_plot_plus_table_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 23.727273500000592,
+          "input_length": 19692,
+          "output_length": 2487
+        }
+      ]
+    },
+    {
+      "bundle_id": "13_fauna_role+example_plot_rep1",
+      "case_id": "13_fauna_role+example_plot_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/13_fauna_role+example_plot_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/13_fauna_role+example_plot_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.9199873097240925e-7,
+          "input_length": 19408,
+          "output_length": 19408
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/13_fauna_role+example_plot_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/13_fauna_role+example_plot_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 40.95741666699905,
+          "input_length": 19408,
+          "output_length": 1820
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/13_fauna_role+example_plot_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/13_fauna_role+example_plot_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 5.887806874998205,
+          "input_length": 19408,
+          "output_length": 6078
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/13_fauna_role+example_plot_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/13_fauna_role+example_plot_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 10.300226041996211,
+          "input_length": 19408,
+          "output_length": 1141
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/13_fauna_role+example_plot_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/13_fauna_role+example_plot_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 24.273991665999347,
+          "input_length": 19408,
+          "output_length": 2116
+        }
+      ]
+    },
+    {
+      "bundle_id": "15_fauna_role+example_plot_plus_table_rep1",
+      "case_id": "15_fauna_role+example_plot_plus_table_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/15_fauna_role+example_plot_plus_table_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/15_fauna_role+example_plot_plus_table_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 3.3400283427909017e-7,
+          "input_length": 19632,
+          "output_length": 19632
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/15_fauna_role+example_plot_plus_table_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/15_fauna_role+example_plot_plus_table_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 52.616826249999576,
+          "input_length": 19632,
+          "output_length": 1406
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/15_fauna_role+example_plot_plus_table_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/15_fauna_role+example_plot_plus_table_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 6.2359196659963345,
+          "input_length": 19632,
+          "output_length": 5932
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/15_fauna_role+example_plot_plus_table_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/15_fauna_role+example_plot_plus_table_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.421626791001472,
+          "input_length": 19632,
+          "output_length": 1419
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/15_fauna_role+example_plot_plus_table_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/15_fauna_role+example_plot_plus_table_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 23.10514533300011,
+          "input_length": 19632,
+          "output_length": 2814
+        }
+      ]
+    },
+    {
+      "bundle_id": "16_fauna_role+insights_plot_rep1",
+      "case_id": "16_fauna_role+insights_plot_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/16_fauna_role+insights_plot_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/16_fauna_role+insights_plot_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.500019036233425e-7,
+          "input_length": 15890,
+          "output_length": 15890
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/16_fauna_role+insights_plot_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/16_fauna_role+insights_plot_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 31.934917625003436,
+          "input_length": 15890,
+          "output_length": 1487
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/16_fauna_role+insights_plot_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/16_fauna_role+insights_plot_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 11.84060558299825,
+          "input_length": 15890,
+          "output_length": 4866
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/16_fauna_role+insights_plot_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/16_fauna_role+insights_plot_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 11.129911625001114,
+          "input_length": 15890,
+          "output_length": 1142
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/16_fauna_role+insights_plot_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/16_fauna_role+insights_plot_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 20.77386679200572,
+          "input_length": 15890,
+          "output_length": 2242
+        }
+      ]
+    },
+    {
+      "bundle_id": "17_fauna_role+insights_table_rep1",
+      "case_id": "17_fauna_role+insights_table_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/17_fauna_role+insights_table_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/17_fauna_role+insights_table_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.090018824674189e-7,
+          "input_length": 27877,
+          "output_length": 27877
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/17_fauna_role+insights_table_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/17_fauna_role+insights_table_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 28.825756708996778,
+          "input_length": 27877,
+          "output_length": 2457
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/17_fauna_role+insights_table_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/17_fauna_role+insights_table_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 8.406597332999809,
+          "input_length": 27877,
+          "output_length": 8436
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/17_fauna_role+insights_table_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/17_fauna_role+insights_table_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 14.176506625000911,
+          "input_length": 27877,
+          "output_length": 1632
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/17_fauna_role+insights_table_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/17_fauna_role+insights_table_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 36.22809308300202,
+          "input_length": 27877,
+          "output_length": 3662
+        }
+      ]
+    },
+    {
+      "bundle_id": "18_fauna_role+insights_plot_plus_table_rep1",
+      "case_id": "18_fauna_role+insights_plot_plus_table_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/18_fauna_role+insights_plot_plus_table_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/18_fauna_role+insights_plot_plus_table_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.0800507627427578e-7,
+          "input_length": 18500,
+          "output_length": 18500
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/18_fauna_role+insights_plot_plus_table_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/18_fauna_role+insights_plot_plus_table_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 35.52714654099691,
+          "input_length": 18500,
+          "output_length": 1649
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/18_fauna_role+insights_plot_plus_table_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/18_fauna_role+insights_plot_plus_table_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 11.420601874997374,
+          "input_length": 18500,
+          "output_length": 6279
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/18_fauna_role+insights_plot_plus_table_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/18_fauna_role+insights_plot_plus_table_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.345578958003898,
+          "input_length": 18500,
+          "output_length": 1202
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/18_fauna_role+insights_plot_plus_table_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/18_fauna_role+insights_plot_plus_table_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 34.777870124999026,
+          "input_length": 18500,
+          "output_length": 2565
+        }
+      ]
+    },
+    {
+      "bundle_id": "19_fauna_insights+example_plot_rep1",
+      "case_id": "19_fauna_insights+example_plot_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/19_fauna_insights+example_plot_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/19_fauna_insights+example_plot_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 1.66997779160738e-7,
+          "input_length": 18935,
+          "output_length": 18935
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/19_fauna_insights+example_plot_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/19_fauna_insights+example_plot_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 35.42329595899355,
+          "input_length": 18935,
+          "output_length": 1550
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/19_fauna_insights+example_plot_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/19_fauna_insights+example_plot_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.921616832994914,
+          "input_length": 18935,
+          "output_length": 5439
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/19_fauna_insights+example_plot_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/19_fauna_insights+example_plot_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.572359707999567,
+          "input_length": 18935,
+          "output_length": 1387
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/19_fauna_insights+example_plot_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/19_fauna_insights+example_plot_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 28.094758332998026,
+          "input_length": 18935,
+          "output_length": 2888
+        }
+      ]
+    },
+    {
+      "bundle_id": "21_fauna_insights+example_plot_plus_table_rep1",
+      "case_id": "21_fauna_insights+example_plot_plus_table_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/21_fauna_insights+example_plot_plus_table_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/21_fauna_insights+example_plot_plus_table_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.500019036233425e-7,
+          "input_length": 20718,
+          "output_length": 20718
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/21_fauna_insights+example_plot_plus_table_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/21_fauna_insights+example_plot_plus_table_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 34.4859427909978,
+          "input_length": 20718,
+          "output_length": 1603
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/21_fauna_insights+example_plot_plus_table_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/21_fauna_insights+example_plot_plus_table_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 6.673989958006132,
+          "input_length": 20718,
+          "output_length": 5954
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/21_fauna_insights+example_plot_plus_table_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/21_fauna_insights+example_plot_plus_table_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.87433166700066,
+          "input_length": 20718,
+          "output_length": 1658
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/21_fauna_insights+example_plot_plus_table_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/21_fauna_insights+example_plot_plus_table_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 27.605212499998743,
+          "input_length": 20718,
+          "output_length": 2632
+        }
+      ]
+    },
+    {
+      "bundle_id": "22_fauna_all_three_plot_rep1",
+      "case_id": "22_fauna_all_three_plot_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/22_fauna_all_three_plot_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/22_fauna_all_three_plot_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.079978003166616e-7,
+          "input_length": 19746,
+          "output_length": 19746
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/22_fauna_all_three_plot_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/22_fauna_all_three_plot_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 36.40361341700191,
+          "input_length": 19746,
+          "output_length": 1768
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/22_fauna_all_three_plot_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/22_fauna_all_three_plot_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 6.101347167001222,
+          "input_length": 19746,
+          "output_length": 6039
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/22_fauna_all_three_plot_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/22_fauna_all_three_plot_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 11.13376133399288,
+          "input_length": 19746,
+          "output_length": 1160
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/22_fauna_all_three_plot_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/22_fauna_all_three_plot_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 24.56955612499587,
+          "input_length": 19746,
+          "output_length": 2703
+        }
+      ]
+    },
+    {
+      "bundle_id": "24_fauna_all_three_plot_plus_table_rep1",
+      "case_id": "24_fauna_all_three_plot_plus_table_rep1",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/24_fauna_all_three_plot_plus_table_rep1",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/24_fauna_all_three_plot_plus_table_rep1/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 1.66997779160738e-7,
+          "input_length": 22204,
+          "output_length": 22204
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/24_fauna_all_three_plot_plus_table_rep1/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/24_fauna_all_three_plot_plus_table_rep1/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 37.82170883400249,
+          "input_length": 22204,
+          "output_length": 1915
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/24_fauna_all_three_plot_plus_table_rep1/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/24_fauna_all_three_plot_plus_table_rep1/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.04634241599706,
+          "input_length": 22204,
+          "output_length": 6537
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/24_fauna_all_three_plot_plus_table_rep1/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/24_fauna_all_three_plot_plus_table_rep1/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.667382542000269,
+          "input_length": 22204,
+          "output_length": 1485
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/24_fauna_all_three_plot_plus_table_rep1/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/24_fauna_all_three_plot_plus_table_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 36.6086409999989,
+          "input_length": 22204,
+          "output_length": 4191
+        }
+      ]
+    },
+    {
+      "bundle_id": "25_fauna_none_plot_rep2",
+      "case_id": "25_fauna_none_plot_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/25_fauna_none_plot_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/25_fauna_none_plot_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.500019036233425e-7,
+          "input_length": 14080,
+          "output_length": 14080
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/25_fauna_none_plot_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/25_fauna_none_plot_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 28.78835375000199,
+          "input_length": 14080,
+          "output_length": 1104
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/25_fauna_none_plot_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/25_fauna_none_plot_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 5.831969917002425,
+          "input_length": 14080,
+          "output_length": 4054
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/25_fauna_none_plot_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/25_fauna_none_plot_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 9.888347082996916,
+          "input_length": 14080,
+          "output_length": 980
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/25_fauna_none_plot_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/25_fauna_none_plot_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 22.68348679200426,
+          "input_length": 14080,
+          "output_length": 2809
+        }
+      ]
+    },
+    {
+      "bundle_id": "27_fauna_none_plot_plus_table_rep2",
+      "case_id": "27_fauna_none_plot_plus_table_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/27_fauna_none_plot_plus_table_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/27_fauna_none_plot_plus_table_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.500019036233425e-7,
+          "input_length": 14581,
+          "output_length": 14581
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/27_fauna_none_plot_plus_table_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/27_fauna_none_plot_plus_table_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 29.253261042002123,
+          "input_length": 14581,
+          "output_length": 1477
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/27_fauna_none_plot_plus_table_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/27_fauna_none_plot_plus_table_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 7.435914125002455,
+          "input_length": 14581,
+          "output_length": 4225
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/27_fauna_none_plot_plus_table_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/27_fauna_none_plot_plus_table_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 13.501271957997233,
+          "input_length": 14581,
+          "output_length": 1242
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/27_fauna_none_plot_plus_table_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/27_fauna_none_plot_plus_table_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 24.647901458003616,
+          "input_length": 14581,
+          "output_length": 2577
+        }
+      ]
+    },
+    {
+      "bundle_id": "28_fauna_role_plot_rep2",
+      "case_id": "28_fauna_role_plot_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/28_fauna_role_plot_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/28_fauna_role_plot_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.500019036233425e-7,
+          "input_length": 13745,
+          "output_length": 13745
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/28_fauna_role_plot_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/28_fauna_role_plot_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 36.14132783400419,
+          "input_length": 13745,
+          "output_length": 1223
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/28_fauna_role_plot_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/28_fauna_role_plot_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 5.946095750005043,
+          "input_length": 13745,
+          "output_length": 4285
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/28_fauna_role_plot_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/28_fauna_role_plot_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 9.15493333300401,
+          "input_length": 13745,
+          "output_length": 791
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/28_fauna_role_plot_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/28_fauna_role_plot_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 21.47810712500359,
+          "input_length": 13745,
+          "output_length": 2207
+        }
+      ]
+    },
+    {
+      "bundle_id": "29_fauna_role_table_rep2",
+      "case_id": "29_fauna_role_table_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/29_fauna_role_table_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/29_fauna_role_table_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.9199873097240925e-7,
+          "input_length": 26003,
+          "output_length": 26003
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/29_fauna_role_table_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/29_fauna_role_table_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 36.1365372500004,
+          "input_length": 26003,
+          "output_length": 2372
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/29_fauna_role_table_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/29_fauna_role_table_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 11.519729125000595,
+          "input_length": 26003,
+          "output_length": 8497
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/29_fauna_role_table_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/29_fauna_role_table_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 13.489814042004582,
+          "input_length": 26003,
+          "output_length": 1473
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/29_fauna_role_table_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/29_fauna_role_table_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 36.37645691700163,
+          "input_length": 26003,
+          "output_length": 2792
+        }
+      ]
+    },
+    {
+      "bundle_id": "30_fauna_role_plot_plus_table_rep2",
+      "case_id": "30_fauna_role_plot_plus_table_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/30_fauna_role_plot_plus_table_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/30_fauna_role_plot_plus_table_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.4999462766572833e-7,
+          "input_length": 17248,
+          "output_length": 17248
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/30_fauna_role_plot_plus_table_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/30_fauna_role_plot_plus_table_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 36.226891250000335,
+          "input_length": 17248,
+          "output_length": 1679
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/30_fauna_role_plot_plus_table_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/30_fauna_role_plot_plus_table_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 6.583424832999299,
+          "input_length": 17248,
+          "output_length": 5279
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/30_fauna_role_plot_plus_table_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/30_fauna_role_plot_plus_table_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 11.370795166003518,
+          "input_length": 17248,
+          "output_length": 1095
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/30_fauna_role_plot_plus_table_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/30_fauna_role_plot_plus_table_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 33.93593458299438,
+          "input_length": 17248,
+          "output_length": 2112
+        }
+      ]
+    },
+    {
+      "bundle_id": "31_fauna_insights_plot_rep2",
+      "case_id": "31_fauna_insights_plot_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/31_fauna_insights_plot_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/31_fauna_insights_plot_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.090018824674189e-7,
+          "input_length": 14631,
+          "output_length": 14631
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/31_fauna_insights_plot_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/31_fauna_insights_plot_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 49.16769233300147,
+          "input_length": 14631,
+          "output_length": 1280
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/31_fauna_insights_plot_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/31_fauna_insights_plot_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 5.783281584001088,
+          "input_length": 14631,
+          "output_length": 4300
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/31_fauna_insights_plot_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/31_fauna_insights_plot_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 13.820141500000318,
+          "input_length": 14631,
+          "output_length": 1256
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/31_fauna_insights_plot_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/31_fauna_insights_plot_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 22.764011457999004,
+          "input_length": 14631,
+          "output_length": 2742
+        }
+      ]
+    },
+    {
+      "bundle_id": "33_fauna_insights_plot_plus_table_rep2",
+      "case_id": "33_fauna_insights_plot_plus_table_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/33_fauna_insights_plot_plus_table_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/33_fauna_insights_plot_plus_table_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.500019036233425e-7,
+          "input_length": 18136,
+          "output_length": 18136
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/33_fauna_insights_plot_plus_table_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/33_fauna_insights_plot_plus_table_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 37.83312933399429,
+          "input_length": 18136,
+          "output_length": 1545
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/33_fauna_insights_plot_plus_table_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/33_fauna_insights_plot_plus_table_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.537588875005895,
+          "input_length": 18136,
+          "output_length": 5145
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/33_fauna_insights_plot_plus_table_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/33_fauna_insights_plot_plus_table_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 15.642772042003344,
+          "input_length": 18136,
+          "output_length": 1638
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/33_fauna_insights_plot_plus_table_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/33_fauna_insights_plot_plus_table_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 27.806552041998657,
+          "input_length": 18136,
+          "output_length": 2383
+        }
+      ]
+    },
+    {
+      "bundle_id": "34_fauna_example_plot_rep2",
+      "case_id": "34_fauna_example_plot_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/34_fauna_example_plot_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/34_fauna_example_plot_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 4.160028765909374e-7,
+          "input_length": 17246,
+          "output_length": 17246
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/34_fauna_example_plot_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/34_fauna_example_plot_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 45.9907441250034,
+          "input_length": 17246,
+          "output_length": 1623
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/34_fauna_example_plot_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/34_fauna_example_plot_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 16.614123542000016,
+          "input_length": 17246,
+          "output_length": 5330
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/34_fauna_example_plot_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/34_fauna_example_plot_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 13.85442624999996,
+          "input_length": 17246,
+          "output_length": 1281
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/34_fauna_example_plot_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/34_fauna_example_plot_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 35.12516145800328,
+          "input_length": 17246,
+          "output_length": 2679
+        }
+      ]
+    },
+    {
+      "bundle_id": "36_fauna_example_plot_plus_table_rep2",
+      "case_id": "36_fauna_example_plot_plus_table_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/36_fauna_example_plot_plus_table_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/36_fauna_example_plot_plus_table_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 3.3300602808594704e-7,
+          "input_length": 19363,
+          "output_length": 19363
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/36_fauna_example_plot_plus_table_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/36_fauna_example_plot_plus_table_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 49.96212241600006,
+          "input_length": 19363,
+          "output_length": 1269
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/36_fauna_example_plot_plus_table_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/36_fauna_example_plot_plus_table_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 17.996405666999635,
+          "input_length": 19363,
+          "output_length": 5657
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/36_fauna_example_plot_plus_table_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/36_fauna_example_plot_plus_table_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 14.416100417001871,
+          "input_length": 19363,
+          "output_length": 1303
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/36_fauna_example_plot_plus_table_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/36_fauna_example_plot_plus_table_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 35.29175020800176,
+          "input_length": 19363,
+          "output_length": 2799
+        }
+      ]
+    },
+    {
+      "bundle_id": "37_fauna_role+example_plot_rep2",
+      "case_id": "37_fauna_role+example_plot_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/37_fauna_role+example_plot_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/37_fauna_role+example_plot_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.500019036233425e-7,
+          "input_length": 18530,
+          "output_length": 18530
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/37_fauna_role+example_plot_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/37_fauna_role+example_plot_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 47.48108024999965,
+          "input_length": 18530,
+          "output_length": 1404
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/37_fauna_role+example_plot_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/37_fauna_role+example_plot_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 16.385736959004134,
+          "input_length": 18530,
+          "output_length": 5513
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/37_fauna_role+example_plot_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/37_fauna_role+example_plot_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.708119625000108,
+          "input_length": 18530,
+          "output_length": 1210
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/37_fauna_role+example_plot_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/37_fauna_role+example_plot_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 30.111598667004728,
+          "input_length": 18530,
+          "output_length": 2557
+        }
+      ]
+    },
+    {
+      "bundle_id": "39_fauna_role+example_plot_plus_table_rep2",
+      "case_id": "39_fauna_role+example_plot_plus_table_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/39_fauna_role+example_plot_plus_table_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/39_fauna_role+example_plot_plus_table_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.9199873097240925e-7,
+          "input_length": 18678,
+          "output_length": 18678
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/39_fauna_role+example_plot_plus_table_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/39_fauna_role+example_plot_plus_table_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 39.65898975000164,
+          "input_length": 18678,
+          "output_length": 1472
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/39_fauna_role+example_plot_plus_table_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/39_fauna_role+example_plot_plus_table_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 19.508130582995364,
+          "input_length": 18678,
+          "output_length": 5965
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/39_fauna_role+example_plot_plus_table_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/39_fauna_role+example_plot_plus_table_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 12.047101208998356,
+          "input_length": 18678,
+          "output_length": 1213
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/39_fauna_role+example_plot_plus_table_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/39_fauna_role+example_plot_plus_table_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 34.81485404200066,
+          "input_length": 18678,
+          "output_length": 3381
+        }
+      ]
+    },
+    {
+      "bundle_id": "40_fauna_role+insights_plot_rep2",
+      "case_id": "40_fauna_role+insights_plot_rep2",
+      "abm": "fauna",
+      "bundle_dir": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/40_fauna_role+insights_plot_rep2",
+      "success": true,
+      "source_validation_error": null,
+      "modes": [
+        {
+          "mode": "none",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/40_fauna_role+insights_plot_rep2/02_summaries/none.txt",
+          "raw_output_path": null,
+          "postprocess_changed": false,
+          "error": null,
+          "duration_seconds": 2.9199873097240925e-7,
+          "input_length": 15062,
+          "output_length": 15062
+        },
+        {
+          "mode": "bart",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/40_fauna_role+insights_plot_rep2/02_summaries/bart.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/40_fauna_role+insights_plot_rep2/03_metadata/raw_summaries/bart.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 32.790637875004904,
+          "input_length": 15062,
+          "output_length": 1128
+        },
+        {
+          "mode": "bert",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/40_fauna_role+insights_plot_rep2/02_summaries/bert.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/40_fauna_role+insights_plot_rep2/03_metadata/raw_summaries/bert.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 14.179973917001917,
+          "input_length": 15062,
+          "output_length": 4435
+        },
+        {
+          "mode": "t5",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/40_fauna_role+insights_plot_rep2/02_summaries/t5.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/40_fauna_role+insights_plot_rep2/03_metadata/raw_summaries/t5.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 13.617286457993032,
+          "input_length": 15062,
+          "output_length": 1237
+        },
+        {
+          "mode": "longformer_ext",
+          "success": true,
+          "output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/40_fauna_role+insights_plot_rep2/02_summaries/longformer_ext.txt",
+          "raw_output_path": "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_100026_821626/bundles/40_fauna_role+insights_plot_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+          "postprocess_changed": true,
+          "error": null,
+          "duration_seconds": 36.289011207998556,
+          "input_length": 15062,
+          "output_length": 1557
+        }
+      ]
+    }
+  ]
+}

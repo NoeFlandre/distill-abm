@@ -1,0 +1,53 @@
+{
+  "image_attached": true,
+  "max_retries": 2,
+  "max_tokens": 32768,
+  "message_count": 1,
+  "messages": [
+    {
+      "content": "We have a plot from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot, mentioning key time steps and values taken by the metric in the plot, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot or any visual in your description. If a plot has very simple dynamics, simply state them without expanding.\n\nThe context and goals of the model are as follows. The Megafaunal Hunting Pressure Model (MHPM) is an interactive, agent-based model designed to conduct experiments to test megaherbivore extinction hypotheses. The model considers environmental change, human hunting behavior, herd demography, herd movement, animal sexual dimorphism, and animal life history. The landscape consists of an abstract square universe that wraps at the edges on a 211x211 patch matrix. The goals are to manipulate socio-natural dynamics to observe how environmental conditions, human hunting, and animal life history interact to either accelerate or buffer extinction or create equilibrium conditions. Hunters follow dynamic optimal foraging theory, balancing energy status, prey value, density, and costs. Ungulates are sexually dimorphic, reproduce, age, and move as herds. The environment controls fodder density, regrowth, and seasonality.\n\nKey Parameters:\n- init-foragers: Range 0.0 to 100.0, Set 20\n- processing-cost-males: Range 0.0 to 20.0, Set 6\n- food-value-males: Range 5.0 to 100.0, Set 30\n- maximum-lifespan: Range 0.0 to 12000.0, Set 10220\n- processing-cost-females: Range 0.0 to 20.0, Set 3\n- food-value-females: Range 5.0 to 100.0, Set 27\n- init-prey: Range 0.0 to 1000.0, Set 250\n- internal-mortality: Range 0.0 to 0.2, Set 0.025\n- age-of-senescence: Range 0.0 to 10000.0, Set 7300\n- ticks-per-year: Range 0.0 to 720.0, Set 365\n- animals-gain-from-food: Range 0.0 to 10.0, Set 1.5\n- animals-starvation-threshold: Range 0.0 to 100.0, Set 25\n- animals-movement-cost: Range 0.0 to 10.0, Set 1\n- foragers-movement-cost: Range 0.0 to 10.0, Set 1\n- grass-proportion: Range 0.0 to 1.0, Set 0.33\n- external-mortality: Range 0.0 to 0.2, Set 0.0025\n- birth-spacing: Range 0.0 to 1000.0, Set 730\n- foraging-radius: Range 1.0 to 100.0, Set 6\n- food-value-calf: Range 0.0 to 20.0, Set 3\n- seasonality: Range 0.0 to 1.0, Set 0.8\n- regrowth-time: Range 0.0 to 365.0, Set 3\n- stop-at-max-ticks: Range None provided, Set True\n- stop-at-max-herd-size: Range None provided, Set False\n- grass-growth: Range None provided, Set True\n- keep-initial-grass-pattern: Range None provided, Set True\n- imortal-foragers: Range None provided, Set True\n- food-storage: Range None provided, Set True\n- max-ticks: Range None provided, Set 73000\n- max-herd-size: Range None provided, Set 500\n\nThis plot represents the current number of female prey animals in the simulation.",
+      "role": "user"
+    }
+  ],
+  "metadata": {
+    "ollama_format": {
+      "description": "Structured smoke output schema for one text response.",
+      "properties": {
+        "response_text": {
+          "title": "Response Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "response_text"
+      ],
+      "title": "StructuredSmokeText",
+      "type": "object"
+    },
+    "ollama_num_ctx": 0,
+    "preserve_raw_text": true,
+    "structured_output_name": "structured_smoke_text",
+    "structured_output_schema": {
+      "description": "Structured smoke output schema for one text response.",
+      "properties": {
+        "response_text": {
+          "title": "Response Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "response_text"
+      ],
+      "title": "StructuredSmokeText",
+      "type": "object"
+    },
+    "table_downsample_stride": 1
+  },
+  "model": "qwen/qwen3.5-27b",
+  "prompt_length": 2933,
+  "prompt_signature": "692437345b4c066b3c466dda9f2661b8d0e6d87d55a4926e74bf1413a4d67e61",
+  "prompt_text": "We have a plot from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot, mentioning key time steps and values taken by the metric in the plot, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot or any visual in your description. If a plot has very simple dynamics, simply state them without expanding.\n\nThe context and goals of the model are as follows. The Megafaunal Hunting Pressure Model (MHPM) is an interactive, agent-based model designed to conduct experiments to test megaherbivore extinction hypotheses. The model considers environmental change, human hunting behavior, herd demography, herd movement, animal sexual dimorphism, and animal life history. The landscape consists of an abstract square universe that wraps at the edges on a 211x211 patch matrix. The goals are to manipulate socio-natural dynamics to observe how environmental conditions, human hunting, and animal life history interact to either accelerate or buffer extinction or create equilibrium conditions. Hunters follow dynamic optimal foraging theory, balancing energy status, prey value, density, and costs. Ungulates are sexually dimorphic, reproduce, age, and move as herds. The environment controls fodder density, regrowth, and seasonality.\n\nKey Parameters:\n- init-foragers: Range 0.0 to 100.0, Set 20\n- processing-cost-males: Range 0.0 to 20.0, Set 6\n- food-value-males: Range 5.0 to 100.0, Set 30\n- maximum-lifespan: Range 0.0 to 12000.0, Set 10220\n- processing-cost-females: Range 0.0 to 20.0, Set 3\n- food-value-females: Range 5.0 to 100.0, Set 27\n- init-prey: Range 0.0 to 1000.0, Set 250\n- internal-mortality: Range 0.0 to 0.2, Set 0.025\n- age-of-senescence: Range 0.0 to 10000.0, Set 7300\n- ticks-per-year: Range 0.0 to 720.0, Set 365\n- animals-gain-from-food: Range 0.0 to 10.0, Set 1.5\n- animals-starvation-threshold: Range 0.0 to 100.0, Set 25\n- animals-movement-cost: Range 0.0 to 10.0, Set 1\n- foragers-movement-cost: Range 0.0 to 10.0, Set 1\n- grass-proportion: Range 0.0 to 1.0, Set 0.33\n- external-mortality: Range 0.0 to 0.2, Set 0.0025\n- birth-spacing: Range 0.0 to 1000.0, Set 730\n- foraging-radius: Range 1.0 to 100.0, Set 6\n- food-value-calf: Range 0.0 to 20.0, Set 3\n- seasonality: Range 0.0 to 1.0, Set 0.8\n- regrowth-time: Range 0.0 to 365.0, Set 3\n- stop-at-max-ticks: Range None provided, Set True\n- stop-at-max-herd-size: Range None provided, Set False\n- grass-growth: Range None provided, Set True\n- keep-initial-grass-pattern: Range None provided, Set True\n- imortal-foragers: Range None provided, Set True\n- food-storage: Range None provided, Set True\n- max-ticks: Range None provided, Set 73000\n- max-herd-size: Range None provided, Set 500\n\nThis plot represents the current number of female prey animals in the simulation.",
+  "provider": "openrouter",
+  "retry_backoff_seconds": 2.0,
+  "temperature": 1.0
+}

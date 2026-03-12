@@ -1,0 +1,9 @@
+The average weekly consumption of whole milk per agent starts at approximately 2654.81 units. There is a rapid decline in consumption over the initial steps, dropping significantly within the first few time steps. This sharp decrease continues until around the 10th step, where the consumption value falls to about 800 units. This initial decline suggests a swift shift in consumer preferences or behaviors, potentially influenced by immediate health concerns or social trends. 
+
+Following this rapid decline, the rate of decrease slows down, and the consumption stabilizes somewhat between steps 10 and 20, fluctuating around 800 units. This period of stabilization indicates a temporary balance in consumer behavior, where the initial drastic changes have settled, and new consumption patterns are being established. 
+
+After step 20, the consumption continues to decline but at a slower and more steady rate, reaching around 500 units by step 25. This gradual decline suggests ongoing but less intense changes in consumer habits, possibly due to sustained campaigns or gradual social influence reinforcing the shift away from whole milk. 
+
+Towards the end of the simulation, from step 25 to step 32, the consumption rate shows minor fluctuations but generally trends downward, ending at approximately 253.10 units. This final phase indicates a stabilization at a lower consumption level, reflecting a long-term change in milk consumption habits among the population. 
+
+For decision makers, these trends highlight the significant initial impact of interventions or influences aimed at reducing whole milk consumption, followed by a period of stabilization and gradual continued decline. This suggests that while initial efforts can lead to substantial immediate changes, sustained efforts are necessary to maintain and further the reduction in whole milk consumption over the long term.

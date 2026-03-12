@@ -1,0 +1,10 @@
+The data reveals long-term trends in the persistence of E-RO households across simulated timesteps under homogeneous behavioral conditions. Key observations include:
+
+1. **Stable equilibrium**: In the primary simulation (first row), the population of E-RO households stabilizes at 20 households across all timesteps. This suggests a resilient equilibrium where herds and pasture biomass reach a balanced state under fixed parameter conditions (fixed rainfall variability, no resting, satisficing thresholds unengaged). 
+
+2. **Gradual decline and stabilization**: Other simulations show initial fluctuations before stabilizing at lower levels (e.g., 15-25 households). These declines likely reflect climatic variability (rainfall std=100) causing intermittent pasture stress, which E-RO agents fail to mitigate due to fixed stocking decisions. The eventual stabilization indicates recovery during favorable rainfall periods, allowing biomass re-growth to sustain reduced herd sizes.
+
+3. **Extreme pressure scenarios**: In runs with lower final counts (e.g., 4-10 households), sustained climatic stress (low biomass thresholds) likely exceeded the adaptive capacity of E-RO agents, leading to gradual extinction. This aligns with E-RO's inflexibility in extreme conditions, as their fixed strategies lack mechanisms to recover from repeated biomass crashes.
+
+**Implications**:
+- E-RO strategies demonstrate stability under controlled variability but remain vulnerable to prolonged climatic shocks. Decision-makers should recognize that conservative, non-adaptive approaches may sustain communities at reduced scales in stable environments. However, these strategies risk collapse if climatic extremes increase, highlighting the need for complementary risk-mitigation strategies like social learning or resting periods.**

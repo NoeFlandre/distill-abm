@@ -1,0 +1,26 @@
+We have a plot and a data table from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot and the data table, mentioning key time steps and values taken by the metric in the plot and the data table, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot and the data table or any visual in your description. If the plot and data table have very simple dynamics, simply state them without expanding.
+
+The context and goals of the model are as follows. <<context_response_from_context_llm>>
+
+When summarizing trends, provide brief insights about their implications for decision makers.
+
+This plot and data table represent the number of households that have engaged in social learning, indicated by the variable household-SL being true.
+
+Statistical summary of the relevant simulation output:
+Statistical evidence for simulation series matching `count households with [household-SL? = true]`.
+Compression tier: 0.
+Matched series count: 30. Detailed signal analysis below is computed on the tick-wise mean of the matched series.
+
+Series: aggregate_mean_of_30_matched_series
+- samples: 101
+- valid numeric samples: 101
+- dropped non-numeric samples: 0
+- start/end values: 0.0000 -> 32.0667
+- mean/median/std/variance: 27.4264, 31.9000, 8.9218, 79.5978
+- min/max: 0.0000 at index 0; 32.0667 at index 63
+- peaks: none detected
+- valleys: none detected
+- inflection indices: 7, 28, 30, 33, 38, 57, 60
+- rolling Mann-Kendall: 0-10: increasing (tau=0.818, slope=1.430, p=0.000, significant=True); 11-21: increasing (tau=1.000, slope=1.139, p=0.000, significant=True); 22-32: increasing (tau=1.000, slope=0.183, p=0.000, significant=True); 33-43: increasing (tau=0.927, slope=0.181, p=0.000, significant=True); 44-54: increasing (tau=0.891, slope=0.029, p=0.000, significant=True); 55-65: increasing (tau=0.709, slope=0.008, p=0.001, significant=True)
+- change points: 40, 100
+- oscillation summary: dominant period 49.00, strong oscillation indices: 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 51, 52, 53, 54, 55, 56, 57, 58, 59

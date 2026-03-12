@@ -1,0 +1,5 @@
+The simulation reveals a distinct two-phase trajectory for the mean deviation between agents' environmental values and their consumption choices. The series initiates at 0.0000. A rapid ascent occurs during the initial phase, reaching a peak value of 13.4756 at step 13. Subsequently, the metric stabilizes, fluctuating within a narrow band around 13.43 for the remainder of the simulation, concluding at 13.4186.
+
+Statistical analysis confirms a significant increasing trend in the early windows (specifically steps 0-9). In contrast, subsequent rolling windows exhibit no significant trend, indicating the system enters a stationary state. The median value of 13.4302 underscores the stability of this high-deviation phase.
+
+In the context of the model, this trajectory indicates that the discrepancy between agents' held environmental standards and their milk purchasing behavior establishes itself rapidly. Following the initial adjustment period, the model demonstrates a persistent dissonance, where consumption choices remain structurally misaligned with internal values for the majority of the historical period simulated.

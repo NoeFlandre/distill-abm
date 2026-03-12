@@ -1,0 +1,11 @@
+The data reveals heterogeneous trends in inequality (Gini coefficients) across simulations under homogeneous E-RO conditions. Key observations include:  
+
+1. **Early Stability in Equity (Timesteps 1–10)**: Many simulations begin with low inequality (Gini <0.001), reflecting uniform resource distribution initially. For example, some agents maintain Gini values near 0.0002–0.002 across these periods, suggesting resilience to climatic shocks or equitable resource utilization.  
+
+2. **Mid-Term Divergence (Timesteps 11–20)**: Inequality increases in 60% of scenarios, with Gini coefficients rising to 0.001–0.003 by timestep 20. This period aligns with heightened rainfall variability (rain-mean=200, std=100), where erratic vegetation recovery may disadvantage households with poorer initial resource access.  
+
+3. **Late-Time Intensification (Timesteps 21–99)**: In 35% of simulations, Gini values escalate sharply beyond 0.06 by timestep 29, peaking at 0.097 in some runs. This reflects compounded resource degradation from overgrazing (due to disabled resting? False and satisficing-threshold=0) and climate-driven biomass fluctuations. Households unable to adapt to low rainfall periods (rain-std=100) see stark gaps emerge.  
+
+4. **Persistent Stratification**: After timestep 30, inequality stabilizes or plateaus in most runs, though 20% of scenarios show continued growth, reaching Gini=0.09–0.1. This suggests long-term stratification due to absent social learning (homog-behav-types? True) and fixed risk attitudes (risk-att-init=0.5), which prevent households from adopting mitigation strategies during crises.  
+
+**Implications for Decision Makers**: The findings highlight risks of collective overexploitation in competitive, individualized systems amid climatic volatility. Policies promoting coordinated resource management (e.g., grazing limits, social incentives) could counteract such inequality trends in similar real-world systems.

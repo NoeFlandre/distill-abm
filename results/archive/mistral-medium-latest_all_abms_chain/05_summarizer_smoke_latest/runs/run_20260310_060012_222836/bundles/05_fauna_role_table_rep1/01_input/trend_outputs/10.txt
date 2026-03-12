@@ -1,0 +1,16 @@
+The simulation of the Megaherbivore Hunting Pressure Model (MHPM) shows a clear overall decreasing trend in the total number of prey animals over time. Initially, the number of animals starts at approximately 166.67 and consistently declines to zero by the end of the simulation. The decline is steep at the beginning, with a rapid decrease in the first few hundred ticks, followed by a more gradual decline. 
+
+Key time steps and values highlight this trend: 
+
+- At the start (index 0), the number of animals is at its maximum with 166.67. 
+- By index 730, the number of animals drops to around 11.37. 
+- At index 709, the count is approximately 9.28, and by index 803, it further reduces to about 7.42. 
+- The trend continues with the number of animals decreasing to around 6.92 at index 820, and further down to approximately 4.63 at index 893. 
+- By index 982, the count is around 2.82, and it slightly drops to about 2.69 at index 995. 
+- Finally, at index 1030, the number of animals is approximately 2.32. 
+
+The statistical analysis indicates several phases of significant decrease, with the most substantial drops occurring in the early stages of the simulation. The rolling Mann-Kendall test identifies multiple intervals of significant decreasing trends, interspersed with brief periods of increase or stability. Notably, the intervals from 0-231, 232-463, and 464-695 ticks show strong decreasing trends with significant slopes. 
+
+Change points are identified at ticks 125, 475, 625, 875, and 2310, marking shifts in the rate of decline. The oscillation analysis reveals a dominant period of 63 ticks, suggesting cyclical patterns within the overall decreasing trend. However, these oscillations do not alter the primary trend of a steady decline in the number of prey animals. 
+
+In summary, the simulation demonstrates a consistent and significant reduction in the prey population over time, with notable phases of rapid decline and intermittent periods of slight recovery or stability.

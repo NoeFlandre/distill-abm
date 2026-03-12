@@ -1,0 +1,19 @@
+{
+  "artifact_source": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/artifact_source.txt",
+  "generated_csv": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/simulation.csv",
+  "plot_1": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/1.png",
+  "plot_10": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/10.png",
+  "plot_11": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/11.png",
+  "plot_12": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/12.png",
+  "plot_13": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/13.png",
+  "plot_14": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/14.png",
+  "plot_2": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/2.png",
+  "plot_3": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/3.png",
+  "plot_4": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/4.png",
+  "plot_5": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/5.png",
+  "plot_6": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/6.png",
+  "plot_7": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/7.png",
+  "plot_8": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/8.png",
+  "plot_9": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/plots/9.png",
+  "resolved_parameters": "results/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/fauna/resolved_parameters.json"
+}

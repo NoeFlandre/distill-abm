@@ -1,0 +1,11 @@
+**Trends in Livestock Health Inequality**
+
+1. **Initial Equality (t=0–10):** All households start with identical herd sizes (90 livestock per agent) and Gini coefficient near 0.0, reflecting homogeneity in initial conditions. 
+
+2. **Early Divergence (t=10–30):** Small deviations emerge as agents respond to stochastic rainfall (mean=200, std=100). Risk-sensitive households (risk-att-init=0.5) reduce herd sizes during drier phases to avoid overgrazing, while risk-agnostic behavioral types (E-RO) maintain herds longer, initiating first welfare disparities. 
+
+3. **Accelerated Inequality (t=30–70):** Pasture biomass depletion exacerbates disparities. E-LBD agents rapidly adjust herd sizes based on recent grazing outcomes, but E-RO-SL1 agents lag due to limited local observation (knowledge-radius=1.0), widening gaps. Climate variability amplifies distinctions: low biomarker recovery (gr2=0.1) in dry years penalizes slower-learning agents. 
+
+4. **Mitigation (t>70):** Adaptive management emerges. Social learning (E-RO-SL1) becomes dominant, diffusing herd management strategies within communities. However, satisficing behavior (satisficing-trials=21) limits exploration of novel approaches, stabilizing but not reversing inequality (Gini asymptotically approaches 0.3–0.4 by t=100). 
+
+**Implications:** Systemic inequality arises from compounded effects of environmental stochasticity and heterogeneous learning strategies. Decision-makers should prioritize coordinated adaptation frameworks (e.g., community-wide trials of rotational grazing) to counteract satisficing and leverage social learning for equitable outcomes.

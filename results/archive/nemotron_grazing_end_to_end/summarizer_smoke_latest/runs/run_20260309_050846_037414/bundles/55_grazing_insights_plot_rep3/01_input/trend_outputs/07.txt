@@ -1,0 +1,21 @@
+ALL LINES have positive trends in their values. Following is a brief description of these lines in the plot in alphabetical order – about their trajectory (whether they are trending upward or downward), and what that trajectory means and how it might inform the decision maker. 
+
+E-LBD – the dark gray line curves upward and has a gentle slope compared to the other lines. The gentle slope suggests the outcome of the E-LBD behavioral type is more stable than the other investigated behavioral types to begin with. 
+ 
+E-RO – the light purple line rises gently with a small certainty until around step 60, then trend upward at a sharper rate. This valuation metric for E-RO behavioral type suggests there is a decrease in the inequality in healthy livestock stock for these households in the long run. 
+
+E-RO-SL1 – This is the pink line. This metric drops gently at first and has a similar trajectory to the E-LBD line. However, this continues to trend upward at a sharp rate before becoming more gradual. These are drastic changes for these households suggesting that the introduction of social learning alters how they value livestock in the long run.
+
+Global-Rain – This is the blue line. The conservative nature of its incline suggests that when the parameters are set in such a way as to ensure steady growth and availability of resources for the herder, it can produce sustainable results for the herders. 
+
+Livestock-healthy – This is the red line. Its upwards trajectory and steep incline suggest that when left to their own devices the herders will begin to simultaneously manage their herds with little regard to the pasture land. This can lead to herding off the pasture, not allowing the grass time to seed due to excessive grazing of the herd. 
+
+Risk-att-init – This is the gray line. Its conservative incline suggests that as long as the risk attitudes are tempered by the risk aversion of the herders, they will act prudently allowing their herds to stay on the value they have attained in the pasture. 
+
+Starting midpoint line – This is the orange line. Its sharp upwards trajectory suggests that when all herders are left to their own devises in managing their herds and what herding practices they will implement can lead to increased inequality in the livestock-healthy metric.
+
+Satisficing-threshold – This is the light gray line. It has the most conservative incline as it suggests that as long as the herders set a threshold that ensures there is grass to graze and they are satisfied when they meet that threshold, this will lead to greater inequality in the healthy livestock values.
+
+Satisficing-trials – This is the brown line. The incline of this line is minor compared to many of its counter parts on the chart, which suggests that the number of trials satisficers use to evaluate pasture in their decision making is a minor contributor in how they eventually decide how many livestock to stock annually. 
+
+Social-susceptibility – This is the maroon line. Its conservative incline suggests that this is a minor contributor to the inequality of the healthy livestock metric.

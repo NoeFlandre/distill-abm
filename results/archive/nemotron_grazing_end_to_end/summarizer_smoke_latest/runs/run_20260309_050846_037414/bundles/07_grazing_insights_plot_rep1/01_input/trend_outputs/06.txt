@@ -1,0 +1,9 @@
+All lines follow a downward trend and show different behavior in their early decline, transient phase, and stabilization phase as follows:
+    
+1. 3 lines show sharp decreases (at a corresponding Y-axis scale at or above 7) at the first few steps, then gradually decrease until they stabilize around 0.1.
+2. 7 lines remain present at the Y-scale of at least 7 during the first few steps, then sharply reach a value of around 6, after which they decrease until they stabilize at around 0.1.
+3. The remaining lines decrease at x-steps of 10, after which they gradually decrease and stabilize at around 0.1.    
+
+However, all lines end at similar values, showing considerable variation in the beginning and long stabilization periods at the end.
+
+This chart shows how to manage livestock stocking during resource shortages, which might help improve decision-making.

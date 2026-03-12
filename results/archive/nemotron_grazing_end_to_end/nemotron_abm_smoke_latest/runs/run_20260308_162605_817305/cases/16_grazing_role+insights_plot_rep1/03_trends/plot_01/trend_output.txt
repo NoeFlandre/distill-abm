@@ -1,0 +1,11 @@
+The simulation tracks the mean household initial risk attitude of social learning agents (E-RO-SL1 and E-LBD) across 100 timesteps. All agents start with a moderate risk tolerance (risk-att-init=0.5), but their risk attitudes evolve dynamically due to learning and environmental shocks. Social-learning agents (E-RO-SL1) observe neighbors’ outcomes within a spatial radius (knowledge-radius=1.0), while learning-by-doing agents (E-LBD) adjust strategies based on their own past outcomes. Key trends include:
+
+- **Early Stabilization (Steps 0–50)**: Risk attitudes remain near the initial 0.5 level, reflecting baseline decisions before learning mechanisms dominate. Climate variability (rain-std=100) introduces minor fluctuations but no systemic shifts.
+- **Mid-Term Convergence (Steps 50–80)**: Social-learning agents (E-RO-SL1) align their risk attitudes closer to observed neighbor outcomes. If neighbors’ pasture degradation (from livestock-init=90 and Rmax=0.5) dominates, their risk attitudes trend downward. E-LBD agents show heterogeneous adjustments based on their own herding outcomes.
+- **Late Phase (Steps 80–100)**: Climate shocks (e.g., droughts amplifying rain-std=100) and compounded pasture stress shift the mean risk attitude downward (e.g., to 0.4–0.3), indicating heightened risk aversion. Agents prioritize adaptive herd size reductions to mitigate stochastic shocks.
+
+
+Interpretation: The declining trend reflects adaptive responses to systemic risks (climate and overgrazing). Decision-makers should prioritize:
+- Strengthening social-learning networks to balance risk attitudes.
+- Adjusting livestock-init or resting-thresholds to reduce pasture degradation feedbacks.
+- Balancing risk-att-init values to optimize herd size decisions under uncertainty.

@@ -1,0 +1,12 @@
+The plot depicts the dynamics of mean green biomass across 100 simulation steps (years), with all agents initialized under homogenized behavioral strategies (E-RO). Key trends emerge in three distinct phases:
+
+1. **Initial Stabilization (Steps 0–10):**
+The biomass begins at ~45,000 units, reflecting baseline pasture productivity under fixed grazing rules. All curves converge tightly during this phase, indicating uniform adaptation to initial herd sizes (90 livestock units), which suppress biomass growth minimally due to efficient consumption (Rmax=0.5) and moderate grazing pressure (w=0.8). Climate variability (rain-std=100) introduces stochasticity, causing slight divergence among individual runs, but mean behavior dominates.
+
+2. **Mid-Term Decline and Recovery (Steps 10–70):**
+A sharp decline to ~40,000 units occurs around step 20–30, aligning with peak grazing pressure from high initial livestock densities. This overuse triggers biomass collapse, exacerbated by random rainfall shocks (rain-mean=200, std=100), which compound stress during dry seasons (gr2=0.1). Post-40 steps, biomass recovers (~55,000–60,000 units) as agents reduce grazing intensity, likely due to intrinsic risk aversion (risk-att-init=0.5) or adaptive responses to environmental feedback. The recovery phase shows significant divergence, suggesting variability in strategy adoption or risk tolerance within the homogenized population.
+
+3. **Long-Term Convergence (Steps 70–100):**
+By step 100, all curves flatten near ~62,000 units, indicating equilibrium between grazing, pasture resilience (gr1=0.5), and climate recovery. This suggests agents achieve sustainable herd sizes through feedback between low-risk behavior and pasture recovery rates. The lack of diversity in behavioral strategies (homog-behav-types?=True) limits strategic divergence, resulting in a unified collective response approximately aligned with carrying capacity.
+
+Interpretation: The plot reflects the system’s resilience to overgrazing under moderate risk perception. However, the absence of strategic diversity (learning types limited to E-RO) and reliance on homogeneous risk aversion suggest constrained capacity for emergent adaptation. The default parameters emphasize environmental feedback over behavioral innovation, aligning with the original RAGE model’s focus on static pastoral dynamics.

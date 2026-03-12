@@ -1,0 +1,67 @@
+The Megafaunal Hunting Pressure Model (MHPM) is an interactive, agent-based simulation designed to test hypotheses regarding megaherbivore extinction. It allows users to simulate a prehistoric landscape to observe how environmental factors and human predation interact to influence population survival. The model runs on a 211x211 patch matrix representing a toroidal landscape.
+
+Context:
+The model simulates a socio-ecological system containing human foragers and sexually dimorphic megaherbivore herds. It incorporates principles of optimal foraging theory, where hunters make decisions based on energy costs and food value. The environment is dynamic, featuring grass growth and seasonal changes.
+
+Goals:
+The primary goal is to determine conditions under which human hunting pressure, combined with environmental constraints, leads to the extinction of megafauna. By manipulating parameters, users can test scenarios of environmental degradation and predation intensity.
+
+Key Parameters and Configurations:
+
+1. init-foragers: Range 0.0 to 100.0. We set it to 20.
+2. processing-cost-males: Range 0.0 to 20.0. We set it to 6.
+3. food-value-males: Range 5.0 to 100.0. We set it to 30.
+4. maximum-lifespan: Range 0.0 to 12000.0. We set it to 10220.
+5. processing-cost-females: Range 0.0 to 20.0. We set it to 3.
+6. food-value-females: Range 5.0 to 100.0. We set it to 27.
+7. init-prey: Range 0.0 to 1000.0. We set it to 250.
+8. internal-mortality: Range 0.0 to 0.2. We set it to 0.025.
+9. age-of-senescence: Range 0.0 to 10000.0. We set it to 7300.
+10. ticks-per-year: Range 0.0 to 720.0. We set it to 365.
+11. animals-gain-from-food: Range 0.0 to 10.0. We set it to 1.5.
+12. animals-starvation-threshold: Range 0.0 to 100.0. We set it to 25.
+13. animals-movement-cost: Range 0.0 to 10.0. We set it to 1.
+14. foragers-movement-cost: Range 0.0 to 10.0. We set it to 1.
+15. grass-proportion: Range 0.0 to 1.0. We set it to 0.33.
+16. external-mortality: Range 0.0 to 0.2. We set it to 0.0025.
+17. birth-spacing: Range 0.0 to 1000.0. We set it to 730.
+18. foraging-radius: Range 1.0 to 100.0. We set it to 6.
+19. food-value-calf: Range 0.0 to 20.0. We set it to 3.
+20. seasonality: Range 0.0 to 1.0. We set it to 0.8.
+21. regrowth-time: Range 0.0 to 365.0. We set it to 3.
+22. stop-at-max-ticks: We set it to True.
+23. stop-at-max-herd-size: We set it to False.
+24. grass-growth: We set it to True.
+25. keep-initial-grass-pattern: We set it to True.
+26. imortal-foragers: We set it to True.
+27. food-storage: We set it to True.
+28. max-ticks: We set it to 73000.
+29. max-herd-size: We set it to 500.
+
+The number of human hunter-gatherer bands in the simulation remains constant at 20 throughout the duration of the simulation, spanning from step 0 to approximately step 2300. This stability aligns with the model parameter setting for immortal foragers, indicating no mortality among the forager population. The constancy suggests that under the given conditions of resource availability and predation, the human population remains unaffected by internal or external pressures within the modeled timeframe.
+
+The total energy of foragers exhibits a steady and consistent decline over time across all simulations. Starting near 0 at the initial time step, the energy decreases linearly, reaching approximately -10,000 by step 1,000, -20,000 by step 2,000, -30,000 by step 3,000, and continuing this trend until reaching close to -40,000 by step 4,000. This uniform downward trajectory suggests that foragers consistently expend more energy than they acquire through hunting and foraging under the given model conditions. The slight divergence among the simulation lines indicates minor variations in energy loss rates, potentially due to differences in hunting success or movement efficiency. However, the overall trend remains dominated by a sustained negative energy balance throughout the simulation period.
+
+The cumulative number of male prey animals killed by forager bands exhibits a consistent pattern of rapid increase followed by a plateau across all simulation runs. Initially, from step 0 to approximately step 500, the cumulative number of males killed rises steeply, with values ranging from approximately 10 to 110 males killed. This period reflects high hunting pressure, likely driven by the presence of a substantial male population and effective foraging strategies. Between steps 500 and 1000, the rate of increase slows, with the cumulative number of males killed reaching values between approximately 100 and 125. After step 1000, the growth in the cumulative number of males killed levels off, with most simulation runs stabilizing between 100 and 125 males killed by step 2000. This plateau suggests that the hunting pressure has reached a limit, potentially due to a decline in the male population, resource saturation, or other ecological constraints within the model.
+
+The cumulative number of female prey animals killed by forager bands increases rapidly from the start of the simulations, reaching approximately 120 kills by step 1200 in most simulation runs. The initial rise is steep, with many simulations achieving over 60 female kills by step 300. By step 800, most simulations show cumulative female kills between 100 and 120. After step 1200, the number of female kills stabilizes, with only minor increases observed up to step 2000. A few simulations deviate slightly, reaching slightly lower cumulative kills, such as 100 to 110, but the overall trend remains consistent across runs. This pattern suggests a high initial hunting pressure on female prey animals, followed by a leveling off as prey availability or forager dynamics change.
+
+The cumulative number of postpartum female prey animals killed by forager bands shows a rapid increase over the initial 500 time steps, with values reaching approximately 60. By the 1,000th time step, the cumulative count rises to around 100. The rate of increase begins to decelerate significantly after this point. The final cumulative values across simulations stabilize within the range of 100 to 125 postpartum females killed. This trajectory suggests that postpartum females constitute a primary target for hunting, with the cumulative loss reaching a plateau, indicating that the population of these specific prey animals may have become depleted or less accessible to foragers in the later stages of the simulation.
+
+The cumulative number of births among the prey animal population exhibits a step-like increase, with the most significant changes occurring between steps 700 and 1500. At the initial time step, the cumulative number of births is zero. A sharp increase occurs around step 700, where the cumulative births rise to approximately 8. Following this, there is a steady accumulation of births, reaching 10 by step 1500. After step 1500, the cumulative number of births remains constant at 10 until the end of the simulation at step 73000. This pattern suggests an initial burst of reproductive activity, followed by a period of sustained but limited birth events, potentially influenced by factors such as forager hunting pressure, environmental constraints, and the population dynamics of the megaherbivores.
+
+The cumulative number of deaths among the prey population exhibits a consistent pattern across all simulations. Over the initial 500 steps, the death count rises steeply from 0 to approximately 180, indicating high early mortality from both natural causes and predation. Between steps 500 and 1500, the rate of increase slows, with deaths climbing to a range between 210 and 250. By the 1500th step, the majority of simulations stabilize, with cumulative deaths plateauing between 220 and 250. Beyond step 2000, the death counts remain largely static, with only minor fluctuations observed in some cases. These trends suggest that the megaherbivore population experiences intense mortality early in the simulation, followed by stabilization as the system reaches a quasi-equilibrium state driven by the interplay of hunting pressure and environmental constraints.
+
+The number of male prey animals in the simulation begins at approximately 125 individuals at the start of the simulation. Over the initial 500 steps, there is a sharp and consistent decline, with the population dropping to around 20 individuals by step 500. This rapid decrease suggests significant pressure on the male prey population, likely due to hunting and other mortality factors. From steps 500 to 1000, the decline continues but at a slightly slower rate, with the population hovering between 10 and 20 individuals. Beyond step 1000, the population stabilizes near zero, indicating that the male prey population is effectively extinct in most simulation runs. By step 2000, the number of male animals remains consistently at or near zero across all simulations, suggesting that the conditions in the model lead to the near-certain extinction of the male prey population within approximately 1000 steps.
+
+The number of female megaherbivores begins at approximately 125 at the initial step. A rapid decline is observed across all simulation runs between steps 0 and 500, where the population drops precipitously to values ranging between 5 and 50. The decline continues more gradually from step 500 to step 1000, with the female population stabilizing at or near zero in most runs by step 1100. A few simulation runs show slightly delayed extinction, with female populations remaining non-zero until approximately step 2300, where the count reaches 1 before extinction. The overall trend indicates that the combination of environmental constraints and human predation leads to the rapid collapse of the female prey population, resulting in extinction within 1000 to 2300 steps in the simulated scenarios.
+
+The total number of all prey animals begins at 250. Over the initial period, the population experiences a rapid decline, dropping to approximately 50 individuals by step 250. By step 500, the population further decreases to around 10 individuals. From step 500 onwards, the number of animals continues to dwindle, reaching close to zero by step 1000. After this point, the population remains near zero for the remaining steps, indicating a complete extinction of the prey animals within the simulation.
+
+The total energy available in the male megaherbivore population exhibits a consistent and rapid decline across all simulation runs. At the initial time step, the total energy values start uniformly between 12,000 and 12,500 units. By step 500, this metric drops significantly, with values ranging between 0 and approximately 5,200 units. The trajectory continues to descend sharply, and by step 1000, the total energy in most runs has fallen below 1,000 units. After step 1500, the total energy remains at or near zero for the vast majority of runs, indicating a near-total depletion of the male population's energy reserves, effectively signaling population collapse or extinction in those scenarios. A few specific runs show a slightly delayed decline, maintaining non-zero energy levels until step 2200 or beyond, but these also eventually trend toward zero by the end of the observation period.
+
+The combined total energy available in the population of female prey animals begins at approximately 12,000 units at the start of the simulation. A rapid and sustained decline occurs, with the total energy dropping to approximately 1,000 units by step 500. This initial phase is characterized by high variance among simulation runs. Following step 500, the rate of decline moderates, and the curves converge toward a baseline. Between steps 1,000 and 1,500, the total energy levels stabilize at or near zero. By step 2,000, the total energy for all simulation runs remains effectively at zero, indicating a complete loss of population energy. Throughout the decline, intermittent increases in energy are observed but are short-lived and do not arrest the downward trend.
+
+The combined total energy of all prey animals begins at approximately 25,000 units at the start of the simulation. A rapid decline occurs consistently across all runs, with the metric dropping to around 8,000 units by step 400. Following this initial phase, the decline continues but at a more variable rate, showing a steep reduction to near 2,000 units by step 500. From step 500 to step 1000, the total energy fluctuates between 0 and 5,000 units before stabilizing. By step 1500, the total energy in nearly all simulations converges to zero, indicating a complete loss of energy mass within the prey population, with the trend maintaining this null value through the final step of 73000.
+
+The percentage of green patches in the simulation initially stabilizes around 32% but shows significant drops at specific intervals. Around step 300, there is a notable decline in green patches, reaching as low as approximately 23%. This drop is followed by a recovery to the initial levels. Another significant decline occurs around step 700, with values dropping to about 29%, followed by another recovery. The trend repeats with another minor decline around step 1050, reaching approximately 31.5%, and a further minor dip around step 1400, reaching about 32.5%. These trends suggest fluctuations in the availability of fodder, possibly influenced by the interaction of human hunting pressure and environmental dynamics within the model.

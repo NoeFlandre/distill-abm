@@ -1,0 +1,9 @@
+The average total number of livestock, including both healthy livestock and those that have been destocked, across all households begins at 90.0 at the start of the simulation. This initial value remains steady until approximately timestep 2, after which a sharp decline occurs. By timestep 10, the average total livestock count drops to about 70.0, and by timestep 20, it further decreases to approximately 50.0. This rapid reduction suggests an early phase of significant livestock destocking, possibly in response to initial resource constraints or risk management strategies.
+
+Between timesteps 20 and 40, the decline slows, with the average total livestock count reaching a minimum of around 42.0 near timestep 35. This period indicates a stabilization phase where households may have adjusted their livestock numbers to match the available resources more closely. 
+
+After timestep 40, the trend reverses, showing a gradual increase in the average total livestock count. By timestep 60, the average rises to approximately 48.0, continuing to climb and eventually stabilizing around 50.0 to 62.0 by timestep 80. This upward trend suggests that households are able to rebuild their herds as the system adjusts, likely due to improved resource availability or refined management strategies. 
+
+In the final phase, from timestep 80 to 100, the average total livestock count stabilizes at various levels depending on the household behavior, ranging from approximately 41.0 to 62.0. This stabilization indicates that households have reached a new equilibrium, adapting to the long-term conditions of the simulation.
+
+For decision-makers, this trend suggests that initial resource constraints necessitate rapid adjustments in livestock numbers, followed by a recovery phase as strategies are refined. The divergence in final livestock counts highlights the impact of different behavioral types on long-term resource management outcomes.

@@ -1,0 +1,9 @@
+The data shows an initial sharp decline in mean destock across all households, consistent with overgrazing and pasture degradation, followed by stabilization at lower levels. Key observations include:
+
+1. **Initial Collapse (Steps 0–20):** Panels 1–5 show rapid destocking (peaking at ~7.2 units, slightly above theoretical 6.0 maximum), suggesting model calibration issues or transient overshooting. Post-correction, destock declines sharply to ~5.9 unit by step 5, then accelerates to ~1.2 unit by step 15 due to biomass depletion from unregulated livestock stocking under fixed rainfall conditions.
+
+2. **Post-Collapse Equilibrium (Steps 20–100):** By step 20, destock plateaus between 0.3 and 0.5 units across households. This reflects biomass recovery limited by grazing pressure. Heterogeneous panels show minor divergence (<0.1 unit variance), indicating similar maladaptive outcomes under homogeneous behavioral types.
+
+3. **Mechanistic Interpretations:** The crash/stabilization aligns with E-RO households (baseline) failing to adjust stocking despite climate-driven vegetation variability (rain-std=100). Absent satisficing/resting rules, agents’ decisions lead to long-term unsustainable biomass levels below optimal management thresholds evaluated by satisficing-trials parameter (21).
+
+Policy implications: Without learning or strategy-switching mechanisms, communities relying on static resource management risk irreversible degradation during climatic shocks. Adaptive strategies could prevent post-collapse equilibria below sustainable thresholds (judged by satisficing metrics in the original RAGE framework).

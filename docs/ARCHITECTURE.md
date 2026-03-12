@@ -19,7 +19,7 @@
   - It now uses the same run-separated scaffolding as the later smokes: `runs/run_*`, `latest_run.txt`, and root `run.log.jsonl`.
 - Exposes `smoke-doe` for pre-LLM inspection of the smoke matrix.
   - `smoke-doe` resolves the full benchmark DOE matrix over ABMs, candidate models, evidence modes, summarization settings, prompt variants, and repetitions.
-  - It groups global DOE factors under `results/doe_smoke_latest/10_shared/global/`, shared ABM artifacts under `results/doe_smoke_latest/10_shared/<abm>/`, and compact case/request indexes under `results/doe_smoke_latest/20_case_index/`.
+  - It groups global DOE factors under `results/archive/doe_smoke_latest/10_shared/global/`, shared ABM artifacts under `results/archive/doe_smoke_latest/10_shared/<abm>/`, and compact case/request indexes under `results/archive/doe_smoke_latest/20_case_index/`.
   - It writes the exact context prompt, the exact trend prompt for each plot, per-request hyperparameters, image/table evidence paths, and unresolved context placeholders that define the pre-LLM boundary.
   - `table` evidence is a statistical dump derived only from the plot-relevant simulation series, not a raw CSV slice.
   - It is strictly pre-LLM: model availability is not preflighted and cannot cause DOE smoke failure.

@@ -49,7 +49,7 @@ Observed result at validation time:
 
 The validated rerun of the quantitative smoke pipeline was written under:
 
-- `results/chains/mistral-medium-latest_all_abms_chain/06_quantitative_smoke_latest/`
+- `results/mistral-medium-latest_all_abms_chain/06_quantitative_smoke_latest/`
 - latest validated run: `runs/run_20260311_131203_114102/`
 
 ## Change Policy

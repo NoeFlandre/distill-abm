@@ -1,0 +1,9 @@
+The influence of E-LBD, E-RO-SL1, and E-RO behavioral types on the average total number of livestock is displayed in the following graph:  
+
+- In the beginning all though it seems as though all behavioral types are roughly equal, with E-LBD performing slightly worse, as within roughly 5 steps all three behavioral types reach approximately 90. Around step 8 they all begin to sharply decrease, with E-RO-SL1 performing the best and E-LBD the worst.  
+- The next significant change around step 33 when suddenly the behavior of all behavioral types completely changes. The behavioral types begin to remain almost flat but E-LBD, E-RO-SL1, and E-RO begin to perform better and worse respectively. For all intents, all three behavioral types behave the same and the step size does not really matter anymore.  
+ - Around step 60 the trend for E-LBD and E-RO-SL1 begins to increase and E-RO ceases to increase.  An increase is shown for all three behavioral types around 90 but E-LBD performs significantly better, with E-RO ceasing to increase. 
+ - Step 100 shows E-LBD and E-RO-SL1 finishing at around 50 while E-RO finishes around 42. 
+
+Implications and suggestions: 
+Initial herding behavior weakens when the grazing land drops to approximately 41 after about 8 years of grazing. Waiting for the land to regenerate to higher levels early in the season would allow for more grazers as well as a more permitting environment for adequate regrowth and prevent exhaustion of the pasture and risk to animal survival with higher growth rates simultaneously helping. Having behavioral types control or adapt to the herd density and grazing trends during pasture depletion may be beneficial for long-term land productivity. This could indicate an opportunity for behavioral strategies to better manage the timing and magnitude of grazing improvements given those social dynamics and climate conditions.

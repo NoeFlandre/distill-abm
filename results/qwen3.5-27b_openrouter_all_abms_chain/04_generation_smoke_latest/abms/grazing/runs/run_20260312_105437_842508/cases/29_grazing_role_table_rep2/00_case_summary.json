@@ -1,0 +1,8 @@
+{
+  "abm": "grazing",
+  "case_id": "29_grazing_role_table_rep2",
+  "evidence_mode": "table",
+  "model": "qwen/qwen3.5-27b",
+  "prompt_variant": "role",
+  "repetition": 2
+}

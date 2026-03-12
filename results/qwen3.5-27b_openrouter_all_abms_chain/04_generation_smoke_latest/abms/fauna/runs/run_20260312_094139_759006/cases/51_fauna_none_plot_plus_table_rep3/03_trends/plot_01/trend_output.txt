@@ -1,0 +1,1 @@
+The number of active human hunter-gatherer bands remains constant throughout the entire simulation, maintaining a steady value of 20 from the initial step to the final step. This static trend indicates that the simulation parameters, specifically the setting for immortal foragers, result in no demographic changes or loss of hunter-gatherer groups over time.

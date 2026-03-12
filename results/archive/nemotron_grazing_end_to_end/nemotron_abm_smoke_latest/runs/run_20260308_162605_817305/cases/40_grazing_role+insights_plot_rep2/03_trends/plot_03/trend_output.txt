@@ -1,0 +1,29 @@
+The provided plot depicts the average reserve biomass across grazing patches over 100 timesteps, with distinct trajectories reflecting agent behavioral strategies and environmental stochasticity. Below is the systematic interpretation of trends, localized gains/losses, and parameter-driven implications:
+
+**Key Trends**
+1. **Initial Decline (Steps 0–30):**
+   - Reserve biomass begins around 90,000 units, followed by a steep decline below 80,000 in the first 10–20 steps. This rapid depletion aligns with the **high herd size (90)** and absence of pasture rest (resting?=False), which intensifies grazing pressure. Variability in rainfall (**random rainfall: mean=200, std=100**) exacerbates stress, reducing initial biomass recovery potential.
+   - Lines diverge significantly post-30 steps, with some trajectories recovering moderately (to 85,000–90,000) and others stagnating below 80,000. Early divergence highlights the impact of **risk-sensitive decision-making** (risk-att-init=0.5): agents with higher herd utilization rates (risk-seeking behavior) experience sharper biomass losses.
+
+2. **Mid-Term Recovery (Steps 30–70):**
+   - By step 50 (≈5 years), biomass stabilizes >100,000 for most agents, driven by adaptive herd adjustments. Agents with **E-LBD** (20 agents) and **E-RO-SL1** (20 agents) show faster recovery than **E-RO** (20 agents), leveraging learning-by-doing and social learning strategies. Social learners (E-RO-SL1) benefit only if neighbors with better-performing strategies are within learning-radius=1.0, though social-susceptibility=0 suggests limited adoption.
+   - Lines retaining moderate decline peaks (e.g., 90,000–100,000) correspond to **risk-averse agents (lower effective r-parameter)** who underutilize herds, preserving biomass but limiting productivity gains.
+
+3. **Long-Term Stabilization (Steps 70–100):**
+   - Post-step 70, biomass converges to 110,000–125,000 units across most simulations, constrained by water-limited biomass maxima. The upper plateau aligns with **b-dry-season regeneration rates (gr1=0.5, gr2=0.1)**, which limit recovery during dry spells.
+   - Lines with sharper post-70-step increases (e.g., reaching 125,000) correspond to agents who balanced herd resizing and grazing pressure using **risk-sensitive rules** (risk-mode?=True). Those with late herd reductions (risk-averse) lag in recovery.
+
+**Agent-Type-Specific Dynamics**
+- **E-RO (20 agents):** Fixed rule-based agents (no learning/use reviewed sofware). Exhibit delayed recovery (steps 50–70) due to inflexible herd sizing amid stochastic rainfall.
+- **E-LBD (20 agents):** Learning-by-doing agents adapt faster by iteratively adjusting herd sizes based on personal outcomes. Show smoother mid-term growth, particularly in runs with moderate rainfall variability.
+- **E-RO-SL1 (20 agents):** Social learners show inconsistent performance. Their recovery depends on observing higher-biomass neighbors within radius=1.0. However, social-susceptibility=0 likely limits strategy adoption, reducing their advantage over E-RO.
+
+**Parameter-Driven Mechanisms**
+- High initial herd size (**livestock-init=90**) triggers overgrazing, depleting biomass in most simulations.   - **Rainfall variability (std=100)** creates stochastic shocks, amplifying biomass heterogeneity. Runs with early rainy-season-weather-patterns recover faster, while prolonged dry spells delay recovery.
+- **gr1=0.5** (high wet-season regeneration) sustains post-decline recovery, but **gr2=0.1** (low dry-season regeneration) caps long-term gains, reflecting water-limited ecosystems.
+
+**Implications**   Targeted management should prioritize herd resizing flexibility in response to environmental uncertainty. Policies enabling social learning (e.g., knowledge-sharing platforms) could enhance resilience for heterogeneous populations. Risk-sensitive decision-making frameworks may optimize herd sustainability in variable climates.
+
+}   
+
+**Summary**   Rapid overgrazing-induced decline precedes variable adaptive recovery. Risk-tolerant and learning-oriented agents recover faster, constrained ultimately by water-dependent biomass limits. Herd management strategies and climate resilience planning are critical for smallholder systems facing climate variability.

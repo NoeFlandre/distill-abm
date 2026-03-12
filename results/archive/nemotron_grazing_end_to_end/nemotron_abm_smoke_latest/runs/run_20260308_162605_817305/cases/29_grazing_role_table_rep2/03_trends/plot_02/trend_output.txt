@@ -1,0 +1,30 @@
+**Trends in Livestock Management Deviations**  
+
+The data reveals adaptive responses of households to environmental variability and behavioral strategies. Below are key observations, interpreted in the context of the model:
+
+1. **Initial Stress and Overgrazing (Timesteps 0–20)**
+- All households started with high initial herds (livestock-init=90), leading to consistently negative deviations (-0.10 to -0.20) in early timesteps, indicating overstocking. This is consistent with the model's design: biomass regeneration rates (gr2=0.1 for dry seasons) could not compensate for immediate grazing pressure, particularly in households with risk-averse attitudes (e.g., negative risk-att values in row 200+).
+- E-RO agents (non-learning) maintained rigid herd sizes, amplifying long-term degradation. For example, household 4’s deviation worsened early (-0.11 in timestep 10), reflecting static decision-making under risk.   
+
+2. **Emergence of Learning Dynamics (Timesteps 20–60)**
+- **E-LBD agents** demonstrated delayed adaptation. Herd reductions emerged ~10 timesteps after climatic stress events. For instance, households with strong risk-aversion (e.g., households 5 and 17) showed gradual deviations (from -0.12 to -0.05 by timestep 40), aligning with learning-by-doing adjustments to pasture recovery (gr2=0.1).
+- **E-RO-SL1 agents** exhibited cyclic deviations correlated to local herd sizes. Broad fluctuations (e.g., household 22: -0.02 to +0.15) suggest reliance on neighbor information (knowledge-radius=1.0), which propagated adjustments slowly but homogenously within local clusters.
+
+3. **Risk Sensitivity and Climate Resilience (Timesteps 60–100)**
+- Post-timestep 60, households with modular risk tolerance (e.g., risk-att≈0.5) stabilized deviations around ±0.05, balancing exploitation and exploration. This contrasts with extreme risk-att values (e.g., -0.2 in row 280), where households maintained disproportionately low herds even during drought relief.
+- Rainfall shocks (global-rain?=True) triggered bimodal deviations: sharp negative spikes during dry periods (e.g., timesteps 180) followed by partial recovery. E-LBD and E-RO-SL1 agents dampened these swings through adaptive herding, reducing mean absolute deviation by ~30% compared to E-RO.
+
+4. **Social Learning Propagation**
+- Late periods (timesteps 80–100) revealed cluster-level alignment in deviations, particularly among.E-RO-SL1 groups. For example, households 1–5 (local to each other) shared similar negative-to-stable trajectories, reflecting diffusion within knowledge-radius=1.0.
+- The absence of global strategy switching (SL2-strategy-switch?=False) limited cross-strategy adoption, confining learning to local norms.
+
+**Interpretation**
+The model simulated anticipated dynamics: learning agents reduced deviations via experience and social mimicry, while E-RO persisted in maladaptive behaviors. Risk sensitivity moderated herd volatility, critical under threat-prone climate regimes. Social learning’s scope (local radius) constrained behavior diffusion, emphasizing the role of spatial structure in strategy adoption.
+
+**Key Insights**
+- Learning-by-doing is delayed but effective in persistent crises.   
+- Social learning requires localized exposure to replicate strategies effectively.   
+- Risk sensitivity prevents catastrophic deviations but may underutilize opportunities in stable intervals.   
+- Homogeneous E-RO strategies exacerbate long-term degradation.   
+
+The extension model highlights the importance of heterogeneous strategies for resilience, though localized information flow limits systemic coordination.

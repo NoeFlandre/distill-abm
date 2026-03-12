@@ -1,0 +1,25 @@
+The report analyzes the average cumulative number of households that have destocked livestock over 100 years in a grazing system simulation, focusing on behavioral types and learning mechanisms.   
+
+**Behavioral Type Comparisons**:   
+- **E-RO (dark blue)**: Demonstrates consistent upward growth (75% cumulative destocking by year 100), indicating reliance on risk aversion and threshold-based resource conservation.   
+- **E-LBD (brown)**: Grows steadily (80% cumulative by Year 100) but plateaus after mid-simulation, suggesting limited adaptation benefits under homogeneous conditions.   
+- **E-RO-SL1 (purple)**: Outperforms others after Year 90 (85% cumulative), reflecting social learning's ability to mitigate climate variability impacts through strategy diffusion.   
+
+**Heterogeneity Impact**:   
+- **EPAT (red)**: Shows sharp destocking asymmetry (80% mid-simulation jump), likely due to satisficing thresholds triggering rapid conservation responses.   
+- **EMoY (green)**: Rises sharply after Year 80 (95% cumulative), possibly from cumulative environmental stressors amplifying destocking decisions.   
+
+**System Dynamics**:   
+- All types show exponential destocking growth, with faster late-stage increases correlating with parameter settings:   
+  - *knowledge-radius=1* enabled effective social learning feedback loops   
+  - *rain-std=100* created persistent vegetation instability requiring intervention.   
+
+**Key Parameter Interactions**:   
+- **resting?, resting-threshold, satisficing Thresholds** devolved control to system-level environmental pressures rather than agent-specific action triggers.   
+- **risk-mode?=True** amplified volatility in destocking patterns for risk-averse types.   
+
+**Simulation Constraints**:   
+- Homogeneous agent configurations limited comparative analysis of behavioral type uniqueness.   
+- Discontinued strategy switching (SL2-strategy-switch?disabled) prevented cross-type diffusion observation.   
+   
+The findings suggest behavioral heterogeneity may be critical for responding to environmental stochasticity, though results cannot assess learning mechanism tradeoffs under mixed populations.

@@ -1,0 +1,87 @@
+An agent-based model (ABM) is a computational framework used to simulate the actions and interactions of autonomous agents to assess their effects on the system as a whole. In this context, the ABM is designed to replicate the adoption behaviors of milk consumption by the British public from 1974 to 2005, focusing on the shift from whole milk to skimmed and semi-skimmed milk. The model aims to explore how perception, habits, and social influence affect an individual's decision-making process regarding milk choice.
+
+The model consists of 1,000 agents, each representing an adult consumer. These agents are part of a social network and make decisions based on various parameters that influence their milk choice. The key parameters and their settings are as follows:
+
+1. **Memory-Lifetime**: This parameter determines how long an agent remembers past experiences. The range is from 1.0 to 10.0, and it is set to 5.0.
+
+2. **Alt-Health-Mean-Initial**: This represents the initial mean health perception of alternative milk types. The range is from 1.0 to 3.0, and it is set to 1.69.
+
+3. **Habit-Threshold**: This is the threshold for habit formation. The range is from 1.0 to 10.0, and it is set to 2.0.
+
+4. **P-Interact**: This is the probability of interaction between agents. The range is from 0.0 to 1.0, and it is set to 0.3.
+
+5. **Social-Susceptibility**: This measures how susceptible an agent is to social influence. The range is from 0.0 to 1.0, and it is set to 0.2.
+
+6. **Incumbent-Initial-Habit**: This represents the initial habit strength for the incumbent milk type (whole milk). The range is from 0.0 to 10.0, and it is set to 10.0.
+
+7. **Alt-Env-Mean-Initial**: This is the initial mean environmental perception of alternative milk types. The range is from 0.0 to 3.0, and it is set to 1.12.
+
+8. **Social-Blindness**: This parameter indicates the degree to which agents are blind to social influences. The range is from 0.0 to 1.0, and it is set to 0.51.
+
+9. **Justification**: This represents the degree to which agents justify their choices. The range is from 0.0 to 1.0, and it is set to 0.61.
+
+10. **Cognitive-Dissonance-Threshold**: This is the threshold for cognitive dissonance, which affects how agents evaluate their choices. The range is from 0.0 to 1.0, and it is set to 0.15.
+
+11. **Network-Parameter**: This parameter influences the structure of the social network. The range is from 2.0 to 10.0, and it is set to 8.0.
+
+12. **Number-of-Agents**: This is the total number of agents in the model, set to 1000.
+
+13. **Habit-On?**: This is a boolean parameter indicating whether habit formation is considered in the model. It is set to True.
+
+14. **Network-Type**: This specifies the type of social network used in the model. It is set to "watts-strogatz".
+
+15. **Norms**: This is a boolean parameter indicating whether social norms are considered in the model. It is set to True.
+
+16. **Social-Conformity**: This measures the degree to which agents conform to social norms. The range is from 0.0 to 1.0, and it is set to 0.28.
+
+The model uses both theoretical grounding and empirical data to inform the ABM, with calibration performed against observed macro-level data. The main outcome reported is the average weekly consumption of each milk type per person. The simulation includes monitors and plots to track the number of agents consuming mostly whole milk or skimmed/semi-skimmed milk and the average consumption of each milk type over time.
+
+The average weekly consumption of whole milk per agent starts at approximately 2600 units. This high initial value indicates a strong initial habit and preference for whole milk among the agents. Within the first five steps, there is a sharp decline in consumption, dropping to around 1000 units. This significant reduction suggests a rapid shift in consumer behavior, likely influenced by the introduction and adoption of alternative milk types such as skimmed and semi-skimmed milk. 
+
+From steps 5 to 15, the decline continues but at a slower rate, stabilizing around 800 units. This period represents a gradual adjustment phase where agents are increasingly influenced by social interactions, health perceptions, and environmental concerns related to alternative milk types. The slower rate of decline indicates that while the shift away from whole milk continues, it becomes more gradual as habits and social norms start to stabilize.
+
+Between steps 15 and 25, the consumption of whole milk remains relatively stable, fluctuating slightly around 700 units. This stability suggests that the agents have reached a new equilibrium in their milk consumption habits, with the influence of social norms, health perceptions, and environmental concerns being balanced out. 
+
+After step 25, there is a slight decline followed by a minor increase, but the overall trend remains relatively flat, ending just below 600 units. This final phase indicates that the consumption of whole milk has reached a steady state, with only minor fluctuations due to ongoing social interactions and individual decision-making processes.
+
+The average weekly consumption of skimmed and semi-skimmed milk per agent exhibits distinct trends over the simulated time steps. Initially, the consumption starts at a very low value, close to zero. This low consumption level persists for a brief period, indicating that agents predominantly consume whole milk at the beginning of the simulation. Around the fifth time step, there is a noticeable and rapid increase in the consumption of skimmed and semi-skimmed milk. This sharp rise continues until approximately the tenth time step, where the consumption levels off and stabilizes around 1200 units. This period of rapid increase suggests a significant shift in consumer behavior, likely influenced by the parameters governing social interactions, habit formation, and perceptions of health and environmental benefits. After reaching this plateau, the consumption remains relatively stable with minor fluctuations until around the twenty-fifth time step. At this point, there is another noticeable increase in consumption, which gradually rises and stabilizes again at a higher level, around 1400 units, by the thirtieth time step. This second increase indicates another shift in consumer preferences, possibly due to reinforced social norms or further dissemination of positive perceptions regarding skimmed and semi-skimmed milk. The overall trend demonstrates a clear transition from whole milk to skimmed and semi-skimmed milk over the simulated period, reflecting the impact of the model's parameters on consumer behavior.
+
+The data from the repeated simulations of the agent-based model show a consistent and linear upward trend in the total number of whole milk choices made by agents over time. Initially, at step 0, the total number of whole milk choices starts at a low value close to zero. As the simulation progresses, the total number of whole |milk choices increases steadily and linearly. By step 10, the total number of whole milk choices reaches approximately 500. This upward trend continues uniformly, and by step 20, the total number of whole milk choices is around 1500. Finally, at step 30, the total number of whole milk choices reaches approximately 2000. The linear nature of the increase suggests a consistent rate of adoption or choice of whole milk by the agents throughout the simulation period.
+
+The trend in the data shows a consistent and steady increase in the total number of skimmed/semi-skimmed milk choices made by agents over time. Initially, at step 0, the number of such choices starts at a low value close to zero. As the steps progress, there is a gradual and smooth upward trajectory in the number of choices for skimmed/semi-skimmed milk. By around step 10, the total number of choices reaches approximately 5,000. This upward trend continues steadily, and by step 20, the total number of choices surpasses 15,000. Finally, at step 30, the total number of skimmed/semi-skimmed milk choices reaches around 25,000. The data indicates a clear and continuous growth in the adoption of skimmed/semi-skimmed milk choices among the agents throughout the simulation period.
+
+The total number of choices made by all agents combined increases linearly over time. Initially, at step 0, the total number of choices made is 0. As the simulation progresses, the total number of choices made increases steadily. By step 10, approximately 10,000 choices have been made. This trend continues uniformly, reaching about 20,000 choices by step 20 and 30,000 choices by step 30. The linear increase indicates a consistent rate of decision-making among the agents throughout the simulation period.
+
+The mean quantity of whole milk consumed by agents starts at a high value of approximately 2600 units. This high initial consumption remains relatively stable for the first few steps. Around step 5, there is a noticeable decline in the mean whole milk quantity, which sharply drops to about 1000 units by step 10. This significant reduction indicates a rapid shift in consumption patterns among the agents. From step 10 to step 20, the decline continues but at a slower rate, stabilizing around 800 units. Between steps 20 and 25, the mean quantity of whole milk consumed fluctuates slightly but generally maintains a downward trend, reaching approximately 600 units. After step 25, the consumption continues to decrease gradually, with minor fluctuations, and stabilizes around 400 units by step 30. This trend suggests a steady reduction in whole milk consumption over time, reflecting changes in agents' preferences and behaviors influenced by the model parameters.
+
+The mean quantity of skimmed and semi-skimmed milk consumed by agents exhibits a rapid increase in the early stages of the simulation, followed by a stabilization and a subsequent gradual rise towards the end of the observed period. Initially, the mean quantity starts at a low value, close to zero. Within the first five steps, there is a sharp increase, with the mean quantity rising steeply to approximately 1200 units. This rapid growth indicates a significant shift in consumption patterns among the agents during this period. Following this initial surge, the mean quantity stabilizes and fluctuates slightly around the 1200 to 1300 unit range for an extended period, suggesting a plateau in the adoption rate of skimmed and semi-skimmed milk. Towards the end of the simulation, around step 25, there is another noticeable increase. The mean quantity rises again, reaching a new plateau close to 1400 units by step 30. This final increase suggests a renewed shift in consumption behaviors, potentially driven by cumulative social influences or changes in perception and habits over time.
+
+The mean habit factor for whole milk exhibits a consistent upward trend over the time steps in the simulation. Initially, the mean habit factor starts at a value slightly above 1.00. Within the first few steps, there is a noticeable increase, reaching approximately 1.02 by the fifth step. This upward trend continues steadily, with the mean habit factor gradually increasing as the steps progress. By around the 15th step, the mean habit factor is approximately 1.03. The trend persists, and by the 30th step, the mean habit factor reaches around 1.05. Throughout the simulation, the mean habit factor for whole milk shows a smooth and continuous rise, indicating a strengthening habit factor over time.
+
+The mean habit factor for skimmed and semi-skimmed milk exhibits a clear upward trend over the time steps observed in the simulation. Initially, the mean habit factor starts at a value of approximately 1.0. This value remains relatively stable for the first few steps, indicating a period of little to no change in habit formation for skimmed and semi-skimmed milk consumption. 
+
+Around the fifth step, there is a slight increase in the mean habit factor, marking the beginning of a gradual upward trend. This trend accelerates significantly after the tenth step, where the mean habit factor begins to rise more steeply. By the fifteenth step, the mean habit factor has increased to around 1.2, indicating a noticeable shift in habit formation towards skimmed and semi-skimmed milk. 
+
+The upward trend continues consistently, with the mean habit factor reaching approximately 1.4 by the twentieth step. This steady increase suggests a growing influence of habit formation on the consumption of skimmed and semi-skimmed milk. As the steps progress beyond the twentieth, the mean habit factor continues to rise, albeit at a slightly less steep rate, eventually approaching a value close to 1.6 by the thirtieth step. 
+
+Throughout the simulation, the mean habit factor demonstrates a consistent and significant increase, reflecting the strengthening habits of consumers towards skimmed and semi-skimmed milk over time.
+
+The mean choice function deviation in the agent-based model exhibits distinct trends over the simulated time steps. Initially, the deviation starts at a very low value close to zero. This indicates that at the beginning of the simulation, agents have very similar choice function scores, suggesting a high level of uniformity in their decision-making processes regarding milk consumption. 
+
+As the simulation progresses, the deviation increases rapidly within the first few steps. By around the fifth step, the deviation reaches approximately 0.5. This sharp rise indicates a growing diversity in the choice function scores among agents, reflecting increasing variability in their preferences and behaviors towards different types of milk. 
+
+Following this rapid increase, the rate of change in the deviation begins to slow down. Between steps 5 and 10, the deviation continues to rise but at a more gradual pace, reaching around 0.6. This period suggests a stabilization phase where the diversity in choice function scores is still increasing but not as dramatically as in the initial steps. 
+
+From step 10 onwards, the deviation continues to increase but at an even slower rate. By step 15, the deviation is slightly above 0.6, and it continues to rise incrementally, approaching a value close to 0.7 by the end of the simulation at step 30. This trend indicates that while the diversity in choice function scores among agents is still growing, it is doing so at a very slow pace, suggesting a near-saturation point where the deviation levels off. 
+
+Overall, the mean choice function deviation shows an initial phase of rapid diversification in agent behaviors, followed by a gradual increase and eventual stabilization, indicating a complex interplay of factors influencing the agents' decision-making processes over time.
+
+The mean value health deviation starts at a low value close to zero and exhibits a rapid increase in the early steps of the simulation. By around the fifth step, the deviation reaches approximately 0.3. This initial phase indicates a significant shift in the agents' health perceptions relative to their milk choices. 
+
+Following this rapid increase, the rate of change in the mean value health deviation begins to slow down. Between steps 5 and 15, the deviation continues to rise but at a more gradual pace, reaching a value of around 0.5. This period suggests a stabilization phase where the agents' perceptions and choices start to align more closely, but still exhibit notable deviations. 
+
+From step 15 to step 25, the mean value health deviation remains relatively stable, fluctuating slightly around the 0.55 mark. This stability indicates a period where the agents' health perceptions and their milk consumption choices are in a state of equilibrium, with minimal changes in deviation. 
+
+After step 25, there is a slight upward trend in the mean value health deviation, which continues until the end of the simulation at step 30, where it reaches a value slightly above 0.6. This final phase suggests a minor increase in the discrepancy between the agents' health perceptions and their actual milk choices, possibly indicating a slight shift in behavior or perception towards the end of the simulation period.
+
+The mean value environmental deviation in the agent-based model simulating milk consumption behaviors shows a rapid initial increase followed by stabilization. Initially, the deviation starts near zero and rises sharply within the first few steps, reaching approximately 13 by step 5. This rapid increase indicates a significant divergence between the agents' environmental values and their milk choices early in the simulation. After this initial phase, the deviation stabilizes and maintains a steady value around 13 for the remainder of the simulation period, extending to step 30. This stabilization suggests that the agents' environmental values and their milk choices reach a form of equilibrium or steady-state, where further interactions and decisions do not significantly alter the mean deviation. The trend highlights the dynamic adjustment period followed by a prolonged phase of stability in the agents' decision-making process regarding milk consumption.

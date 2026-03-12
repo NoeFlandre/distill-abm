@@ -1,0 +1,1 @@
+The number of human hunter-gatherer bands remains constant at 20 throughout the entire simulation period. This indicates that there is no change in the number of active foragers from the beginning to the end of the simulation, suggesting a stable population of human hunters in the model's environment.

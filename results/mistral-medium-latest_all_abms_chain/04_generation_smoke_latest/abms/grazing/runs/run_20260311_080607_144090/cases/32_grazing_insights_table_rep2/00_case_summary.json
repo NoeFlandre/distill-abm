@@ -1,0 +1,8 @@
+{
+  "abm": "grazing",
+  "case_id": "32_grazing_insights_table_rep2",
+  "evidence_mode": "table",
+  "model": "mistral-medium-latest",
+  "prompt_variant": "insights",
+  "repetition": 2
+}

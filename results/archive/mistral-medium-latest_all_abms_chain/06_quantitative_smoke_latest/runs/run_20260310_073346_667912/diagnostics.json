@@ -1,0 +1,15 @@
+{
+  "successful_row_count": 1440,
+  "reference_families": {
+    "author": {
+      "row_count": 1080,
+      "reading_ease_zero_count": 0,
+      "reading_ease_all_zero": false
+    },
+    "modeler_ground_truth": {
+      "row_count": 360,
+      "reading_ease_zero_count": 0,
+      "reading_ease_all_zero": false
+    }
+  }
+}

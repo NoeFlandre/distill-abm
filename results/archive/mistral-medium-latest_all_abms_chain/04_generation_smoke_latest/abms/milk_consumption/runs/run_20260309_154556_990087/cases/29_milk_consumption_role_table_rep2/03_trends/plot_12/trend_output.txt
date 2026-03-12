@@ -1,0 +1,7 @@
+The mean deviation between the agents' held environmental values and the implied values by their milk choices exhibits a clear trend over the simulation period. Initially, the deviation starts at 0.0000 and rapidly increases to a peak value of 13.4756 by the 13th time step. This initial phase is characterized by a strong increasing trend, as evidenced by the rolling Mann-Kendall test, which shows significant increases in the early time steps (0-4 and 5-9) with high tau values and significant p-values. 
+
+Following this rapid increase, the deviation stabilizes around a mean value of approximately 13.4302, with minor fluctuations. The peaks and valleys identified in the data indicate small variations around this stable value, with peaks at time steps 13, 21, 19, 27, and 30, and valleys at time steps 20, 18, 26, 29, and 31. These fluctuations are minimal, suggesting a period of stability in the mean deviation. 
+
+The rolling Mann-Kendall test further supports this stability, showing no significant trends in the later time steps (10-14, 15-19, 20-24, and 25-29). The oscillation summary indicates a dominant period of 15.00, with strong oscillation indices scattered throughout the time steps, reinforcing the presence of minor fluctuations around the stable mean value. 
+
+Overall, the mean deviation quickly rises to a high value and then stabilizes, indicating that the agents' held environmental values and the implied values by their milk choices reach a steady state of deviation after an initial adjustment period.

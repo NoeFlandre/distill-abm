@@ -1,0 +1,5 @@
+The consumption trajectory reveals a structural break in consumer preference. Starting from a baseline of 5.29 units, the aggregate mean quantity escalates to 1456.5991 units by the final time step. This transition is characterized by a rapid acceleration followed by a sustained high-consumption plateau.
+
+Detailed analysis highlights significant oscillation with a dominant period of approximately 15 time steps. After an initial phase of rapid growth, the consumption levels off, fluctuating around a median of 1220.2054 units. Notable peaks occur at time step 11 (1265.4700) and time step 13 (1240.3462), while minor retractions are observed around steps 18 through 23.
+
+From a behavioral perspective, this pattern indicates that once a critical mass of adoption is reached within the social network, the new habit becomes the dominant norm. The persistence of high consumption levels suggests strong path dependence. For decision-makers, the findings imply that early intervention is critical to trigger the initial shift, as subsequent changes in preference are resisted by established habits and social conformity pressures.
