@@ -63,6 +63,12 @@ def test_remove_repeated_phrases_keeps_one_full_loop_unit_when_tail_is_partial()
     assert remove_repeated_phrases(text) == "Signal rises. A B C."
 
 
+def test_remove_repeated_phrases_preserves_prefix_punctuation_and_numeric_formatting() -> None:
+    text = "Value (mean=2.5, std=0.4) rises steadily; A B C A B C A B C."
+
+    assert remove_repeated_phrases(text) == "Value (mean=2.5, std=0.4) rises steadily; A B C."
+
+
 def test_postprocess_summary_preserves_non_loop_repetition_that_may_be_meaningful() -> None:
     text = "Very very high demand can still matter. Very high demand may persist."
 
