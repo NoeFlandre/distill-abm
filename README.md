@@ -84,6 +84,7 @@ src/distill_abm/
 
 docs/
   ARCHITECTURE.md
+  RUN_EXECUTION_ORDER.md
   EVALUATION_FREEZE.md
   QUALITY_SWEEP_2026-03-11.md
   WALKTHROUGH.md
@@ -238,6 +239,7 @@ Repo workflow notes:
 - See `docs/AGENT_WORKFLOW.md` for the repository-specific agent workflow, verification order, and evidence expectations.
 - See `docs/AGENT_BACKLOG.md` for the current prioritized backlog of agent-friendly quality improvements that remain after the present refactors.
 - See `docs/MANUAL_VALIDATION.md` for the current evidence-style manual verification record covering the pre-LLM workflow surfaces.
+- See `docs/RUN_EXECUTION_ORDER.md` for a user-facing walkthrough of what happens after `distill-abm run` receives model, evidence-mode, and summarizer arguments.
 
 Agent-oriented CLI additions:
 
