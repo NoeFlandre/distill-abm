@@ -33,6 +33,12 @@ from distill_abm.pipeline.local_qwen_sample_response import (
     looks_like_context_overflow,
     parse_structured_smoke_text,
 )
+from distill_abm.pipeline.prompt_compression_artifacts import (
+    PromptCompressionAttempt,
+    build_prompt_compression_run_entry,
+    write_prompt_compression_artifacts,
+    write_prompt_compression_run_summary,
+)
 from distill_abm.pipeline.run_artifact_contracts import (
     case_summary_path,
     latest_report_pointer_path,
@@ -100,6 +106,7 @@ class LocalQwenSampleSmokeResult(BaseModel):
     review_csv_path: Path
     run_log_path: Path
     viewer_html_path: Path
+    prompt_compression_summary_path: Path
     success: bool
     failed_case_ids: list[str] = Field(default_factory=list)
     cases: list[LocalQwenSampleCaseResult] = Field(default_factory=list)
@@ -394,6 +401,26 @@ def run_local_qwen_sample_smoke(
 
     review_csv_path = run_root / "request_review.csv"
     _write_review_csv(review_csv_path, review_rows)
+    prompt_compression_entries = [
+        entry
+        for entry in (
+            build_prompt_compression_run_entry(
+                source_run_root=run_root,
+                scope="sample_case",
+                case_id=case_result.case_id,
+                abm=case_result.abm,
+                evidence_mode=case_result.evidence_mode,
+                prompt_variant=case_result.prompt_variant,
+                artifacts_dir=case_result.case_dir / "01_inputs",
+            )
+            for case_result in results
+        )
+        if entry is not None
+    ]
+    prompt_compression_summary_path = write_prompt_compression_run_summary(
+        run_root=run_root,
+        entries=prompt_compression_entries,
+    )
     finished_at = datetime.now(UTC)
     report_json_path = sampled_smoke_report_path(run_root)
     report_markdown_path = run_root / "smoke_local_qwen_report.md"
@@ -406,6 +433,7 @@ def run_local_qwen_sample_smoke(
         review_csv_path=review_csv_path,
         run_log_path=run_log_path,
         viewer_html_path=viewer_html_contract_path(run_root),
+        prompt_compression_summary_path=prompt_compression_summary_path,
         run_id=run_id,
         success=not failed_case_ids,
         failed_case_ids=failed_case_ids,
@@ -614,6 +642,7 @@ def _render_report(result: LocalQwenSampleSmokeResult) -> str:
         f"- run_log_path: `{result.run_log_path}`",
         f"- viewer_html_path: `{result.viewer_html_path}`",
         f"- review_csv_path: `{result.review_csv_path}`",
+        f"- prompt_compression_summary_path: `{result.prompt_compression_summary_path}`",
         "",
         "| case_id | abm | evidence_mode | prompt_variant | success |",
         "| --- | --- | --- | --- | --- |",
@@ -645,6 +674,8 @@ def _run_trend_with_fitting_table(
 ) -> tuple[str, dict[str, object]]:
     max_stride = 64
     last_exc: StructuredSmokeResponseError | None = None
+    compression_attempts: list[PromptCompressionAttempt] = []
+    compression_prompts: list[str] = []
     for stride in range(1, max_stride + 1):
         table_csv = _build_case_table_for_stride(
             inputs_dir=inputs_dir,
@@ -661,6 +692,20 @@ def _run_trend_with_fitting_table(
             enabled=enabled,
         )
         _write_text(inputs_dir / "trend_prompt.txt", trend_prompt)
+        compression_attempts.append(
+            PromptCompressionAttempt(
+                attempt_index=len(compression_attempts) + 1,
+                table_downsample_stride=stride,
+                compression_tier=max(stride - 1, 0),
+                prompt_length=len(trend_prompt),
+            )
+        )
+        compression_prompts.append(trend_prompt)
+        write_prompt_compression_artifacts(
+            output_dir=inputs_dir,
+            attempts=compression_attempts,
+            prompts=compression_prompts,
+        )
         _write_json(
             requests_dir / "trend_request.json",
             _build_request_preview(

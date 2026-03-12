@@ -357,6 +357,19 @@ def _render_html(payload: dict[str, Any]) -> str:
             ${item.trends && item.trends.length
               ? ""
               : textCard("Evidence Table", item.paths.table_csv, item.table_csv_text)}
+            ${item.trends && item.trends.length
+              ? ""
+              : textCard("Compression State", item.paths.trend_prompt_compression, item.trend_prompt_compression_text)}
+            ${item.trends && item.trends.length
+              ? ""
+              : textCard(
+                  "Prompt Before Compression",
+                  item.paths.trend_prompt_pre_compression,
+                  item.trend_prompt_pre_compression_text
+                )}
+            ${item.trends && item.trends.length
+              ? ""
+              : textCard("Compressed Prompt", item.paths.trend_prompt_compressed, item.trend_prompt_compressed_text)}
           </div>
           <div class="detail-grid">
             ${item.trends && item.trends.length
@@ -440,6 +453,17 @@ def _render_html(payload: dict[str, Any]) -> str:
                 ${textCard("Trend Output", trend.trend_output_path, trend.trend_output_text)}
                 ${textCard("Evidence Table", trend.table_csv_path, trend.table_csv_text)}
                 ${imageCard("Evidence Plot", trend.image_path)}
+                ${textCard(
+                    "Compression State",
+                    trend.trend_prompt_compression_path,
+                    trend.trend_prompt_compression_text
+                  )}
+                ${textCard(
+                    "Prompt Before Compression",
+                    trend.trend_prompt_pre_compression_path,
+                    trend.trend_prompt_pre_compression_text
+                  )}
+                ${textCard("Compressed Prompt", trend.trend_prompt_compressed_path, trend.trend_prompt_compressed_text)}
               </div>
               <div class="meta" style="margin-top: 10px;">
                 ${trend.trend_trace_path ? `<a href="${escapeHtmlAttr(trend.trend_trace_path)}">trend trace</a>` : ""}

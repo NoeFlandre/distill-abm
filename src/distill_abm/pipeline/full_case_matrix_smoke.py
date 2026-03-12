@@ -48,6 +48,12 @@ from distill_abm.pipeline.local_qwen_sample_smoke import (
     _write_optional_thinking,
     _write_text,
 )
+from distill_abm.pipeline.prompt_compression_artifacts import (
+    PromptCompressionAttempt,
+    build_prompt_compression_run_entry,
+    write_prompt_compression_artifacts,
+    write_prompt_compression_run_summary,
+)
 from distill_abm.pipeline.run_artifact_contracts import (
     FULL_CASE_MATRIX_REPORT_FILENAME,
     case_summary_path,
@@ -98,6 +104,7 @@ class FullCaseMatrixSmokeResult(BaseModel):
     review_csv_path: Path
     run_log_path: Path
     viewer_html_path: Path
+    prompt_compression_summary_path: Path
     success: bool
     failed_case_ids: list[str] = Field(default_factory=list)
     cases: list[FullCaseMatrixCaseResult] = Field(default_factory=list)
@@ -237,6 +244,29 @@ def run_full_case_matrix_smoke(
 
     review_csv_path = run_root / "request_review.csv"
     write_run_review_csv(review_csv_path, build_run_review_rows(case_results))
+    prompt_compression_entries = [
+        entry
+        for entry in (
+            build_prompt_compression_run_entry(
+                source_run_root=run_root,
+                scope="full_case_matrix_plot",
+                case_id=case_result.case_id,
+                abm=case_result.abm,
+                evidence_mode=case_result.evidence_mode,
+                prompt_variant=case_result.prompt_variant,
+                repetition=case_result.repetition,
+                artifacts_dir=case_result.case_dir / "03_trends" / f"plot_{plot.plot_index:02d}",
+                plot_index=plot.plot_index,
+            )
+            for case_result, case in zip(case_results, cases, strict=True)
+            for plot in case_input.plots
+        )
+        if entry is not None
+    ]
+    prompt_compression_summary_path = write_prompt_compression_run_summary(
+        run_root=run_root,
+        entries=prompt_compression_entries,
+    )
     finished_at = datetime.now(UTC)
     smoke_result = FullCaseMatrixSmokeResult(
         started_at_utc=started_at.isoformat(),
@@ -248,6 +278,7 @@ def run_full_case_matrix_smoke(
         review_csv_path=review_csv_path,
         run_log_path=run_log_path,
         viewer_html_path=viewer_html_path(run_root),
+        prompt_compression_summary_path=prompt_compression_summary_path,
         success=not failed_case_ids,
         failed_case_ids=failed_case_ids,
         cases=case_results,
@@ -616,6 +647,8 @@ def _run_trend_with_fitting_table(
     image_path: Path | None,
 ) -> tuple[str, dict[str, object]]:
     last_exc: StructuredSmokeResponseError | None = None
+    compression_attempts: list[PromptCompressionAttempt] = []
+    compression_prompts: list[str] = []
     for stride in range(1, 65):
         table_csv = _build_trend_table_csv_for_stride(
             frame=frame,
@@ -633,6 +666,20 @@ def _run_trend_with_fitting_table(
             enabled=_enabled_features_from_variant(case.prompt_variant),
         )
         _write_text(trend_dir / "trend_prompt.txt", trend_prompt)
+        compression_attempts.append(
+            PromptCompressionAttempt(
+                attempt_index=len(compression_attempts) + 1,
+                table_downsample_stride=stride,
+                compression_tier=max(stride - 1, 0),
+                prompt_length=len(trend_prompt),
+            )
+        )
+        compression_prompts.append(trend_prompt)
+        write_prompt_compression_artifacts(
+            output_dir=trend_dir,
+            attempts=compression_attempts,
+            prompts=compression_prompts,
+        )
         try:
             return _invoke_structured_smoke_text(
                 adapter=adapter,
@@ -728,6 +775,7 @@ def _render_report(result: FullCaseMatrixSmokeResult) -> str:
         f"- failed_case_count: `{len(result.failed_case_ids)}`",
         f"- run_log_path: `{result.run_log_path}`",
         f"- viewer_html_path: `{result.viewer_html_path}`",
+        f"- prompt_compression_summary_path: `{result.prompt_compression_summary_path}`",
         "",
         "| case_id | evidence_mode | prompt_variant | repetition | success | reused |",
         "| --- | --- | --- | --- | --- | --- |",
