@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pandas as pd
 
+TOKEN_PATTERN = re.compile(r"[^\W_]+(?:['’][^\W_]+)*", re.UNICODE)
+
 
 def remove_sentences_with_www(text: str) -> str:
     """Drops sentences containing `www.` links that leak into generated outputs."""
@@ -43,11 +45,39 @@ def remove_space_before_dot(text: str) -> str:
     return re.sub(r"\s+\.", ".", text)
 
 
+def remove_repeated_sentences(text: str) -> str:
+    """Collapse adjacent duplicate sentences while preserving non-adjacent repeats."""
+    sentences = _split_sentences(text)
+    if not sentences:
+        return text.strip()
+
+    deduped: list[str] = []
+    previous_normalized: str | None = None
+    for sentence in sentences:
+        normalized = _normalize_sentence_for_comparison(sentence)
+        if normalized and normalized == previous_normalized:
+            continue
+        deduped.append(sentence.strip())
+        previous_normalized = normalized
+    return " ".join(part for part in deduped if part).strip()
+
+
+def remove_repeated_phrases(text: str) -> str:
+    """Collapse obvious contiguous repeated tail loops inside sentences."""
+    sentences = _split_sentences(text)
+    if not sentences:
+        return text.strip()
+    cleaned = [_collapse_tail_loop(sentence) for sentence in sentences]
+    return " ".join(part for part in cleaned if part).strip()
+
+
 def capitalize_sentences(text: str) -> str:
     """Capitalizes sentence and paragraph starts after regex cleanups."""
     if not text:
         return text
-    updated = text[0].upper() + text[1:]
+    updated = text
+    if not _starts_with_label_prefix(text):
+        updated = text[0].upper() + text[1:]
     updated = re.sub(r"([.!?]\s+)([a-z])", _capitalize_match, updated)
     return re.sub(r"(\n\s*)([a-z])", _capitalize_match, updated)
 
@@ -74,6 +104,8 @@ def _remove_non_unicode(text: str) -> str:
 def postprocess_summary(text: str) -> str:
     """Apply cleanup stages in deterministic order."""
     cleaned = remove_sentences_with_www(text)
+    cleaned = remove_repeated_sentences(cleaned)
+    cleaned = remove_repeated_phrases(cleaned)
     cleaned = remove_hyphens_after_punctuation(cleaned)
     cleaned = remove_unnecessary_punctuation(cleaned)
     cleaned = remove_unnecessary_spaces_in_parentheses(cleaned)
@@ -123,3 +155,92 @@ def postprocess_csv_batch(
         clean_non_unicode(interim, output_csv)
 
     return pd.read_csv(output_csv)
+
+
+def _split_sentences(text: str) -> list[str]:
+    normalized = " ".join(text.split())
+    if not normalized:
+        return []
+    return [part.strip() for part in re.split(r"(?<=[.!?])\s+", normalized) if part.strip()]
+
+
+def _normalize_sentence_for_comparison(sentence: str) -> str:
+    return " ".join(sentence.split()).strip().casefold()
+
+
+def _starts_with_label_prefix(text: str) -> bool:
+    return re.match(r"^[A-Za-z0-9_-]+:{1,2}\S", text) is not None
+
+
+def _collapse_tail_loop(sentence: str) -> str:
+    trailing_punctuation = ""
+    if sentence and sentence[-1] in ".!?":
+        trailing_punctuation = sentence[-1]
+        sentence = sentence[:-1]
+
+    token_matches = list(TOKEN_PATTERN.finditer(sentence))
+    tokens = [match.group(0) for match in token_matches]
+    if len(tokens) < 9:
+        return (sentence + trailing_punctuation).strip()
+
+    lowered = [token.casefold() for token in tokens]
+    best_keep_end: int | None = None
+    best_start = len(tokens) + 1
+
+    for start in range(len(tokens)):
+        tail = lowered[start:]
+        if len(tail) < 9:
+            continue
+        for unit_length in range(3, min(12, len(tail)) + 1):
+            unit = tail[:unit_length]
+            if not unit:
+                continue
+            if not _tail_matches_repeating_unit(tail, unit):
+                continue
+            full_repeats, remainder = divmod(len(tail), unit_length)
+            if full_repeats < 3:
+                continue
+            _ = remainder
+            keep_end = start + unit_length
+            keep_end = _trim_trailing_connector_end(lowered, keep_end)
+            if keep_end <= 0:
+                continue
+            if start < best_start or (start == best_start and best_keep_end is not None and keep_end < best_keep_end):
+                best_keep_end = keep_end
+                best_start = start
+
+    if best_keep_end is None:
+        return (sentence + trailing_punctuation).strip()
+    collapsed = sentence[: token_matches[best_keep_end - 1].end()].strip()
+    return f"{collapsed}{trailing_punctuation}".strip()
+
+
+def _tail_matches_repeating_unit(tail: list[str], unit: list[str]) -> bool:
+    if len(tail) < len(unit) * 3:
+        return False
+    for index, token in enumerate(tail):
+        if token != unit[index % len(unit)]:
+            return False
+    return True
+
+
+def _trim_trailing_connector_end(tokens: list[str], keep_end: int) -> int:
+    if keep_end <= 3:
+        return keep_end
+    if tokens[keep_end - 1].casefold() in {
+        "in",
+        "of",
+        "the",
+        "and",
+        "or",
+        "to",
+        "for",
+        "with",
+        "on",
+        "at",
+        "by",
+        "from",
+        "as",
+    }:
+        return keep_end - 1
+    return keep_end

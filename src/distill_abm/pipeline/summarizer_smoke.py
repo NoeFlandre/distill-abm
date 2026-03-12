@@ -22,6 +22,7 @@ from distill_abm.summarize.models import (
     summarize_with_longformer_ext,
     summarize_with_t5,
 )
+from distill_abm.summarize.postprocess import postprocess_summary
 from distill_abm.utils import detect_placeholder_signals
 
 SummarizerSmokeMode = Literal["none", "bart", "bert", "t5", "longformer_ext"]
@@ -44,6 +45,8 @@ class SummarizerModeResult(BaseModel):
     mode: SummarizerSmokeMode
     success: bool
     output_path: Path
+    raw_output_path: Path | None = None
+    postprocess_changed: bool = False
     error: str | None = None
     duration_seconds: float
     input_length: int
@@ -228,7 +231,8 @@ def _process_bundle(
     trend_dir = input_dir / "trend_outputs"
     summary_dir = bundle_dir / "02_summaries"
     metadata_dir = bundle_dir / "03_metadata"
-    for directory in (input_dir, trend_dir, summary_dir, metadata_dir):
+    raw_summary_dir = metadata_dir / "raw_summaries"
+    for directory in (input_dir, trend_dir, summary_dir, metadata_dir, raw_summary_dir):
         directory.mkdir(parents=True, exist_ok=True)
     log_event(logger, "summarizer_bundle_start", bundle_id=bundle.bundle_id, case_id=bundle.case_id, abm=bundle.abm)
 
@@ -268,9 +272,11 @@ def _process_bundle(
     if source_validation_error is None:
         for mode in ("none", "bart", "bert", "t5", "longformer_ext"):
             output_path = summary_dir / f"{mode}.txt"
+            raw_output_path = None if mode == "none" else raw_summary_dir / f"{mode}.txt"
             existing_result = _load_resumable_mode_result(
                 mode=mode,
                 output_path=output_path,
+                raw_output_path=raw_output_path,
                 input_length=len(combined_input),
                 resume=resume,
             )
@@ -280,13 +286,18 @@ def _process_bundle(
             else:
                 started = time.perf_counter()
                 try:
-                    summary_text = combined_input if mode == "none" else resolved_summarizers[mode](combined_input)
+                    raw_summary_text = combined_input if mode == "none" else resolved_summarizers[mode](combined_input)
+                    summary_text = raw_summary_text if mode == "none" else postprocess_summary(raw_summary_text).strip()
                     duration = time.perf_counter() - started
                     output_path.write_text(summary_text, encoding="utf-8")
+                    if raw_output_path is not None:
+                        raw_output_path.write_text(raw_summary_text, encoding="utf-8")
                     mode_result = SummarizerModeResult(
                         mode=mode,
                         success=bool(summary_text.strip()),
                         output_path=output_path,
+                        raw_output_path=raw_output_path,
+                        postprocess_changed=raw_summary_text.strip() != summary_text.strip(),
                         duration_seconds=duration,
                         input_length=len(combined_input),
                         output_length=len(summary_text),
@@ -306,6 +317,7 @@ def _process_bundle(
                         mode=mode,
                         success=False,
                         output_path=output_path,
+                        raw_output_path=raw_output_path,
                         duration_seconds=duration,
                         input_length=len(combined_input),
                         output_length=0,
@@ -477,6 +489,7 @@ def _load_resumable_mode_result(
     *,
     mode: SummarizerSmokeMode,
     output_path: Path,
+    raw_output_path: Path | None,
     input_length: int,
     resume: bool,
 ) -> SummarizerModeResult | None:
@@ -486,10 +499,17 @@ def _load_resumable_mode_result(
         summary_text = _validate_source_text(output_path)
     except Exception:
         return None
+    existing_raw_output_path = raw_output_path if raw_output_path is not None and raw_output_path.exists() else None
+    postprocess_changed = False
+    if existing_raw_output_path is not None:
+        raw_summary_text = existing_raw_output_path.read_text(encoding="utf-8").strip()
+        postprocess_changed = raw_summary_text != summary_text.strip()
     return SummarizerModeResult(
         mode=mode,
         success=True,
         output_path=output_path,
+        raw_output_path=existing_raw_output_path,
+        postprocess_changed=postprocess_changed,
         duration_seconds=0.0,
         input_length=input_length,
         output_length=len(summary_text),
