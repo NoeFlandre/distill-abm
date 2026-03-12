@@ -108,6 +108,7 @@ Run `--help` on any CLI tool before using it. Read what it does and how to compo
 
 - Reviewer time is precious. Don't waste it on validation you should have done.
 - PR descriptions must be **truthful**: goal, scope, how tested, tradeoffs, links to demos/issues.
+- Use **one branch + one worktree per PR/task** so isolated work stays reviewable and cleanup is straightforward.
 - Split work aggressively into smaller commits and PRs.
 
 ---
