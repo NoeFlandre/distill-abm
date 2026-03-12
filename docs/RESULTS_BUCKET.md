@@ -62,8 +62,3 @@ Download the mirrored tree back locally:
 ```bash
 hf sync hf://buckets/NoeFlandre/distill-abms-results ./results
 ```
-
-## Notes
-
-- The bucket README is generated from this document so the bucket root explains the layout and links back to GitHub.
-- Keep the bucket layout aligned with local `results/`; do not introduce alternate top-level folders in one place only.
