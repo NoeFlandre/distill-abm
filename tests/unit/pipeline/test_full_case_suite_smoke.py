@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import csv
+import json
 from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
@@ -168,6 +170,119 @@ def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkey
     suite_summary = result.prompt_compression_summary_path.read_text(encoding="utf-8")
     assert '"triggered_entries": 2' in suite_summary
     assert '"total_compressions": 2' in suite_summary
+
+
+def test_run_full_case_suite_smoke_aggregates_run_observability_artifacts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("MISTRAL_API_KEY", "debug-token")
+
+    def fake_run_full_case_matrix_smoke(**kwargs):  # type: ignore[no-untyped-def]
+        output_root = kwargs["output_root"]
+        run_root = output_root / "runs" / "run_1"
+        run_root.mkdir(parents=True, exist_ok=True)
+        (output_root / "latest_run.txt").write_text(str(run_root), encoding="utf-8")
+        observability_csv = run_root / "run_observability.csv"
+        observability_csv.write_text(
+            (
+                "run_root,request_kind,case_id,abm,provider,model,temperature,runtime_provider,"
+                "runtime_precision,table_downsample_stride,compression_tier,prompt_compression_applied\n"
+                f"{run_root},trend,01_{kwargs['case_input'].abm},"
+                f"{kwargs['case_input'].abm},openrouter,qwen/qwen3.5-27b,1.0,Fireworks,fp8,2,1,true\n"
+            ),
+            encoding="utf-8",
+        )
+        summary_json = run_root / "run_observability_summary.json"
+        summary_json.write_text(
+            json.dumps(
+                {
+                    "request_count": 1,
+                    "runtime_providers": ["Fireworks"],
+                    "runtime_precisions": ["fp8"],
+                    "compression": {"request_count_with_compression": 1},
+                }
+            ),
+            encoding="utf-8",
+        )
+        (run_root / "run_observability_summary.md").write_text("# summary\n", encoding="utf-8")
+        return SimpleNamespace(
+            success=True,
+            report_json_path=run_root / "report.json",
+            report_markdown_path=run_root / "report.md",
+            review_csv_path=run_root / "review.csv",
+            viewer_html_path=run_root / "review.html",
+            failed_case_ids=[],
+            observability_csv_path=observability_csv,
+            observability_summary_json_path=summary_json,
+            observability_summary_markdown_path=run_root / "run_observability_summary.md",
+        )
+
+    monkeypatch.setattr(
+        "distill_abm.pipeline.full_case_suite_smoke.run_full_case_matrix_smoke",
+        fake_run_full_case_matrix_smoke,
+    )
+
+    suite_input = {
+        "fauna": FullCaseSmokeInput(
+            abm="fauna",
+            csv_path=tmp_path / "fauna.csv",
+            parameters_path=tmp_path / "fauna_params.txt",
+            documentation_path=tmp_path / "fauna_docs.txt",
+            plots=(),
+        ),
+        "grazing": FullCaseSmokeInput(
+            abm="grazing",
+            csv_path=tmp_path / "grazing.csv",
+            parameters_path=tmp_path / "grazing_params.txt",
+            documentation_path=tmp_path / "grazing_docs.txt",
+            plots=(),
+        ),
+    }
+    for path in [
+        suite_input["fauna"].csv_path,
+        suite_input["fauna"].parameters_path,
+        suite_input["fauna"].documentation_path,
+        suite_input["grazing"].csv_path,
+        suite_input["grazing"].parameters_path,
+        suite_input["grazing"].documentation_path,
+    ]:
+        path.write_text("x", encoding="utf-8")
+
+    cases_by_abm = cast(
+        dict[str, tuple[FullCaseMatrixCaseSpec, ...]],
+        {
+            abm: (
+                FullCaseMatrixCaseSpec(
+                    case_id=f"01_{abm}_none_plot_rep1",
+                    abm=abm,
+                    evidence_mode="plot",
+                    prompt_variant="none",
+                    repetition=1,
+                ),
+            )
+            for abm in suite_input
+        },
+    )
+
+    result = run_full_case_suite_smoke(
+        abm_inputs=suite_input,
+        cases_by_abm=cases_by_abm,
+        adapter=_Adapter(),
+        model="mistral-medium-latest",
+        output_root=tmp_path / "suite",
+    )
+
+    assert result.observability_csv_path is not None
+    assert result.observability_summary_json_path is not None
+    rows = list(csv.DictReader(result.observability_csv_path.open(encoding="utf-8")))
+    assert len(rows) == 2
+    assert {row["abm"] for row in rows} == {"fauna", "grazing"}
+    assert {row["runtime_provider"] for row in rows} == {"Fireworks"}
+    assert {row["compression_tier"] for row in rows} == {"1"}
+    summary = json.loads(result.observability_summary_json_path.read_text(encoding="utf-8"))
+    assert summary["request_count"] == 2
+    assert summary["runtime_providers"] == ["Fireworks"]
+    assert summary["compression"]["request_count_with_compression"] == 2
 
 
 def test_run_full_case_suite_smoke_marks_abm_failure_without_crashing(

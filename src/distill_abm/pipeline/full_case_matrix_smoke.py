@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import shutil
 import threading
@@ -19,6 +20,10 @@ from distill_abm.llm.resilience import CIRCUIT_BREAKER_OPEN_SECONDS, is_transien
 from distill_abm.pipeline.doe_smoke_prompts import build_legacy_doe_context_prompt, build_legacy_doe_trend_prompt
 from distill_abm.pipeline.full_case_matrix_run_review import build_run_review_rows, write_run_review_csv
 from distill_abm.pipeline.full_case_review_csv import write_case_review_csv
+from distill_abm.pipeline.full_case_run_observability import (
+    build_run_observability_rows,
+    write_run_observability_artifacts,
+)
 from distill_abm.pipeline.full_case_smoke import (
     EvidenceMode,
     FullCasePlotInput,
@@ -43,7 +48,6 @@ from distill_abm.pipeline.local_qwen_sample_response import (
 from distill_abm.pipeline.local_qwen_sample_smoke import (
     _context_cache_key,
     _invoke_structured_smoke_text,
-    _materialize_context_artifacts,
     _write_json,
     _write_optional_thinking,
     _write_text,
@@ -105,6 +109,9 @@ class FullCaseMatrixSmokeResult(BaseModel):
     run_log_path: Path
     viewer_html_path: Path
     prompt_compression_summary_path: Path
+    observability_csv_path: Path | None = None
+    observability_summary_json_path: Path | None = None
+    observability_summary_markdown_path: Path | None = None
     success: bool
     failed_case_ids: list[str] = Field(default_factory=list)
     cases: list[FullCaseMatrixCaseResult] = Field(default_factory=list)
@@ -114,6 +121,11 @@ class _CachedContext(BaseModel):
     text: str
     trace: dict[str, object]
 
+
+CONTEXT_SOURCE_FRESH_REQUEST = "fresh_request"
+CONTEXT_SOURCE_SHARED_CACHE = "shared_context_cache"
+CONTEXT_SOURCE_RESUMED_PREVIOUS_RUN = "resumed_previous_run"
+CONTEXT_MATERIALIZATION_SOURCE_KEY = "context_materialization_source"
 
 DEFAULT_MAX_CASE_ATTEMPTS = 3
 DEFAULT_MATRIX_PASS_WAIT_SECONDS = CIRCUIT_BREAKER_OPEN_SECONDS
@@ -165,6 +177,150 @@ def build_full_case_matrix_case_specs(
     return tuple(specs)
 
 
+def _context_trace_with_materialization_source(
+    *,
+    context_trace: dict[str, object],
+    materialization_source: str,
+) -> dict[str, object]:
+    annotated_trace = copy.deepcopy(context_trace)
+    request_block = annotated_trace.get("request")
+    request_payload = copy.deepcopy(request_block) if isinstance(request_block, dict) else {}
+    metadata_block = request_payload.get("metadata")
+    metadata_payload = copy.deepcopy(metadata_block) if isinstance(metadata_block, dict) else {}
+    metadata_payload[CONTEXT_MATERIALIZATION_SOURCE_KEY] = materialization_source
+    request_payload["metadata"] = metadata_payload
+    annotated_trace["request"] = request_payload
+    return annotated_trace
+
+
+def _write_context_artifacts(
+    *,
+    context_dir: Path,
+    context_text: str,
+    context_trace: dict[str, object],
+    materialization_source: str,
+) -> dict[str, object]:
+    annotated_trace = _context_trace_with_materialization_source(
+        context_trace=context_trace,
+        materialization_source=materialization_source,
+    )
+    _write_json(context_dir / "context_request.json", annotated_trace["request"])
+    _write_text(context_dir / "context_output.txt", context_text)
+    _write_json(context_dir / "context_trace.json", annotated_trace)
+    _write_optional_thinking(context_dir / "context_thinking.txt", annotated_trace)
+    return annotated_trace
+
+
+def _write_failed_context_artifacts(
+    *,
+    context_dir: Path,
+    error: StructuredSmokeResponseError,
+    materialization_source: str,
+) -> None:
+    annotated_trace = _context_trace_with_materialization_source(
+        context_trace=error.trace,
+        materialization_source=materialization_source,
+    )
+    _write_json(context_dir / "context_request.json", annotated_trace["request"])
+    _write_json(context_dir / "context_trace.json", annotated_trace)
+    _write_optional_thinking(context_dir / "context_thinking.txt", annotated_trace)
+    _write_text(context_dir / "error.txt", str(error))
+
+
+def _structured_smoke_error_with_context_source(
+    error: StructuredSmokeResponseError,
+    *,
+    materialization_source: str,
+) -> StructuredSmokeResponseError:
+    annotated_trace = _context_trace_with_materialization_source(
+        context_trace=dict(error.trace),
+        materialization_source=materialization_source,
+    )
+    return StructuredSmokeResponseError(str(error), trace=annotated_trace, prompt=error.prompt)
+
+
+def _context_materialization_source_from_trace(trace: dict[str, object]) -> str:
+    request_block = trace.get("request")
+    if not isinstance(request_block, dict):
+        return CONTEXT_SOURCE_FRESH_REQUEST
+    metadata_block = request_block.get("metadata")
+    if not isinstance(metadata_block, dict):
+        return CONTEXT_SOURCE_FRESH_REQUEST
+    source = metadata_block.get(CONTEXT_MATERIALIZATION_SOURCE_KEY)
+    return str(source) if isinstance(source, str) and source else CONTEXT_SOURCE_FRESH_REQUEST
+
+
+def _register_resumed_context_in_cache(
+    *,
+    context_cache: dict[str, _CachedContext],
+    context_futures: dict[str, Future[_CachedContext]],
+    context_lock: threading.Lock,
+    context_key: str,
+    context_text: str,
+    context_trace: dict[str, object],
+) -> _CachedContext:
+    resumed_context = _CachedContext(text=context_text, trace=context_trace)
+    with context_lock:
+        if context_key in context_cache:
+            return context_cache[context_key]
+        context_cache[context_key] = resumed_context
+        in_flight_future = context_futures.get(context_key)
+        if in_flight_future is not None and not in_flight_future.done():
+            in_flight_future.set_result(resumed_context)
+            context_futures.pop(context_key, None)
+        elif in_flight_future is not None and in_flight_future.done():
+            context_futures.pop(context_key, None)
+        return resumed_context
+
+
+def _register_previous_run_context_in_cache(
+    *,
+    case_input: FullCaseSmokeInput,
+    case_prompt_variant: str,
+    model: str,
+    previous_case_dir: Path | None,
+    context_cache: dict[str, _CachedContext],
+    context_futures: dict[str, Future[_CachedContext]],
+    context_lock: threading.Lock,
+) -> None:
+    if previous_case_dir is None:
+        return
+    context_dir = previous_case_dir / "02_context"
+    validation_state_file = validation_state_path(previous_case_dir)
+    context_output_path = context_dir / "context_output.txt"
+    context_trace_path = context_dir / "context_trace.json"
+    if (
+        not previous_case_dir.exists()
+        or not context_dir.exists()
+        or not context_output_path.exists()
+        or not context_trace_path.exists()
+    ):
+        return
+    validation_state = _load_validation_state(validation_state_file)
+    if not _is_context_accepted(context_dir=context_dir, validation_state=validation_state):
+        return
+    try:
+        context_text = context_output_path.read_text(encoding="utf-8")
+        context_trace = json.loads(context_trace_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return
+    context_prompt = build_legacy_doe_context_prompt(
+        abm=case_input.abm,
+        inputs_csv_path=case_input.parameters_path,
+        inputs_doc_path=case_input.documentation_path,
+        enabled=_enabled_features_from_variant(case_prompt_variant),
+    )
+    context_key = _context_cache_key(prompt=context_prompt, model=model)
+    _register_resumed_context_in_cache(
+        context_cache=context_cache,
+        context_futures=context_futures,
+        context_lock=context_lock,
+        context_key=context_key,
+        context_text=context_text,
+        context_trace=context_trace,
+    )
+
+
 def run_full_case_matrix_smoke(
     *,
     case_input: FullCaseSmokeInput,
@@ -198,15 +354,33 @@ def run_full_case_matrix_smoke(
     for _attempt in range(1, max(max_case_attempts, 1) + 1):
         next_remaining: list[FullCaseMatrixCaseSpec] = []
         max_case_workers = min(resolve_parallel_case_workers(adapter.provider), len(remaining_cases))
+        case_dirs: dict[str, tuple[Path, Path | None]] = {}
+        for case in remaining_cases:
+            case_dir = run_root / "cases" / case.case_id
+            previous_case_dir = previous_run_root / "cases" / case.case_id if previous_run_root else None
+            if resume_existing and previous_case_dir and previous_case_dir.exists() and not case_dir.exists():
+                shutil.copytree(previous_case_dir, case_dir)
+            else:
+                case_dir.mkdir(parents=True, exist_ok=True)
+            case_dirs[case.case_id] = (case_dir, previous_case_dir)
+
+        if resume_existing and previous_run_root is not None:
+            for case in remaining_cases:
+                case_dir, previous_case_dir = case_dirs[case.case_id]
+                _register_previous_run_context_in_cache(
+                    case_input=case_input,
+                    case_prompt_variant=case.prompt_variant,
+                    model=model,
+                    previous_case_dir=previous_case_dir,
+                    context_cache=context_cache,
+                    context_futures=context_futures,
+                    context_lock=context_lock,
+                )
+
         with ThreadPoolExecutor(max_workers=max_case_workers) as executor:
             future_to_case: dict[Future[FullCaseMatrixCaseResult], FullCaseMatrixCaseSpec] = {}
             for case in remaining_cases:
-                case_dir = run_root / "cases" / case.case_id
-                previous_case_dir = previous_run_root / "cases" / case.case_id if previous_run_root else None
-                if resume_existing and previous_case_dir and previous_case_dir.exists() and not case_dir.exists():
-                    shutil.copytree(previous_case_dir, case_dir)
-                else:
-                    case_dir.mkdir(parents=True, exist_ok=True)
+                case_dir, previous_case_dir = case_dirs[case.case_id]
                 future = executor.submit(
                     _run_full_case_matrix_case,
                     case_input=case_input,
@@ -267,6 +441,9 @@ def run_full_case_matrix_smoke(
         run_root=run_root,
         entries=prompt_compression_entries,
     )
+    observability_csv_path, observability_summary_json_path, observability_summary_markdown_path = (
+        write_run_observability_artifacts(run_root=run_root, rows=build_run_observability_rows(case_results))
+    )
     finished_at = datetime.now(UTC)
     smoke_result = FullCaseMatrixSmokeResult(
         started_at_utc=started_at.isoformat(),
@@ -279,6 +456,9 @@ def run_full_case_matrix_smoke(
         run_log_path=run_log_path,
         viewer_html_path=viewer_html_path(run_root),
         prompt_compression_summary_path=prompt_compression_summary_path,
+        observability_csv_path=observability_csv_path,
+        observability_summary_json_path=observability_summary_json_path,
+        observability_summary_markdown_path=observability_summary_markdown_path,
         success=not failed_case_ids,
         failed_case_ids=failed_case_ids,
         cases=case_results,
@@ -331,28 +511,39 @@ def _run_full_case_matrix_case(
     )
     review_rows: list[dict[str, str]] = []
     context_text = ""
+    context_key = _context_cache_key(prompt=context_prompt, model=model)
     cached_context = context_cache.get(_context_cache_key(prompt=context_prompt, model=model))
     if resume_existing and _is_context_accepted(context_dir=context_dir, validation_state=validation_state):
         context_text = (context_dir / "context_output.txt").read_text(encoding="utf-8")
-        if cached_context is None:
-            context_cache[_context_cache_key(prompt=context_prompt, model=model)] = _CachedContext(
-                text=context_text,
-                trace=json.loads((context_dir / "context_trace.json").read_text(encoding="utf-8")),
-            )
+        context_trace = json.loads((context_dir / "context_trace.json").read_text(encoding="utf-8"))
+        context_trace = _write_context_artifacts(
+            context_dir=context_dir,
+            context_text=context_text,
+            context_trace=context_trace,
+            materialization_source=CONTEXT_SOURCE_RESUMED_PREVIOUS_RUN,
+        )
+        cached_context = _register_resumed_context_in_cache(
+            context_cache=context_cache,
+            context_futures=context_futures,
+            context_lock=context_lock,
+            context_key=context_key,
+            context_text=context_text,
+            context_trace=context_trace,
+        )
         _record_context_review_row(review_rows=review_rows, context_dir=context_dir, validation_status="accepted")
     elif cached_context is not None:
-        _materialize_context_artifacts(
-            requests_dir=context_dir,
-            outputs_dir=context_dir,
+        _write_context_artifacts(
+            context_dir=context_dir,
             context_text=cached_context.text,
             context_trace=cached_context.trace,
+            materialization_source=CONTEXT_SOURCE_SHARED_CACHE,
         )
         validation_state.context = {"status": "accepted", "error": None}
         _record_context_review_row(review_rows=review_rows, context_dir=context_dir, validation_status="accepted")
         context_text = cached_context.text
     else:
         try:
-            cached_context = _resolve_shared_matrix_context(
+            cached_context, context_materialization_source = _resolve_shared_matrix_context(
                 adapter=adapter,
                 model=model,
                 prompt=context_prompt,
@@ -365,10 +556,11 @@ def _run_full_case_matrix_case(
                 context_lock=context_lock,
             )
         except StructuredSmokeResponseError as exc:
-            _write_json(context_dir / "context_request.json", exc.trace["request"])
-            _write_json(context_dir / "context_trace.json", exc.trace)
-            _write_optional_thinking(context_dir / "context_thinking.txt", exc.trace)
-            _write_text(context_dir / "error.txt", str(exc))
+            _write_failed_context_artifacts(
+                context_dir=context_dir,
+                error=exc,
+                materialization_source=_context_materialization_source_from_trace(exc.trace),
+            )
             validation_state.context = {"status": "retry", "error": str(exc)}
             _write_json(validation_state_file, validation_state.model_dump(mode="json"))
             _finalize_case(
@@ -391,11 +583,11 @@ def _run_full_case_matrix_case(
             )
         context_text = cached_context.text
         context_trace = cached_context.trace
-        _materialize_context_artifacts(
-            requests_dir=context_dir,
-            outputs_dir=context_dir,
+        _write_context_artifacts(
+            context_dir=context_dir,
             context_text=context_text,
             context_trace=context_trace,
+            materialization_source=context_materialization_source,
         )
         validation_state.context = {"status": "accepted", "error": None}
         if (context_dir / "error.txt").exists():
@@ -540,12 +732,12 @@ def _resolve_shared_matrix_context(
     context_cache: dict[str, _CachedContext],
     context_futures: dict[str, Future[_CachedContext]],
     context_lock: threading.Lock,
-) -> _CachedContext:
+) -> tuple[_CachedContext, str]:
     context_key = _context_cache_key(prompt=prompt, model=model)
     with context_lock:
         cached_context = context_cache.get(context_key)
         if cached_context is not None:
-            return cached_context
+            return cached_context, CONTEXT_SOURCE_SHARED_CACHE
         in_flight_future = context_futures.get(context_key)
         if in_flight_future is None:
             in_flight_future = Future()
@@ -566,6 +758,16 @@ def _resolve_shared_matrix_context(
                 retry_backoff_seconds=retry_backoff_seconds,
             )
             cached_context = _CachedContext(text=context_text, trace=context_trace)
+        except StructuredSmokeResponseError as exc:
+            annotated_error = _structured_smoke_error_with_context_source(
+                exc,
+                materialization_source=CONTEXT_SOURCE_FRESH_REQUEST,
+            )
+            with context_lock:
+                inflight = context_futures.pop(context_key, None)
+                if inflight is not None and not inflight.done():
+                    inflight.set_exception(annotated_error)
+            raise annotated_error from exc
         except Exception as exc:
             with context_lock:
                 inflight = context_futures.pop(context_key, None)
@@ -577,9 +779,15 @@ def _resolve_shared_matrix_context(
             inflight = context_futures.pop(context_key, None)
             if inflight is not None and not inflight.done():
                 inflight.set_result(cached_context)
-        return cached_context
+        return cached_context, CONTEXT_SOURCE_FRESH_REQUEST
 
-    return in_flight_future.result()
+    try:
+        return in_flight_future.result(), CONTEXT_SOURCE_SHARED_CACHE
+    except StructuredSmokeResponseError as exc:
+        raise _structured_smoke_error_with_context_source(
+            exc,
+            materialization_source=CONTEXT_SOURCE_SHARED_CACHE,
+        ) from exc
 
 
 def _execute_matrix_trend(
@@ -776,6 +984,9 @@ def _render_report(result: FullCaseMatrixSmokeResult) -> str:
         f"- run_log_path: `{result.run_log_path}`",
         f"- viewer_html_path: `{result.viewer_html_path}`",
         f"- prompt_compression_summary_path: `{result.prompt_compression_summary_path}`",
+        f"- observability_csv_path: `{result.observability_csv_path}`",
+        f"- observability_summary_json_path: `{result.observability_summary_json_path}`",
+        f"- observability_summary_markdown_path: `{result.observability_summary_markdown_path}`",
         "",
         "| case_id | evidence_mode | prompt_variant | repetition | success | reused |",
         "| --- | --- | --- | --- | --- | --- |",
