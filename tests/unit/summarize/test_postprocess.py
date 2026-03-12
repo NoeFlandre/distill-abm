@@ -57,6 +57,12 @@ def test_remove_repeated_phrases_collapses_obvious_tail_loops() -> None:
     )
 
 
+def test_remove_repeated_phrases_keeps_one_full_loop_unit_when_tail_is_partial() -> None:
+    text = "Signal rises. A B C A B C A B C A B."
+
+    assert remove_repeated_phrases(text) == "Signal rises. A B C."
+
+
 def test_postprocess_summary_preserves_non_loop_repetition_that_may_be_meaningful() -> None:
     text = "Very very high demand can still matter. Very high demand may persist."
 

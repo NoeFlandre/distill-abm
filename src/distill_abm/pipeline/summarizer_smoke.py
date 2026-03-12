@@ -499,12 +499,17 @@ def _load_resumable_mode_result(
         summary_text = _validate_source_text(output_path)
     except Exception:
         return None
+    existing_raw_output_path = raw_output_path if raw_output_path is not None and raw_output_path.exists() else None
+    postprocess_changed = False
+    if existing_raw_output_path is not None:
+        raw_summary_text = existing_raw_output_path.read_text(encoding="utf-8").strip()
+        postprocess_changed = raw_summary_text != summary_text.strip()
     return SummarizerModeResult(
         mode=mode,
         success=True,
         output_path=output_path,
-        raw_output_path=raw_output_path if raw_output_path is not None and raw_output_path.exists() else None,
-        postprocess_changed=raw_output_path is not None and raw_output_path.exists(),
+        raw_output_path=existing_raw_output_path,
+        postprocess_changed=postprocess_changed,
         duration_seconds=0.0,
         input_length=input_length,
         output_length=len(summary_text),

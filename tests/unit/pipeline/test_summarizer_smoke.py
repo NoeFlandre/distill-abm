@@ -171,10 +171,10 @@ def test_run_summarizer_smoke_reuses_successful_outputs_when_resuming(tmp_path: 
         output_root=output_root,
         validated_bundles=(bundle,),
         summarizer_fns={
-            "bart": lambda text: f"bart::{text}",
-            "bert": lambda text: f"bert::{text}",
-            "t5": lambda text: f"t5::{text}",
-            "longformer_ext": lambda text: f"longformer::{text}",
+            "bart": lambda _text: "bart::clean summary",
+            "bert": lambda _text: "bert::clean summary",
+            "t5": lambda _text: "t5::clean summary",
+            "longformer_ext": lambda _text: "longformer::clean summary",
         },
     )
 
@@ -200,6 +200,41 @@ def test_run_summarizer_smoke_reuses_successful_outputs_when_resuming(tmp_path: 
     assert resumed.run_root != first.run_root
     assert all(mode.success for mode in resumed.bundles[0].modes)
     assert {mode.duration_seconds for mode in resumed.bundles[0].modes} == {0.0}
+
+
+def test_run_summarizer_smoke_resume_preserves_false_postprocess_changed_for_unchanged_outputs(tmp_path: Path) -> None:
+    output_root = tmp_path / "smoke"
+    bundle = _bundle(tmp_path)
+
+    first = run_summarizer_smoke(
+        source_root=tmp_path,
+        output_root=output_root,
+        validated_bundles=(bundle,),
+        summarizer_fns={
+            "bart": lambda _text: "bart::clean summary",
+            "bert": lambda _text: "bert::clean summary",
+            "t5": lambda _text: "t5::clean summary",
+            "longformer_ext": lambda _text: "longformer::clean summary",
+        },
+    )
+    assert first.success is True
+
+    resumed = run_summarizer_smoke(
+        source_root=tmp_path,
+        output_root=output_root,
+        resume=True,
+        validated_bundles=(bundle,),
+        summarizer_fns={
+            "bart": lambda _text: (_ for _ in ()).throw(AssertionError("should not rerun")),
+            "bert": lambda _text: (_ for _ in ()).throw(AssertionError("should not rerun")),
+            "t5": lambda _text: (_ for _ in ()).throw(AssertionError("should not rerun")),
+            "longformer_ext": lambda _text: (_ for _ in ()).throw(AssertionError("should not rerun")),
+        },
+    )
+
+    bart_mode = next(mode for mode in resumed.bundles[0].modes if mode.mode == "bart")
+    assert bart_mode.raw_output_path is not None
+    assert bart_mode.postprocess_changed is False
 
 
 def test_default_validated_smoke_bundles_discovers_completed_suite_abms(tmp_path: Path) -> None:
