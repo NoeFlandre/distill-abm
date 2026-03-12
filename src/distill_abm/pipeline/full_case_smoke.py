@@ -508,6 +508,7 @@ def _finalize_full_case_result(
     review_rows: list[dict[str, str]],
     validation_state: FullCaseValidationState,
 ) -> None:
+    plot_inputs_by_index = {plot_input.plot_index: plot_input for plot_input in case_input.plots}
     prompt_compression_entries = [
         entry
         for entry in (
@@ -518,10 +519,11 @@ def _finalize_full_case_result(
                 abm=case_input.abm,
                 evidence_mode=evidence_mode,
                 prompt_variant=prompt_variant,
-                artifacts_dir=result.case_dir / "03_trends" / f"plot_{plot_input.plot_index:02d}",
-                plot_index=plot_input.plot_index,
+                artifacts_dir=trend_result.trend_dir,
+                plot_index=trend_result.plot_index,
             )
-            for plot_input in case_input.plots
+            for trend_result in result.trend_results
+            if trend_result.plot_index in plot_inputs_by_index
         )
         if entry is not None
     ]
