@@ -309,6 +309,7 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
     selected_scores = dict_block(scores_block.get("selected_scores"))
     full_scores = dict_block(scores_block.get("full_scores"))
     summary_scores = dict_block(scores_block.get("summary_scores"))
+    runtime_block = dict_block(llm_block.get("runtime"))
 
     base = {
         "run_output_dir": str(smoke_inputs.output_dir),
@@ -317,6 +318,9 @@ def _build_case_response_rows(case_result: SmokeCaseResult, smoke_inputs: SmokeS
         "resumed_from_existing": str(case_result.resumed_from_existing),
         "provider": str(llm_block.get("provider", "")),
         "model": str(llm_block.get("model", "")),
+        "precision": stringify(llm_block.get("precision")),
+        "runtime_providers_used": stringify(runtime_block.get("providers_used")),
+        "runtime_precisions_used": stringify(runtime_block.get("precisions_used")),
         "temperature": stringify(request_block.get("temperature")),
         "max_tokens": stringify(request_block.get("max_tokens")),
         "max_retries": stringify(request_block.get("max_retries")),
