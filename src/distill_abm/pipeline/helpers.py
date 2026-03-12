@@ -27,6 +27,7 @@ from distill_abm.summarize.models import (
     summarize_with_longformer_ext,
     summarize_with_t5,
 )
+from distill_abm.summarize.postprocess import postprocess_summary
 from distill_abm.summarize.text import clean_markdown_symbols, strip_think_prefix
 from distill_abm.viz.plots import generate_stats_table
 
@@ -403,6 +404,26 @@ def summarize_report_text_pair_for_ids(
     )
 
 
+def summarize_report_text_pair_with_details_for_ids(
+    text: str,
+    skip_summarization: bool,
+    summarizer_ids: tuple[SummarizerId, ...],
+    allow_fallback: bool = True,
+) -> tuple[str, str | None, list[dict[str, object]]]:
+    """Return raw trend text, optional summary, and per-summarizer cleanup details."""
+    if skip_summarization:
+        return text, None, []
+
+    details = _collect_summary_details(text=text, summarizer_specs=_summarizer_specs_from_ids(summarizer_ids))
+    summary = _combine_summary_details(details)
+    if summary:
+        return text, summary, details
+
+    if allow_fallback:
+        return text, None, details
+    raise RuntimeError("No configured summarizer produced a valid summary for this text mode")
+
+
 def _summarizer_specs_from_ids(
     summarizer_ids: tuple[SummarizerId, ...],
 ) -> tuple[tuple[str, Callable[[str], str]], ...]:
@@ -417,15 +438,41 @@ def _summarizer_specs_from_ids(
 
 def _collect_summary(text: str, summarizer_specs: Sequence[tuple[str, Callable[[str], str]]]) -> str:
     """Run all configured summarizers and combine non-empty summaries in order."""
-    summary_parts: list[str] = []
-    for _name, runner in summarizer_specs:
+    return _combine_summary_details(_collect_summary_details(text=text, summarizer_specs=summarizer_specs))
+
+
+def _collect_summary_details(
+    text: str,
+    summarizer_specs: Sequence[tuple[str, Callable[[str], str]]],
+) -> list[dict[str, object]]:
+    """Run summarizers and keep raw-vs-cleaned outputs for auditability."""
+    details: list[dict[str, object]] = []
+    for name, runner in summarizer_specs:
         try:
-            value = runner(text).strip()
+            raw_text = runner(text).strip()
         except Exception:
             # Keep direct output as a robust fallback when summarization backends are unavailable.
             continue
-        if value:
-            summary_parts.append(value)
+        if not raw_text:
+            continue
+        cleaned_text = postprocess_summary(raw_text).strip()
+        details.append(
+            {
+                "summarizer": name,
+                "raw_text": raw_text,
+                "cleaned_text": cleaned_text,
+                "postprocess_changed": cleaned_text != raw_text,
+            }
+        )
+    return details
+
+
+def _combine_summary_details(details: Sequence[dict[str, object]]) -> str:
+    summary_parts = [
+        str(detail["cleaned_text"]).strip()
+        for detail in details
+        if isinstance(detail.get("cleaned_text"), str) and str(detail["cleaned_text"]).strip()
+    ]
     return "\n".join(summary_parts).strip()
 
 
