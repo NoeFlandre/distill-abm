@@ -184,8 +184,15 @@ def test_build_case_response_rows_serializes_complete_metadata_path(tmp_path: Pa
             "documentation_path": "docs.txt",
         },
         "llm": {
-            "provider": "fake",
-            "model": "fake-model",
+            "provider": "openrouter",
+            "model": "qwen/qwen3.5-27b",
+            "precision": "fp8",
+            "runtime": {
+                "context": {"provider": "DeepInfra", "precision": "fp8"},
+                "trend": {"provider": "Fireworks", "precision": "fp8"},
+                "providers_used": ["DeepInfra", "Fireworks"],
+                "precisions_used": ["fp8"],
+            },
             "request": {
                 "temperature": 0.5,
                 "max_tokens": 1000,
@@ -275,6 +282,9 @@ def test_build_case_response_rows_serializes_complete_metadata_path(tmp_path: Pa
     assert len(rows) == 2
     assert rows[0]["text_source_mode"] == "summary_only"
     assert rows[0]["summarizers"] == '["t5"]'
+    assert rows[0]["precision"] == "fp8"
+    assert rows[0]["runtime_providers_used"] == '["DeepInfra", "Fireworks"]'
+    assert rows[0]["runtime_precisions_used"] == '["fp8"]'
 
 
 def test_build_case_response_rows_returns_fallback_row_for_invalid_metadata(tmp_path: Path) -> None:
