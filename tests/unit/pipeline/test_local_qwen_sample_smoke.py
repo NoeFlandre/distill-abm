@@ -266,6 +266,13 @@ def test_run_local_qwen_sample_smoke_writes_review_friendly_case_artifacts(tmp_p
             "prompt_length": len(trend_prompt_text),
         }
     ]
+    run_summary = json.loads(result.prompt_compression_summary_path.read_text(encoding="utf-8"))
+    assert run_summary["total_entries"] == 1
+    assert run_summary["triggered_entries"] == 0
+    assert run_summary["total_compressions"] == 0
+    assert run_summary["entries"][0]["case_id"] == "milk_plot_case"
+    assert run_summary["entries"][0]["scope"] == "sample_case"
+    assert run_summary["entries"][0]["triggered"] is False
     assert result.review_csv_path.exists()
     review_csv = result.review_csv_path.read_text(encoding="utf-8")
     assert "case_summary_path" in review_csv
@@ -426,6 +433,11 @@ def test_run_local_qwen_sample_smoke_compresses_statistical_table_when_prompt_to
     final_prompt = (case_dir / "01_inputs" / "trend_prompt.txt").read_text(encoding="utf-8")
     assert original_prompt != compressed_prompt
     assert compressed_prompt == final_prompt
+    run_summary = json.loads(result.prompt_compression_summary_path.read_text(encoding="utf-8"))
+    assert run_summary["total_entries"] == 1
+    assert run_summary["triggered_entries"] == 1
+    assert run_summary["total_compressions"] == 1
+    assert run_summary["entries"][0]["attempt_count"] == 2
 
 
 def test_run_local_qwen_sample_smoke_flags_generic_unavailable_output_as_failure(tmp_path: Path) -> None:
