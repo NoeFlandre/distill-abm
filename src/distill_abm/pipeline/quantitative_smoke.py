@@ -40,6 +40,9 @@ from distill_abm.pipeline.quantitative_rendering import (
 from distill_abm.pipeline.quantitative_rendering import (
     render_optimal_markdown_table as _render_optimal_markdown_table,
 )
+from distill_abm.pipeline.quantitative_rendering import (
+    render_evidence_summary_markdown_table as _render_evidence_summary_markdown_table,
+)
 from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import (
     latest_run_pointer_path,
@@ -56,12 +59,15 @@ _render_factorial_markdown_table = _render_factorial_markdown_table
 _render_factorial_latex_table = _render_factorial_latex_table
 _render_optimal_markdown_table = _render_optimal_markdown_table
 _render_optimal_latex_table = _render_optimal_latex_table
+_render_evidence_summary_markdown_table = _render_evidence_summary_markdown_table
 
 __all__ = [
     "QuantitativeRecord",
     "QuantitativeSmokeResult",
+    "_build_evidence_summary_rows",
     "_render_anova_latex_table",
     "_render_anova_markdown_table",
+    "_render_evidence_summary_markdown_table",
     "_render_factorial_latex_table",
     "_render_factorial_markdown_table",
     "_render_optimal_latex_table",
@@ -149,6 +155,7 @@ class QuantitativeSmokeResult(BaseModel):
     optimal_csv_path: Path
     anova_table_markdown_path: Path
     anova_table_latex_path: Path
+    evidence_summary_table_markdown_path: Path
     factorial_table_markdown_path: Path
     factorial_table_latex_path: Path
     optimal_table_markdown_path: Path
@@ -318,6 +325,7 @@ def run_quantitative_smoke(
         optimal_csv_path=combined_paths["optimal_csv_path"],
         anova_table_markdown_path=overview_paths["anova_table_markdown_path"],
         anova_table_latex_path=combined_paths["anova_table_latex_path"],
+        evidence_summary_table_markdown_path=overview_paths["evidence_summary_table_markdown_path"],
         factorial_table_markdown_path=overview_paths["factorial_table_markdown_path"],
         factorial_table_latex_path=combined_paths["factorial_table_latex_path"],
         optimal_table_markdown_path=overview_paths["optimal_table_markdown_path"],
@@ -704,16 +712,19 @@ def _write_overview_tables(
 ) -> dict[str, Path]:
     overview_root.mkdir(parents=True, exist_ok=True)
     anova_table_markdown_path = overview_root / "anova_table.md"
+    evidence_summary_table_markdown_path = overview_root / "evidence_summary_table.md"
     factorial_table_markdown_path = overview_root / "factorial_table.md"
     optimal_table_markdown_path = overview_root / "best_scores_table.md"
 
     anova_rows: list[dict[str, float | str | None]] = []
+    evidence_summary_rows: list[dict[str, str]] = []
     factorial_frames: list[pd.DataFrame] = []
     optimal_rows: list[dict[str, str]] = []
     for reference_family, record_rows in sorted(reference_record_rows.items()):
         frame = pd.DataFrame(record_rows)
         for row in _compute_anova_rows(frame):
             anova_rows.append({"Reference family": reference_family, **row})
+        evidence_summary_rows.extend(_build_evidence_summary_rows(record_rows))
         factorial_input_path = scratch_root / f"{reference_family}_overview_factorial_input.csv"
         factorial_output_path = scratch_root / f"{reference_family}_overview_factorial_contributions.csv"
         factorial_input_frame = _build_factorial_input_frame(record_rows)
@@ -731,6 +742,10 @@ def _write_overview_tables(
         else pd.DataFrame(columns=["Reference family", "Feature", *METRIC_COLUMN_NAMES])
     )
     anova_table_markdown_path.write_text(_render_overview_anova_markdown_table(anova_rows), encoding="utf-8")
+    evidence_summary_table_markdown_path.write_text(
+        _render_evidence_summary_markdown_table(evidence_summary_rows),
+        encoding="utf-8",
+    )
     factorial_table_markdown_path.write_text(
         _render_overview_factorial_markdown_table(combined_factorial),
         encoding="utf-8",
@@ -738,6 +753,7 @@ def _write_overview_tables(
     optimal_table_markdown_path.write_text(_render_optimal_markdown_table(optimal_rows), encoding="utf-8")
     return {
         "anova_table_markdown_path": anova_table_markdown_path,
+        "evidence_summary_table_markdown_path": evidence_summary_table_markdown_path,
         "factorial_table_markdown_path": factorial_table_markdown_path,
         "optimal_table_markdown_path": optimal_table_markdown_path,
     }
@@ -899,6 +915,36 @@ def _build_optimal_score_rows(record_rows: list[dict[str, str]]) -> list[dict[st
     return optimal_rows
 
 
+def _build_evidence_summary_rows(record_rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    if not record_rows:
+        return []
+    frame = pd.DataFrame(record_rows).copy()
+    group_columns = ["reference_family", "evidence", "abm"]
+    for metric in METRIC_COLUMN_NAMES:
+        frame[metric] = frame[metric].astype(float)
+    evidence_order = {"plot": 0, "table": 1, "plot+table": 2}
+    rows: list[dict[str, str]] = []
+    for group_values, group_frame in frame.groupby(group_columns, sort=True):
+        reference_family, evidence, abm = group_values
+        row: dict[str, str] = {
+            "Reference family": str(reference_family),
+            "Evidence": str(evidence),
+            "ABM": str(abm),
+        }
+        for metric in METRIC_COLUMN_NAMES:
+            row[f"Avg {metric}"] = _format_float_cell(group_frame[metric].mean())
+            row[f"Best {metric}"] = _format_float_cell(group_frame[metric].max())
+        rows.append(row)
+    rows.sort(
+        key=lambda row: (
+            row["Reference family"],
+            evidence_order.get(row["Evidence"], len(evidence_order)),
+            row["ABM"],
+        )
+    )
+    return rows
+
+
 def _write_optimal_csv(path: Path, rows: list[dict[str, str]]) -> None:
     _write_csv(path, fieldnames=["Reference family", "ABM", "Summary", "LLM", *METRIC_COLUMN_NAMES], rows=rows)
 
@@ -944,6 +990,7 @@ def _render_markdown_report(result: QuantitativeSmokeResult) -> str:
         f"- quantitative_rows_path: `{result.quantitative_rows_path}`\n"
         f"- structured_results_path: `{result.structured_results_path}`\n"
         f"- anova_csv_path: `{result.anova_csv_path}`\n"
+        f"- evidence_summary_table_markdown_path: `{result.evidence_summary_table_markdown_path}`\n"
         f"- factorial_csv_path: `{result.factorial_csv_path}`\n"
         f"- optimal_csv_path: `{result.optimal_csv_path}`\n"
     )
