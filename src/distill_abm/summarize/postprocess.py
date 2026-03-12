@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pandas as pd
 
+TOKEN_PATTERN = re.compile(r"[^\W_]+(?:['’][^\W_]+)*", re.UNICODE)
+
 
 def remove_sentences_with_www(text: str) -> str:
     """Drops sentences containing `www.` links that leak into generated outputs."""
@@ -176,7 +178,7 @@ def _collapse_tail_loop(sentence: str) -> str:
         trailing_punctuation = sentence[-1]
         sentence = sentence[:-1]
 
-    token_matches = list(re.finditer(r"[A-Za-z0-9']+", sentence))
+    token_matches = list(TOKEN_PATTERN.finditer(sentence))
     tokens = [match.group(0) for match in token_matches]
     if len(tokens) < 9:
         return (sentence + trailing_punctuation).strip()
