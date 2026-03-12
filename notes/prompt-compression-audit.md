@@ -19,6 +19,11 @@ Observed result:
 
 ## Focused Verification
 
+Behavior covered:
+
+- per-trend compression artifacts
+- run-root `prompt_compression_summary.json` aggregation for sampled smoke, full-case smoke, full-case matrix smoke, and full-case suite smoke
+
 Command:
 
 ```bash

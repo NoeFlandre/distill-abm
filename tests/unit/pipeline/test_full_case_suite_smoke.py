@@ -37,6 +37,28 @@ def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkey
         run_root = output_root / "runs" / "run_1"
         run_root.mkdir(parents=True, exist_ok=True)
         (output_root / "latest_run.txt").write_text(str(run_root), encoding="utf-8")
+        (run_root / "prompt_compression_summary.json").write_text(
+            '{"run_root":"'
+            + str(run_root)
+            + '","total_entries":1,"triggered_entries":1,"total_compressions":1,'
+            + '"entries":[{"source_run_root":"'
+            + str(run_root)
+            + '","scope":"full_case_matrix_plot","case_id":"01_case","abm":"'
+            + kwargs["case_input"].abm
+            + '","evidence_mode":"table","prompt_variant":"role","repetition":1,"plot_index":1,'
+            + '"artifacts_dir":"'
+            + str(run_root / "cases" / "01_case" / "03_trends" / "plot_01")
+            + '","compression_artifact_path":"'
+            + str(run_root / "cases" / "01_case" / "03_trends" / "plot_01" / "trend_prompt_compression.json")
+            + '","pre_compression_prompt_path":"'
+            + str(run_root / "cases" / "01_case" / "03_trends" / "plot_01" / "trend_prompt_pre_compression.txt")
+            + '","compressed_prompt_path":"'
+            + str(run_root / "cases" / "01_case" / "03_trends" / "plot_01" / "trend_prompt_compressed.txt")
+            + '","triggered":true,"compression_count":1,"attempt_count":2,'
+            + '"attempts":[{"attempt_index":1,"table_downsample_stride":1,"compression_tier":0,"prompt_length":100},'
+            + '{"attempt_index":2,"table_downsample_stride":2,"compression_tier":1,"prompt_length":90}]}]}',
+            encoding="utf-8",
+        )
         recorded_abms.append(kwargs["case_input"].abm)
         return SimpleNamespace(
             success=True,
@@ -44,6 +66,7 @@ def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkey
             report_markdown_path=run_root / "report.md",
             review_csv_path=run_root / "review.csv",
             viewer_html_path=run_root / "review.html",
+            prompt_compression_summary_path=run_root / "prompt_compression_summary.json",
             failed_case_ids=[],
         )
 
@@ -138,9 +161,13 @@ def test_run_full_case_suite_smoke_writes_outer_artifacts(tmp_path: Path, monkey
     assert result.report_markdown_path.exists()
     assert result.review_csv_path.exists()
     assert result.review_html_path.exists()
+    assert result.prompt_compression_summary_path.exists()
     assert (tmp_path / "suite" / "suite_progress.json").exists()
     assert "Mistral Generation Dashboard" in result.review_html_path.read_text(encoding="utf-8")
     assert "Planned cases" in result.report_markdown_path.read_text(encoding="utf-8")
+    suite_summary = result.prompt_compression_summary_path.read_text(encoding="utf-8")
+    assert '"triggered_entries": 2' in suite_summary
+    assert '"total_compressions": 2' in suite_summary
 
 
 def test_run_full_case_suite_smoke_marks_abm_failure_without_crashing(

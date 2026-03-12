@@ -24,6 +24,12 @@ from distill_abm.pipeline.full_case_suite_progress import (
     refresh_progress_abm_snapshot,
 )
 from distill_abm.pipeline.local_qwen_sample_smoke import _write_json, _write_text
+from distill_abm.pipeline.prompt_compression_artifacts import (
+    PROMPT_COMPRESSION_SUMMARY_FILENAME,
+    PromptCompressionRunEntry,
+    read_prompt_compression_run_summary,
+    write_prompt_compression_run_summary,
+)
 from distill_abm.pipeline.run_artifact_contracts import (
     acquire_active_run_lock,
     latest_run_pointer_path,
@@ -52,6 +58,7 @@ class FullCaseSuiteAbmResult(BaseModel):
     report_markdown_path: Path
     review_csv_path: Path
     review_html_path: Path
+    prompt_compression_summary_path: Path
     planned_case_count: int
     failed_case_ids: list[str] = Field(default_factory=list)
 
@@ -69,6 +76,7 @@ class FullCaseSuiteSmokeResult(BaseModel):
     report_markdown_path: Path
     review_csv_path: Path
     review_html_path: Path
+    prompt_compression_summary_path: Path
     success: bool
     failed_abms: list[str] = Field(default_factory=list)
     abms: list[FullCaseSuiteAbmResult] = Field(default_factory=list)
@@ -136,6 +144,7 @@ def _initial_abm_results_by_name(
             report_markdown_path=run_root / "smoke_full_case_matrix_report.md",
             review_csv_path=run_root / "request_review.csv",
             review_html_path=run_root / "review.html",
+            prompt_compression_summary_path=run_root / PROMPT_COMPRESSION_SUMMARY_FILENAME,
             planned_case_count=progress.planned_case_count,
             failed_case_ids=[],
         )
@@ -291,6 +300,11 @@ def run_full_case_suite_smoke(
                         report_markdown_path=matrix_result.report_markdown_path,
                         review_csv_path=matrix_result.review_csv_path,
                         review_html_path=matrix_result.viewer_html_path,
+                        prompt_compression_summary_path=getattr(
+                            matrix_result,
+                            "prompt_compression_summary_path",
+                            latest_abm_run / "prompt_compression_summary.json",
+                        ),
                         planned_case_count=len(case_specs),
                         failed_case_ids=list(matrix_result.failed_case_ids),
                     )
@@ -304,6 +318,7 @@ def run_full_case_suite_smoke(
                         report_markdown_path=abm_output_root / "smoke_full_case_matrix_report.md",
                         review_csv_path=abm_output_root / "request_review.csv",
                         review_html_path=abm_output_root / "review.html",
+                        prompt_compression_summary_path=abm_output_root / PROMPT_COMPRESSION_SUMMARY_FILENAME,
                         planned_case_count=len(case_specs),
                         failed_case_ids=["abm_runner_failed"],
                     )
@@ -392,6 +407,12 @@ def run_full_case_suite_smoke(
             }
             for abm_result in abm_results
         ]
+        prompt_compression_entries: list[PromptCompressionRunEntry] = []
+        for abm_result in abm_results:
+            summary = read_prompt_compression_run_summary(abm_result.prompt_compression_summary_path)
+            if summary is None:
+                continue
+            prompt_compression_entries.extend(summary.entries)
 
         finished_at = datetime.now(UTC)
         result = FullCaseSuiteSmokeResult(
@@ -405,10 +426,12 @@ def run_full_case_suite_smoke(
             report_markdown_path=run_root / "smoke_full_case_suite_report.md",
             review_csv_path=run_root / "review.csv",
             review_html_path=run_root / "review.html",
+            prompt_compression_summary_path=run_root / PROMPT_COMPRESSION_SUMMARY_FILENAME,
             success=all(item.success for item in abm_results),
             failed_abms=[item.abm for item in abm_results if not item.success],
             abms=abm_results,
         )
+        write_prompt_compression_run_summary(run_root=run_root, entries=prompt_compression_entries)
         _write_json(result.report_json_path, result.model_dump(mode="json"))
         _write_text(result.report_markdown_path, _render_report(result))
         _write_summary_csv(result.review_csv_path, summary_rows)
@@ -456,6 +479,7 @@ def _render_report(result: FullCaseSuiteSmokeResult) -> str:
         "",
         f"- success: `{str(result.success).lower()}`",
         f"- failed ABMs: `{', '.join(result.failed_abms) if result.failed_abms else 'none'}`",
+        f"- prompt_compression_summary_path: `{result.prompt_compression_summary_path}`",
         "",
         "| ABM | Success | Planned cases | Failed cases | Review HTML |",
         "| --- | --- | --- | --- | --- |",

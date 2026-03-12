@@ -206,6 +206,11 @@ def test_run_full_case_smoke_writes_context_and_all_trends(tmp_path: Path) -> No
     assert compression_payload["triggered"] is False
     assert compression_payload["compression_count"] == 0
     assert compression_payload["attempt_count"] == 1
+    run_summary = json.loads(result.prompt_compression_summary_path.read_text(encoding="utf-8"))
+    assert run_summary["total_entries"] == 2
+    assert run_summary["triggered_entries"] == 0
+    assert run_summary["total_compressions"] == 0
+    assert {entry["plot_index"] for entry in run_summary["entries"]} == {1, 2}
 
 
 def test_run_full_case_smoke_resume_reuses_context_and_accepted_trends(tmp_path: Path) -> None:
@@ -589,6 +594,11 @@ def test_run_full_case_matrix_smoke_records_prompt_compression_artifacts(tmp_pat
     final_prompt = (trend_dir / "trend_prompt.txt").read_text(encoding="utf-8")
     assert original_prompt != compressed_prompt
     assert compressed_prompt == final_prompt
+    run_summary = json.loads(result.prompt_compression_summary_path.read_text(encoding="utf-8"))
+    assert run_summary["total_entries"] == 1
+    assert run_summary["triggered_entries"] == 1
+    assert run_summary["total_compressions"] == 1
+    assert run_summary["entries"][0]["scope"] == "full_case_matrix_plot"
 
 
 def test_run_full_case_matrix_smoke_executes_case_trends_concurrently(tmp_path: Path) -> None:
