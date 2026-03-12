@@ -97,7 +97,7 @@ def test_process_documentation_stages(tmp_path: Path) -> None:
 
 
 def test_extract_experiment_parameters_prefers_named_experiment() -> None:
-    code = Path("data/milk_consumption_abm/milk_consumption.nlogo").read_text(encoding="utf-8")
+    code = Path("data/abms/milk_consumption/milk_consumption.nlogo").read_text(encoding="utf-8")
     values = extract_experiment_parameters(code, preferred_experiment="Milk Consumption Trends")
     assert values["number-of-agents"] == 1000
     assert values["habit-on?"] is True
@@ -106,14 +106,14 @@ def test_extract_experiment_parameters_prefers_named_experiment() -> None:
 
 
 def test_extract_experiment_parameters_filters_output_csv_file_value() -> None:
-    code = Path("data/fauna_abm/fauna.nlogo").read_text(encoding="utf-8")
+    code = Path("data/abms/fauna/fauna.nlogo").read_text(encoding="utf-8")
     values = extract_experiment_parameters(code, preferred_experiment="2023-20-6-0.33-0.8")
     assert "Output-csv-file" not in values
     assert len(values) == 29
 
 
 def test_find_reference_narrative_path_for_abm() -> None:
-    reference_path = find_reference_narrative_path(Path("data/grazing_abm"))
+    reference_path = find_reference_narrative_path(Path("data/abms/grazing"))
     assert reference_path is not None
     assert reference_path.name == "reference_narrative.txt"
 
@@ -208,7 +208,7 @@ end
 
 def test_extract_experiment_parameters_accepts_code_string() -> None:
     """Test that extract_experiment_parameters accepts string content."""
-    code_str = Path("data/fauna_abm/fauna.nlogo").read_text(encoding="utf-8")
+    code_str = Path("data/abms/fauna/fauna.nlogo").read_text(encoding="utf-8")
     # Should work with string content
     values = extract_experiment_parameters(code_str, preferred_experiment="2023-20-6-0.33-0.8")
     assert isinstance(values, dict)

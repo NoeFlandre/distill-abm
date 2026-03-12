@@ -50,7 +50,7 @@ def test_run_validation_suite_writes_structured_reports(
 
     result = run_validation_suite(
         output_root=tmp_path / "validation",
-        abm_models={"fauna": Path("data/fauna_abm/fauna.nlogo")},
+        abm_models={"fauna": Path("data/abms/fauna/fauna.nlogo")},
     )
 
     assert result.success is True
@@ -81,7 +81,7 @@ def test_run_validation_suite_marks_non_selected_checks_as_skipped(
 
     result = run_validation_suite(
         output_root=tmp_path / "validation",
-        abm_models={"fauna": Path("data/fauna_abm/fauna.nlogo")},
+        abm_models={"fauna": Path("data/abms/fauna/fauna.nlogo")},
         checks=["ruff"],
     )
 
@@ -103,7 +103,7 @@ def test_run_validation_suite_records_command_launch_failure(
 
     result = run_validation_suite(
         output_root=tmp_path / "validation",
-        abm_models={"fauna": Path("data/fauna_abm/fauna.nlogo")},
+        abm_models={"fauna": Path("data/abms/fauna/fauna.nlogo")},
         checks=["ruff"],
     )
 

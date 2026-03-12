@@ -21,17 +21,17 @@ def test_load_viz_config_fallbacks_and_explicit_parameters() -> None:
 
     assert fauna_cfg.netlogo_viz is not None
     assert fauna_cfg.netlogo_viz.fallback_mode == "always"
-    assert fauna_cfg.netlogo_viz.fallback_csv == "data/fauna_abm/legacy/reduced_version.csv"
-    assert fauna_cfg.netlogo_viz.fallback_plot_dir == "data/fauna_abm/legacy/plots"
+    assert fauna_cfg.netlogo_viz.fallback_csv == "data/abms/fauna/legacy/reduced_version.csv"
+    assert fauna_cfg.netlogo_viz.fallback_plot_dir == "data/abms/fauna/legacy/plots"
 
     assert milk_cfg.netlogo_viz is not None
     assert milk_cfg.netlogo_viz.fallback_mode == "always"
     assert milk_cfg.netlogo_viz.experiment_parameters["network-type"] == '"watts-strogatz"'
-    assert milk_cfg.netlogo_viz.fallback_csv == "data/milk_consumption_abm/legacy/reducedmilk.csv"
-    assert milk_cfg.netlogo_viz.fallback_plot_dir == "data/milk_consumption_abm/legacy/plots"
+    assert milk_cfg.netlogo_viz.fallback_csv == "data/abms/milk_consumption/legacy/reducedmilk.csv"
+    assert milk_cfg.netlogo_viz.fallback_plot_dir == "data/abms/milk_consumption/legacy/plots"
 
     assert grazing_cfg.netlogo_viz is not None
     assert grazing_cfg.netlogo_viz.fallback_mode == "always"
     assert grazing_cfg.netlogo_viz.experiment_parameters["behavioral-type"] == "E-RO"
-    assert grazing_cfg.netlogo_viz.fallback_csv == "data/grazing_abm/legacy/reduced3.csv"
-    assert grazing_cfg.netlogo_viz.fallback_plot_dir == "data/grazing_abm/legacy/plots"
+    assert grazing_cfg.netlogo_viz.fallback_csv == "data/abms/grazing/legacy/reduced3.csv"
+    assert grazing_cfg.netlogo_viz.fallback_plot_dir == "data/abms/grazing/legacy/plots"

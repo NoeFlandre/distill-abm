@@ -51,7 +51,7 @@ def test_default_viz_smoke_stages_are_granular() -> None:
     specs = {
         "milk_consumption": VizSmokeSpec(
             abm="milk_consumption",
-            model_path=Path("data/milk_consumption_abm/milk_consumption.nlogo"),
+            model_path=Path("data/abms/milk_consumption/milk_consumption.nlogo"),
             experiment_name="Milk Consumption Trends",
             experiment_parameters={"number-of-agents": 1000},
             num_runs=2,
