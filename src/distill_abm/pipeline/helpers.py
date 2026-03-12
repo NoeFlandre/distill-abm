@@ -198,6 +198,7 @@ def invoke_adapter_with_trace(
                 "response": {
                     "provider": response.provider,
                     "model": response.model,
+                    "runtime": _extract_runtime_metadata_from_raw(response.raw, response.provider),
                     "raw_text": response.text,
                     "raw_text_length": len(response.text),
                     "raw_text_signature": hashlib.sha256(response.text.encode("utf-8")).hexdigest(),
@@ -264,6 +265,76 @@ def _extract_usage_from_raw(raw: object) -> dict[str, int] | None:
             "completion_tokens": eval_count,
             "total_tokens": prompt_eval + eval_count,
         }
+    return None
+
+
+def _extract_runtime_metadata_from_raw(raw: object, response_provider: str) -> dict[str, str]:
+    if not isinstance(raw, dict):
+        return {}
+    provider = _extract_runtime_provider_from_raw(raw, response_provider)
+    precision = _extract_runtime_precision_from_raw(raw)
+    runtime: dict[str, str] = {}
+    if provider:
+        runtime["provider"] = provider
+    if precision:
+        runtime["precision"] = precision
+    return runtime
+
+
+def _extract_runtime_provider_from_raw(raw: dict[str, object], response_provider: str) -> str | None:
+    provider_block = raw.get("provider")
+    if isinstance(provider_block, dict):
+        provider_name = _first_non_empty_string(provider_block, "name", "provider", "slug", "id")
+        if provider_name:
+            return provider_name
+    if isinstance(provider_block, str):
+        provider_name = provider_block.strip()
+        if provider_name and provider_name.lower() != response_provider.strip().lower():
+            return provider_name
+
+    for container_key in ("routing", "route", "provider_info", "provider_metadata"):
+        container = raw.get(container_key)
+        if not isinstance(container, dict):
+            continue
+        provider_name = _first_non_empty_string(container, "provider", "provider_name", "name", "slug", "id")
+        if provider_name:
+            return provider_name
+
+    return _first_non_empty_string(
+        raw,
+        "provider_name",
+        "provider_slug",
+        "upstream_provider",
+        "backend_provider",
+        "inference_provider",
+    )
+
+
+def _extract_runtime_precision_from_raw(raw: dict[str, object]) -> str | None:
+    provider_block = raw.get("provider")
+    if isinstance(provider_block, dict):
+        precision = _first_non_empty_string(provider_block, "precision", "quantization")
+        if precision:
+            return precision
+
+    for container_key in ("routing", "route", "provider_info", "provider_metadata"):
+        container = raw.get(container_key)
+        if not isinstance(container, dict):
+            continue
+        precision = _first_non_empty_string(container, "precision", "quantization")
+        if precision:
+            return precision
+
+    return _first_non_empty_string(raw, "precision", "quantization", "provider_precision", "provider_quantization")
+
+
+def _first_non_empty_string(mapping: dict[str, object], *keys: str) -> str | None:
+    for key in keys:
+        value = mapping.get(key)
+        if isinstance(value, str):
+            normalized = value.strip()
+            if normalized:
+                return normalized
     return None
 
 

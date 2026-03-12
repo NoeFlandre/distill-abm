@@ -60,6 +60,26 @@ class MistralUsageAdapter(LLMAdapter):
         )
 
 
+class RoutedPrecisionAdapter(LLMAdapter):
+    provider = "openrouter"
+
+    def __init__(self) -> None:
+        self.calls: list[LLMRequest] = []
+
+    def complete(self, request: LLMRequest) -> LLMResponse:
+        self.calls.append(request)
+        provider_name = "DeepInfra" if len(self.calls) == 1 else "Fireworks"
+        return LLMResponse(
+            provider=self.provider,
+            model=request.model,
+            text=f"resp-{len(self.calls)}",
+            raw={
+                "provider": {"name": provider_name, "quantization": "fp8"},
+                "usage": {"prompt_tokens": 8, "completion_tokens": 4, "total_tokens": 12},
+            },
+        )
+
+
 def _write_inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
@@ -212,6 +232,34 @@ def test_run_pipeline_full_text_only_bypasses_summarizers(tmp_path: Path, monkey
     metadata = json.loads(result.metadata_path.read_text(encoding="utf-8"))
     assert metadata["inputs"]["text_source_mode"] == "full_text_only"
     assert metadata["inputs"]["selected_text_source"] == "full_text_only"
+
+
+def test_run_pipeline_records_runtime_provider_and_precision_metadata(tmp_path: Path) -> None:
+    csv_path, parameters_path, documentation_path = _write_inputs(tmp_path)
+
+    result = run_pipeline(
+        inputs=PipelineInputs(
+            csv_path=csv_path,
+            parameters_path=parameters_path,
+            documentation_path=documentation_path,
+            output_dir=tmp_path / "out",
+            model="qwen/qwen3.5-27b",
+            metric_pattern="mean-incum",
+            metric_description="weekly milk",
+            text_source_mode="full_text_only",
+            evidence_mode="plot",
+        ),
+        prompts=_prompts(),
+        adapter=RoutedPrecisionAdapter(),
+    )
+
+    assert result.metadata_path is not None
+    metadata = json.loads(result.metadata_path.read_text(encoding="utf-8"))
+    assert metadata["llm"]["precision"] == "fp8"
+    assert metadata["llm"]["runtime"]["context"] == {"precision": "fp8", "provider": "DeepInfra"}
+    assert metadata["llm"]["runtime"]["trend"] == {"precision": "fp8", "provider": "Fireworks"}
+    assert metadata["llm"]["runtime"]["providers_used"] == ["DeepInfra", "Fireworks"]
+    assert metadata["llm"]["runtime"]["precisions_used"] == ["fp8"]
 
 
 def test_run_pipeline_summary_only_with_strict_mode_fails_if_all_summarizers_fallback_none(

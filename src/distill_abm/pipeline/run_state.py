@@ -379,6 +379,10 @@ def _build_metadata_payload(
 
     context_usage = _extract_trace_usage(debug_trace, "context_request_path")
     trend_usage = _extract_trace_usage(debug_trace, "trend_request_path")
+    context_runtime = _extract_trace_runtime(debug_trace, "context_request_path")
+    trend_runtime = _extract_trace_runtime(debug_trace, "trend_request_path")
+    runtime_providers = _collect_runtime_values(context_runtime, trend_runtime, field="provider")
+    runtime_precisions = _collect_runtime_values(context_runtime, trend_runtime, field="precision")
     observability = _build_observability_summary(context_usage=context_usage, trend_usage=trend_usage)
     additional_reference_metadata = _build_additional_reference_metadata(
         additional_scoring_references=additional_scoring_references,
@@ -422,6 +426,7 @@ def _build_metadata_payload(
         "llm": {
             "provider": adapter.provider,
             "model": inputs.model,
+            "precision": runtime_precisions[0] if len(runtime_precisions) == 1 else None,
             "request": {
                 "temperature": default_temperature,
                 "max_tokens": default_max_tokens,
@@ -448,6 +453,12 @@ def _build_metadata_payload(
                 "context": context_usage,
                 "trend": trend_usage,
                 "total": _combine_usage(context_usage, trend_usage),
+            },
+            "runtime": {
+                "context": context_runtime,
+                "trend": trend_runtime,
+                "providers_used": runtime_providers,
+                "precisions_used": runtime_precisions,
             },
             "observability": observability,
         },
@@ -527,17 +538,9 @@ def _build_metadata_payload(
 
 
 def _extract_trace_usage(debug_trace: dict[str, object], key: str) -> dict[str, int] | None:
-    trace_path_value = debug_trace.get(key)
-    if not isinstance(trace_path_value, str):
+    response = _read_trace_response(debug_trace, key)
+    if not response:
         return None
-    trace_path = Path(trace_path_value)
-    if not trace_path.exists():
-        return None
-    try:
-        payload = json.loads(trace_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return None
-    response = _as_dict(payload.get("response"))
     usage = response.get("usage")
     if not isinstance(usage, dict):
         return None
@@ -556,6 +559,35 @@ def _extract_trace_usage(debug_trace: dict[str, object], key: str) -> dict[str, 
     }
 
 
+def _extract_trace_runtime(debug_trace: dict[str, object], key: str) -> dict[str, str] | None:
+    response = _read_trace_response(debug_trace, key)
+    if not response:
+        return None
+    runtime = _as_dict(response.get("runtime"))
+    provider = runtime.get("provider")
+    precision = runtime.get("precision")
+    payload: dict[str, str] = {}
+    if isinstance(provider, str) and provider:
+        payload["provider"] = provider
+    if isinstance(precision, str) and precision:
+        payload["precision"] = precision
+    return payload or None
+
+
+def _read_trace_response(debug_trace: dict[str, object], key: str) -> dict[str, object]:
+    trace_path_value = debug_trace.get(key)
+    if not isinstance(trace_path_value, str):
+        return {}
+    trace_path = Path(trace_path_value)
+    if not trace_path.exists():
+        return {}
+    try:
+        payload = json.loads(trace_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    return _as_dict(payload.get("response"))
+
+
 def _combine_usage(*usages: dict[str, int] | None) -> dict[str, int] | None:
     available = [usage for usage in usages if usage is not None]
     if not available:
@@ -565,6 +597,20 @@ def _combine_usage(*usages: dict[str, int] | None) -> dict[str, int] | None:
         "completion_tokens": sum(usage["completion_tokens"] for usage in available),
         "total_tokens": sum(usage["total_tokens"] for usage in available),
     }
+
+
+def _collect_runtime_values(
+    *runtime_payloads: dict[str, str] | None,
+    field: str,
+) -> list[str]:
+    values: list[str] = []
+    for payload in runtime_payloads:
+        if payload is None:
+            continue
+        value = payload.get(field)
+        if value and value not in values:
+            values.append(value)
+    return values
 
 
 def _build_observability_summary(
