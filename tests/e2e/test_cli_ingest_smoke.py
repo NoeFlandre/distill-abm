@@ -13,7 +13,7 @@ runner = CliRunner()
 
 
 def _write_model(root: Path, abm: str) -> None:
-    model_dir = root / f"{abm}_abm"
+    model_dir = root / "abms" / abm
     model_dir.mkdir(parents=True, exist_ok=True)
     model_name = f"{abm}.nlogo" if abm != "milk_consumption" else "model.nlogo"
     (model_dir / model_name).write_text(

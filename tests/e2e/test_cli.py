@@ -55,7 +55,7 @@ def _write_min_nlogo_model(tmp_path: Path) -> tuple[Path, Path]:
 
 
 def _write_min_nlogo_model_dir(root: Path, abm_name: str, doc_text: str) -> tuple[Path, Path, Path]:
-    model_dir = root / f"{abm_name}_abm"
+    model_dir = root / "abms" / abm_name
     model_dir.mkdir(parents=True, exist_ok=True)
     model_path = model_dir / f"{abm_name}.nlogo"
     model_path.write_text(
