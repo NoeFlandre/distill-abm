@@ -252,6 +252,27 @@ def test_run_local_qwen_sample_smoke_writes_review_friendly_case_artifacts(tmp_p
     assert "response-1" in trend_prompt_text
     assert "Return your final answer as a JSON object" not in context_prompt_text
     assert "Return your final answer as a JSON object" not in trend_prompt_text
+    compression_payload = json.loads(
+        (case_dir / "01_inputs" / "trend_prompt_compression.json").read_text(encoding="utf-8")
+    )
+    assert compression_payload["triggered"] is False
+    assert compression_payload["compression_count"] == 0
+    assert compression_payload["attempt_count"] == 1
+    assert compression_payload["attempts"] == [
+        {
+            "attempt_index": 1,
+            "table_downsample_stride": 1,
+            "compression_tier": 0,
+            "prompt_length": len(trend_prompt_text),
+        }
+    ]
+    run_summary = json.loads(result.prompt_compression_summary_path.read_text(encoding="utf-8"))
+    assert run_summary["total_entries"] == 1
+    assert run_summary["triggered_entries"] == 0
+    assert run_summary["total_compressions"] == 0
+    assert run_summary["entries"][0]["case_id"] == "milk_plot_case"
+    assert run_summary["entries"][0]["scope"] == "sample_case"
+    assert run_summary["entries"][0]["triggered"] is False
     assert result.review_csv_path.exists()
     review_csv = result.review_csv_path.read_text(encoding="utf-8")
     assert "case_summary_path" in review_csv
@@ -394,8 +415,29 @@ def test_run_local_qwen_sample_smoke_compresses_statistical_table_when_prompt_to
     assert result.success is True
     assert len(adapter.requests) == 3
     assert adapter.requests[2].metadata["table_downsample_stride"] == 2
-    table_text = (result.cases[0].case_dir / "01_inputs" / "trend_evidence_table.txt").read_text(encoding="utf-8")
+    case_dir = result.cases[0].case_dir
+    table_text = (case_dir / "01_inputs" / "trend_evidence_table.txt").read_text(encoding="utf-8")
     assert "Statistical evidence for simulation series matching `metric-a`." in table_text
+    compression_payload = json.loads(
+        (case_dir / "01_inputs" / "trend_prompt_compression.json").read_text(encoding="utf-8")
+    )
+    assert compression_payload["triggered"] is True
+    assert compression_payload["compression_count"] == 1
+    assert compression_payload["attempt_count"] == 2
+    assert compression_payload["attempts"][0]["table_downsample_stride"] == 1
+    assert compression_payload["attempts"][0]["compression_tier"] == 0
+    assert compression_payload["attempts"][1]["table_downsample_stride"] == 2
+    assert compression_payload["attempts"][1]["compression_tier"] == 1
+    original_prompt = (case_dir / "01_inputs" / "trend_prompt_pre_compression.txt").read_text(encoding="utf-8")
+    compressed_prompt = (case_dir / "01_inputs" / "trend_prompt_compressed.txt").read_text(encoding="utf-8")
+    final_prompt = (case_dir / "01_inputs" / "trend_prompt.txt").read_text(encoding="utf-8")
+    assert original_prompt != compressed_prompt
+    assert compressed_prompt == final_prompt
+    run_summary = json.loads(result.prompt_compression_summary_path.read_text(encoding="utf-8"))
+    assert run_summary["total_entries"] == 1
+    assert run_summary["triggered_entries"] == 1
+    assert run_summary["total_compressions"] == 1
+    assert run_summary["entries"][0]["attempt_count"] == 2
 
 
 def test_run_local_qwen_sample_smoke_flags_generic_unavailable_output_as_failure(tmp_path: Path) -> None:

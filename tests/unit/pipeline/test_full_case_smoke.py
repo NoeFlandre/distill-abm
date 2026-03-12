@@ -103,6 +103,57 @@ class _ConcurrentAdapter(LLMAdapter):
         )
 
 
+class _ContextOverflowThenSuccessAdapter(LLMAdapter):
+    provider = "openrouter"
+
+    def __init__(self) -> None:
+        self._calls = 0
+
+    def complete(self, request):  # type: ignore[no-untyped-def]
+        self._calls += 1
+        if self._calls == 1:
+            return LLMResponse(
+                provider="openrouter",
+                model=request.model,
+                text='{"response_text":"response-1"}',
+                raw={
+                    "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
+                    "choices": [{"message": {"content": '{"response_text":"response-1"}'}}],
+                },
+            )
+        if request.metadata.get("table_downsample_stride") == 1:
+            raise ValueError(
+                "This model's maximum context length is 131072 tokens. Your request has too many input tokens."
+            )
+        return LLMResponse(
+            provider="openrouter",
+            model=request.model,
+            text=f'{{"response_text":"response-{self._calls}"}}',
+            raw={
+                "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
+                "choices": [{"message": {"content": f'{{"response_text":"response-{self._calls}"}}'}}],
+            },
+        )
+
+
+class _ContextFailureAdapter(LLMAdapter):
+    provider = "openrouter"
+
+    def complete(self, request):  # type: ignore[no-untyped-def]
+        _ = request
+        return LLMResponse(
+            provider="openrouter",
+            model="openrouter/test",
+            text="",
+            raw={
+                "message": {"content": "", "thinking": "reasoning only"},
+                "done_reason": "length",
+                "eval_count": 1024,
+                "prompt_eval_count": 300,
+            },
+        )
+
+
 def test_resolve_parallel_trend_workers_reduces_for_mistral() -> None:
     assert resolve_parallel_trend_workers("mistral") == 1
     assert resolve_parallel_trend_workers("openrouter") == 6
@@ -167,6 +218,17 @@ def test_run_full_case_smoke_writes_context_and_all_trends(tmp_path: Path) -> No
         "plot_index,reporter_pattern,plot_description,trend_prompt_path,"
         "trend_output_path,image_path,table_csv_path,success,error,validation_status"
     )
+    compression_payload = json.loads(
+        (result.case_dir / "03_trends" / "plot_01" / "trend_prompt_compression.json").read_text(encoding="utf-8")
+    )
+    assert compression_payload["triggered"] is False
+    assert compression_payload["compression_count"] == 0
+    assert compression_payload["attempt_count"] == 1
+    run_summary = json.loads(result.prompt_compression_summary_path.read_text(encoding="utf-8"))
+    assert run_summary["total_entries"] == 2
+    assert run_summary["triggered_entries"] == 0
+    assert run_summary["total_compressions"] == 0
+    assert {entry["plot_index"] for entry in run_summary["entries"]} == {1, 2}
 
 
 def test_run_full_case_smoke_resume_reuses_context_and_accepted_trends(tmp_path: Path) -> None:
@@ -238,6 +300,64 @@ def test_run_full_case_smoke_resume_reuses_context_and_accepted_trends(tmp_path:
     row_by_plot = {row["plot_index"]: row for row in rows}
     assert row_by_plot["1"]["validation_status"] == "accepted"
     assert row_by_plot["2"]["validation_status"] == "accepted"
+
+
+def test_run_full_case_smoke_ignores_stale_prompt_compression_artifacts_when_context_fails(tmp_path: Path) -> None:
+    csv_path = tmp_path / "simulation.csv"
+    csv_path.write_text("tick;metric one\n0;1\n1;3\n", encoding="utf-8")
+    parameters_path = tmp_path / "parameters.txt"
+    parameters_path.write_text("parameter narrative", encoding="utf-8")
+    documentation_path = tmp_path / "documentation.txt"
+    documentation_path.write_text("documentation body", encoding="utf-8")
+    plot_one = tmp_path / "1.png"
+    plot_one.write_bytes(b"plot-one")
+    output_root = tmp_path / "out"
+    trend_dir = output_root / "cases" / "01_grazing_role_table_full_case" / "03_trends" / "plot_01"
+    trend_dir.mkdir(parents=True, exist_ok=True)
+    (trend_dir / "trend_prompt_compression.json").write_text(
+        json.dumps(
+            {
+                "triggered": True,
+                "compression_count": 1,
+                "attempt_count": 2,
+                "attempts": [
+                    {"attempt_index": 1, "table_downsample_stride": 1, "compression_tier": 0, "prompt_length": 100},
+                    {"attempt_index": 2, "table_downsample_stride": 2, "compression_tier": 1, "prompt_length": 80},
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_full_case_smoke(
+        case_input=FullCaseSmokeInput(
+            abm="grazing",
+            csv_path=csv_path,
+            parameters_path=parameters_path,
+            documentation_path=documentation_path,
+            plots=(
+                FullCasePlotInput(
+                    plot_index=1,
+                    reporter_pattern="metric one",
+                    plot_description="First plot",
+                    plot_path=plot_one,
+                ),
+            ),
+        ),
+        adapter=_ContextFailureAdapter(),
+        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        output_root=output_root,
+        evidence_mode="table",
+        prompt_variant="role",
+        max_tokens=128,
+    )
+
+    assert result.success is False
+    run_summary = json.loads(result.prompt_compression_summary_path.read_text(encoding="utf-8"))
+    assert run_summary["total_entries"] == 0
+    assert run_summary["triggered_entries"] == 0
+    assert run_summary["total_compressions"] == 0
+    assert run_summary["entries"] == []
 
 
 def test_run_full_case_smoke_resume_reruns_invalid_accepted_trend_output(tmp_path: Path) -> None:
@@ -493,6 +613,68 @@ def test_run_full_case_matrix_smoke_retries_failed_case_in_same_invocation(tmp_p
     assert result.failed_case_ids == []
     trend_output = (result.cases[0].case_dir / "03_trends" / "plot_01" / "trend_output.txt").read_text(encoding="utf-8")
     assert trend_output == "response-3"
+
+
+def test_run_full_case_matrix_smoke_records_prompt_compression_artifacts(tmp_path: Path) -> None:
+    csv_path = tmp_path / "simulation.csv"
+    csv_path.write_text("tick;metric one\n0;1\n1;3\n", encoding="utf-8")
+    parameters_path = tmp_path / "parameters.txt"
+    parameters_path.write_text("parameter narrative", encoding="utf-8")
+    documentation_path = tmp_path / "documentation.txt"
+    documentation_path.write_text("documentation body", encoding="utf-8")
+    plot_one = tmp_path / "1.png"
+    plot_one.write_bytes(b"plot-one")
+    case_input = FullCaseSmokeInput(
+        abm="grazing",
+        csv_path=csv_path,
+        parameters_path=parameters_path,
+        documentation_path=documentation_path,
+        plots=(
+            FullCasePlotInput(
+                plot_index=1,
+                reporter_pattern="metric one",
+                plot_description="This plot represents herd size.",
+                plot_path=plot_one,
+            ),
+        ),
+    )
+
+    result = run_full_case_matrix_smoke(
+        case_input=case_input,
+        adapter=_ContextOverflowThenSuccessAdapter(),
+        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        output_root=tmp_path / "out",
+        cases=(
+            FullCaseMatrixCaseSpec(
+                case_id="01_grazing_role_table_rep1",
+                abm="grazing",
+                evidence_mode="table",
+                prompt_variant="role",
+                repetition=1,
+            ),
+        ),
+        max_tokens=128,
+        resume_existing=True,
+    )
+
+    assert result.success is True
+    trend_dir = result.cases[0].case_dir / "03_trends" / "plot_01"
+    compression_payload = json.loads((trend_dir / "trend_prompt_compression.json").read_text(encoding="utf-8"))
+    assert compression_payload["triggered"] is True
+    assert compression_payload["compression_count"] == 1
+    assert compression_payload["attempt_count"] == 2
+    assert compression_payload["attempts"][0]["table_downsample_stride"] == 1
+    assert compression_payload["attempts"][1]["table_downsample_stride"] == 2
+    original_prompt = (trend_dir / "trend_prompt_pre_compression.txt").read_text(encoding="utf-8")
+    compressed_prompt = (trend_dir / "trend_prompt_compressed.txt").read_text(encoding="utf-8")
+    final_prompt = (trend_dir / "trend_prompt.txt").read_text(encoding="utf-8")
+    assert original_prompt != compressed_prompt
+    assert compressed_prompt == final_prompt
+    run_summary = json.loads(result.prompt_compression_summary_path.read_text(encoding="utf-8"))
+    assert run_summary["total_entries"] == 1
+    assert run_summary["triggered_entries"] == 1
+    assert run_summary["total_compressions"] == 1
+    assert run_summary["entries"][0]["scope"] == "full_case_matrix_plot"
 
 
 def test_run_full_case_matrix_smoke_executes_case_trends_concurrently(tmp_path: Path) -> None:

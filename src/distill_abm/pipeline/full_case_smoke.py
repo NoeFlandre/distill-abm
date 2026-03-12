@@ -29,6 +29,13 @@ from distill_abm.pipeline.local_qwen_sample_smoke import (
     _write_optional_thinking,
     _write_text,
 )
+from distill_abm.pipeline.prompt_compression_artifacts import (
+    PROMPT_COMPRESSION_SUMMARY_FILENAME,
+    PromptCompressionAttempt,
+    build_prompt_compression_run_entry,
+    write_prompt_compression_artifacts,
+    write_prompt_compression_run_summary,
+)
 from distill_abm.pipeline.run_artifact_contracts import case_summary_path, validation_state_path
 from distill_abm.pipeline.statistical_evidence import build_statistical_evidence, render_evidence_artifacts
 
@@ -74,6 +81,7 @@ class FullCaseSmokeResult(BaseModel):
     report_json_path: Path
     report_markdown_path: Path
     review_csv_path: Path
+    prompt_compression_summary_path: Path
     success: bool
     failed_plot_indices: list[int] = Field(default_factory=list)
     trend_results: list[FullCaseTrendResult] = Field(default_factory=list)
@@ -188,6 +196,7 @@ def run_full_case_smoke(
                 report_json_path=output_root / "full_case_smoke_report.json",
                 report_markdown_path=output_root / "full_case_smoke_report.md",
                 review_csv_path=output_root / "review.csv",
+                prompt_compression_summary_path=output_root / PROMPT_COMPRESSION_SUMMARY_FILENAME,
                 success=False,
                 failed_plot_indices=[],
                 trend_results=[],
@@ -349,6 +358,7 @@ def run_full_case_smoke(
         report_json_path=output_root / "full_case_smoke_report.json",
         report_markdown_path=output_root / "full_case_smoke_report.md",
         review_csv_path=output_root / "review.csv",
+        prompt_compression_summary_path=output_root / PROMPT_COMPRESSION_SUMMARY_FILENAME,
         success=not failed_plot_indices,
         failed_plot_indices=failed_plot_indices,
         trend_results=trend_results,
@@ -395,6 +405,18 @@ def _execute_full_case_trend(
         enabled=enabled,
     )
     _write_text(trend_dir / "trend_prompt.txt", trend_prompt)
+    write_prompt_compression_artifacts(
+        output_dir=trend_dir,
+        attempts=[
+            PromptCompressionAttempt(
+                attempt_index=1,
+                table_downsample_stride=1,
+                compression_tier=0,
+                prompt_length=len(trend_prompt),
+            )
+        ],
+        prompts=[trend_prompt],
+    )
     try:
         trend_text, trend_trace = _invoke_structured_smoke_text(
             adapter=adapter,
@@ -486,6 +508,29 @@ def _finalize_full_case_result(
     review_rows: list[dict[str, str]],
     validation_state: FullCaseValidationState,
 ) -> None:
+    plot_inputs_by_index = {plot_input.plot_index: plot_input for plot_input in case_input.plots}
+    prompt_compression_entries = [
+        entry
+        for entry in (
+            build_prompt_compression_run_entry(
+                source_run_root=result.output_root,
+                scope="full_case_plot",
+                case_id=result.case_id,
+                abm=case_input.abm,
+                evidence_mode=evidence_mode,
+                prompt_variant=prompt_variant,
+                artifacts_dir=trend_result.trend_dir,
+                plot_index=trend_result.plot_index,
+            )
+            for trend_result in result.trend_results
+            if trend_result.plot_index in plot_inputs_by_index
+        )
+        if entry is not None
+    ]
+    result.prompt_compression_summary_path = write_prompt_compression_run_summary(
+        run_root=result.output_root,
+        entries=prompt_compression_entries,
+    )
     summary_payload = {
         "case_id": result.case_id,
         "abm": case_input.abm,
@@ -515,6 +560,7 @@ def _render_report(result: FullCaseSmokeResult) -> str:
         f"- case_id: `{result.case_id}`",
         f"- failed_plot_count: `{len(result.failed_plot_indices)}`",
         f"- review_csv_path: `{result.review_csv_path}`",
+        f"- prompt_compression_summary_path: `{result.prompt_compression_summary_path}`",
         "",
         "| plot_index | success |",
         "| --- | --- |",
