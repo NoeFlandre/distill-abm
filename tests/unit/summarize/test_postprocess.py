@@ -69,6 +69,24 @@ def test_remove_repeated_phrases_preserves_prefix_punctuation_and_numeric_format
     assert remove_repeated_phrases(text) == "Value (mean=2.5, std=0.4) rises steadily; A B C."
 
 
+def test_remove_repeated_phrases_preserves_unicode_word_boundaries() -> None:
+    text = "Signal rises. café café café café café café café café café."
+
+    assert remove_repeated_phrases(text) == "Signal rises. café café café."
+
+
+def test_remove_repeated_phrases_preserves_unicode_prefix_punctuation_and_numbers() -> None:
+    text = "Valeur (moyenne=2.5) monte; café café café café café café café café café."
+
+    assert remove_repeated_phrases(text) == "Valeur (moyenne=2.5) monte; café café café."
+
+
+def test_remove_repeated_phrases_trims_dangling_connector_after_unicode_loop() -> None:
+    text = "Observation. café au lait café au lait café au lait café au."
+
+    assert remove_repeated_phrases(text) == "Observation. café au lait."
+
+
 def test_postprocess_summary_preserves_non_loop_repetition_that_may_be_meaningful() -> None:
     text = "Very very high demand can still matter. Very high demand may persist."
 
