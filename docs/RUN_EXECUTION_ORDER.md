@@ -171,7 +171,9 @@ For a user, the simplest mental model is:
 If someone wants to understand a surprising result, the fastest inspection order is:
 
 1. `pipeline_run_metadata.json`
-2. `debug_trace/context_request.json`
-3. `debug_trace/trend_request.json`
+2. `debug_trace/llm/context_request.json`
+3. `debug_trace/llm/trend_request.json`
 4. `report.csv`
 5. `stats_table.csv`
+
+The metadata file also records the exact trace paths under the debug-trace section, so if the trace layout changes again, `pipeline_run_metadata.json` remains the safest starting point.
