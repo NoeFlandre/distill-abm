@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import os
 import time
 from datetime import UTC, datetime
@@ -15,6 +16,13 @@ from distill_abm.llm.resilience import CIRCUIT_BREAKER_OPEN_SECONDS, is_transien
 from distill_abm.pipeline.full_case_matrix_smoke import (
     FullCaseMatrixCaseSpec,
     run_full_case_matrix_smoke,
+)
+from distill_abm.pipeline.full_case_run_observability import (
+    RUN_OBSERVABILITY_FILENAME,
+    build_run_observability_summary,
+    read_run_observability_rows,
+    render_run_observability_summary,
+    write_run_observability_csv,
 )
 from distill_abm.pipeline.full_case_smoke import FullCaseSmokeInput
 from distill_abm.pipeline.full_case_suite_progress import (
@@ -60,6 +68,9 @@ class FullCaseSuiteAbmResult(BaseModel):
     review_html_path: Path
     prompt_compression_summary_path: Path
     planned_case_count: int
+    observability_csv_path: Path | None = None
+    observability_summary_json_path: Path | None = None
+    observability_summary_markdown_path: Path | None = None
     failed_case_ids: list[str] = Field(default_factory=list)
 
 
@@ -77,6 +88,9 @@ class FullCaseSuiteSmokeResult(BaseModel):
     review_csv_path: Path
     review_html_path: Path
     prompt_compression_summary_path: Path
+    observability_csv_path: Path | None = None
+    observability_summary_json_path: Path | None = None
+    observability_summary_markdown_path: Path | None = None
     success: bool
     failed_abms: list[str] = Field(default_factory=list)
     abms: list[FullCaseSuiteAbmResult] = Field(default_factory=list)
@@ -146,6 +160,19 @@ def _initial_abm_results_by_name(
             review_html_path=run_root / "review.html",
             prompt_compression_summary_path=run_root / PROMPT_COMPRESSION_SUMMARY_FILENAME,
             planned_case_count=progress.planned_case_count,
+            observability_csv_path=(
+                run_root / RUN_OBSERVABILITY_FILENAME if (run_root / RUN_OBSERVABILITY_FILENAME).exists() else None
+            ),
+            observability_summary_json_path=(
+                run_root / "run_observability_summary.json"
+                if (run_root / "run_observability_summary.json").exists()
+                else None
+            ),
+            observability_summary_markdown_path=(
+                run_root / "run_observability_summary.md"
+                if (run_root / "run_observability_summary.md").exists()
+                else None
+            ),
             failed_case_ids=[],
         )
     return results
@@ -292,6 +319,23 @@ def run_full_case_suite_smoke(
                         on_case_completed=live_case_progress_callback,
                     )
                     latest_abm_run = Path((abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip())
+                    observability_csv_path = getattr(matrix_result, "observability_csv_path", None)
+                    if observability_csv_path is None:
+                        candidate = latest_abm_run / RUN_OBSERVABILITY_FILENAME
+                        if candidate.exists():
+                            observability_csv_path = candidate
+                    observability_summary_json_path = getattr(matrix_result, "observability_summary_json_path", None)
+                    if observability_summary_json_path is None:
+                        candidate = latest_abm_run / "run_observability_summary.json"
+                        if candidate.exists():
+                            observability_summary_json_path = candidate
+                    observability_summary_markdown_path = getattr(
+                        matrix_result, "observability_summary_markdown_path", None
+                    )
+                    if observability_summary_markdown_path is None:
+                        candidate = latest_abm_run / "run_observability_summary.md"
+                        if candidate.exists():
+                            observability_summary_markdown_path = candidate
                     abm_result = FullCaseSuiteAbmResult(
                         abm=abm,
                         success=matrix_result.success,
@@ -306,6 +350,9 @@ def run_full_case_suite_smoke(
                             latest_abm_run / "prompt_compression_summary.json",
                         ),
                         planned_case_count=len(case_specs),
+                        observability_csv_path=observability_csv_path,
+                        observability_summary_json_path=observability_summary_json_path,
+                        observability_summary_markdown_path=observability_summary_markdown_path,
                         failed_case_ids=list(matrix_result.failed_case_ids),
                     )
                 except Exception as exc:
@@ -320,6 +367,9 @@ def run_full_case_suite_smoke(
                         review_html_path=abm_output_root / "review.html",
                         prompt_compression_summary_path=abm_output_root / PROMPT_COMPRESSION_SUMMARY_FILENAME,
                         planned_case_count=len(case_specs),
+                        observability_csv_path=None,
+                        observability_summary_json_path=None,
+                        observability_summary_markdown_path=None,
                         failed_case_ids=["abm_runner_failed"],
                     )
                     log_event(
@@ -413,6 +463,24 @@ def run_full_case_suite_smoke(
             if summary is None:
                 continue
             prompt_compression_entries.extend(summary.entries)
+        observability_rows: list[dict[str, str]] = []
+        for abm_result in abm_results:
+            if abm_result.observability_csv_path is None:
+                continue
+            observability_rows.extend(read_run_observability_rows(abm_result.observability_csv_path))
+        observability_csv_path = run_root / RUN_OBSERVABILITY_FILENAME
+        observability_summary_json_path = run_root / "run_observability_summary.json"
+        observability_summary_markdown_path = run_root / "run_observability_summary.md"
+        observability_summary = build_run_observability_summary(observability_rows)
+        write_run_observability_csv(observability_csv_path, observability_rows)
+        observability_summary_json_path.write_text(
+            json.dumps(observability_summary, indent=2, sort_keys=True),
+            encoding="utf-8",
+        )
+        observability_summary_markdown_path.write_text(
+            render_run_observability_summary(observability_summary, csv_path=observability_csv_path),
+            encoding="utf-8",
+        )
 
         finished_at = datetime.now(UTC)
         result = FullCaseSuiteSmokeResult(
@@ -427,6 +495,9 @@ def run_full_case_suite_smoke(
             review_csv_path=run_root / "review.csv",
             review_html_path=run_root / "review.html",
             prompt_compression_summary_path=run_root / PROMPT_COMPRESSION_SUMMARY_FILENAME,
+            observability_csv_path=observability_csv_path,
+            observability_summary_json_path=observability_summary_json_path,
+            observability_summary_markdown_path=observability_summary_markdown_path,
             success=all(item.success for item in abm_results),
             failed_abms=[item.abm for item in abm_results if not item.success],
             abms=abm_results,
@@ -480,6 +551,9 @@ def _render_report(result: FullCaseSuiteSmokeResult) -> str:
         f"- success: `{str(result.success).lower()}`",
         f"- failed ABMs: `{', '.join(result.failed_abms) if result.failed_abms else 'none'}`",
         f"- prompt_compression_summary_path: `{result.prompt_compression_summary_path}`",
+        f"- observability_csv_path: `{result.observability_csv_path}`",
+        f"- observability_summary_json_path: `{result.observability_summary_json_path}`",
+        f"- observability_summary_markdown_path: `{result.observability_summary_markdown_path}`",
         "",
         "| ABM | Success | Planned cases | Failed cases | Review HTML |",
         "| --- | --- | --- | --- | --- |",
