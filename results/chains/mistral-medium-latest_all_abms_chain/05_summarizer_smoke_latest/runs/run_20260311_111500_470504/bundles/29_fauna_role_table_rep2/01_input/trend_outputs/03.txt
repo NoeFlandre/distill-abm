@@ -1,0 +1,9 @@
+The cumulative number of male prey animals hunted and killed by forager bands in the Megaherbivore Hunting Pressure Model (MHPM) exhibits distinct trends over the simulation period. Initially, the number of males killed starts at zero and begins to increase rapidly. This rapid increase is evident in the early stages, particularly within the first 250 ticks, where the slope of increase is steep. The trend continues to rise, albeit at a slightly reduced rate, up to around 500 ticks. 
+
+Following this period, the rate of increase in the number of males killed starts to taper off, indicating a slowing trend. This deceleration continues until approximately 850 ticks, where the cumulative number of males killed begins to stabilize. The stabilization phase is marked by minor fluctuations around a mean value, with the cumulative number of males killed hovering around 117 to 120. 
+
+The data shows several inflection points, notably around ticks 362, 1241, and 1330, which indicate changes in the rate of increase. The most significant peaks in the cumulative number of males killed are observed around ticks 1876, 2040, and 1672, where the values reach approximately 120. The valleys, or local minima, are less pronounced but are observed around ticks 1958, 1696, and 1167. 
+
+The rolling Mann-Kendall test indicates significant increasing trends in the early and middle phases of the simulation, with notable windows of increase up to around 1391 ticks. Beyond this point, the trend becomes less consistent, with periods of no significant trend and even a slight decreasing trend observed towards the end of the simulation period. 
+
+Oscillations in the data are detected towards the very end of the simulation, with a dominant period of approximately 63 ticks. These oscillations suggest minor periodic variations in the cumulative number of males killed, but they do not significantly deviate from the stabilized mean value.

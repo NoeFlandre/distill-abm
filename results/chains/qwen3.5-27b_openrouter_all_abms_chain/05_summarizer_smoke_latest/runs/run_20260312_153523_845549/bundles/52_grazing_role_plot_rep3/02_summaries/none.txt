@@ -1,0 +1,57 @@
+Context and Goals
+
+This simulation extends the RAGE model to study how smallholder farmers manage grazing land when they can learn from their own experience or from neighbors. In this version, each farmer stays on their own plot of land. They decide how many animals to keep based on how the grass is doing and what others are doing. The goal is to see how different learning styles affect the health of the pasture and the farmers' success over time. There are three main ways farmers behave: baseline (E-RO), learning from their own results (E-LBD), and learning from neighbors (E-RO-SL1). The model runs for a set number of years to track changes in grass and livestock.
+
+Key Parameters and Settings
+
+- number-households: Range from 1.0 to 100.0. We set it to 60.
+- satisficing-threshold: Range from 0.0 to 100.0. We set it to 0.
+- satisficing-trials: Range from 0.0 to 100.0. We set it to 21.
+- knowledge-radius: Range from 0.0 to 5.0. We set it to 1.
+- resting-threshold: Range from 0.0 to 1.0. We set it to 0.1.
+- intrinsic-preference: Range from 0.0 to 1.0. We set it to 0.
+- social-susceptibility: Range from 0.0 to 1.0. We set it to 0.
+- global-rain?: We set it to True.
+- start-on-homepatch?: We set it to True.
+- resting?: We set it to False.
+- homog-behav-types?: We set it to True.
+- extension-model?: We set it to True.
+- SL2-strategy-switch?: We set it to False.
+- risk-mode?: We set it to True.
+- behavioral-type: We set it to E-RO.
+- number-SAT: We set it to 0.
+- number-E-RO: We set it to 20.
+- number-TRAD: We set it to 0.
+- b: We set it to 0.
+- number-MAX: We set it to 0.
+- rain-mean: We set it to 200.
+- risk-att-init: We set it to 0.5.
+- gr1: We set it to 0.5.
+- number-E-LBD: We set it to 20.
+- gr2: We set it to 0.1.
+- number-E-RO-SL1: We set it to 20.
+- timesteps: We set it to 100.
+- w: We set it to 0.8.
+- number-random: We set it to 0.
+- livestock-init: We set it to 90.
+- rain-std: We set it to 100.
+
+The mean household initial risk attitude across all social learning agents remains constant over the entire 100-step simulation. The values range approximately between -0.10 and 0.18, with multiple distinct horizontal lines indicating varying initial attitudes among different households or subgroups. Specifically, the highest initial risk attitude is observed at approximately 0.18, while the lowest is near -0.10. Intermediate values are distributed across a spectrum, including levels around 0.14, 0.11, 0.07, 0.05, 0.01, -0.02, -0.05, -0.07, and -0.09. These values do not change over time, as expected for initial conditions that are fixed at the start of the simulation.
+
+The mean household risk attitude exhibits significant divergence among agents over time. Initially, risk attitudes cluster between -0.1 and 0.2 at step 0. From step 0 to 20, most agents demonstrate a rapid increase in risk attitude, with several reaching values between 0.5 and 0.8 by step 30. The highest values stabilize near 0.8 by step 50 and remain constant until step 100. In contrast, a subset of agents shows a decline in risk attitude after step 40. By step 60, the lowest risk attitudes drop to approximately -0.3, maintaining this level through step 100. Mid-range values fluctuate between 0.1 and 0.6 from step 40 onwards, reflecting heterogeneous behavioral adaptation among households.
+
+Initially, at step 0, the average reserve biomass across all patches is approximately 90,000. This value remains relatively stable for the first few time steps before beginning a gradual decline. By around step 10, the average reserve biomass drops to roughly 85,000, marking a notable decrease from the starting value. The decline continues until approximately step 30, where it reaches its lowest point, close to 80,000. Following this trough, there is a significant and rapid increase in the average reserve biomass. This growth is particularly pronounced between steps 30 and 60, where the value rises sharply from 80,000 to around 115,000. From step 60 onwards, the rate of increase slows, and the biomass levels off, approaching a plateau. By step 80, the average reserve biomass stabilizes at approximately 125,000, maintaining this level through the end of the simulation at step 100.
+
+Initially, at step 0, the average green biomass across all patches is approximately 45000. Between steps 0 and 20, a general decline in green biomass is observed, with most simulation runs converging towards a low of around 41000 to 43000 by step 15. Notably, one simulation trajectory deviates early, maintaining higher levels before rejoining the trend. A distinct minimum is reached across the majority of runs between steps 25 and 35, with values bottoming out near 40000 to 41000. Following this trough, a rapid and steep increase in green biomass commences from approximately step 40. By step 60, the mean green biomass has surged past 55000 in most simulations. The rate of increase slows significantly after step 70. By step 80, the values begin to plateau, stabilizing between 56000 and 64000 depending on the specific simulation run. At the final step, 100, the mean green biomass ranges from approximately 59000 to 64000 across the different runs, indicating a substantial recovery and increase in available biomass compared to the minimum values observed earlier.
+
+The average total number of livestock, including both healthy livestock and those that have been destocked, across all households starts at 90 at step 0. This value rapidly declines over the initial time steps, reaching approximately 40 to 45 by step 40. This significant decrease suggests a substantial adjustment in livestock numbers in response to the initial conditions of the simulation. After step 40, the trend begins to shift, showing a gradual increase in the livestock count. By step 60, the average number of livestock starts to stabilize and then slightly increases, reaching values between 45 and 62 by step 100. This stabilization and slight increase indicate a period of adjustment where the livestock numbers are finding a new equilibrium, possibly due to the farmers' learning and adaptation strategies.
+
+The average number of livestock destocked across all households begins at 0.0 at the initial step. In the first few time steps, specifically between steps 1 and 5, there is a rapid increase in destocking, with the average reaching a peak value of approximately 7.3 livestock per household around step 5. Following this peak, there is a consistent and significant decline in the number of destocked livestock. By step 10, the average destocking has dropped to approximately 5.5, and by step 20, it decreases further to around 2.0. The decline continues at a slower rate, reaching approximately 1.0 by step 40. From step 40 onwards, the destocking rate stabilizes, fluctuating minimally between 0.8 and 1.2 until the end of the simulation at step 100. Some individual household lines show minor fluctuations or spikes, such as around step 60, but these are within the overall stable range observed after step 40.
+
+Initially, at step 0, the inequality in the distribution of healthy livestock is zero, indicating perfect equality among households. As the simulation progresses, inequality starts to increase gradually, reaching a Gini coefficient of approximately 0.015 by step 40. This initial slow increase suggests that differences in livestock management strategies begin to affect herd health outcomes unevenly among households. After step 40, the Gini coefficient begins to rise more sharply, indicating an acceleration in the divergence of livestock health across households. By step 80, the inequality has increased significantly, with the Gini coefficient reaching values around 0.06 to 0.09. The trend continues to rise towards step 100, where the Gini coefficient for some simulations exceeds 0.09, indicating high levels of inequality in livestock health distribution. This pattern suggests that over time, the initial homogeneity in livestock management evolves into a state where some households consistently maintain healthier herds than others, likely due to the compounding effects of their learning strategies and interactions.
+
+The number of households engaging in social learning starts at zero for all simulation runs. By timestep 10, the count of households with social learning begins to increase across the simulations, with some runs reaching up to 10 households. A rapid increase is observed between timesteps 10 and 30, where the number of households engaging in social learning rises sharply. By timestep 30, the count ranges between approximately 20 and 40 households across the different simulation runs. From timesteps 30 to 50, the increase continues but at a slower rate, with some runs stabilizing around 40 to 50 households. By timestep 50, most simulation runs plateau, showing little to no further increase in the number of households engaging in social learning. By the final timestep, 100, the number of households with social learning stabilizes, ranging from approximately 15 to 54 households across the different runs. The trend indicates a rapid initial adoption of social learning behavior, followed by stabilization as the simulation progresses.
+
+The average cumulative number of livestock destocked across all households increases over the 100 timesteps. Initially, from timestep 0 to 20, there is a sharp increase, with values rising from approximately 0 to around 70. From timestep 20 to 60, the rate of increase slows, and the values range between 70 and 110. After timestep 60, the growth continues at a more steady and gradual pace, with values reaching approximately 130 to 170 by timestep 100. The spread among the simulated runs widens over time, indicating variability in the cumulative destocking among different household behaviors or conditions.
+
+The number of households following the E-RO strategy exhibits a range of behaviors across the simulation steps. Initially, all households start at a count of 20, reflecting the initial setting of 20 households with the E-RO behavioral type. Over the first 10 steps, some households show a rapid decline, with counts dropping to as low as 2, while others maintain counts near the initial 20. From steps 10 to 30, there is variability in the trends, with some households increasing their counts, peaking around 40, while others continue to decline. After step 30, the trends stabilize, with most households settling between counts of 10 and 25. A few households show a gradual decline, reaching counts as low as 2 by step 100. This behavior suggests that the initial adoption of the E-RO strategy varies, with some households maintaining or increasing their reliance on this strategy while others shift away from it over time.

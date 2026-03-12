@@ -1,0 +1,8 @@
+[
+  {
+    "model": "qwen/qwen3.5-27b",
+    "model_id": "qwen3_5_27b",
+    "preflight_error": null,
+    "provider": "openrouter"
+  }
+]

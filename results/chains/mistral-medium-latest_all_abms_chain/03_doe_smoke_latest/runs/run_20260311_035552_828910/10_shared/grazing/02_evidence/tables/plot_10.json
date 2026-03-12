@@ -1,0 +1,5 @@
+{
+  "reporter_pattern": "count households with [household-behavioral-type = \"E-RO\"]",
+  "series_path": "results/chains/mistral-medium-latest_all_abms_chain/03_doe_smoke_latest/runs/run_20260311_035552_828910/10_shared/grazing/02_evidence/tables/plot_10_series.csv",
+  "summary_path": "results/chains/mistral-medium-latest_all_abms_chain/03_doe_smoke_latest/runs/run_20260311_035552_828910/10_shared/grazing/02_evidence/tables/plot_10.txt"
+}

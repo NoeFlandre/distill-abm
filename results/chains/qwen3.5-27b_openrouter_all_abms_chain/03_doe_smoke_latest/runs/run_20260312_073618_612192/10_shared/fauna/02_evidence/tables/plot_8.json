@@ -1,0 +1,5 @@
+{
+  "reporter_pattern": "count animals with [species = 1]",
+  "series_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/03_doe_smoke_latest/runs/run_20260312_073618_612192/10_shared/fauna/02_evidence/tables/plot_8_series.csv",
+  "summary_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/03_doe_smoke_latest/runs/run_20260312_073618_612192/10_shared/fauna/02_evidence/tables/plot_8.txt"
+}

@@ -1,0 +1,513 @@
+{
+  "started_at_utc": "2026-03-12T07:26:27.957541+00:00",
+  "finished_at_utc": "2026-03-12T07:26:27.972253+00:00",
+  "output_root": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest",
+  "run_id": "run_20260312_072627_957541",
+  "run_root": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541",
+  "run_log_path": "/Users/noeflandre/distill-abm/results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/run.log.jsonl",
+  "success": true,
+  "failed_abms": [],
+  "selected_stage_ids": [
+    "experiment-parameters",
+    "gui-parameters",
+    "updated-parameters",
+    "narrative",
+    "documentation",
+    "cleaned-documentation",
+    "final-documentation",
+    "code"
+  ],
+  "abms": [
+    {
+      "abm": "fauna",
+      "model_path": "data/abms/fauna/fauna.nlogo",
+      "output_dir": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/fauna",
+      "status": "ok",
+      "artifact_index_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/fauna/ingest_artifact_index.json",
+      "stage_results": [
+        {
+          "stage": {
+            "stage_id": "experiment-parameters",
+            "artifact_key": "experiment_parameters_json",
+            "description": "Resolved experiment parameter JSON.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/fauna/JSON/experiment_parameters.json",
+            "exists": true,
+            "size_bytes": 864,
+            "sha256": "e0a183e146823096d486a20e82f10a126d5c4d72df80ac7174488f98e401a86a",
+            "preview": "{\n    \"init-foragers\": 20,\n    \"processing-cost-females\": 3,\n    \"keep-initial-grass-pattern\": true,\n    \"maximum-lifespan\": 10220,\n    \"food-value-males\": 30,\n    \"internal-mortality\": 0.025,\n    \"ma",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "gui-parameters",
+            "artifact_key": "gui_parameters_json",
+            "description": "Extracted GUI controls JSON.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/fauna/JSON/gui_parameters.json",
+            "exists": true,
+            "size_bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "preview": "{}",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "updated-parameters",
+            "artifact_key": "updated_gui_parameters_json",
+            "description": "GUI controls updated with experiment values.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/fauna/JSON/updated_gui_parameters.json",
+            "exists": true,
+            "size_bytes": 3,
+            "sha256": "8eb95bcbc154530931e15fc418c8b1fe991095671409552099ea1aa596999ede",
+            "preview": "{\n}",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "narrative",
+            "artifact_key": "narrative_txt",
+            "description": "Narrative text synthesized from parameters.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/fauna/TXT/narrative_combined.txt",
+            "exists": true,
+            "size_bytes": 1595,
+            "sha256": "3becf775e75205ad19fb0577daad7d6ef70ba8bdeb5c72633ec90c02af35dcf0",
+            "preview": "We have 29 parameters:\n  - init-foragers, from 0.0 to 100.0. We set it to 20.\n  - processing-cost-males, from 0.0 to 20.0. We set it to 6.\n  - food-value-males, from 5.0 to 100.0. We set it to 30.\n  -",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "documentation",
+            "artifact_key": "documentation_json",
+            "description": "Raw documentation extraction.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/fauna/JSON/documentation.json",
+            "exists": true,
+            "size_bytes": 12232,
+            "sha256": "bb74c689781b402f85d852357ca757dc52567fb583a4d9efea7a7c8fbd5e0e34",
+            "preview": "{\n    \"documentation\": \"@#$#@#$#@\\n## WHAT IS IT?\\nThe Megafaunal Hunting Pressure Model (MHPM) is an interactive, agent-based model designed to conduct experiments to test megaherbivore extinction hy",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "cleaned-documentation",
+            "artifact_key": "cleaned_documentation_json",
+            "description": "Documentation after URL cleanup.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/fauna/JSON/cleaned_documentation.json",
+            "exists": true,
+            "size_bytes": 12189,
+            "sha256": "4b7a20b48e52b42ced25567040dc08842e8acb72b00100abb1cd621bc945ca5e",
+            "preview": "{\n  \"documentation\": \"@#$#@#$#@\\n## WHAT IS IT?\\nThe Megafaunal Hunting Pressure Model (MHPM) is an interactive, agent-based model designed to conduct experiments to test megaherbivore extinction hypo",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "final-documentation",
+            "artifact_key": "final_documentation_txt",
+            "description": "Final documentation text handed downstream.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/fauna/TXT/final_documentation.txt",
+            "exists": true,
+            "size_bytes": 11911,
+            "sha256": "7496f6b5226009f84e9846a8d3e522aa6327217456e145b8a0cd093b1ab12b4e",
+            "preview": "The Megafaunal Hunting Pressure Model (MHPM) is an interactive, agent-based model designed to conduct experiments to test megaherbivore extinction hypotheses. The model considers environmental change,",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "code",
+            "artifact_key": "extracted_code_txt",
+            "description": "Extracted NetLogo source code text.",
+            "inspect_placeholder_signals": false
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/fauna/TXT/extracted_code.txt",
+            "exists": true,
+            "size_bytes": 16869,
+            "sha256": "812c4f9396a8cde4a468e18fc386c56f616f31ef3b13d16c4b40d9076db927d1",
+            "preview": "globals [prey-list long-prey-list diversity _recording-save-file-name birth-count death-count num-foragers num-animals males-killed females-killed ppfem-killed seasonal wet-season dry-season]\n;;prey-l",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        }
+      ],
+      "error_code": null,
+      "error": null
+    },
+    {
+      "abm": "grazing",
+      "model_path": "data/abms/grazing/grazing.nlogo",
+      "output_dir": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/grazing",
+      "status": "ok",
+      "artifact_index_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/grazing/ingest_artifact_index.json",
+      "stage_results": [
+        {
+          "stage": {
+            "stage_id": "experiment-parameters",
+            "artifact_key": "experiment_parameters_json",
+            "description": "Resolved experiment parameter JSON.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/grazing/JSON/experiment_parameters.json",
+            "exists": true,
+            "size_bytes": 784,
+            "sha256": "7c1be16c925002e7f23bee7241fb8554e549f1e0a93947b7589ab24aa31953dc",
+            "preview": "{\n    \"behavioral-type\": \"E-RO\",\n    \"number-SAT\": 0,\n    \"number-E-RO\": 20,\n    \"number-TRAD\": 0,\n    \"resting?\": false,\n    \"b\": 0,\n    \"number-MAX\": 0,\n    \"rain-mean\": 200,\n    \"homog-behav-types?",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "gui-parameters",
+            "artifact_key": "gui_parameters_json",
+            "description": "Extracted GUI controls JSON.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/grazing/JSON/gui_parameters.json",
+            "exists": true,
+            "size_bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "preview": "{}",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "updated-parameters",
+            "artifact_key": "updated_gui_parameters_json",
+            "description": "GUI controls updated with experiment values.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/grazing/JSON/updated_gui_parameters.json",
+            "exists": true,
+            "size_bytes": 3,
+            "sha256": "8eb95bcbc154530931e15fc418c8b1fe991095671409552099ea1aa596999ede",
+            "preview": "{\n}",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "narrative",
+            "artifact_key": "narrative_txt",
+            "description": "Narrative text synthesized from parameters.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/grazing/TXT/narrative_combined.txt",
+            "exists": true,
+            "size_bytes": 1269,
+            "sha256": "c507463c433d8282dbb56a8462667b16196fc9bec560f70fd78ca0e4f4cb6ce5",
+            "preview": "We have 31 parameters:\n  - number-households, from 1.0 to 100.0. We set it to 60.\n  - satisficing-threshold, from 0.0 to 100.0. We set it to 0.\n  - satisficing-trials, from 0.0 to 100.0. We set it to ",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "documentation",
+            "artifact_key": "documentation_json",
+            "description": "Raw documentation extraction.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/grazing/JSON/documentation.json",
+            "exists": true,
+            "size_bytes": 6578,
+            "sha256": "6ed749836c025977c56f1c2a8cc80ead2492c2633ed7a705f9307d77c0b3621d",
+            "preview": "{\n    \"documentation\": \"@#$#@#$#@\\n# RAGE RAngeland Grazing ModEl - EXTENSION\\n\\n## WHAT IS IT?\\n\\nThis is an extension of the original RAGE model where we add learning capabilities to agents, specifi",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "cleaned-documentation",
+            "artifact_key": "cleaned_documentation_json",
+            "description": "Documentation after URL cleanup.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/grazing/JSON/cleaned_documentation.json",
+            "exists": true,
+            "size_bytes": 6523,
+            "sha256": "1ef2b85bd7261ed7b34d7fc965ddf49fcc30095def1a82b40820ce632e14e7b2",
+            "preview": "{\n  \"documentation\": \"@#$#@#$#@\\n# RAGE RAngeland Grazing ModEl - EXTENSION\\n\\n## WHAT IS IT?\\n\\nThis is an extension of the original RAGE model where we add learning capabilities to agents, specifica",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "final-documentation",
+            "artifact_key": "final_documentation_txt",
+            "description": "Final documentation text handed downstream.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/grazing/TXT/final_documentation.txt",
+            "exists": true,
+            "size_bytes": 6206,
+            "sha256": "54b90f274bee531421796277a327af7f35c5ab86e747d2bc38e2c181eea4242c",
+            "preview": "This is an extension of the original RAGE model where we add learning capabilities to agents, specifically learning-by-doing and social learning (two processes central to adaptive (co-)management). \n\n",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "code",
+            "artifact_key": "extracted_code_txt",
+            "description": "Extracted NetLogo source code text.",
+            "inspect_placeholder_signals": false
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/grazing/TXT/extracted_code.txt",
+            "exists": true,
+            "size_bytes": 57033,
+            "sha256": "5e21a77568d017f8b54bf8eaa97c13f600ee9e6f463341e010a739d590e172da",
+            "preview": "globals\n[\n  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n  ;; model parameters\n  ;;",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        }
+      ],
+      "error_code": null,
+      "error": null
+    },
+    {
+      "abm": "milk_consumption",
+      "model_path": "data/abms/milk_consumption/milk_consumption.nlogo",
+      "output_dir": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/milk_consumption",
+      "status": "ok",
+      "artifact_index_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/milk_consumption/ingest_artifact_index.json",
+      "stage_results": [
+        {
+          "stage": {
+            "stage_id": "experiment-parameters",
+            "artifact_key": "experiment_parameters_json",
+            "description": "Resolved experiment parameter JSON.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/milk_consumption/JSON/experiment_parameters.json",
+            "exists": true,
+            "size_bytes": 487,
+            "sha256": "d8cb994a73cadedd3c3f1ccbc5b850de662a34182c6857fb51c38e5846095b0d",
+            "preview": "{\n    \"number-of-agents\": 1000,\n    \"habit-on?\": true,\n    \"network-type\": \"watts-strogatz\",\n    \"norms\": true,\n    \"network-parameter\": 8,\n    \"memory-lifetime\": 5,\n    \"habit-threshold\": 2,\n    \"cog",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "gui-parameters",
+            "artifact_key": "gui_parameters_json",
+            "description": "Extracted GUI controls JSON.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/milk_consumption/JSON/gui_parameters.json",
+            "exists": true,
+            "size_bytes": 2,
+            "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "preview": "{}",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "updated-parameters",
+            "artifact_key": "updated_gui_parameters_json",
+            "description": "GUI controls updated with experiment values.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/milk_consumption/JSON/updated_gui_parameters.json",
+            "exists": true,
+            "size_bytes": 3,
+            "sha256": "8eb95bcbc154530931e15fc418c8b1fe991095671409552099ea1aa596999ede",
+            "preview": "{\n}",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "narrative",
+            "artifact_key": "narrative_txt",
+            "description": "Narrative text synthesized from parameters.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/milk_consumption/TXT/narrative_combined.txt",
+            "exists": true,
+            "size_bytes": 875,
+            "sha256": "939db2c0ee6fc2efa4d2f3e65a73a2d1a429b5a3d0e1d4634be1f8336048bc8d",
+            "preview": "We have 16 parameters:\n  - memory-lifetime, from 1.0 to 10.0. We set it to 5.\n  - alt-health-mean-initial, from 1.0 to 3.0. We set it to 1.69.\n  - habit-threshold, from 1.0 to 10.0. We set it to 2.\n  ",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "documentation",
+            "artifact_key": "documentation_json",
+            "description": "Raw documentation extraction.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/milk_consumption/JSON/documentation.json",
+            "exists": true,
+            "size_bytes": 4690,
+            "sha256": "5c1f51a43aa9908c4d16d51bae47fe3880d35e27d1bb1926c43d9914dcdefd1a",
+            "preview": "{\n    \"documentation\": \"@#$#@#$#@\\n## WHAT IS IT?\\n\\nThe overall objective of the agent-based model is to reproduce adoption behaviours of milk consumption by the British public (1974-2005), by replic",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "cleaned-documentation",
+            "artifact_key": "cleaned_documentation_json",
+            "description": "Documentation after URL cleanup.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/milk_consumption/JSON/cleaned_documentation.json",
+            "exists": true,
+            "size_bytes": 4688,
+            "sha256": "48760a5f858e746bfc00f2f4429b0c97d659743fb32618321bce25f119cdf5b1",
+            "preview": "{\n  \"documentation\": \"@#$#@#$#@\\n## WHAT IS IT?\\n\\nThe overall objective of the agent-based model is to reproduce adoption behaviours of milk consumption by the British public (1974-2005), by replicat",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "final-documentation",
+            "artifact_key": "final_documentation_txt",
+            "description": "Final documentation text handed downstream.",
+            "inspect_placeholder_signals": true
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/milk_consumption/TXT/final_documentation.txt",
+            "exists": true,
+            "size_bytes": 3960,
+            "sha256": "c467551f8320148f9c60803ccdea93d3edaccc07246ace67d51f909d0143b8eb",
+            "preview": "The overall objective of the agent-based model is to reproduce adoption behaviours of milk consumption by the British public (1974-2005), by replicating individual preferences and decision factors. Sp",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        },
+        {
+          "stage": {
+            "stage_id": "code",
+            "artifact_key": "extracted_code_txt",
+            "description": "Extracted NetLogo source code text.",
+            "inspect_placeholder_signals": false
+          },
+          "status": "ok",
+          "artifact": {
+            "path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/milk_consumption/TXT/extracted_code.txt",
+            "exists": true,
+            "size_bytes": 28088,
+            "sha256": "720b4dc1122c980eda73789601b8308662e5ce962738e04b2048398fbb98c4f4",
+            "preview": "globals [\n  number-of-agents                  ;number of agents\n  norm-data                         ;public concern data informed from Ipsos Mori and YouGov longitudinal survey data on concerns of the",
+            "placeholder_signals": []
+          },
+          "error_code": null,
+          "error": null
+        }
+      ],
+      "error_code": null,
+      "error": null
+    }
+  ],
+  "report_markdown_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/ingest_smoke_report.md",
+  "report_json_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/01_ingest_smoke_latest/runs/run_20260312_072627_957541/ingest_smoke_report.json"
+}

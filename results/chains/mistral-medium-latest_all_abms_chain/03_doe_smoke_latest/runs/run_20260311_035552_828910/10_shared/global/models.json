@@ -1,0 +1,8 @@
+[
+  {
+    "model": "mistral-medium-latest",
+    "model_id": "mistral_medium_debug",
+    "preflight_error": null,
+    "provider": "mistral"
+  }
+]

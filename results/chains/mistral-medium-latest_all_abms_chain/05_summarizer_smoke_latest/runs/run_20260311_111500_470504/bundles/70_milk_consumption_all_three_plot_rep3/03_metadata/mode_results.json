@@ -1,0 +1,55 @@
+{
+  "bundle_id": "70_milk_consumption_all_three_plot_rep3",
+  "case_id": "70_milk_consumption_all_three_plot_rep3",
+  "abm": "milk_consumption",
+  "bundle_dir": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/70_milk_consumption_all_three_plot_rep3",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/70_milk_consumption_all_three_plot_rep3/02_summaries/none.txt",
+      "error": null,
+      "duration_seconds": 5.830002010043245e-7,
+      "input_length": 23727,
+      "output_length": 23727
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/70_milk_consumption_all_three_plot_rep3/02_summaries/bart.txt",
+      "error": null,
+      "duration_seconds": 29.533008583000083,
+      "input_length": 23727,
+      "output_length": 2068
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/70_milk_consumption_all_three_plot_rep3/02_summaries/bert.txt",
+      "error": null,
+      "duration_seconds": 5.72844112499979,
+      "input_length": 23727,
+      "output_length": 6360
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/70_milk_consumption_all_three_plot_rep3/02_summaries/t5.txt",
+      "error": null,
+      "duration_seconds": 8.314116999999897,
+      "input_length": 23727,
+      "output_length": 1611
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/70_milk_consumption_all_three_plot_rep3/02_summaries/longformer_ext.txt",
+      "error": null,
+      "duration_seconds": 45.10645733299998,
+      "input_length": 23727,
+      "output_length": 6762
+    }
+  ]
+}

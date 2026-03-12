@@ -1,0 +1,65 @@
+{
+  "bundle_id": "02_grazing_none_table_rep1",
+  "case_id": "02_grazing_none_table_rep1",
+  "abm": "grazing",
+  "bundle_dir": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_104934_150669/bundles/02_grazing_none_table_rep1",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_104934_150669/bundles/02_grazing_none_table_rep1/02_summaries/none.txt",
+      "raw_output_path": null,
+      "postprocess_changed": false,
+      "error": null,
+      "duration_seconds": 3.3400283427909017e-7,
+      "input_length": 17921,
+      "output_length": 17921
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_104934_150669/bundles/02_grazing_none_table_rep1/02_summaries/bart.txt",
+      "raw_output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_104934_150669/bundles/02_grazing_none_table_rep1/03_metadata/raw_summaries/bart.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 30.649052374996245,
+      "input_length": 17921,
+      "output_length": 1484
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_104934_150669/bundles/02_grazing_none_table_rep1/02_summaries/bert.txt",
+      "raw_output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_104934_150669/bundles/02_grazing_none_table_rep1/03_metadata/raw_summaries/bert.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 10.263733708001382,
+      "input_length": 17921,
+      "output_length": 5411
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_104934_150669/bundles/02_grazing_none_table_rep1/02_summaries/t5.txt",
+      "raw_output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_104934_150669/bundles/02_grazing_none_table_rep1/03_metadata/raw_summaries/t5.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 13.858642958999553,
+      "input_length": 17921,
+      "output_length": 1320
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_104934_150669/bundles/02_grazing_none_table_rep1/02_summaries/longformer_ext.txt",
+      "raw_output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_104934_150669/bundles/02_grazing_none_table_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+      "postprocess_changed": false,
+      "error": null,
+      "duration_seconds": 45.98484549999557,
+      "input_length": 17921,
+      "output_length": 2775
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+The average initial risk attitude of all social learning agents remains constant across the 100 timesteps, with no changes observed at any key time steps. The values taken by the metric are stable, indicating that the initial risk attitude disposition does not change over the simulation period.

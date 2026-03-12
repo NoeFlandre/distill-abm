@@ -1,0 +1,5 @@
+The average weekly consumption of the incumbent whole milk product initiates at 2654.81 units and experiences a sustained reduction over the observation period, concluding at 253.10 units at step 32. This downward trajectory remains consistent across the simulation horizon, indicating a systematic transition away from the traditional option.
+
+Statistical analysis confirms a significant negative trend across the majority of the timeline. While local inflection points occur at steps 5, 13, 16, 19, 24, 25, 27, and 30, they do not interrupt the overall decline. Rolling window analyses further validate the decreasing pattern, particularly in the initial and middle phases, before the rate of change stabilizes at the lower bound.
+
+For decision makers, this sharp decline suggests that once consumer sentiment shifts, the incumbent market share erodes rapidly. The stabilization near 253 units likely represents a core segment with inelastic demand, resistant to social influence or health-based habit formation.
