@@ -1,0 +1,11 @@
+The total number of prey animals in the simulation begins at approximately 167 and exhibits a rapid decline in the initial time steps. This sharp decrease suggests a high predation pressure or unfavorable environmental conditions early in the simulation. By around 730 ticks, the number of prey animals stabilizes to a lower value, indicating a potential equilibrium between birth rates and mortality factors. 
+
+Throughout the simulation, there are several minor peaks and valleys, suggesting periodic fluctuations in the prey population. These oscillations could be due to seasonal variations or other cyclic factors influencing birth rates or mortality. The peaks at around 730, 709, and 803 ticks, although modest, indicate brief periods where the prey population experiences slight recoveries. 
+
+The inflection points scattered throughout the timeline suggest changes in the rate of decline or recovery of the prey population. These points could correspond to significant events or shifts in the simulation dynamics, such as changes in predator behavior or environmental conditions. 
+
+The rolling Mann-Kendall analysis indicates a consistent decreasing trend in the prey population across most windows, with a few periods of slight increase. This overall decreasing trend underscores the persistent pressure on the prey population, leading to a gradual decline over time. 
+
+The simulation ends with the prey population reaching zero, indicating a complete extinction event. This outcome suggests that the combined effects of predation, environmental conditions, and other mortality factors were sufficient to drive the prey population to extinction over the simulated period. 
+
+For decision-makers, these trends highlight the sensitivity of prey populations to predation and environmental pressures. The rapid initial decline and subsequent fluctuations underscore the importance of understanding and managing factors that influence prey mortality and birth rates to prevent extinction events. The periodic oscillations suggest that even minor changes in conditions can have significant impacts on prey populations, emphasizing the need for careful monitoring and intervention strategies.

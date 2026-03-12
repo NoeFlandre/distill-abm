@@ -1,0 +1,83 @@
+You are an expert in megaherbivore extinction with a statistic background.
+
+We have a data table from repeated simulations of an agent based model. Your goal is to describe the trends in details from the data table, mentioning key time steps and values taken by the metric in the data table, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the data table or any visual in your description. If a data table has very simple dynamics, simply state them without expanding.
+
+The context and goals of the model are as follows. <<context_response_from_context_llm>>
+
+This data table represents the cumulative number of births among the prey animal population.
+
+Statistical summary of the relevant simulation output:
+Statistical evidence for simulation series matching `birth-count`.
+Compression tier: 0.
+Matched series count: 40. Detailed signal analysis below is computed on the tick-wise mean of the matched series.
+
+Series: aggregate_mean_of_40_matched_series
+- samples: 2312
+- valid numeric samples: 2312
+- dropped non-numeric samples: 0
+- start value: 0.0000
+- end value: 1.0000
+- mean: 2.1751
+- median: 2.4865
+- std: 1.8327
+- variance: 3.3588
+- minimum value: 0.0000
+- minimum index: 0
+- maximum value: 5.6000
+- maximum index: 1673
+- peaks:
+  - peak 1: index 1702 value 5.6000 prominence 0.0000
+  - peak 2: index 1392 value 4.3000 prominence 0.0000
+  - peak 3: index 1214 value 3.4500 prominence 0.0000
+  - peak 4: index 1073 value 2.8750 prominence 0.0000
+- valleys:
+  - valley 1: index 1422 value 3.8889 prominence 0.0000
+  - valley 2: index 1281 value 3.0588 prominence 0.0000
+  - valley 3: index 1097 value 2.8710 prominence 0.0000
+- inflection index 1: 613
+- inflection index 2: 733
+- inflection index 3: 903
+- inflection index 4: 1121
+- inflection index 5: 1227
+- inflection index 6: 1328
+- inflection index 7: 1415
+- inflection index 8: 1511
+- inflection index 9: 1777
+- inflection index 10: 1847
+- inflection index 11: 1850
+- inflection index 12: 1930
+- inflection index 13: 2040
+- inflection index 14: 2195
+- rolling Mann-Kendall status: ok
+- rolling Mann-Kendall window 1: start=696 end=927 trend=increasing tau=0.833 slope=0.001 p=0.000 significant=True
+- rolling Mann-Kendall window 2: start=928 end=1159 trend=increasing tau=0.851 slope=0.003 p=0.000 significant=True
+- rolling Mann-Kendall window 3: start=1160 end=1391 trend=increasing tau=0.392 slope=0.002 p=0.000 significant=True
+- rolling Mann-Kendall window 4: start=1392 end=1623 trend=increasing tau=0.784 slope=0.007 p=0.000 significant=True
+- rolling Mann-Kendall window 5: start=1624 end=1855 trend=decreasing tau=-0.495 slope=-0.005 p=0.000 significant=True
+- rolling Mann-Kendall window 6: start=1856 end=2087 trend=decreasing tau=-0.453 slope=0.000 p=0.000 significant=True
+- change point 1: 725
+- change point 2: 1325
+- change point 3: 1850
+- change point 4: 2050
+- change point 5: 2310
+- oscillation dominant period: 50.00
+- oscillation index 1: 625
+- oscillation index 2: 630
+- oscillation index 3: 635
+- oscillation index 4: 640
+- oscillation index 5: 645
+- oscillation index 6: 650
+- oscillation index 7: 655
+- oscillation index 8: 660
+- oscillation index 9: 665
+- oscillation index 10: 670
+- oscillation index 11: 675
+- oscillation index 12: 680
+- oscillation index 13: 685
+- oscillation index 14: 690
+- oscillation index 15: 785
+- oscillation index 16: 790
+- oscillation index 17: 795
+- oscillation index 18: 800
+- oscillation index 19: 805
+- oscillation index 20: 810

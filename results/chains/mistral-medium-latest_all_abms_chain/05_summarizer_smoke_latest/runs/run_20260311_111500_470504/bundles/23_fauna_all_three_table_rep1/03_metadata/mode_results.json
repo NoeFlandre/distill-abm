@@ -1,0 +1,55 @@
+{
+  "bundle_id": "23_fauna_all_three_table_rep1",
+  "case_id": "23_fauna_all_three_table_rep1",
+  "abm": "fauna",
+  "bundle_dir": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/23_fauna_all_three_table_rep1",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/23_fauna_all_three_table_rep1/02_summaries/none.txt",
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 27630,
+      "output_length": 27630
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/23_fauna_all_three_table_rep1/02_summaries/bart.txt",
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 27630,
+      "output_length": 2352
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/23_fauna_all_three_table_rep1/02_summaries/bert.txt",
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 27630,
+      "output_length": 2775
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/23_fauna_all_three_table_rep1/02_summaries/t5.txt",
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 27630,
+      "output_length": 2256
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/chains/mistral-medium-latest_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260311_111500_470504/bundles/23_fauna_all_three_table_rep1/02_summaries/longformer_ext.txt",
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 27630,
+      "output_length": 3668
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "artifact_source": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/artifact_source.txt",
+  "generated_csv": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/simulation.csv",
+  "plot_1": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/1.png",
+  "plot_10": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/10.png",
+  "plot_11": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/11.png",
+  "plot_12": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/12.png",
+  "plot_2": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/2.png",
+  "plot_3": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/3.png",
+  "plot_4": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/4.png",
+  "plot_5": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/5.png",
+  "plot_6": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/6.png",
+  "plot_7": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/7.png",
+  "plot_8": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/8.png",
+  "plot_9": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/plots/9.png",
+  "resolved_parameters": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/02_viz_smoke_latest/runs/run_20260312_073125_236782/milk_consumption/resolved_parameters.json"
+}

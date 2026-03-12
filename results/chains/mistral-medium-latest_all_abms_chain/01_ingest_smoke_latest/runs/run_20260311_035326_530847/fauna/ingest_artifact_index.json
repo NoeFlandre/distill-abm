@@ -1,0 +1,12 @@
+{
+  "cleaned_documentation_json": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/JSON/cleaned_documentation.json",
+  "documentation_json": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/JSON/documentation.json",
+  "documentation_without_default_json": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/JSON/documentation_without_default.json",
+  "experiment_parameters_json": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/JSON/experiment_parameters.json",
+  "extracted_code_txt": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/TXT/extracted_code.txt",
+  "final_documentation_txt": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/TXT/final_documentation.txt",
+  "gui_parameters_json": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/JSON/gui_parameters.json",
+  "narrative_txt": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/TXT/narrative_combined.txt",
+  "updated_experiment_parameters_json": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/JSON/updated_experiment_parameters.json",
+  "updated_gui_parameters_json": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/JSON/updated_gui_parameters.json"
+}

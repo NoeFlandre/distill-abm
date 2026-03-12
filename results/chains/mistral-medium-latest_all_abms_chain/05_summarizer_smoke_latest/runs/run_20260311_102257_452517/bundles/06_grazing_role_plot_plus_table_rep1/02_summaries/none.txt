@@ -1,0 +1,101 @@
+The agent-based model in question is an extension of the RAGE (Rangeland Grazing Ecology) model, which simulates the interactions between pastures, livestock, and household livelihoods in a common property grazing system. The extension introduces learning capabilities to the agents, specifically learning-by-doing and social learning, which are central to adaptive co-management. The model aims to evaluate the long-term social-ecological consequences of different household behavioral types and their interactions with ecological and climatic parameters. The model consists of two main sub-models: Vegetation and Household decision-making, which are linked through a yearly sequence of processes. The key parameters of the model are as follows:
+
+- **number-households**: This parameter determines the number of households in the model, ranging from 1.0 to 100.0. We have set it to 60.
+
+- **satisficing-threshold**: This parameter sets the threshold for satisficing behavior, ranging from 0.0 to 100.0. We have set it to 0.
+
+- **satisficing-trials**: This parameter determines the number of trials for satisficing behavior, ranging from 0.0 to 100.0. We have set it to 21.
+
+- **knowledge-radius**: This parameter sets the radius within which households can observe and gather knowledge, ranging from 0.0 to 5.0. We have set it to 1.
+
+- **resting-threshold**: This parameter determines the threshold for pasture resting, ranging from 0.0 to 1.0. We have set it to 0.1.
+
+- **intrinsic-preference**: This parameter sets the intrinsic preference for livestock, ranging from 0.0 to 1.0. We have set it to 0.
+
+- **social-susceptibility**: This parameter determines the susceptibility to social influence, ranging from 0.0 to 1.0. We have set it to 0.
+
+- **global-rain?**: This boolean parameter determines whether rainfall is global or patch-specific. We have set it to True.
+
+- **start-on-homepatch?**: This boolean parameter determines whether households start on their home patch. We have set it to True.
+
+- **resting?**: This boolean parameter determines whether pasture resting is enabled. We have set it to False.
+
+- **homog-behav-types?**: This boolean parameter determines whether household behavioral types are homogeneous. We have set it to True.
+
+- **extension-model?**: This boolean parameter determines whether the extension model is enabled. We have set it to True.
+
+- **SL2-strategy-switch?**: This boolean parameter determines whether strategy switching (double-loop learning) is enabled. We have set it to False.
+
+- **risk-mode?**: This boolean parameter determines whether risk mode is enabled. We have set it to True.
+
+- **behavioral-type**: This parameter sets the behavioral type of households. We have set it to E-RO (baseline behavior).
+
+- **number-SAT**: This parameter determines the number of satisficer households. We have set it to 0.
+
+- **number-E-RO**: This parameter determines the number of E-RO (baseline behavior) households. We have set it to 20.
+
+- **number-TRAD**: This parameter determines the number of traditional households. We have set it to 0.
+
+- **b**: This parameter is related to livestock reproduction and is not used in the extension model. We have set it to 0.
+
+- **number-MAX**: This parameter determines the number of maximizer households. We have set it to 0.
+
+- **rain-mean**: This parameter sets the mean rainfall. We have set it to 200.
+
+- **risk-att-init**: This parameter sets the initial risk attitude of households. We have set it to 0.5.
+
+- **gr1**: This parameter is related to vegetation growth. We have set it to 0.5.
+
+- **number-E-LBD**: This parameter determines the number of learning-by-doing households. We have set it to 20.
+
+- **gr2**: This parameter is related to vegetation growth. We have set it to 0.1.
+
+- **number-E-RO-SL1**: This parameter determines the number of social learning single-loop households. We have set it to 20.
+
+- **timesteps**: This parameter sets the number of timesteps for the simulation. We have set it to 100.
+
+- **w**: This parameter is related to vegetation growth. We have set it to 0.8.
+
+- **number-random**: This parameter determines the number of random households. We have set it to 0.
+
+- **livestock-init**: This parameter sets the initial number of livestock. We have set it to 90.
+
+- **rain-std**: This parameter sets the standard deviation of rainfall. We have set it to 100.
+
+The model allows for the evaluation of various scenarios, such as the influence of demographic settings and herd size, the impact of different learning strategies, and the diffusion of learning behaviors among households. The model is grounded in social theory and reflects empirical observations, providing a robust framework for studying the complex interactions in grazing systems.
+
+The mean household initial risk attitude remains constant throughout the simulation period. The initial value is approximately 0.0074, and this value does not change over the 100 steps. The statistical summary indicates that the mean, median, standard deviation, and variance are all consistent with a value of approximately 0.0074, showing no variation or trend over time. The rolling Mann-Kendall test results across different windows confirm that there is no significant trend in the data. The peaks and valleys identified in the data all have the same value, further indicating the lack of variation. The oscillation analysis suggests periodic behavior, but the values remain unchanged, reinforcing the stability of the mean household initial risk attitude throughout the simulation.
+
+The simulation of the agent-based model, which evaluates the long-term social-ecological consequences of different household behavioral types and their interactions with ecological and climatic parameters, shows distinct trends in the average degree of deviation from the recommended number of livestock for all extension agents. Initially, the mean household risk attitude starts at a low value of approximately 0.0074. This value remains relatively low and stable for the first few time steps. Around time step 7, there is a noticeable inflection point where the risk attitude begins to increase more rapidly. This upward trend continues, reaching a peak value of approximately 0.3814 at time step 33. Following this peak, the risk attitude exhibits a series of smaller peaks and valleys, indicating some oscillation in the data. The values fluctuate but generally show a decreasing trend after the initial peak. By time step 50, a significant change point is observed, marking a shift in the trend. From this point onward, the risk attitude values stabilize and exhibit less pronounced fluctuations. The final value at time step 100 is approximately 0.1911, indicating a slight decrease from the peak but still higher than the initial value. The statistical analysis reveals several periods of increasing and decreasing trends, with significant trends identified in the early and middle time steps. The latter part of the simulation shows no significant trend, suggesting a stabilization in the household risk attitude. The dominant period of oscillation is around 49 time steps, indicating a cyclical pattern in the data. Overall, the simulation demonstrates an initial increase in risk attitude, followed by a period of fluctuation and eventual stabilization.
+
+The mean reserve biomass in the grazing system exhibits distinct trends over the 100 steps of the simulation. Initially, the reserve biomass starts at 90,000 units. In the early steps, there is a slight increase, reaching a small peak at around 90,523 units by step 3. Following this, the biomass experiences a notable decline, hitting a low point of approximately 84,114 units at step 26. This period of decrease is significant and consistent, as indicated by the statistical analysis showing a strong decreasing trend in the initial windows. 
+
+After reaching the lowest point, the reserve biomass begins to recover. From step 26 onwards, there is a steady and significant increase in biomass. This upward trend continues consistently, with the biomass levels rising sharply between steps 33 and 54, where the increase is particularly pronounced. The biomass eventually stabilizes at higher levels, reaching around 121,073 units by the final step of the simulation. 
+
+The overall trend shows an initial decline followed by a robust recovery and growth in reserve biomass. The inflection points at steps 8 and 48 mark significant changes in the trend direction, transitioning from a decline to a period of recovery and growth. The oscillation indices suggest periodic fluctuations, but the dominant pattern is one of recovery and increase after the initial decline. The change points at steps 50 and 100 further emphasize the shift towards stabilization and growth in the latter half of the simulation period.
+
+The average green biomass across all patches in the grazing system exhibits distinct trends over the 100 time steps of the simulation. Initially, the mean green biomass starts at approximately 45,000 units. During the first 27 time steps, there is a notable decline, reaching a minimum value of around 42,057 units. This period of decrease is followed by a significant and steady increase in green biomass. From time step 27 onwards, the green biomass consistently rises, reaching a peak of approximately 60,535 units by the end of the simulation at time step 100. The overall mean green biomass across the entire simulation period is about 51,529 units, with a median value of 51,197 units. The standard deviation of 8,006 units indicates some variability around the mean. The data shows a clear inflection point around time step 49, marking the transition from a decreasing trend to an increasing trend. Statistical analysis using the rolling Mann-Kendall test confirms these observations, indicating a significant decreasing trend early in the simulation and a significant increasing trend in the latter part. The change points at time steps 50 and 100 further highlight the shifts in the trend of green biomass. The oscillation analysis suggests periodic fluctuations with a dominant period of 49 time steps, indicating cyclical patterns within the overall trend.
+
+The average total number of livestock, including both healthy livestock and those that have been destocked, across all households starts at a high value of 90.0000. This initial value rapidly decreases in the early steps, reaching a minimum value of approximately 41.0089 around step 37. This period of decline is characterized by a steep drop, indicating a significant reduction in livestock numbers early in the simulation. Following this low point, the trend reverses, and the livestock numbers begin to increase gradually. This increase continues steadily through the remaining steps, with the values showing a consistent upward trend. By the end of the simulation at step 100, the average livestock number reaches approximately 47.5472. The overall mean of the livestock numbers across all steps is 48.7946, with a median value of 47.3122, indicating that the values are relatively balanced around this central tendency. The standard deviation of 9.5663 and variance of 91.5150 suggest moderate variability in the livestock numbers throughout the simulation. The data shows significant trends in different windows, with initial decreasing trends followed by increasing trends in later windows, indicating a shift in the dynamics of livestock numbers over time. The presence of change points at steps 20, 55, and 100 further highlights the shifts in the trend of livestock numbers. The oscillation analysis indicates periodic fluctuations, with a dominant period of 49 steps, suggesting cyclical patterns in the livestock numbers.
+
+The mean destock of households starts at 0 and rapidly increases to a peak of approximately 6.61 at step 3. Following this peak, there is a sharp decline to around 3.33 by step 8. The trend continues to decrease, albeit with smaller fluctuations, reaching approximately 0.31 by step 100. The initial phase shows a steep decline in destocking from step 3 to step 21, followed by a more gradual decline with minor oscillations. The rolling Mann-Kendall test indicates significant decreasing trends in the initial phases (steps 0-32) and a brief increasing trend around steps 66-76, with periods of no significant trend in between. The data exhibits several inflection points, indicating changes in the rate of decline, particularly around steps 6, 21, 23, and 27. The oscillation analysis suggests a dominant period of 49 steps, with multiple oscillation indices indicating periodic fluctuations throughout the series. The overall trend demonstrates a rapid initial adjustment followed by a stabilization phase with minor periodic variations.
+
+The analysis of the simulation results reveals a consistent upward trend in the Gini coefficient for total healthy livestock over the 100 time steps. Initially, the Gini coefficient starts at approximately 0.0, indicating a relatively equal distribution of healthy livestock among households. As the simulation progresses, the Gini coefficient gradually increases, reflecting a growing inequality in the distribution of healthy livestock.
+
+Key time steps and values highlight this trend. By time step 10, the Gini coefficient reaches around 0.01, showing a slight increase in inequality. This upward trend continues steadily, with notable inflection points at time steps 8, 13, 15, 20, 25, 37, and 57, where the rate of increase in the Gini coefficient experiences slight changes. By time step 50, the Gini coefficient is approximately 0.03, indicating a moderate level of inequality. The trend persists, and by the final time step of 100, the Gini coefficient reaches about 0.073, signifying a substantial increase in inequality over the course of the simulation.
+
+The statistical analysis confirms this increasing trend, with all rolling Mann-Kendall windows showing a significant increasing trend in the Gini coefficient. The change points at time steps 51, 71, and 100 further emphasize the periods where the rate of increase in inequality becomes more pronounced. The oscillation indices towards the end of the simulation suggest some variability in the rate of increase, but the overall trend remains consistently upward.
+
+In summary, the simulation demonstrates a clear and steady increase in the inequality of healthy livestock distribution among households over time, with the Gini coefficient rising from near equality to a notable level of inequality by the end of the simulation period.
+
+The number of households engaging in social learning, as indicated by the variable household-SL being true, exhibits a clear upward trend over the 100 time steps of the simulation. Initially, at time step 0, no households are engaged in social learning. The number of households adopting social learning begins to increase sharply around time step 7, marking the first inflection point. By time step 28, another inflection point is observed, where the rate of increase starts to slow down. The number of households engaging in social learning continues to rise, albeit at a slower pace, reaching a peak around time step 63 with approximately 32 households. After this peak, the number of households engaging in social learning stabilizes and remains relatively constant for the remainder of the simulation. The statistical analysis indicates a consistent increasing trend across multiple rolling Mann-Kendall windows, with significant p-values, suggesting a robust upward trend in social learning adoption among households. The change points at time steps 40 and 100 further highlight the periods where notable shifts in the trend occur. The oscillation indices suggest some periodic fluctuations, but the dominant trend remains an increase in the number of households engaging in social learning.
+
+The average cumulative number of livestock destocked across all households in the grazing system model shows a consistent increasing trend over the 100 time steps. Initially, the destocking starts at 0 and exhibits a rapid increase in the early stages, particularly within the first 25 time steps. This period marks the first significant change point, where the rate of increase begins to moderate. 
+
+Between time steps 25 and 60, the rate of destocking continues to rise but at a slower pace compared to the initial phase. This period is characterized by several inflection points, indicating subtle changes in the rate of increase. The second major change point occurs around time step 60, after which the trend stabilizes further, showing a more gradual increase in the cumulative number of livestock destocked. 
+
+Throughout the simulation, the destocking process maintains a steady upward trajectory, with the final value reaching approximately 96.78 by the end of the 100 time steps. The statistical analysis reveals that the trend is consistently increasing across all rolling Mann-Kendall windows, with significant slopes indicating a steady rise in destocking over time. The presence of multiple inflection points and oscillation indices suggests periodic variations in the rate of increase, but the overall trend remains upward. 
+
+The model's parameters, such as the number of households, behavioral types, and ecological settings, contribute to the observed trends. The consistent increase in destocking reflects the adaptive management strategies employed by households in response to ecological and climatic conditions, as well as their learning behaviors over time.
+
+The number of non-learning households in the simulation starts at 20 and exhibits a general decreasing trend over the 100 time steps. Initially, there is a slight increase, peaking at around 21.1 households by the 8th time step. Following this peak, a significant downward trend begins, with the count of non-learning households dropping sharply to around 15 by the 20th time step. This period of decrease continues more gradually until around the 45th time step, where the count stabilizes somewhat. From this point onward, the number of non-learning households fluctuates slightly but remains relatively stable, ending at approximately 14.7 households by the 100th time step. The overall mean number of non-learning households across the simulation is about 16.37, with a standard deviation of approximately 1.92. The data shows significant decreasing trends in the early and middle phases of the simulation, with periods of stability towards the latter part. The oscillations in the data suggest periodic fluctuations, but these are relatively minor compared to the overall decreasing trend observed initially.

@@ -1,0 +1,1 @@
+The aggregate metric exhibits a linear increase from 0.0000 at time step 0 to 32000.0000 at time step 32. With a population of 1,000 agents, the constant slope of 1000.000 choices per step indicates exactly one recorded choice per agent per time period. No significant deviations, peaks, or valleys interrupt this steady accumulation throughout the simulation.

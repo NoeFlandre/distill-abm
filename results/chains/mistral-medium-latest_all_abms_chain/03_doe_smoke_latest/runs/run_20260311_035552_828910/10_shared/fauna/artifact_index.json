@@ -1,0 +1,11 @@
+{
+  "copied_csv_path": "results/chains/mistral-medium-latest_all_abms_chain/03_doe_smoke_latest/runs/run_20260311_035552_828910/10_shared/fauna/01_inputs/simulation.csv",
+  "copied_documentation_path": "results/chains/mistral-medium-latest_all_abms_chain/03_doe_smoke_latest/runs/run_20260311_035552_828910/10_shared/fauna/01_inputs/documentation.txt",
+  "copied_parameters_path": "results/chains/mistral-medium-latest_all_abms_chain/03_doe_smoke_latest/runs/run_20260311_035552_828910/10_shared/fauna/01_inputs/parameters.txt",
+  "plot_count": 14,
+  "source_csv_path": "results/chains/mistral-medium-latest_all_abms_chain/02_viz_smoke_latest/fauna/simulation.csv",
+  "source_documentation_path": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/TXT/final_documentation.txt",
+  "source_parameters_path": "results/chains/mistral-medium-latest_all_abms_chain/01_ingest_smoke_latest/runs/run_20260311_035326_530847/fauna/TXT/narrative_combined.txt",
+  "source_viz_artifact_source": "fallback",
+  "table_evidence_format": "statistical evidence derived from the plot-relevant simulation series only"
+}

@@ -1,0 +1,115 @@
+The Megaherbivore Hunting Pressure Model (MHPM) is an agent-based model designed to test hypotheses related to the extinction of megaherbivores. The model considers various factors such as environmental change, human hunting behavior, herd demography, movement, sexual dimorphism, and life history of animals. The landscape is a simplified grassland environment with randomly generated patches of grass, male and female ungulates, and human hunters. The model allows users to manipulate various parameters to establish the socio-natural dynamics of the experiment matrix.
+
+The model's key parameters and their respective ranges and set values are as follows:
+
+- **init-foragers**: Represents the initial number of human hunters. Range: 0.0 to 100.0. Set value: 20.
+
+- **processing-cost-males**: The energy cost for hunters to process male prey. Range: 0.0 to 20.0. Set value: 6.
+
+- **food-value-males**: The energy hunters gain from eating male prey. Range: 5.0 to 100.0. Set value: 30.
+
+- **maximum-lifespan**: The maximum lifespan of animals in ticks. Range: 0.0 to 12000.0. Set value: 10220.
+
+- **processing-cost-females**: The energy cost for hunters to process female prey. Range: 0.0 to 20.0. Set value: 3.
+
+- **food-value-females**: The energy hunters gain from eating female prey. Range: 5.0 to 100.0. Set value: 27.
+
+- **init-prey**: The initial number of prey (ungulates). Range: 0.0 to 1000.0. Set value: 250.
+
+- **internal-mortality**: The probability of an animal dying from internal causes at each time step. Range: 0.0 to 0.2. Set value: 0.025.
+
+- **age-of-senescence**: The age at which animals start to experience increased mortality. Range: 0.0 to 10000.0. Set value: 7300.
+
+- **ticks-per-year**: The number of ticks per year. Range: 0.0 to 720.0. Set value: 365.
+
+- **animals-gain-from-food**: The energy animals gain from food. Range: 0.0 to 10.0. Set value: 1.5.
+
+- **animals-starvation-threshold**: The energy level below which animals starve. Range: 0.0 to 100.0. Set value: 25.
+
+- **animals-movement-cost**: The energy cost for animals to move. Range: 0.0 to 10.0. Set value: 1.
+
+- **foragers-movement-cost**: The energy cost for hunters to move. Range: 0.0 to 10.0. Set value: 1.
+
+- **grass-proportion**: The proportion of the landscape covered in grass. Range: 0.0 to 1.0. Set value: 0.33.
+
+- **external-mortality**: The probability of an animal dying from external causes at each time step. Range: 0.0 to 0.2. Set value: 0.0025.
+
+- **birth-spacing**: The minimum number of ticks between births for females. Range: 0.0 to 1000.0. Set value: 730.
+
+- **foraging-radius**: The radius within which hunters can detect prey. Range: 1.0 to 100.0. Set value: 6.
+
+- **food-value-calf**: The energy hunters gain from eating a calf. Range: 0.0 to 20.0. Set value: 3.
+
+- **seasonality**: The degree of seasonality in the environment. Range: 0.0 to 1.0. Set value: 0.8.
+
+- **regrowth-time**: The time it takes for grass to regrow after being grazed. Range: 0.0 to 365.0. Set value: 3.
+
+- **stop-at-max-ticks**: Determines whether the experiment stops when the maximum number of ticks is reached. Set value: True.
+
+- **stop-at-max-herd-size**: Determines whether the experiment stops when the maximum herd size is reached. Set value: False.
+
+- **grass-growth**: Determines whether grass regrows after being grazed. Set value: True.
+
+- **keep-initial-grass-pattern**: Determines whether grass regrowth is limited to initially vegetated areas. Set value: True.
+
+- **immortal-foragers**: Determines whether hunters are immortal. Set value: True.
+
+- **food-storage**: Determines whether hunters can store food energy. Set value: True.
+
+- **max-ticks**: The maximum number of ticks for the experiment. Set value: 73000.
+
+- **max-herd-size**: The maximum size of the herd. Set value: 500.
+
+The model's landscape consists of an abstract square universe that wraps at the edges, existing on a 211x211 patch matrix with a relative spatial scale. Hunters are embedded with logic approximating dynamic optimal foraging theory, making foraging decisions based on environmental feedback. Ungulate herds are sexually dimorphic, with distinct food values and processing costs for males and females. Animals can reproduce, and users can control sex ratios and reproduction probability. The environment can be controlled by changing the density of fodder and the time it takes for grass to regrow. The model allows users to conduct experiments to test how environmental conditions, human hunting, and animal life history interact to influence extinction dynamics.
+
+The number of human hunter-gatherer bands in the simulation remains constant throughout the entire duration of the simulation. Initially, the number of foragers is set at 20, and this value does not change over the 73000 time steps. This stability indicates that the parameters governing the hunter population, such as immortality and potentially balanced energy costs and gains, are configured in a way that prevents any fluctuation in the number of active hunter-gatherer bands. For decision makers, this implies that under the given parameter settings, the hunter population is stable and does not face conditions that would lead to an increase or decrease in their numbers. This could be useful for understanding scenarios where hunter populations remain constant despite other dynamic environmental and ecological factors.
+
+The total energy of foragers exhibits a consistent downward trend throughout the simulation. Initially, the total energy of foragers starts around 0 and gradually decreases. By approximately 500 steps, the total energy drops to around -5000. This decline continues steadily, reaching about -10000 by 1000 steps. The trend persists, and by 1500 steps, the total energy is approximately -20000. As the simulation progresses to 2000 steps, the total energy further declines to around -35000. This continuous decrease in total energy suggests that the foragers are consistently expending more energy than they are gaining, likely due to the costs associated with movement and processing prey, coupled with the energy gained from hunting not being sufficient to offset these costs. For decision makers, this trend indicates that under the current model parameters, foragers are not sustaining their energy levels, which could lead to potential energy deficits and impact their survival and hunting efficiency over time.
+
+The cumulative number of male prey animals hunted and killed by forager bands exhibits a rapid increase in the initial phase of the simulation, followed by a gradual plateau. Initially, the number of males killed rises steeply from 0 to approximately 100 within the first 500 steps. This rapid increase continues, reaching around 120 males killed by approximately 1000 steps. Beyond this point, the rate of increase slows down significantly, and the cumulative number of males killed stabilizes, fluctuating slightly around the 120 mark for the remainder of the simulation. 
+
+For decision makers, this trend suggests that the initial phase of hunting has a significant impact on the male prey population, with a rapid reduction in their numbers. However, as time progresses, the rate at which males are killed diminishes, indicating a possible stabilization in the hunting pressure or a reduction in the availability of male prey. This could imply that the initial hunting efforts are highly effective, but sustained hunting pressure may not yield proportionally increasing returns over time. Understanding these dynamics can help in formulating strategies for sustainable hunting practices and conservation efforts to prevent the extinction of megaherbivores.
+
+The cumulative number of female prey animals hunted and killed by forager bands exhibits a rapid increase in the early stages of the simulation, followed by a gradual plateau. Initially, the number of females killed rises steeply from 0 to approximately 100 within the first 500 steps. This rapid increase suggests a high initial hunting pressure on female prey, likely due to the abundance of prey and the energy requirements of the hunters. 
+
+Between 500 and 1500 steps, the rate of increase slows down significantly, indicating a reduction in the hunting success rate or a decrease in the availability of female prey. By around 1500 steps, the cumulative number of females killed stabilizes around 120, suggesting that the system has reached a dynamic equilibrium where the hunting pressure is balanced by the remaining prey population's ability to sustain itself or evade hunters. 
+
+For decision makers, these trends imply that initial hunting pressures can significantly impact female prey populations quickly. However, as the prey population adapts or diminishes, the hunting success rate decreases, leading to a stabilization in the number of females killed. This insight can inform conservation strategies and hunting regulations to ensure the sustainability of prey populations and the ecological balance within the environment.
+
+The cumulative number of postpartum females killed exhibits a rapid increase in the early stages of the simulation, followed by a gradual plateau. Initially, the number of postpartum females killed rises steeply from 0 to approximately 100 within the first 500 steps. This rapid increase indicates a high initial hunting pressure on postpartum females. Following this steep rise, the rate of increase slows down significantly. Between 500 and 1500 steps, the cumulative number of postpartum females killed continues to rise but at a much slower pace, eventually stabilizing around 120 postpartum females killed. This plateau suggests that the hunting pressure on postpartum females reaches a saturation point, where the number of postpartum females killed per unit time decreases and stabilizes. For decision makers, this trend implies that initial hunting efforts are highly effective in targeting postpartum females, but over time, the efficiency of hunting diminishes, leading to a stabilization in the cumulative number of postpartum females killed. This could inform strategies related to sustainable hunting practices and conservation efforts to protect postpartum females and their offspring.
+
+The cumulative number of births among the prey animal population exhibits distinct trends over time. Initially, there is a period with no births, lasting until approximately 700 steps. Following this, there is a sharp increase in the number of births, with the cumulative count rising steeply to around 8 births by step 1000. This rapid increase suggests a period of favorable conditions for reproduction. After reaching this peak, the number of births stabilizes, maintaining a steady state around 8 births until approximately step 1500. This plateau indicates a balance in the population dynamics where births are consistent but not increasing. Around step 1500, there is a notable decline in the cumulative number of births, dropping to about 6 births by step 1700. This decline could imply a change in environmental conditions or increased predation pressure. Post step 1700, the number of births fluctuates slightly but generally trends upwards again, reaching around 10 births by the end of the observed period. This final increase suggests a recovery or adaptation in the population, possibly due to improved conditions or reduced predation. For decision makers, these trends highlight the importance of understanding the factors influencing birth rates and the need for strategies to manage and sustain prey populations under varying environmental and predation pressures.
+
+The cumulative number of deaths among the prey animal population exhibits distinct trends over the time steps in the simulation. Initially, the number of deaths is low, reflecting the starting conditions of the model with a stable population. As the simulation progresses, there is a rapid increase in the number of deaths, which begins around the 500th step and continues steeply until approximately the 1500th step. During this period, the cumulative deaths rise from near zero to around 200. This sharp increase suggests a significant event or a combination of factors leading to higher mortality rates among the prey population. 
+
+Following this rapid increase, the rate of deaths begins to plateau, indicating a stabilization in the number of deaths per time step. By around the 2000th step, the cumulative number of deaths reaches approximately 250 and remains relatively constant thereafter. This plateau suggests that the population has reached a new equilibrium where the number of deaths stabilizes, potentially due to a balance between births and deaths or a reduction in the prey population size that limits further increases in mortality. 
+
+For decision makers, these trends highlight critical periods where interventions could be most impactful. The initial rapid increase in deaths suggests a phase where the population is under significant stress, possibly due to environmental factors, predation pressure, or a combination of both. Understanding the causes behind this rapid increase could inform strategies to mitigate high mortality rates. The subsequent plateau indicates a stabilization phase, which could be used to assess the long-term sustainability of the prey population under the given conditions. This insight can guide conservation efforts and resource management to ensure the stability of the ecosystem.
+
+The number of male animals in the Megaherbivore Hunting Pressure Model (MHPM) exhibits a consistent declining trend across all simulations. Initially, the number of male animals starts at approximately 120. This number remains relatively stable for a brief period before beginning a steady decline. By around 500 steps, the number of male animals drops to about 80. The decline continues, and by 1000 steps, the number of male animals further reduces to approximately 40. Beyond 1000 steps, the decline becomes more gradual, with the number of male animals approaching zero around 2000 steps. This trend suggests a rapid initial reduction in the male animal population followed by a more gradual decline as the population nears extinction. For decision makers, this trend indicates that under the given parameters, the male animal population is highly susceptible to extinction pressures, with significant reductions occurring within the first 2000 steps of the simulation. This insight could inform conservation strategies and highlight the need for interventions to mitigate factors contributing to the rapid decline of male animals.
+
+The number of female animals in the Megaherbivore Hunting Pressure Model (MHPM) simulations exhibits a consistent declining trend across all runs. Initially, the number of female animals starts at approximately 120. Within the first 500 steps, there is a steep decline, with the number of female animals dropping to around 40. This rapid decrease continues, and by around 1000 steps, the number of female animals falls to approximately 10. Beyond this point, the decline becomes more gradual, with the number of female animals approaching zero around 2000 steps. This trend indicates a significant reduction in the female animal population over time, suggesting high hunting pressure or other environmental factors leading to their decline. For decision makers, this trend underscores the potential vulnerability of female animals under the given conditions and highlights the need for interventions to mitigate the factors contributing to their rapid decline.
+
+The simulations of the Megaherbivore Hunting Pressure Model (MHPM) show a consistent trend across all runs. Initially, the total number of animals starts at around 250, reflecting the set value for the initial number of prey. This number remains relatively stable for a brief period before beginning a steady decline. By approximately 500 steps, the total number of animals has decreased significantly, often falling below 100. This decline continues more gradually, with the number of animals dropping to near zero by around 2000 steps. In most simulations, the population of animals is effectively extinct by this point, with very few or no animals remaining. 
+
+For decision makers, these trends suggest that under the given parameters and conditions, the population of megaherbivores is highly susceptible to extinction within a relatively short time frame. This insight could be crucial for understanding the potential impacts of human hunting pressure and environmental factors on megaherbivore populations and for developing strategies to mitigate these effects.
+
+The total energy of male animals in the Megaherbivore Hunting Pressure Model (MHPM) starts at a high value of approximately 12,000 units. This initial high energy level indicates a healthy and robust population of male prey animals at the beginning of the simulation. 
+
+In the early stages, up to around 500 steps, there is a steep decline in the total energy, dropping to about 2,000 units. This rapid decrease suggests a significant reduction in the male population's energy reserves, potentially due to high hunting pressure, environmental factors, or a combination of both. Decision makers should note that this period is critical, as it indicates a rapid depletion of energy resources among male animals, which could lead to increased vulnerability and potential population decline. 
+
+Following this steep decline, from approximately 500 to 1,500 steps, the total energy continues to decrease but at a slower rate, stabilizing around 500 units. This phase indicates a period of adjustment where the remaining male animals may have adapted to the pressures, but their energy levels are still being depleted. This trend suggests that while the initial shock has passed, the population is still under significant stress. 
+
+Beyond 1,500 steps, the total energy of male animals approaches near-zero levels and remains there for the rest of the simulation. This indicates that the male population has been nearly or completely depleted, with very few, if any, male animals remaining in the simulation. For decision makers, this implies that the conditions set in the model lead to a near-total extinction of male animals over time, highlighting the severe impact of the simulated pressures on the male population.
+
+The total energy of female animals in the Megaherbivore Hunting Pressure Model (MHPM) shows a consistent and rapid decline over time. Initially, the total energy of female animals starts at a high value of approximately 12,000 units. Within the first 500 steps, there is a steep drop in energy levels, decreasing to around 2,000 units. This rapid decline continues, and by around 1,000 steps, the total energy levels approach near zero. Beyond 1,000 steps, the energy levels remain very low, close to zero, indicating a significant reduction in the energy available in the female animal population. This trend suggests a rapid depletion of energy resources among female animals, potentially leading to a collapse in their population. For decision makers, this implies that under the given parameters and conditions, the female animal population is highly vulnerable to extinction due to the rapid loss of energy, which could be influenced by factors such as hunting pressure, environmental changes, and resource availability.
+
+The total energy of all animals in the Megaherbivore Hunting Pressure Model (MHPM) exhibits a consistent declining trend across all simulations. Initially, the total energy of all animals starts at approximately 25,000 units. This high energy level is maintained for a brief period, indicating a stable and abundant prey population at the beginning of the simulation. 
+
+Around the 200th step, a noticeable decline in total energy begins, marking the onset of a significant reduction in the energy levels of the prey population. By the 500th step, the total energy drops sharply to around 5,000 units, suggesting a critical phase where the prey population experiences substantial stress or depletion. This rapid decline continues until approximately the 1,000th step, where the total energy stabilizes at a much lower level, close to zero. 
+
+The stabilization at near-zero energy levels indicates that the prey population has been nearly exhausted or has reached a state of minimal energy reserves. This trend implies that the combination of hunting pressure, environmental conditions, and other model parameters leads to a significant reduction in the prey population's energy over time. 
+
+For decision-makers, these trends highlight the potential impacts of sustained hunting pressure and environmental factors on megaherbivore populations. The rapid decline in total energy suggests that without intervention or changes in hunting practices and environmental management, prey populations could face severe depletion or extinction. This insight underscores the importance of sustainable hunting practices and conservation efforts to maintain the energy balance and viability of prey populations in the long term.
+
+The percentage of green patches starts at approximately 33% and remains stable for the first 500 steps. This initial stability suggests a consistent availability of grass for the prey animals, providing a stable food source. Around step 500, there is a sharp decline in the percentage of green patches, dropping to around 26%. This decline indicates a significant reduction in grass availability, which could be due to increased grazing pressure or environmental changes affecting grass regrowth. Following this decline, the percentage of green patches quickly recovers to around 33% by step 750. This recovery suggests a period of regrowth or reduced grazing pressure, allowing the grass patches to replenish. The percentage of green patches remains relatively stable again until around step 1250, where another sharp decline occurs, dropping to approximately 26%. This second decline mirrors the first, indicating a possible cyclical pattern in grass availability. After this decline, the percentage of green patches recovers once more to around 33% by step 1500. The final trend shows the percentage of green patches stabilizing around 33% for the remainder of the simulation, with minor fluctuations. This overall pattern of sharp declines followed by recoveries suggests periodic fluctuations in grass availability, which could be influenced by seasonal changes, grazing patterns, or other environmental factors. For decision makers, understanding these fluctuations is crucial for managing grazing practices and ensuring the sustainability of the grassland ecosystem.

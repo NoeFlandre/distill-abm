@@ -1,0 +1,65 @@
+{
+  "bundle_id": "30_milk_consumption_role_plot_plus_table_rep2",
+  "case_id": "30_milk_consumption_role_plot_plus_table_rep2",
+  "abm": "milk_consumption",
+  "bundle_dir": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/30_milk_consumption_role_plot_plus_table_rep2",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/30_milk_consumption_role_plot_plus_table_rep2/02_summaries/none.txt",
+      "raw_output_path": null,
+      "postprocess_changed": false,
+      "error": null,
+      "duration_seconds": 8.330025593750179e-7,
+      "input_length": 13524,
+      "output_length": 13524
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/30_milk_consumption_role_plot_plus_table_rep2/02_summaries/bart.txt",
+      "raw_output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/30_milk_consumption_role_plot_plus_table_rep2/03_metadata/raw_summaries/bart.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 54.01029091599776,
+      "input_length": 13524,
+      "output_length": 1029
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/30_milk_consumption_role_plot_plus_table_rep2/02_summaries/bert.txt",
+      "raw_output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/30_milk_consumption_role_plot_plus_table_rep2/03_metadata/raw_summaries/bert.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 23.0797501249981,
+      "input_length": 13524,
+      "output_length": 4133
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/30_milk_consumption_role_plot_plus_table_rep2/02_summaries/t5.txt",
+      "raw_output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/30_milk_consumption_role_plot_plus_table_rep2/03_metadata/raw_summaries/t5.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 13.876643667004828,
+      "input_length": 13524,
+      "output_length": 877
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/30_milk_consumption_role_plot_plus_table_rep2/02_summaries/longformer_ext.txt",
+      "raw_output_path": "results/chains/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260312_123851_693299/bundles/30_milk_consumption_role_plot_plus_table_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 53.843261707996135,
+      "input_length": 13524,
+      "output_length": 2199
+    }
+  ]
+}

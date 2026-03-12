@@ -1,0 +1,93 @@
+The agent-based model in question is an extension of the RAGE (Rangeland Grazing Ecology) model, which simulates the interactions between pastures, livestock, and household livelihoods in a common property grazing system. The extension introduces learning capabilities to the agents, specifically learning-by-doing and social learning, which are central to adaptive co-management. The model aims to evaluate the long-term social-ecological consequences of different household behavioral types and their interactions with ecological and climatic parameters. The model consists of two main sub-models: Vegetation and Household decision-making, which are linked through a yearly sequence of processes. The key parameters of the model are as follows:
+
+- **number-households**: This parameter determines the number of households in the model, ranging from 1.0 to 100.0. We have set it to 60.
+
+- **satisficing-threshold**: This parameter sets the threshold for satisficing behavior, ranging from 0.0 to 100.0. We have set it to 0.
+
+- **satisficing-trials**: This parameter determines the number of trials for satisficing behavior, ranging from 0.0 to 100.0. We have set it to 21.
+
+- **knowledge-radius**: This parameter sets the radius within which households can observe and gather knowledge, ranging from 0.0 to 5.0. We have set it to 1.
+
+- **resting-threshold**: This parameter determines the threshold for pasture resting, ranging from 0.0 to 1.0. We have set it to 0.1.
+
+- **intrinsic-preference**: This parameter sets the intrinsic preference for livestock, ranging from 0.0 to 1.0. We have set it to 0.
+
+- **social-susceptibility**: This parameter determines the susceptibility to social influence, ranging from 0.0 to 1.0. We have set it to 0.
+
+- **global-rain?**: This boolean parameter determines whether rainfall is global or patch-specific. We have set it to True.
+
+- **start-on-homepatch?**: This boolean parameter determines whether households start on their home patch. We have set it to True.
+
+- **resting?**: This boolean parameter determines whether pasture resting is enabled. We have set it to False.
+
+- **homog-behav-types?**: This boolean parameter determines whether household behavioral types are homogeneous. We have set it to True.
+
+- **extension-model?**: This boolean parameter determines whether the extension model is enabled. We have set it to True.
+
+- **SL2-strategy-switch?**: This boolean parameter determines whether strategy switching (double-loop learning) is enabled. We have set it to False.
+
+- **risk-mode?**: This boolean parameter determines whether risk mode is enabled. We have set it to True.
+
+- **behavioral-type**: This parameter sets the behavioral type of households. We have set it to E-RO (baseline behavior).
+
+- **number-SAT**: This parameter determines the number of satisficer households. We have set it to 0.
+
+- **number-E-RO**: This parameter determines the number of E-RO (baseline behavior) households. We have set it to 20.
+
+- **number-TRAD**: This parameter determines the number of traditional households. We have set it to 0.
+
+- **b**: This parameter is related to livestock reproduction and is not used in the extension model. We have set it to 0.
+
+- **number-MAX**: This parameter determines the number of maximizer households. We have set it to 0.
+
+- **rain-mean**: This parameter sets the mean rainfall. We have set it to 200.
+
+- **risk-att-init**: This parameter sets the initial risk attitude of households. We have set it to 0.5.
+
+- **gr1**: This parameter is related to vegetation growth. We have set it to 0.5.
+
+- **number-E-LBD**: This parameter determines the number of learning-by-doing households. We have set it to 20.
+
+- **gr2**: This parameter is related to vegetation growth. We have set it to 0.1.
+
+- **number-E-RO-SL1**: This parameter determines the number of social learning single-loop households. We have set it to 20.
+
+- **timesteps**: This parameter sets the number of timesteps for the simulation. We have set it to 100.
+
+- **w**: This parameter is related to vegetation growth. We have set it to 0.8.
+
+- **number-random**: This parameter determines the number of random households. We have set it to 0.
+
+- **livestock-init**: This parameter sets the initial number of livestock. We have set it to 90.
+
+- **rain-std**: This parameter sets the standard deviation of rainfall. We have set it to 100.
+
+The model allows for the evaluation of various scenarios, such as the influence of demographic settings and herd size, the impact of different learning strategies, and the diffusion of learning behaviors among households. The model is grounded in social theory and reflects empirical observations, providing a robust framework for studying the complex interactions in grazing systems.
+
+The mean household initial risk attitude remains constant throughout the simulation period. The values of the metric range from approximately -0.1 to 0.17. The majority of the values are clustered around -0.05, 0, and 0.05, indicating that most households have a neutral to slightly conservative initial risk attitude. There are a few outliers with values around 0.15 and -0.1, suggesting a small number of households with more extreme initial risk attitudes. The consistency of these values over time indicates that the initial risk attitudes of households do not change during the simulation, reflecting a static initial disposition to deviate from the recommended number of livestock among social learning agents.
+
+The metric representing the mean household risk attitude shows a variety of trends across different simulations. Initially, the risk attitude values are clustered around 0.5, reflecting the initial risk attitude parameter setting. In the early time steps, up to around step 20, there is a noticeable divergence in the trends. Some simulations show an increase in risk attitude, while others show a decrease or remain relatively stable. By step 20, the values start to stabilize into more distinct patterns. Several simulations exhibit a steady increase in risk attitude, reaching values as high as 0.8 by around step 40. These higher values then remain relatively constant for the remainder of the simulation. Conversely, other simulations show a decrease in risk attitude, with values dropping to as low as -0.2 by around step 40, and these lower values also remain relatively constant thereafter. A few simulations display a more moderate trend, stabilizing around the initial value of 0.5. The stabilization of risk attitude values by around step 40 suggests that the households' risk attitudes have adapted to the conditions of the grazing system and ecological parameters, reflecting the influence of learning capabilities and adaptive co-management strategies. The diversity in the final risk attitude values indicates varying outcomes based on the interactions between household behaviors, ecological conditions, and climatic parameters.
+
+The mean reserve biomass in the grazing system exhibits distinct trends over the 100 steps of the simulation. Initially, the mean reserve biomass starts around 90,000 units. In the early steps, up to approximately step 10, there is a slight decline in the mean reserve biomass, reaching a low point just below 90,000 units. Following this initial dip, the mean reserve biomass begins to increase steadily. From step 10 to around step 40, the biomass shows a consistent upward trend, rising sharply. By step 40, the mean reserve biomass reaches approximately 110,000 units. After step 40, the rate of increase starts to slow down, and the biomass levels begin to plateau. From step 60 onwards, the mean reserve biomass stabilizes, fluctuating slightly but generally maintaining a level around 120,000 units until the end of the simulation at step 100. This trend indicates an initial period of biomass reduction followed by a significant recovery and stabilization, suggesting a dynamic interaction between grazing activities and biomass regeneration over time.
+
+The simulations of the agent-based model show a consistent trend in the mean green biomass across all patches over the 100 time steps. Initially, the mean green biomass starts at approximately 45,000 units. During the first 20 time steps, there is a slight decline in the mean green biomass, reaching a minimum value of around 44,000 units. Following this initial decline, the mean green biomass begins to increase steadily. By around the 40th time step, the mean green biomass surpasses its initial value and continues to rise. This upward trend persists throughout the remaining time steps, with the mean green biomass reaching values close to 65,000 units by the 100th time step. The overall pattern indicates an initial reduction in biomass followed by a significant and sustained recovery and growth phase.
+
+The metric representing the average total number of livestock, including both healthy livestock and those that have been destocked, across all households, exhibits distinct trends over the 100 steps of the simulation. Initially, the metric starts at a high value of approximately 90. This is followed by a sharp decline within the first 10 steps, dropping to around 45. This rapid decrease suggests an initial adjustment phase where households might be destocking livestock or experiencing a high rate of livestock loss. Between steps 10 and 40, the metric stabilizes, fluctuating slightly around the value of 45, indicating a period of equilibrium where the number of livestock remains relatively constant. After step 40, the metric begins to rise gradually, showing a steady increase until it reaches approximately 60 by step 100. This upward trend suggests a recovery or growth phase where households are either acquiring more livestock or experiencing improved livestock survival rates. The overall pattern indicates an initial sharp decline, a period of stability, followed by a gradual recovery in the average total number of livestock across households.
+
+In the initial time steps, the mean destock of households starts at a high value of approximately 7. This high initial destocking rate indicates that a significant number of households are removing livestock due to insufficient resources right from the beginning of the simulation. By around step 5, the mean destock of households rapidly decreases to about 2. This sharp decline suggests that households are quickly adapting to the initial conditions, possibly finding ways to better manage their livestock or resources. From step 5 to step 20, the mean destock continues to decline, albeit at a slower rate, reaching a value close to 1. This period indicates a stabilization phase where households are gradually improving their management practices or benefiting from more favorable conditions. Beyond step 20, the mean destock of households fluctuates around a value of 1, with minor variations. This fluctuation suggests that while the overall destocking rate has stabilized, there are still periodic adjustments being made by households in response to varying conditions. These minor fluctuations could be due to environmental variability, such as changes in rainfall or pasture quality, or due to the adaptive behaviors of the households as they learn and adjust their strategies over time. After step 40, the mean destock of households remains relatively constant around 1, indicating a long-term equilibrium where the rate of destocking has stabilized. This equilibrium suggests that households have adapted to the ecological and climatic conditions, and their management practices are sufficiently robust to maintain a steady state with minimal destocking.
+
+The Gini coefficient for total healthy livestock starts at 0 for all simulations, indicating an initial state of perfect equality in the distribution of healthy livestock across households. As the simulation progresses, the Gini coefficient increases, reflecting a growing inequality in livestock distribution. Around the 20th step, the Gini coefficient values begin to diverge more noticeably, ranging approximately between 0.01 and 0.03. By the 40th step, the inequality continues to rise, with values spreading further apart, roughly between 0.02 and 0.05. This trend of increasing inequality persists, and by the 60th step, the Gini coefficient values are more distinctly spread, generally falling between 0.03 and 0.07. As the simulation approaches the 100th step, the Gini coefficients show a broader range of inequality, with values spanning from approximately 0.03 to 0.09. This indicates that by the end of the simulation, there is a significant variation in the distribution of healthy livestock among households, with some households possessing a much larger share of the livestock than others.
+
+The simulations show a variety of trends in the adoption of social learning among households over the 100 time steps. Initially, all simulations start with zero households engaging in social learning. Within the first 10 time steps, there is a rapid increase in the number of households adopting social learning across all simulations. By around 20 time steps, the number of households engaging in social learning stabilizes in most simulations, with values ranging from approximately 12 to 54 households. Some simulations show a gradual increase in the number of households adopting social learning up to around 40 time steps, after which the number stabilizes. The final number of households engaging in social learning varies significantly across simulations, with some simulations showing as few as 12 households and others showing up to 54 households. This variability indicates diverse outcomes in the adoption of social learning behaviors under the given parameters and initial conditions.
+
+The metric of mean destock total of households exhibits a rapid increase in the initial time steps, followed by a gradual leveling off as the simulation progresses. Initially, from step 0 to around step 20, there is a steep rise in the mean destock total, indicating a significant amount of livestock destocking early in the simulation. By step 20, the mean destock total reaches approximately 60. Following this rapid increase, the rate of destocking slows down considerably. From step 20 to step 100, the mean destock total continues to rise but at a much slower and more consistent rate. By the end of the simulation at step 100, the mean destock total ranges between approximately 80 and 170 across different simulations. This trend suggests that the majority of destocking occurs early in the simulation, with the process tapering off and stabilizing as time progresses. The variation in the final values indicates differing outcomes based on the specific dynamics and interactions within each simulation run.
+
+The data from the repeated simulations of the agent-based model show several distinct trends in the number of non-learning households over the 100 time steps. Initially, there is a wide range in the count of non-learning households, with values spanning from approximately 5 to 40. This variability indicates a diverse starting condition or rapid initial changes in household strategies. 
+
+By around the 20th time step, a noticeable stratification begins to emerge. Several trajectories show a significant decline in the number of non-learning households, dropping to values as low as 0. Conversely, other trajectories stabilize at higher counts, maintaining between 20 to 40 non-learning households. This suggests that different simulation runs lead to varying degrees of adoption of learning strategies among households. 
+
+Between the 20th and 40th time steps, the trends continue to diverge. Some simulation runs show a steady count of non-learning households, while others exhibit a gradual decline or stabilization at lower counts. This period marks a transition phase where the influence of initial conditions starts to wane, and the system dynamics begin to dominate. 
+
+From the 40th time step onwards, the trajectories largely stabilize. The majority of the simulation runs converge to a relatively steady state, with counts of non-learning households ranging broadly but consistently within the observed bounds. Some runs maintain higher counts around 25 to 40, while others settle at lower counts, some even reaching as low as 0. This stabilization indicates that the system has reached a dynamic equilibrium where the number of non-learning households fluctuates within a narrower range. 
+
+Overall, the data suggest that the initial conditions and early dynamics play a crucial role in determining the long-term behavior of the system. The wide range of final states indicates that multiple stable configurations are possible under the given parameters, reflecting the complex interactions between household decision-making and ecological factors in the grazing system.
