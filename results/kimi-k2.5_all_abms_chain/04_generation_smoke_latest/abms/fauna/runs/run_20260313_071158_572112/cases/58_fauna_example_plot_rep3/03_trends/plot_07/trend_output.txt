@@ -1,0 +1,9 @@
+The cumulative number of prey deaths begins at zero and increases rapidly during the initial phase of approximately the first 500 time steps, reaching values between 150 and 200. This initial surge suggests high mortality rates affecting the founding population of 250 individuals, driven by the combined effects of natural mortality and hunting pressure from the 20 foragers.
+
+Following this rapid initial increase, the rate of mortality accumulation decelerates markedly between approximately 500 and 1000 time steps, with cumulative deaths rising from roughly 200 to between 225 and 250. This slowing reflects the depletion of the prey population as the cumulative death count approaches the initial population size, reducing the pool of available individuals subject to mortality.
+
+After approximately 1000 to 1500 time steps, the cumulative death count stabilizes at plateau values ranging from approximately 225 to 250 across different simulation runs. This plateau indicates that mortality events have effectively ceased or slowed to negligible rates, consistent with the prey population having been driven to extinction or reduced to a minimal residual population where births balance deaths.
+
+One simulation trajectory exhibits notably slower mortality accumulation during the initial 500 time steps, beginning with a delayed onset and maintaining lower cumulative death counts compared to other runs, though it eventually converges toward similar plateau values by approximately 1500 time steps. This deviation suggests stochastic variation in initial hunting success or herd spatial distribution patterns.
+
+The variance across simulation runs is minimal during the initial phase, increases substantially during the middle phase between 500 and 1000 steps as different trajectories diverge in their mortality rates, and decreases again as runs converge toward similar final cumulative death counts at the plateaus.

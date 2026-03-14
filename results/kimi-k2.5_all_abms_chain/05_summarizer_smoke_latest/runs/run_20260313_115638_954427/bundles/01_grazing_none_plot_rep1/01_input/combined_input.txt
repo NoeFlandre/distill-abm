@@ -1,0 +1,134 @@
+This agent-based model is an extension of the RAGE (Resilience of Agent-based Grazing Systems) model, designed to simulate feedbacks between pastures, livestock, and household livelihoods in grazing systems. While the original RAGE model focused on common property grazing with mobile households, this extension applies to smallholder farming contexts where pastures are private property and households remain stationary on their patches. The model introduces learning capabilities to agent decision-making, specifically incorporating learning-by-doing and social learning processes central to adaptive co-management. It implements three new behavioral types: E-RO (baseline behavior), E-RO-SL1 (social learning), and E-LBD (learning-by-doing). Agents are characterized by heterogeneity in uncertainty management, represented by an r-parameter (household-risk-att) that captures factors such as sensing uncertainty, information noise, and risk attitude. The model comprises two main sub-models: Vegetation dynamics and Household decision-making. These operate through a yearly sequence where green biomass updates, households with E-RO-SL1 types update their r-parameters, households update behavioral strategies (if switching is enabled), make livestock placement decisions, livestock feeds on biomass, households observe neighbor performance, reserve biomass updates, and households observe and remember reserve biomass states.
+
+The model aims to compare the long-term social-ecological performance of different behavioral types (E-RO, E-LBD, and E-RO-SL1) under various ecological and climatic conditions. It seeks to evaluate how learning capabilities affect household resilience and pasture conditions in private property grazing systems. Specific objectives include analyzing the impact of social learning double-loop processes through strategy switching in heterogeneous populations, observing the diffusion and competition between different learning behaviors in mixed populations, and assessing how demographic settings and initial herd sizes influence system outcomes. The model allows for the evaluation of outcomes across social, ecological, and economic dimensions including average herd size, pasture biomass condition, and surviving number of households.
+
+**Parameters:**
+
+- **number-households**: Range 1.0 to 100.0; set to 60.
+- **satisficing-threshold**: Range 0.0 to 100.0; set to 0.
+- **satisficing-trials**: Range 0.0 to 100.0; set to 21.
+- **knowledge-radius**: Range 0.0 to 5.0; set to 1.
+- **resting-threshold**: Range 0.0 to 1.0; set to 0.1.
+- **intrinsic-preference**: Range 0.0 to 1.0; set to 0.
+- **social-susceptibility**: Range 0.0 to 1.0; set to 0.
+- **global-rain?**: Set to True.
+- **start-on-homepatch?**: Set to True.
+- **resting?**: Set to False.
+- **homog-behav-types?**: Set to True.
+- **extension-model?**: Set to True.
+- **SL2-strategy-switch?**: Set to False.
+- **risk-mode?**: Set to True.
+- **behavioral-type**: Set to E-RO.
+- **number-SAT**: Set to 0.
+- **number-E-RO**: Set to 20.
+- **number-TRAD**: Set to 0.
+- **b**: Set to 0 (reproduction not used in extension model).
+- **number-MAX**: Set to 0.
+- **rain-mean**: Set to 200.
+- **risk-att-init**: Set to 0.5.
+- **gr1**: Set to 0.5.
+- **number-E-LBD**: Set to 20.
+- **gr2**: Set to 0.1.
+- **number-E-RO-SL1**: Set to 20.
+- **timesteps**: Set to 100.
+- **w**: Set to 0.8.
+- **number-random**: Set to 0.
+- **livestock-init**: Set to 90.
+- **rain-std**: Set to 100.
+
+Throughout the 100-step simulation, the mean household initial risk attitude maintains constant values with no temporal variation; the values observed at step 0 remain unchanged at step 100. Across the population of 20 social learning agents (E-RO-SL1), the metric ranges from approximately -0.11 to +0.18. Several agents exhibit negative initial risk attitudes between approximately -0.11 and -0.02, while others display positive values between approximately +0.01 and +0.18, with clustering observed around +0.05 to +0.08 and smaller groups at higher positive values around +0.14 and +0.18. These constant values represent fixed baseline dispositions to deviate from recommended livestock numbers that serve as reference points for the social learning process; as initial parameters, they do not update during the yearly sequence of vegetation dynamics and household decision-making operations.
+
+The simulation tracks household risk attitude (r-parameter) across 100 steps for 60 households comprising three behavioral types (E-RO, E-LBD, and E-RO-SL1). 
+
+**Initial Conditions (Steps 0-10):**
+Households begin with heterogeneous risk attitudes distributed between approximately -0.1 and +0.15. Most values cluster near zero or slightly below, with a few households starting at modest positive values around 0.1 to 0.15. The population remains relatively stable during this phase with minimal adjustment.
+
+**Rapid Transition Phase (Steps 10-30):**
+Beginning around step 10-15, the majority of households undergo sharp increases in risk attitude. By step 20, values span from approximately 0.0 to 0.65. The upward trajectory continues through step 30, where the population reaches maximum dispersion with some households attaining values of 0.75-0.8 (the upper bound observed in the simulation) while others stabilize at intermediate levels between 0.2 and 0.6. This period marks the most dynamic change, with slopes reaching steep positive rates.
+
+**Differentiation and Crisis Phase (Steps 30-60):**
+Between steps 30 and 45, most trajectories stabilize or exhibit minor fluctuations around established levels (0.6-0.8, 0.4-0.5, and 0.2-0.3). However, a notable divergence occurs between steps 40 and 55, where approximately 8-10 households experience catastrophic declines. These trajectories drop precipitously from moderate positive values (0.2-0.4) to strongly negative territory, bottoming out at approximately -0.3 to -0.35 by step 55-60. Concurrently, several households maintaining values around 0.3-0.4 exhibit volatility before settling or declining to near-zero levels.
+
+**Long-term Stabilization (Steps 60-100):**
+From step 60 onward, the population segregates into approximately seven distinct stable bands:
+1. High risk-takers: 0.75-0.78 (2-3 households)
+2. Upper-moderate: 0.68-0.72 (4-5 households)  
+3. Mid-high: 0.60-0.65 (3-4 households)
+4. Central cluster: 0.45-0.55 (8-10 households)
+5. Conservative: 0.20-0.40 (10-12 households)
+6. Near-neutral: -0.05 to +0.15 (15-18 households)
+7. Highly conservative/negative: -0.30 to -0.20 (5-6 households)
+
+The negative-valued group maintains stable positions around -0.35 to -0.20 throughout the final 40 steps, indicating persistent risk-averse behavior or substantial deviation below recommended livestock levels. The highest group sustains values near 0.8 with minimal variation (±0.02), suggesting robust adoption of risk-tolerant strategies. Intermediate groups exhibit minor oscillations of ±0.02 to ±0.05 but maintain clear separation, indicating that initial learning trajectories and social-ecological feedbacks lock households into distinct risk-management regimes.
+
+The mean reserve biomass trajectory begins at approximately 90,000 units and exhibits three distinct phases over the 100-step simulation. During the initial phase (steps 0-10), the metric shows a brief marginal increase to roughly 90,500-91,000 before transitioning into a prolonged decline. This degradation phase extends through approximately step 40, reaching minimum values ranging between 80,000 and 88,000 depending on the stochastic realization. The nadir represents a biomass reduction of 2,000 to 10,000 units from initial levels.
+
+A sharp recovery phase initiates around step 40 and continues through step 65. During this interval, biomass increases rapidly in a sigmoid pattern from the minimum values to levels between 110,000 and 125,000. The steepest rate of increase occurs approximately between steps 45 and 55, with biomass rising by roughly 20,000 to 30,000 units over this decade.
+
+Following step 65, the system enters a stabilization phase where mean reserve biomass plateaus at equilibrium values ranging from approximately 111,000 to 128,000 by step 100. This represents a net increase of 20,000 to 38,000 units above initial conditions, with considerable variation across simulation runs in the final equilibrium level achieved.
+
+In the context of the private property grazing system with heterogeneous agent types (E-RO, E-LBD, and E-RO-SL1), these dynamics indicate an initial period of resource depletion under livestock grazing pressure, followed by adaptive recovery facilitated by learning-by-doing and social learning processes. The final stabilization at elevated biomass levels—substantially exceeding initial conditions—suggests that the learning mechanisms enable agents to develop sustainable pasture management strategies that enhance long-term reserve biomass availability. The variation in equilibrium outcomes across runs likely reflects the interaction between stochastic rainfall variability (mean 200, standard deviation 100) and differential learning trajectories among the behavioral types.
+
+Across all simulation runs, the mean green biomass follows a consistent four-phase trajectory characterized by initial depletion, trough maintenance, rapid recovery, and heterogeneous stabilization. At initialization, the metric begins at approximately 45,000 units. During the first 20 steps, biomass declines sharply under grazing pressure, reaching minimum values between 40,000 and 44,000 units by step 20. Most trajectories bottom out near 40,000–42,000 units, though individual runs maintain higher minima near 44,000.  
+
+Following this trough, a steep sigmoid recovery phase dominates steps 25 through 60. Growth accelerates most rapidly between steps 40 and 50, with values climbing from roughly 42,000–45,000 to between 55,000 and 62,000. During this interval, the simulation runs exhibit increasing divergence, indicating that stochastic vegetation dynamics and heterogeneous household decision-making—particularly distinctions between E-RO, E-LBD, and E-RO-SL1 learning behaviors—generate divergent pasture recovery rates despite uniform climatic forcing.  
+
+After step 60, the expansion rate diminishes as the system approaches saturation. Between steps 60 and 100, biomass asymptotically stabilizes at run-specific equilibria ranging from approximately 56,000 to 64,000 units. This final 8,000-unit spread across runs at step 100 suggests that learning mechanisms, risk attitudes (r-parameters), and localized grazing histories produce lasting differences in long-term pasture carrying capacity. Notably, all terminal values exceed initial conditions, indicating net biomass accumulation over the 100-step sequence, yet the system does not converge to a single equilibrium state, reflecting the persistent ecological footprint of divergent adaptive behaviors in the private property grazing context.
+
+The mean livestock holdings plus destocked animals per household begins at 90 units at the initiation of the simulation. Over the first 20 steps, the metric undergoes a steep decline, falling to approximately 40-50 units as households rapidly reduce herd sizes in response to ecological conditions. Between steps 20 and 40, the rate of decrease moderates, reaching a minimum value of approximately 40 units near step 40.
+
+Following this minimum, the metric exhibits divergent trajectories across the remainder of the 100-step simulation period. In a subset of outcomes, values remain relatively stable at low levels, persisting between 40 and 45 units through step 100. The majority of outcomes demonstrate moderate recovery, increasing from the minimum to stabilize between 45 and 50 units by approximately step 80, with minimal subsequent change.
+
+A small number of outcomes exhibit substantially higher recovery, with values increasing from the minimum of 40 to reach approximately 58-62 units by step 100. These higher-performing outcomes show continuous increase through approximately step 80 before stabilizing.
+
+By step 100, the metric spans a range from approximately 41 to 62 units across outcomes, with most values clustering between 45 and 50. 
+
+In the context of the RAGE extension model simulating private property grazing with adaptive learning, these dynamics reflect an initial crisis phase characterized by forced destocking due to resource constraints, followed by a recovery phase where learning capabilities—specifically learning-by-doing and social learning processes—generate heterogeneous long-term outcomes. The divergence after step 40 indicates that household adaptive capacity, influenced by behavioral type heterogeneity (E-RO, E-LBD, E-RO-SL1) and stochastic ecological feedbacks, creates path-dependent resilience trajectories. The substantial variation in final livestock holdings (approximately 50% difference between the lowest and highest outcomes) demonstrates that learning and adaptation mechanisms significantly affect household livelihood resilience in grazing systems, with some combinations of learning behaviors and ecological conditions enabling recovery to near-initial herd sizes while others result in persistent low-level equilibria.
+
+In the initial phase spanning approximately the first five time steps, the mean destock metric rises sharply from initial values near zero to peak levels ranging between approximately 6 and 7.5, representing the maximum values observed across all simulation trajectories.
+
+Between approximately steps 5 and 30, the metric undergoes a steep decline characterized by high variability across runs. By step 10, values have decreased to ranges between approximately 1 and 4. By step 20, most trajectories have fallen below 2.5, though individual runs exhibit considerable dispersion with some maintaining values near 2.0-2.5 while others drop below 1.0.
+
+During the transition period spanning roughly steps 20 to 50, the trajectories display pronounced oscillatory behavior with intermittent spikes superimposed on the downward trend. Values during this phase range widely from near zero to approximately 2.0, with the amplitude of fluctuations gradually diminishing over time.
+
+From approximately step 50 through step 100, the system reaches a steady-state regime where mean destock values stabilize at distinct constant levels with minimal temporal variation within individual trajectories. These asymptotic values span a continuous range from approximately 0 to 1.0, with multiple trajectories clustering at discrete equilibrium levels. Specifically, the highest trajectory stabilizes near 1.0, while others settle at intermediate levels of approximately 0.8, 0.5-0.7, and 0.1-0.3, with a subset approaching values near zero.
+
+The long-term behavior demonstrates persistent heterogeneity in outcomes, with the spread between the highest and lowest stable values maintained at approximately 1.0 unit throughout the final 40-50 steps of the simulation. This suggests that while all trajectories eventually reach stable destocking regimes, systematic differences in long-term performance persist based on behavioral type or stochastic factors.
+
+At initialization (step 0), the Gini coefficient equals zero, reflecting identical initial livestock endowments of 90 animals across all 60 households in the system.  
+
+During the first 20 steps, inequality increases universally across all simulation runs, with the Gini coefficient rising rapidly to values between approximately 0.005 and 0.015. This indicates the initial emergence of differentiation in healthy livestock holdings among households.
+
+Between steps 20 and 50, the simulation trajectories begin to diverge substantially. While all paths continue to exhibit increasing inequality, the rate of increase varies markedly across runs. By step 50, the Gini coefficient values span a range from approximately 0.015 to 0.040, with some simulation outcomes showing more than double the inequality levels of others.
+
+From step 50 to step 100, this divergence accelerates and becomes more pronounced. By the final timestep, the Gini coefficient values spread across a broad spectrum from approximately 0.030 to 0.095. Specifically, certain simulation runs reach high inequality levels exceeding 0.090, while others stabilize at moderate levels between 0.060 and 0.080, and a minority maintains relatively lower inequality in the range of 0.030 to 0.045.
+
+The overall pattern demonstrates a consistent trend toward increasing inequality in healthy livestock distribution over the 100-step period for all behavioral configurations (20 E-RO, 20 E-LBD, and 20 E-RO-SL1 households). However, the threefold variation in final Gini values indicates significant path dependency, wherein stochastic rainfall variability (mean 200, standard deviation 100) and heterogeneous learning mechanisms generate divergent distributional outcomes among private property households.
+
+The trajectories begin at a count of 0 households with social learning at step 0, remaining near zero through approximately step 5. Between steps 5 and 30, all simulation runs exhibit a rapid, stepwise increase in the number of households engaged in social learning, with discrete jumps occurring at irregular intervals consistent with the yearly update cycle of the household decision-making sub-model. The rate of adoption varies substantially across runs: some trajectories reach saturation by step 25-30, while others continue accumulating households until approximately step 40-50.
+
+Final plateau values range widely from approximately 18 to 54 households across the 60 total households in the system. The majority of trajectories stabilize between 40-50 households, with several runs reaching 48-54 households, indicating near-complete diffusion of social learning behavior beyond the initial 20 E-RO-SL1 agents to include E-RO and E-LBD type households. A minority of runs plateau at lower values (18-30 households), suggesting incomplete adoption. By step 60, all trajectories have stabilized, maintaining constant counts through step 100 with no further changes in household-SL status.
+
+The data reveals substantial heterogeneity in cumulative destocking outcomes across the 100 time steps. During the initial phase (approximately steps 0-20), all simulation runs exhibit a rapid accumulation of destocked livestock, with the mean cumulative destock count rising sharply from 0 to values ranging between approximately 60 and 80.
+
+Following this initial period, the trajectories diverge considerably. A subset of simulations continues to accumulate destocked animals at a relatively constant or slightly accelerating rate throughout the entire simulation period, reaching cumulative totals between approximately 140 and 180 by step 100. Another group shows moderate continued accumulation, ending with values between roughly 100 and 130.
+
+Notably, several trajectories plateau at relatively low levels, stabilizing around step 30-40 at cumulative values of approximately 60-90 and remaining nearly constant through step 100. The lowest observed trajectory stabilizes at approximately 58 from step 40 onward.
+
+This divergence results in a widening gap between simulation outcomes over time, with the range between the minimum and maximum cumulative destock totals expanding from near zero at step 0 to approximately 115 units by step 100 (spanning roughly 58 to 173).
+
+In the context of the grazing system model, these patterns indicate that household destocking behavior—representing adaptive responses to pasture conditions, livestock management needs, and climatic variability—follows markedly different long-term trajectories depending on stochastic rainfall realizations and the interaction of heterogeneous risk attitudes with the three behavioral types (E-RO, E-LBD, and E-RO-SL1). The plateauing trajectories suggest that in some simulation runs, households reach a stable equilibrium where minimal further destocking is required, while the continuously rising trajectories indicate persistent pressure for livestock reduction throughout the 100-year period in other runs.
+
+The ensemble of simulations tracking E-RO (non-learning) household counts over 100 steps reveals substantial trajectory divergence from a common initial condition of 20 households.
+
+**Early Phase (Steps 0–20):**  
+All simulation runs initiate with exactly 20 non-learning households. Within the first 20 steps, the population counts separate rapidly into three distinct dynamic regimes. One subset of trajectories exhibits sharp increases, reaching values between 30 and 40 households by step 15–20. A second subset declines precipitously to levels between 0 and 15 households. Notably, at least one trajectory maintains a constant value of exactly 20 households throughout the entire simulation duration without deviation.
+
+**Middle Phase (Steps 20–40):**  
+This period represents the point of maximum divergence among simulation runs. The high-growth trajectories plateau at peak values of approximately 40 households, sustaining levels between 35 and 40 until approximately step 35–40, after which they undergo a steep decline. By step 40, these trajectories fall to values between 23 and 34. Meanwhile, the declining trajectories continue their descent, with several reaching near-extinction levels of 0–5 households. Intermediate trajectories stabilize at distinct levels: approximately 26, 25, 23, 18, and 13 households. Some trajectories that had declined to the 10–15 range stabilize temporarily before further adjustment.
+
+**Late Phase (Steps 40–100):**  
+The system settles into persistent quasi-equilibrium states with minimal fluctuation. By step 100, the final distribution of non-learning households spans the full range from 0 to approximately 26 households. Distinct stable outcomes emerge at specific abundance levels: near-extinction (0–3 households), low persistence (8–10 households), moderate persistence (13 and 18 households), and high persistence (23–26 households). The trajectories that peaked at 40 households stabilize in the 23–26 range. Several trajectories stabilize at exactly 10 households, 13 households, or fall to and maintain 0 households from approximately step 65 onward. The trajectory fixed at 20 households remains unchanged throughout.
+
+**Interpretation:**  
+Under the parameter configuration with 60 total households initially divided equally among three behavioral types (E-RO, E-LBD, and E-RO-SL1), the competition and potential strategy switching among behavioral types generates highly variable outcomes. Non-learning households may temporarily dominate the population (increasing to twice the initial count), maintain baseline levels, or decline to near-extinction. The stabilization of distinct abundance levels—particularly the convergence of multiple independent runs to specific values such as 10, 13, 23, and 26 households—suggests the existence of multiple stable attractors in the social-ecological system. The sensitivity of outcomes to stochastic processes occurring primarily within the first 40 steps determines the long-term persistence of non-learning behavioral strategies in the household population.

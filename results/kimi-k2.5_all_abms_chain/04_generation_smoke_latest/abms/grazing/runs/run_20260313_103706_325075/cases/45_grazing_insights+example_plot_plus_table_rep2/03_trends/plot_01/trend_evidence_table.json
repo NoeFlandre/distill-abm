@@ -1,0 +1,293 @@
+{
+  "reporter_pattern": "mean [household-risk-att-init] of households",
+  "time_column": null,
+  "matched_columns": [
+    "mean [household-risk-att-init] of households",
+    "mean [household-risk-att-init] of households.1",
+    "mean [household-risk-att-init] of households.2",
+    "mean [household-risk-att-init] of households.3",
+    "mean [household-risk-att-init] of households.4",
+    "mean [household-risk-att-init] of households.5",
+    "mean [household-risk-att-init] of households.6",
+    "mean [household-risk-att-init] of households.7",
+    "mean [household-risk-att-init] of households.8",
+    "mean [household-risk-att-init] of households.9",
+    "mean [household-risk-att-init] of households.10",
+    "mean [household-risk-att-init] of households.11",
+    "mean [household-risk-att-init] of households.12",
+    "mean [household-risk-att-init] of households.13",
+    "mean [household-risk-att-init] of households.14",
+    "mean [household-risk-att-init] of households.15",
+    "mean [household-risk-att-init] of households.16",
+    "mean [household-risk-att-init] of households.17",
+    "mean [household-risk-att-init] of households.18",
+    "mean [household-risk-att-init] of households.19",
+    "mean [household-risk-att-init] of households.20",
+    "mean [household-risk-att-init] of households.21",
+    "mean [household-risk-att-init] of households.22",
+    "mean [household-risk-att-init] of households.23",
+    "mean [household-risk-att-init] of households.24",
+    "mean [household-risk-att-init] of households.25",
+    "mean [household-risk-att-init] of households.26",
+    "mean [household-risk-att-init] of households.27",
+    "mean [household-risk-att-init] of households.28",
+    "mean [household-risk-att-init] of households.29"
+  ],
+  "matched_series_count": 30,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_30_matched_series",
+      "sample_count": 101,
+      "valid_sample_count": 101,
+      "dropped_non_numeric_count": 0,
+      "start_value": 0.007361111111111129,
+      "end_value": 0.0073611111111111125,
+      "mean": 0.007361111111111114,
+      "median": 0.0073611111111111125,
+      "std": 7.290662494160365e-18,
+      "variance": 5.315375960375664e-35,
+      "minimum": 0.007361111111111094,
+      "minimum_index": 67,
+      "maximum": 0.007361111111111129,
+      "maximum_index": 0,
+      "peaks": [
+        {
+          "index": 30.0,
+          "source_index": 30.0,
+          "time": 30.0,
+          "value": 0.0073611111111111256,
+          "prominence": 0.0
+        },
+        {
+          "index": 47.0,
+          "source_index": 47.0,
+          "time": 47.0,
+          "value": 0.0073611111111111256,
+          "prominence": 0.0
+        },
+        {
+          "index": 59.0,
+          "source_index": 59.0,
+          "time": 59.0,
+          "value": 0.0073611111111111256,
+          "prominence": 0.0
+        },
+        {
+          "index": 65.0,
+          "source_index": 65.0,
+          "time": 65.0,
+          "value": 0.0073611111111111256,
+          "prominence": 0.0
+        },
+        {
+          "index": 44.0,
+          "source_index": 44.0,
+          "time": 44.0,
+          "value": 0.007361111111111124,
+          "prominence": 0.0
+        },
+        {
+          "index": 53.0,
+          "source_index": 53.0,
+          "time": 53.0,
+          "value": 0.007361111111111124,
+          "prominence": 0.0
+        },
+        {
+          "index": 33.0,
+          "source_index": 33.0,
+          "time": 33.0,
+          "value": 0.007361111111111122,
+          "prominence": 0.0
+        },
+        {
+          "index": 71.0,
+          "source_index": 71.0,
+          "time": 71.0,
+          "value": 0.007361111111111122,
+          "prominence": 0.0
+        }
+      ],
+      "valleys": [
+        {
+          "index": 45.0,
+          "source_index": 45.0,
+          "time": 45.0,
+          "value": 0.0073611111111111195,
+          "prominence": 0.0
+        },
+        {
+          "index": 16.0,
+          "source_index": 16.0,
+          "time": 16.0,
+          "value": 0.007361111111111114,
+          "prominence": 0.0
+        },
+        {
+          "index": 77.0,
+          "source_index": 77.0,
+          "time": 77.0,
+          "value": 0.0073611111111111125,
+          "prominence": 0.0
+        },
+        {
+          "index": 31.0,
+          "source_index": 31.0,
+          "time": 31.0,
+          "value": 0.007361111111111111,
+          "prominence": 0.0
+        },
+        {
+          "index": 60.0,
+          "source_index": 60.0,
+          "time": 60.0,
+          "value": 0.007361111111111111,
+          "prominence": 0.0
+        },
+        {
+          "index": 70.0,
+          "source_index": 70.0,
+          "time": 70.0,
+          "value": 0.007361111111111111,
+          "prominence": 0.0
+        },
+        {
+          "index": 79.0,
+          "source_index": 79.0,
+          "time": 79.0,
+          "value": 0.007361111111111111,
+          "prominence": 0.0
+        },
+        {
+          "index": 10.0,
+          "source_index": 10.0,
+          "time": 10.0,
+          "value": 0.007361111111111109,
+          "prominence": 0.0
+        }
+      ],
+      "inflection_indices": [
+        4,
+        96
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 11,
+        "windows": [
+          {
+            "start_index": 0,
+            "end_index": 10,
+            "trend": "no trend",
+            "tau": -0.2727272727272727,
+            "slope": -8.673617379884035e-19,
+            "p": 0.2688797429060221,
+            "significant": false
+          },
+          {
+            "start_index": 11,
+            "end_index": 21,
+            "trend": "no trend",
+            "tau": -0.03636363636363636,
+            "slope": 0.0,
+            "p": 0.9372477153407601,
+            "significant": false
+          },
+          {
+            "start_index": 22,
+            "end_index": 32,
+            "trend": "no trend",
+            "tau": -0.07272727272727272,
+            "slope": 0.0,
+            "p": 0.8121397839801439,
+            "significant": false
+          },
+          {
+            "start_index": 33,
+            "end_index": 43,
+            "trend": "no trend",
+            "tau": -0.05454545454545454,
+            "slope": 0.0,
+            "p": 0.8744966411277522,
+            "significant": false
+          },
+          {
+            "start_index": 44,
+            "end_index": 54,
+            "trend": "no trend",
+            "tau": -0.18181818181818182,
+            "slope": -7.434529182757744e-19,
+            "p": 0.47950012218695326,
+            "significant": false
+          },
+          {
+            "start_index": 55,
+            "end_index": 65,
+            "trend": "no trend",
+            "tau": 0.23636363636363636,
+            "slope": 6.746146851020917e-19,
+            "p": 0.343283918228662,
+            "significant": false
+          },
+          {
+            "start_index": 66,
+            "end_index": 76,
+            "trend": "no trend",
+            "tau": 0.05454545454545454,
+            "slope": 3.4694469519536144e-19,
+            "p": 0.8755190474171655,
+            "significant": false
+          },
+          {
+            "start_index": 77,
+            "end_index": 87,
+            "trend": "no trend",
+            "tau": -0.4,
+            "slope": -8.673617379884035e-19,
+            "p": 0.09617932259341999,
+            "significant": false
+          },
+          {
+            "start_index": 88,
+            "end_index": 98,
+            "trend": "no trend",
+            "tau": 0.01818181818181818,
+            "slope": 0.0,
+            "p": 1.0,
+            "significant": false
+          }
+        ]
+      },
+      "change_points": [
+        100
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 49.0,
+        "oscillation_indices": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          43,
+          44,
+          45
+        ]
+      }
+    }
+  ]
+}

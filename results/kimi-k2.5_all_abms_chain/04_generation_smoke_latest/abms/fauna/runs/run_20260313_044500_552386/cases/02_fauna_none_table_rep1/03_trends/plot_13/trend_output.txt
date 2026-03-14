@@ -1,0 +1,9 @@
+The aggregate energy content of prey populations initiates at approximately 16,667 units. During the first 350 time steps, this metric undergoes steep monotonic decline characterized by slopes exceeding −24 units per step, reaching approximately 4,100 units by step 385.  
+
+Between steps 385 and 875, the trajectory exhibits damped oscillations with a dominant period of 63 steps, superimposed on a continued but moderating downward trend. Peak values during this interval range from approximately 3,764 to 4,102 units, while valleys descend progressively from roughly 4,100 to 802 units. Specific local minima occur at steps 708 (869 units) and 782 (802 units).  
+
+From steps 875 to 1,391, the decline decelerates substantially to rates below −1 unit per step, with values fluctuating in the low hundreds. A temporary reversal occurs between steps 1,392 and 1,623, where aggregate prey energy increases at a rate of +0.034 units per step, representing a demographic recovery or buffering phase induced by density-dependent relaxation.  
+
+Subsequent dynamics between steps 1,624 and 2,087 alternate between declining (1,624–1,855) and increasing (1,856–2,087) trends, though at reduced magnitudes compared to earlier phases. The final interval from approximately step 2,087 to 2,311 witnesses the terminal decline to extinction, with values reaching zero by step 2,311.  
+
+The early collapse followed by prolonged low-density oscillations and eventual extinction suggests that initial hunting pressure rapidly depressed populations below sustainable thresholds. The persistent 63-step cyclical patterns align with the strong seasonality parameter influencing grass regrowth and prey energy accumulation, while the temporary recovery phase around steps 1,392–1,623 indicates attempted demographic rebound that ultimately failed to prevent extinction prior to the senescence threshold (7,300 steps) or maximum lifespan (10,220 steps) parameters.

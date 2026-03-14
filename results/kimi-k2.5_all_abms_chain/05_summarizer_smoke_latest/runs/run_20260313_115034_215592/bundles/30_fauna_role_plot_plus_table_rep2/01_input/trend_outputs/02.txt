@@ -1,0 +1,7 @@
+The total energy of forager bands exhibits a continuous decline throughout the simulation period, beginning at an initial value of 2000 and terminating at approximately -38229. The trajectory is characterized by distinct phases of deceleration and acceleration in the rate of energy depletion.
+
+During the initial interval from tick 0 to approximately tick 232, the energy declines at a rate of roughly 11 units per tick. This is followed by a transient period of reduced depletion between ticks 232 and 464, where the rate slows to approximately 8.8 units per tick, representing a temporary deceleration in energy loss.
+
+After tick 464, the decline rate increases substantially. Between ticks 464 and 696, the slope steepens to approximately -15.7 units per tick, followed by further acceleration to -18.5 units per tick through tick 928. By tick 1160, the rate of decline stabilizes at approximately 20 units per tick and remains constant at this level through the remainder of the simulation, from tick 1160 to tick 2312.
+
+The trajectories across all 40 simulation runs demonstrate high convergence, particularly after the initial transient phase, with minimal variance in energy levels between runs during the linear decline phase. The oscillation indices detected between ticks 2170 and 2265 indicate minor periodic fluctuations around the dominant linear trend in the terminal phase of the simulation.

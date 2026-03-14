@@ -1,0 +1,17 @@
+The cumulative destock total begins at 0 and increases monotonically throughout the 100-step simulation period, reaching a terminal aggregate mean value of approximately 96.8 units across the 30 simulation runs, with a median of 81.2 and substantial variance (standard deviation of 20.3).
+
+The most rapid accumulation occurs during the initial phase from step 0 to step 25, where change point analysis detects the first significant regime shift. Within this window, the rate of increase decelerates progressively: the initial 10 steps exhibit the steepest slope of 4.956 units per step, declining to 1.466 by steps 11–21 and further to 0.687 by steps 22–32. Despite this deceleration, values rise rapidly enough that by step 25, trajectories have already diverged significantly across simulation runs, with individual run values ranging from approximately 50 to 90 units.
+
+During the middle phase from step 25 to step 60, the accumulation rate continues to slow, with detected inflection points at steps 45, 47, 53, and 56 indicating minor fluctuations in the deceleration pattern. The slope decreases to approximately 0.358 by steps 33–43 and stabilizes around 0.32 by steps 44–54. A second change point at step 60 marks the end of this transitional phase. Divergence between simulation runs intensifies during this period, with the spread between highest and lowest values widening substantially; by step 60, the range extends from roughly 70 to 130 units.
+
+In the late phase from step 60 to step 100, the rate of increase stabilizes at approximately 0.31 units per step from step 55 onward, maintaining this steady but slow accumulation through the terminal step. The ten inflection points detected between steps 62 and 80 suggest continued minor oscillations around this stable growth rate. By step 100, final values across the 30 simulation runs range widely from approximately 60 to 170 units, indicating persistent heterogeneity in outcomes despite the convergence of growth rates.
+
+Statistical analysis reveals a significant monotonic increasing trend throughout all time windows (Mann-Kendall p < 0.001), with an oscillation period of approximately 49 steps suggesting a secondary cyclical component underlying the primary growth trend.
+
+**Implications for Decision Makers:**
+
+The consistent early rapid destocking during the initial 25 steps suggests that households initially adjust aggressively to pasture conditions or learning signals, potentially depleting herds to sustainable levels quickly. This critical window requires close monitoring as it determines baseline stocking rates for subsequent periods.
+
+The substantial divergence in cumulative destocking after step 25 indicates that learning behavior types (E-RO, E-LBD, and E-RO-SL1) and risk attitudes lead to markedly different long-term livestock management strategies. Some households maintain conservative destocking regimes while others accumulate minimal destocking obligations, suggesting that learning mechanisms significantly affect resilience outcomes. Extension programs should prioritize supporting social learning and learning-by-doing processes that appear to drive this divergence in sustainable stocking rates.
+
+The stabilization of destocking rates after step 60 suggests that households reach steady-state management patterns where learning and adaptation have largely converged to stable strategies. Interventions targeting behavioral change may be most effective if implemented before this convergence occurs, as patterns become increasingly rigid thereafter.

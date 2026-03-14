@@ -1,0 +1,9 @@
+The mean quantity of skimmed and semi-skimmed milk consumed starts near zero at the initial time step. It increases rapidly and approximately linearly over the first ten time steps, reaching values between 1,200 and 1,280. This initial surge corresponds to the early adoption phase where health perceptions and social influence mechanisms begin to shift consumer preferences away from whole milk toward lower-fat alternatives.
+
+Between time steps 10 and 25, the consumption quantity enters a plateau phase, fluctuating narrowly around 1,220 to 1,250 with minor oscillations. This stabilization suggests that the system has reached a temporary equilibrium where the rate of new adopters slows as habit strength and incumbent preferences create resistance to further switching, despite continued social influence and global norm effects.
+
+Starting around time step 25, the metric initiates a second growth phase, accelerating particularly after time step 28. By the final time step (approximately 32), consumption rises to roughly 1,450. This late-stage increase indicates a renewed transition dynamic, potentially driven by accumulated social pressure, generational turnover in habits, or the eventual overcoming of cognitive dissonance thresholds among resistant agents.
+
+Variance across simulation runs remains relatively low throughout, though slight deviations emerge during the rapid growth phases (steps 5-10 and 25-32), suggesting that while the overall adoption trajectory is robust, the precise timing of transition points is sensitive to stochastic social interactions within the network topology.
+
+For decision makers, the dual-phase adoption pattern indicates that milk market transitions occur in distinct waves rather than smooth continuous change, suggesting that intervention strategies should be sustained over extended periods to capture the secondary wave of adopters who require longer habit-disposition periods or stronger social proof before switching.

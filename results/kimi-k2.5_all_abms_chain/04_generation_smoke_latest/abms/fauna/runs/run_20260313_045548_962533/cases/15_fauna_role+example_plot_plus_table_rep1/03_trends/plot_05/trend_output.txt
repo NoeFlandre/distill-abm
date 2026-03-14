@@ -1,0 +1,9 @@
+The cumulative mortality of postpartum females follows a saturating trajectory characterized by three distinct phases. Initially, from tick 0 to approximately 475, the count increases rapidly at a rate exceeding 0.2 individuals per tick, indicating intensive hunting pressure on nursing females during the early simulation period.
+
+During the intermediate phase, spanning roughly ticks 475 to 850, the accumulation rate decelerates substantially, with the slope dropping first to approximately 0.06 and then to 0.015 kills per tick. This transition reflects the declining availability of postpartum females as the population is depleted.
+
+By approximately tick 850 to 1000, the cumulative count reaches a stable plateau with a maximum value of 119 and a terminal value of 117. This saturation persists throughout the remainder of the simulation, with the cumulative total exhibiting minor oscillations around a median of 116.86 and a dominant oscillation period of approximately 63 ticks. The plateau suggests that the pool of available breeding females has been effectively exhausted.
+
+Considerable stochasticity exists across the 40 simulation runs regarding the timing of this saturation. While all runs converge to similar maximum values ranging from approximately 106 to 123 individuals, the temporal point at which the maximum is reached varies substantially, with some runs saturating by tick 500 and others continuing to accumulate kills beyond tick 2000. This variability indicates differences in the efficiency and timing of hunting pressure application across replicates, though the ultimate cumulative impact remains consistent.
+
+The overall pattern demonstrates that hunting pressure on postpartum females is concentrated in the first 1000 ticks (approximately 2.7 years), after which the cumulative kill count stabilizes, reflecting the finite number of breeding females available in the initial population.

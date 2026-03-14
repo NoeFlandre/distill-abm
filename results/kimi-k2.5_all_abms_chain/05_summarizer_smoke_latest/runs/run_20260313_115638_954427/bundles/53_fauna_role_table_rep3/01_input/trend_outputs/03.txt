@@ -1,0 +1,17 @@
+:
+
+The cumulative mortality of male megaherbivores exhibits a rapid initial accumulation phase followed by prolonged stabilization and terminal fluctuation. From initialization at zero, the metric increases steeply through approximately the first 1,160 time steps, with particularly sharp rises occurring between indices 0–463 where slopes exceed 0.17 per step, reaching values approaching 118 by index 1,160. This early phase demonstrates consistently positive but decelerating growth, transitioning from strong initial increases to gradual accumulation rates near 0.008 as the system approaches equilibrium.
+
+Between approximately index 1,160 and 1,855, the series stabilizes around a plateau of roughly 118–120 individuals, achieving a maximum value of 120.17 near index 1,876. During this middle period, accumulation intermittently plateaus with statistically flat trends (indices 1,160–1,391 and 1,624–1,855 interspersed with weak resurgences), while oscillating around peak values. Notable inflection points at indices 1,241, 1,330, 1,397, and 1,455 mark subtle shifts in trajectory during this stabilization.
+
+After index 1,856, the metric undergoes a slight declining trend, concluding at 117.5 by the final observation at index 2,312. This late-phase decrease follows a dominant oscillatory pattern with a period of approximately 63 indices, particularly evident between indices 2,170 and 2,265, suggesting cyclical variations in hunting success potentially driven by seasonal resource fluctuations or shifting encounter rates as male subpopulation densities change.
+
+The series exhibits structural change points at regular early intervals (indices 125, 250, 375, 500, 625, and 850), demarcating transitions in accumulation rates, with an additional terminal change point at 2,310. The distribution centers around the plateau level (median 116.5), while the lower mean of 100.4 reflects the extended initial growth phase from zero. The final decline to 117.5 from the peak of 120.17 suggests potential late-simulation shifts in forager targeting behavior or reduced encounter probabilities as cumulative harvests impact local male availability.
+
+**Key values and indices:**
+- Initial value: 0 at index 0
+- Maximum value: 120.17 at index 1,876
+- Final value: 117.5 at index 2,312
+- Mean: 100.3948; Median: 116.5
+- Dominant oscillation period: 63 indices
+- Critical trend transitions: Indices 1,160 (cessation of rapid growth), 1,876 (peak), 1,856 (initiation of decline)

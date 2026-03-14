@@ -1,0 +1,11 @@
+The total energy of female animals initiates at approximately 12,500 energy units. Over the course of 2,311 steps (approximately 6.3 years given 365 ticks per year), this metric undergoes a continuous decline, ultimately reaching zero, which indicates complete extinction of the female population.
+
+The decline occurs in distinct phases. During the initial period from step 0 to approximately step 500, the population experiences a rapid reduction in total energy, falling from 12,500 to values fluctuating around 2,000 to 4,000 energy units. A notable inflection occurs around step 375, marking a transition in the rate of decline. This phase is characterized by high variability between simulation replicates.
+
+Following the initial crash, from approximately step 500 to step 1500, the decline continues but at a reduced rate, with intermittent fluctuations and temporary plateaus. During this middle phase, minor recoveries occur, including a statistically significant period of increasing trend between steps 1160 and 1391, though the overall trajectory remains downward.
+
+In the final phase, from approximately step 1500 to step 2311, the total energy diminishes asymptotically toward zero. By step 2311, all simulation runs converge at zero energy, confirming the extinction of the female animal population across all replicates.
+
+Throughout the simulation, the mean energy level across all runs averages approximately 1,569 units, with a median of 100 units, indicating that the population spends the majority of the simulated time at severely depleted energy levels following the initial rapid decline.
+
+This pattern suggests that under the specified parameter configuration—including initial populations of 250 prey and 20 foragers, with differential food values and processing costs between sexes, combined with environmental constraints—the female megafauna population cannot sustain itself against the combined pressures of human hunting and environmental limits, leading to inevitable extinction within approximately six years.

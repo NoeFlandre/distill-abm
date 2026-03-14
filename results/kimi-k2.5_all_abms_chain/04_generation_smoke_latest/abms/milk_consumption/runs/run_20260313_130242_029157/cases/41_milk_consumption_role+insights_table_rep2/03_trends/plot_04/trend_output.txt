@@ -1,0 +1,15 @@
+The simulation reveals a complete transformation in milk consumption patterns over the 31-year period from 1974 to 2005, depicting the shift from exclusive whole milk dominance to near-universal adoption of skimmed and semi-skimmed varieties. The cumulative count of alternative milk selections initiates at zero in 1974 and terminates at approximately 25,644 selections by 2005, representing an average accumulation of roughly 11,157 selections across the period with a median value of 10,679.
+
+The trajectory exhibits three distinct phases of adoption velocity. During the initial latency period spanning 1974 to 1978, the system accumulates approximately 200 alternative selections annually. This early phase reflects the persistence of strong incumbent habits and modest initial health and environmental perceptions that prove insufficient to overcome habitual thresholds for the majority of agents.
+
+The acceleration phase emerges between 1979 and 1983, where the annual accumulation rate increases substantially to approximately 737 selections. This period marks the critical transition where social influence mechanisms begin to overcome habitual inertia, facilitating the spread of new consumption patterns through the network structure.
+
+The maturation phase extends from 1984 through 2003, characterized by a stabilized high-velocity growth rate of approximately 933 to 936 annual selections. This twenty-year plateau indicates sustained diffusion through the late majority population, with social conformity and justification mechanisms maintaining transition momentum even as the market approaches saturation. By the final years, the annual selection rate suggests that approximately 94 percent of agents are choosing alternative milk varieties, representing a near-complete reversal from the 1974 baseline.
+
+**Implications for Decision Makers:**
+
+The trajectory demonstrates that disrupting entrenched consumption habits requires sustained multi-year intervention periods before measurable acceleration occurs. The five-year latency period suggests that early adoption efforts may show minimal visible returns despite underlying preference shifts, requiring patience from stakeholders monitoring initial outcomes.
+
+Once social thresholds are breached, transitions become self-sustaining through network effects, indicating that policy interventions should focus resources on achieving critical mass rather than maintaining perpetual incentives. The twenty-year plateau in growth rates during the maturation phase suggests that as markets mature, growth becomes linear rather than exponential, requiring differentiated strategies for capturing final resistant segments compared to engaging the early majority.
+
+The near-complete adoption by 2005 implies that given sufficient time and social network propagation, even deeply habitual behaviors dominated by strong incumbent preferences can be substantially displaced through the cumulative effect of health perception shifts and social influence mechanisms.

@@ -1,0 +1,7 @@
+**Trends in Forager Population Dynamics**
+
+The population of active foragers maintains a constant value of 20 agents throughout the entire simulation period from step 0 through step 2200. No variation in forager count is observed at any temporal interval; the metric remains invariant at its initial value with zero deviation across all recorded time steps. This steady-state condition persists uniformly without evidence of growth, decline, or stochastic fluctuation.
+
+**Implications for Decision Makers**
+
+With immortal-foragers activated and the hunter population fixed at the initialization value of 20, human predation pressure operates as a static variable independent of simulation dynamics. This parameter configuration effectively decouples hunter demographics from the extinction trajectories being studied, allowing clear attribution of megafaunal population outcomes to prey life-history constraints, environmental productivity parameters, and fixed-intensity hunting pressure. Decision makers should interpret prey extinction events or stable equilibria under these settings as direct consequences of bottom-up ecological constraints and prey intrinsic growth rates rather than emergent properties of coupled human-prey demographic feedback loops. This controlled setup provides a baseline measurement environment for testing specific hypotheses regarding prey vulnerability thresholds under constant predation pressure before introducing variable hunter mortality or reproduction dynamics.

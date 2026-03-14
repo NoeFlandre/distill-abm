@@ -1,0 +1,16 @@
+Analysis of the cumulative male mortality trajectories reveals a consistent three-phase pattern across simulation replicates. 
+
+**Phase 1: Rapid Accumulation (Steps 0-500)**
+During the initial 500 time steps, male mortality accumulates rapidly and approximately linearly, with the cumulative count rising from 0 to between 60 and 120 individuals. By step 250, most replicates have recorded 20-50 males killed; by step 500, the majority have reached 80-115 males killed. This phase represents the period of active hunting when the male population is still abundant and hunters can efficiently locate and pursue targets.
+
+**Phase 2: Deceleration (Steps 500-1000)**
+The rate of male mortality decelerates substantially after approximately step 500. Trajectories that were rising sharply begin to curve toward horizontal asymptotes. By step 750, most replicates show cumulative kills between 100-120; by step 1000, additional mortality has slowed to fewer than 5 males per 100 steps. This deceleration coincides with the depletion of the harvestable male population, as the initial cohort of 250 prey animals (approximately 125 males) is reduced through hunting mortality.
+
+**Phase 3: Asymptotic Plateau (Steps 1000-2000+)**
+After step 1000-1200, male mortality effectively ceases in most replicates, with cumulative totals stabilizing between approximately 110 and 125 individuals. Some replicates plateau as low as 100, while the highest reaches approximately 125. A few trajectories exhibit minor continued accumulation (reaching 122-125 by step 1500-1800), suggesting stochastic encounters with the last surviving males. By step 2000, nearly all trajectories have flattened completely, indicating that the male segment of the prey population has been functionally extirpated through hunting pressure.
+
+**Cross-Simulation Variability**
+The spread between fast and slow extinction trajectories spans approximately 300-400 steps at the midpoint of the deceleration phase. Replicates with the steepest initial slopes (reaching 100+ males by step 600) reflect scenarios where hunter-prey encounters were frequent and successful. Replicates with the slowest accumulation (reaching 100 males only by step 900-1000) suggest landscapes or movement patterns that created refugia or reduced encounter rates.
+
+**Implications for Decision Makers**
+The consistent asymptote near 100-125 males killed—approaching the estimated initial male population of 125 animals—indicates that the current hunting pressure (20 hunters, foraging radius of 6, male food value of 30) is sufficient to drive local extinction of males within approximately 3-5 years (1000-1800 daily time steps). The rapid deceleration of hunting success after 500 steps suggests a conservation tipping point: managers monitoring hunting returns would observe declining per-capita harvest rates well before population collapse, providing a potential early warning signal. The variability in time-to-extinction across replicates (spanning roughly 500 steps between fastest and slowest) implies that local landscape stochasticity and animal movement patterns significantly mediate extinction timing, meaning identical hunting pressures could produce population collapse over different time horizons depending on micro-scale habitat configuration.

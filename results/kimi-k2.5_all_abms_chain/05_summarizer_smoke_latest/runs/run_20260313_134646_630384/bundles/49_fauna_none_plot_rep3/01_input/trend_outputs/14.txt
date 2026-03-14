@@ -1,0 +1,11 @@
+The percentage of vegetated landscape patches begins at approximately 33% and, within the first 100 time steps, declines slightly to approximately 32%, where it stabilizes with minor fluctuations. Between steps 100 and 300, the metric exhibits a gradual increase toward 32.5-33%.
+
+At approximately step 300-350, all simulation runs exhibit a severe decline in vegetation coverage, with values plummeting sharply to between 23% and 30%. This event displays considerable variability across runs, with minimum values spanning approximately 7 percentage points. Rapid recovery restores the metric to 32.5-33% by approximately step 400.
+
+The system maintains relative stability at 32.5-33% until around step 700-750, when a second sharp decline occurs. This event is less pronounced than the first, with values falling consistently to approximately 29-30% across all runs. Recovery to baseline levels is achieved by step 800.
+
+From step 800 through step 1100, the percentage remains stable near 33%. A minor reduction to approximately 31.5-32% occurs around step 1100-1200, followed by rapid restoration to baseline levels.
+
+In the extended phase from step 1200 to 2200, the metric fluctuates narrowly around 32.5-33%, with occasional brief dips to approximately 32.3% near steps 1400, 1800, and 2200. The long-term equilibrium stabilizes at approximately 32.5-33%, consistent with the grass-proportion parameter setting of 0.33.
+
+The pronounced episodic declines in fodder availability, particularly the events at steps 300-350 and 700-750, correspond to seasonal cycles in the model environment (seasonality parameter set to 0.8), during which grass availability is constrained. The severity of the first crash and its high variability across runs suggests sensitivity to initial stochastic conditions in the establishment of herbivore grazing patterns and herd distribution. The progressively attenuated magnitude of subsequent crashes indicates the system is converging toward a stable dynamic equilibrium between vegetation regrowth (facilitated by the short regrowth time of 3 ticks) and herbivore consumption pressure. The high seasonality setting produces periodic stress on fodder availability, but the rapid regrowth capacity prevents long-term depletion, maintaining the system near the 33% vegetation coverage level throughout the simulation duration.

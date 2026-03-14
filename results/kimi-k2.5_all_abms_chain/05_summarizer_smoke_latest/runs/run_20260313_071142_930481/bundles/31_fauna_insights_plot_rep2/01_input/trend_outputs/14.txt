@@ -1,0 +1,9 @@
+The percentage of vegetated landscape patches initiates at approximately 33% and exhibits a pattern of periodic collapses and recoveries with progressively decreasing amplitude over the simulation timeframe. Within the first 250 time steps, the metric undergoes a severe decline from 33% to a minimum of 23-24%, representing a vegetation depletion of roughly 9 percentage points. The system subsequently recovers, reaching approximately 33% again by step 600.
+
+A second major collapse occurs around step 650-700, reducing vegetation cover to 29-30%, followed by recovery to the 33% baseline by step 800. A third disturbance manifests at step 1100, producing a smaller decline to 31-32% before returning to baseline.
+
+After step 1200, fluctuations persist but with attenuated severity: vegetation cover drops to approximately 32.5% at step 1500, 32.7% at step 1800, and 32.8% at step 2200, with each recovery maintaining the system near the initial 33% grass proportion. By the conclusion of the observation period around step 2200, oscillation amplitudes have diminished to less than 1 percentage point.
+
+**Implications for Decision Makers:**
+
+The environmental system demonstrates strong resilience, consistently returning to baseline vegetation levels following severe depletion events. However, the initial 250-step period involves critical fodder scarcity that could substantially stress herbivore populations. The attenuation of oscillation amplitude over time suggests the grassland environment self-organizes toward a sustainable equilibrium within approximately 4-6 years, with perturbations becoming progressively less severe. This indicates that short-term vegetation monitoring during the first 2-3 years may significantly overestimate long-term environmental degradation risk, and management strategies should account for this initial adjustment period before assessing ecosystem stability.

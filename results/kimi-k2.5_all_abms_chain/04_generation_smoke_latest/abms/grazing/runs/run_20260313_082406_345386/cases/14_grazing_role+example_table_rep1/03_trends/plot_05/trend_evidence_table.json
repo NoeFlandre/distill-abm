@@ -1,0 +1,189 @@
+{
+  "reporter_pattern": "mean [livestock + destock] of households",
+  "time_column": null,
+  "matched_columns": [
+    "mean [livestock + destock] of households",
+    "mean [livestock + destock] of households.1",
+    "mean [livestock + destock] of households.2",
+    "mean [livestock + destock] of households.3",
+    "mean [livestock + destock] of households.4",
+    "mean [livestock + destock] of households.5",
+    "mean [livestock + destock] of households.6",
+    "mean [livestock + destock] of households.7",
+    "mean [livestock + destock] of households.8",
+    "mean [livestock + destock] of households.9",
+    "mean [livestock + destock] of households.10",
+    "mean [livestock + destock] of households.11",
+    "mean [livestock + destock] of households.12",
+    "mean [livestock + destock] of households.13",
+    "mean [livestock + destock] of households.14",
+    "mean [livestock + destock] of households.15",
+    "mean [livestock + destock] of households.16",
+    "mean [livestock + destock] of households.17",
+    "mean [livestock + destock] of households.18",
+    "mean [livestock + destock] of households.19",
+    "mean [livestock + destock] of households.20",
+    "mean [livestock + destock] of households.21",
+    "mean [livestock + destock] of households.22",
+    "mean [livestock + destock] of households.23",
+    "mean [livestock + destock] of households.24",
+    "mean [livestock + destock] of households.25",
+    "mean [livestock + destock] of households.26",
+    "mean [livestock + destock] of households.27",
+    "mean [livestock + destock] of households.28",
+    "mean [livestock + destock] of households.29"
+  ],
+  "matched_series_count": 30,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_30_matched_series",
+      "sample_count": 101,
+      "valid_sample_count": 101,
+      "dropped_non_numeric_count": 0,
+      "start_value": 90.0,
+      "end_value": 47.54722222222222,
+      "mean": 48.79460946094609,
+      "median": 47.31222222222222,
+      "std": 9.566347408885559,
+      "variance": 91.51500274749144,
+      "minimum": 41.0088888888889,
+      "minimum_index": 37,
+      "maximum": 90.0,
+      "maximum_index": 0,
+      "peaks": [],
+      "valleys": [
+        {
+          "index": 37.0,
+          "source_index": 37.0,
+          "time": 37.0,
+          "value": 41.0088888888889,
+          "prominence": 0.0
+        }
+      ],
+      "inflection_indices": [
+        3,
+        46
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 11,
+        "windows": [
+          {
+            "start_index": 0,
+            "end_index": 10,
+            "trend": "decreasing",
+            "tau": -0.9818181818181818,
+            "slope": -3.4698148148148107,
+            "p": 3.4942442033170096e-05,
+            "significant": true
+          },
+          {
+            "start_index": 11,
+            "end_index": 21,
+            "trend": "decreasing",
+            "tau": -1.0,
+            "slope": -0.9628395061728396,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 22,
+            "end_index": 32,
+            "trend": "decreasing",
+            "tau": -1.0,
+            "slope": -0.36819444444445004,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 33,
+            "end_index": 43,
+            "trend": "no trend",
+            "tau": 0.38181818181818183,
+            "slope": 0.043333333333330636,
+            "p": 0.11947098677170076,
+            "significant": false
+          },
+          {
+            "start_index": 44,
+            "end_index": 54,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.31345679012345884,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 55,
+            "end_index": 65,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.14638888888888957,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 66,
+            "end_index": 76,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.023611111111112137,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 77,
+            "end_index": 87,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.004907407407407287,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 88,
+            "end_index": 98,
+            "trend": "increasing",
+            "tau": 0.9818181818181818,
+            "slope": 0.0022222222222207932,
+            "p": 3.4942442033170096e-05,
+            "significant": true
+          }
+        ]
+      },
+      "change_points": [
+        20,
+        55,
+        100
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 49.0,
+        "oscillation_indices": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          39,
+          40,
+          41,
+          42
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+The aggregate mean trajectory of total energy across 40 simulation runs exhibits a complete collapse from an initial value of 12,500 to extinction (0) by tick 2,312. This decline follows a nonlinear pattern characterized by distinct phases of varying depletion rates, temporary demographic recoveries, and superimposed seasonal oscillations.
+
+The initial phase (ticks 0–500) demonstrates a precipitous decrease with steep negative slopes ranging from approximately -22.6 to -26.7 energy units per tick. During this period, aggregate female energy plummets from 12,500 to roughly 2,200 by tick 375, representing a loss of over 82% of the initial energy reserve. This rapid depletion reflects intensive hunting pressure on the founding female population.
+
+Following the initial crash, the system enters a prolonged decelerating decline phase spanning ticks 500–1,159. The rate of energy loss diminishes substantially, with slopes decreasing from -5.7 to -0.56 energy units per tick. Change points at ticks 375, 500, 625, and 875 mark transitions in the velocity of decline as the population adjusts to reduced density and hunting encounters become less frequent.
+
+Between ticks 1,160 and 1,391, the trajectory exhibits a statistically significant temporary reversal, showing a slightly increasing trend (tau = 0.113, slope = 0.019). This brief demographic recovery suggests a period where female survival and energy acquisition temporarily outpace mortality from hunting and environmental stressors.
+
+The trend resumes decreasing between ticks 1,392 and 1,855, accelerating moderately (slope = -0.167). A second brief increasing interval occurs around ticks 1,856–2,087 before the final collapse ensues. The terminal change point at tick 2,310 marks the transition to complete extinction, with the population reaching zero energy by tick 2,312.
+
+Superimposed on this long-term decline is a cyclical oscillation with a dominant period of approximately 63 ticks, consistent with strong seasonal resource fluctuations (seasonality = 0.8). Local peaks in aggregate energy occur at irregular intervals between ticks 376 and 410, with values ranging from 2,097 to 2,233, representing seasonal pulses of energy availability before the inexorable downward trend resumes.
+
+The high standard deviation of 3,083 relative to the mean of 1,569, combined with a median of only 100, indicates substantial heterogeneity in extinction timing across replicates. While the mean trajectory persists for over 2,300 ticks, individual simulation runs exhibit variable collapse times, with some populations losing all female energy within 500 ticks while others maintain residual energy beyond 2,000 ticks before final extinction.

@@ -1,0 +1,8 @@
+{
+  "abm": "grazing",
+  "case_id": "19_grazing_insights+example_plot_rep1",
+  "evidence_mode": "plot",
+  "model": "moonshotai/kimi-k2.5",
+  "prompt_variant": "insights+example",
+  "repetition": 1
+}

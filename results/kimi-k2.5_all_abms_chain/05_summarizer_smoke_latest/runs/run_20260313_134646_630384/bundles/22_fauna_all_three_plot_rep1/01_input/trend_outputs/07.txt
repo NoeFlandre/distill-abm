@@ -1,0 +1,15 @@
+The cumulative number of deaths begins at zero and exhibits a rapid, near-linear increase during the initial phase of the simulation, reaching approximately 200 deaths by step 500. This initial surge represents a high mortality rate acting upon the starting population of 250 prey animals, driven by the combined pressures of human hunting and natural mortality sources including starvation, senescence, and external predation.
+
+Following this initial phase, the rate of mortality accumulation decelerates significantly between steps 500 and 1000, adding approximately 20 to 50 additional deaths. This deceleration suggests a depletion of the prey base, as fewer individuals remain alive to succumb to mortality factors. By step 1000, the system approaches a stationary state where the cumulative count stabilizes at final values ranging between 220 and 250 deaths across different simulation runs.
+
+The plateau phase, sustained from approximately step 1000 through the end of the observation period at step 2000, indicates the cessation of mortality events. Given that final cumulative deaths approach or slightly exceed the initial population of 250—accounting for limited reproduction over the temporal window—this plateau likely reflects local exhaustion or functional extinction of the prey population under sustained hunting pressure from the immortal forager agents.
+
+Variability across simulation runs manifests primarily in the timing of the mortality rate deceleration and the exact final cumulative death count, with some runs plateauing earlier near 220 deaths while others continue accumulating deaths until reaching approximately 250. This stochasticity reflects the probabilistic nature of agent interactions, movement patterns, and demographic events within the complex adaptive system.
+
+**Implications for Decision Makers:**
+
+The concentration of approximately 80 percent of total mortality within the first 500 steps demonstrates that population collapse occurs extremely rapidly under the modeled hunting pressure. Management interventions, if they are to be effective, must be implemented immediately upon system initialization or detection of hunting activity; delayed responses will likely prove ineffective as the prey population approaches irreversible depletion.
+
+The high terminal mortality rates, with cumulative deaths effectively matching or exceeding the initial population size, indicate that the current configuration of 20 hunters and the specified environmental parameters creates an unsustainable predation regime leading to certain prey extinction. Decision makers should consider this a worst-case scenario requiring immediate reduction in hunter numbers or spatial restriction of hunting activity.
+
+Finally, the observed variability in extinction timing across runs suggests that deterministic predictions of population collapse are unreliable due to stochastic demographic and behavioral factors. Conservation planning must incorporate substantial safety buffers and account for uncertainty in population viability assessments, rather than relying on precise temporal forecasts of extinction events.

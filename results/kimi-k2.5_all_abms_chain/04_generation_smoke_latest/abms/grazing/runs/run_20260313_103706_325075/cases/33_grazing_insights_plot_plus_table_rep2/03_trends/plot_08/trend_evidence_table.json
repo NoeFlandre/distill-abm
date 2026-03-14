@@ -1,0 +1,158 @@
+{
+  "reporter_pattern": "count households with [household-SL? = true]",
+  "time_column": null,
+  "matched_columns": [
+    "count households with [household-SL? = true]",
+    "count households with [household-SL? = true].1",
+    "count households with [household-SL? = true].2",
+    "count households with [household-SL? = true].3",
+    "count households with [household-SL? = true].4",
+    "count households with [household-SL? = true].5",
+    "count households with [household-SL? = true].6",
+    "count households with [household-SL? = true].7",
+    "count households with [household-SL? = true].8",
+    "count households with [household-SL? = true].9",
+    "count households with [household-SL? = true].10",
+    "count households with [household-SL? = true].11",
+    "count households with [household-SL? = true].12",
+    "count households with [household-SL? = true].13",
+    "count households with [household-SL? = true].14",
+    "count households with [household-SL? = true].15",
+    "count households with [household-SL? = true].16",
+    "count households with [household-SL? = true].17",
+    "count households with [household-SL? = true].18",
+    "count households with [household-SL? = true].19",
+    "count households with [household-SL? = true].20",
+    "count households with [household-SL? = true].21",
+    "count households with [household-SL? = true].22",
+    "count households with [household-SL? = true].23",
+    "count households with [household-SL? = true].24",
+    "count households with [household-SL? = true].25",
+    "count households with [household-SL? = true].26",
+    "count households with [household-SL? = true].27",
+    "count households with [household-SL? = true].28",
+    "count households with [household-SL? = true].29"
+  ],
+  "matched_series_count": 30,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_30_matched_series",
+      "sample_count": 101,
+      "valid_sample_count": 101,
+      "dropped_non_numeric_count": 0,
+      "start_value": 0.0,
+      "end_value": 32.06666666666667,
+      "mean": 27.426402640264023,
+      "median": 31.9,
+      "std": 8.921757828285394,
+      "variance": 79.5977627465717,
+      "minimum": 0.0,
+      "minimum_index": 0,
+      "maximum": 32.06666666666667,
+      "maximum_index": 63,
+      "peaks": [],
+      "valleys": [],
+      "inflection_indices": [
+        7,
+        28,
+        30,
+        33,
+        38,
+        57,
+        60
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 11,
+        "windows": [
+          {
+            "start_index": 0,
+            "end_index": 10,
+            "trend": "increasing",
+            "tau": 0.8181818181818182,
+            "slope": 1.4296296296296296,
+            "p": 0.00030301161181345293,
+            "significant": true
+          },
+          {
+            "start_index": 11,
+            "end_index": 21,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 1.1388888888888886,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 22,
+            "end_index": 32,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.1833333333333318,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 33,
+            "end_index": 43,
+            "trend": "increasing",
+            "tau": 0.9272727272727272,
+            "slope": 0.1809523809523808,
+            "p": 7.856495413371967e-05,
+            "significant": true
+          },
+          {
+            "start_index": 44,
+            "end_index": 54,
+            "trend": "increasing",
+            "tau": 0.8909090909090909,
+            "slope": 0.029166666666666785,
+            "p": 0.00012354829922678334,
+            "significant": true
+          },
+          {
+            "start_index": 55,
+            "end_index": 65,
+            "trend": "increasing",
+            "tau": 0.7090909090909091,
+            "slope": 0.00833333333333286,
+            "p": 0.0013734307176853644,
+            "significant": true
+          }
+        ]
+      },
+      "change_points": [
+        40,
+        100
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 49.0,
+        "oscillation_indices": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59
+        ]
+      }
+    }
+  ]
+}

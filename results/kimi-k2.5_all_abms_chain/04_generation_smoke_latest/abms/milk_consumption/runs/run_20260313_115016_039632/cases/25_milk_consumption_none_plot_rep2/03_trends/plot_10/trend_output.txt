@@ -1,0 +1,9 @@
+At initialization (step 0), the mean percentage difference between maximum and minimum choice function scores among agents is approximately 0.0, indicating that choice function evaluations are initially homogeneous across the population of 1,000 agents. The metric increases monotonically throughout the entire simulation period, exhibiting two distinct phases of growth.
+
+During the first phase, spanning approximately steps 0 through 5, the deviation increases rapidly and non-linearly along a concave trajectory, rising sharply from 0.0 to approximately 0.58. This represents a period of rapid diversification in how agents evaluate milk options as they begin processing information about alternatives to whole milk.
+
+During the second phase, from step 5 through approximately step 32, the metric continues to increase but at a substantially attenuated, approximately linear rate, progressing from roughly 0.58 to approximately 0.75. The rate of increase during this latter phase is markedly shallower than the initial growth period, suggesting a slowing but continuing differentiation in agent choice evaluations.
+
+Across all repeated simulation runs, the trajectories remain highly consistent with minimal variation between replications at any given time step. By the terminal time step, the deviation approaches approximately 0.75, indicating substantial heterogeneity in choice function evaluations among agents following the simulated 1974-2005 transition period.
+
+This pattern indicates that diversity in agent decision-making criteria increases continuously throughout the milk consumption transition, with the most rapid differentiation occurring in the early stages as social influence and perception dynamics begin to drive agents toward alternative milk varieties.

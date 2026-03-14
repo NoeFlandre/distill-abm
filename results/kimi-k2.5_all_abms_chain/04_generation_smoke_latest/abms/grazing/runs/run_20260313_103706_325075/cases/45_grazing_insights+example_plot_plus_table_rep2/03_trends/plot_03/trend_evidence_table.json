@@ -1,0 +1,196 @@
+{
+  "reporter_pattern": "mean-reserve-biomass",
+  "time_column": null,
+  "matched_columns": [
+    "mean-reserve-biomass",
+    "mean-reserve-biomass.1",
+    "mean-reserve-biomass.2",
+    "mean-reserve-biomass.3",
+    "mean-reserve-biomass.4",
+    "mean-reserve-biomass.5",
+    "mean-reserve-biomass.6",
+    "mean-reserve-biomass.7",
+    "mean-reserve-biomass.8",
+    "mean-reserve-biomass.9",
+    "mean-reserve-biomass.10",
+    "mean-reserve-biomass.11",
+    "mean-reserve-biomass.12",
+    "mean-reserve-biomass.13",
+    "mean-reserve-biomass.14",
+    "mean-reserve-biomass.15",
+    "mean-reserve-biomass.16",
+    "mean-reserve-biomass.17",
+    "mean-reserve-biomass.18",
+    "mean-reserve-biomass.19",
+    "mean-reserve-biomass.20",
+    "mean-reserve-biomass.21",
+    "mean-reserve-biomass.22",
+    "mean-reserve-biomass.23",
+    "mean-reserve-biomass.24",
+    "mean-reserve-biomass.25",
+    "mean-reserve-biomass.26",
+    "mean-reserve-biomass.27",
+    "mean-reserve-biomass.28",
+    "mean-reserve-biomass.29"
+  ],
+  "matched_series_count": 30,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_30_matched_series",
+      "sample_count": 101,
+      "valid_sample_count": 101,
+      "dropped_non_numeric_count": 0,
+      "start_value": 90000.0,
+      "end_value": 121072.58963623625,
+      "mean": 103366.2648734673,
+      "median": 104366.54955516949,
+      "std": 16057.24881913233,
+      "variance": 257835239.63952664,
+      "minimum": 84114.0706304575,
+      "minimum_index": 26,
+      "maximum": 121072.58963623625,
+      "maximum_index": 100,
+      "peaks": [
+        {
+          "index": 3.0,
+          "source_index": 3.0,
+          "time": 3.0,
+          "value": 90522.73616536063,
+          "prominence": 0.0
+        }
+      ],
+      "valleys": [
+        {
+          "index": 26.0,
+          "source_index": 26.0,
+          "time": 26.0,
+          "value": 84114.0706304575,
+          "prominence": 0.0
+        }
+      ],
+      "inflection_indices": [
+        8,
+        48
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 11,
+        "windows": [
+          {
+            "start_index": 0,
+            "end_index": 10,
+            "trend": "decreasing",
+            "tau": -0.6727272727272727,
+            "slope": -358.89119837867474,
+            "p": 0.0050693095567015956,
+            "significant": true
+          },
+          {
+            "start_index": 11,
+            "end_index": 21,
+            "trend": "decreasing",
+            "tau": -1.0,
+            "slope": -195.59492426685756,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 22,
+            "end_index": 32,
+            "trend": "no trend",
+            "tau": 0.45454545454545453,
+            "slope": 21.604956693459826,
+            "p": 0.06170669002831275,
+            "significant": false
+          },
+          {
+            "start_index": 33,
+            "end_index": 43,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 620.2690536139344,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 44,
+            "end_index": 54,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 1908.991455695262,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 55,
+            "end_index": 65,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 643.4350086065751,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 66,
+            "end_index": 76,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 93.33870958349387,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 77,
+            "end_index": 87,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 20.531370195184234,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          },
+          {
+            "start_index": 88,
+            "end_index": 98,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 5.368666072191748,
+            "p": 2.623614939456509e-05,
+            "significant": true
+          }
+        ]
+      },
+      "change_points": [
+        50,
+        100
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 49.0,
+        "oscillation_indices": [
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ]
+      }
+    }
+  ]
+}

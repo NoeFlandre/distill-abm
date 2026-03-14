@@ -1,0 +1,7 @@
+The aggregate mean household risk attitude initiates at approximately 0.007 and undergoes a steep ascent during the initial 33 steps, characterized by statistically significant increasing trends across consecutive windows. This early phase culminates in a peak value of 0.381 around step 33, indicating maximum divergence in risk management strategies as households experiment with different behavioral approaches.
+
+Subsequently, the metric experiences a pronounced decline between steps 33 and 65, with strongly negative trends reducing the mean by roughly half to approximately 0.19. This decreasing phase reflects a consolidation of risk attitudes as households adjust their strategies based on observed outcomes and social learning.
+
+Beyond step 65, the mean risk attitude stabilizes, showing no significant trend through the final 35 steps of the simulation. The system concludes at step 100 with a mean risk attitude of 0.191, maintaining persistent variability across the population of households while the aggregate remains below the peak exploratory levels observed midway through the simulation.
+
+In the context of adaptive co-management, this pattern illustrates how learning processes initially generate high diversity in uncertainty management among private property households, followed by selective retention of moderate risk strategies that prove sustainable within the specific ecological and social configuration of the grazing system.

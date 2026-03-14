@@ -1,0 +1,11 @@
+The cumulative mortality of female prey exhibits a characteristic pattern of rapid accumulation followed by saturation across all simulation runs. During the initial phase spanning approximately the first 500 time steps, female deaths accumulate at a high rate, with the cumulative count rising from zero to between 80 and 120 individuals.
+
+In the subsequent interval from step 500 to step 1000, the rate of increase declines markedly as the values begin to stabilize.
+
+Beyond approximately step 1000, the cumulative count reaches a persistent plateau for the majority of runs, with final values concentrated in the range of 115 to 125.
+
+Considerable variation exists in the specific timing of the saturation phase across runs. Some runs plateau as early as step 700-800, maintaining constant cumulative counts for the remainder of the simulation. Other runs exhibit sporadic increases in female mortality extending to step 1500 or beyond, with one run continuing to accumulate kills until approximately step 2100.
+
+Additionally, one simulation displays a distinct delayed onset pattern, with negligible female mortality during the initial 200 steps followed by a steep acceleration that eventually converges on the same asymptotic range observed in other runs.
+
+Interpreted within the context of the model, the steep initial rise reflects intensive hunting pressure targeting females during the early phase of the simulation when prey are abundant. The asymptotic plateau at approximately 120-125 cumulative deaths corresponds to the near-complete depletion of the female segment of the prey population, consistent with an initial prey population of 250 individuals and approximately equal sex ratios. The saturation of the mortality counts indicates that foragers hunt females to effective extinction, after which continued accumulation of female kills ceases. The heterogeneity in the timing of saturation reflects stochastic variation in encounter rates and foraging decisions, while the convergence of all runs to a narrow range of final values suggests a deterministic limit imposed by the initial female population size.

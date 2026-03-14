@@ -1,0 +1,8 @@
+:
+The number of active human forager bands remains constant at the initialization value of 20 across all observed time steps from the start of the simulation through approximately step 2,300. This static demographic profile exhibits zero variance both temporally and across repeated simulation replicates, showing no episodes of mortality, recruitment, or population fluctuation.
+
+This unchanging forager count emerged directly from the experimental configuration combining an initial population of 20 hunters with the `imortal-foragers` parameter set to True, which eliminates death from energy depletion, alongside the absence of explicit hunter reproduction or immigration mechanisms in the model design. Consequently, the predator population functions as a fixed external forcing variable rather than a dynamic system component responsive to prey availability or environmental conditions.
+
+**Insights for Decision Makers:**
+
+For stakeholders evaluating megafaunal population trajectories, this constancy establishes that any declines or collapses in herbivore populations result strictly from the sustained hunting pressure of 20 active predators operating under optimal foraging rules, without the moderating influence of predator demographic responses to prey scarcity. While this simplifies causal attribution by removing feedback loops between prey availability and predator numbers, it also constrains the model's ability to simulate realistic extinction scenarios where hunting pressure might naturally abate following prey depletion, potentially producing more severe prey population declines than would occur with dynamic hunter demographics.

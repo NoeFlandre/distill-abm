@@ -1,0 +1,136 @@
+{
+  "reporter_pattern": "alt-total-try",
+  "time_column": null,
+  "matched_columns": [
+    "alt-total-try",
+    "alt-total-try.1",
+    "alt-total-try.2",
+    "alt-total-try.3",
+    "alt-total-try.4",
+    "alt-total-try.5",
+    "alt-total-try.6",
+    "alt-total-try.7",
+    "alt-total-try.8",
+    "alt-total-try.9",
+    "alt-total-try.10",
+    "alt-total-try.11",
+    "alt-total-try.12",
+    "alt-total-try.13",
+    "alt-total-try.14",
+    "alt-total-try.15",
+    "alt-total-try.16",
+    "alt-total-try.17",
+    "alt-total-try.18",
+    "alt-total-try.19",
+    "alt-total-try.20",
+    "alt-total-try.21",
+    "alt-total-try.22",
+    "alt-total-try.23",
+    "alt-total-try.24",
+    "alt-total-try.25",
+    "alt-total-try.26",
+    "alt-total-try.27",
+    "alt-total-try.28",
+    "alt-total-try.29"
+  ],
+  "matched_series_count": 30,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_30_matched_series",
+      "sample_count": 33,
+      "valid_sample_count": 33,
+      "dropped_non_numeric_count": 0,
+      "start_value": 0.0,
+      "end_value": 25643.833333333332,
+      "mean": 11157.354545454546,
+      "median": 10679.433333333332,
+      "std": 8241.320907834719,
+      "variance": 67919370.30591369,
+      "minimum": 0.0,
+      "minimum_index": 0,
+      "maximum": 25643.833333333332,
+      "maximum_index": 32,
+      "peaks": [],
+      "valleys": [],
+      "inflection_indices": [
+        31
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 5,
+        "windows": [
+          {
+            "start_index": 0,
+            "end_index": 4,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 201.4625,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 5,
+            "end_index": 9,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 736.5833333333333,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 10,
+            "end_index": 14,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 927.2166666666669,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 15,
+            "end_index": 19,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 933.3500000000004,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 20,
+            "end_index": 24,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 935.2041666666671,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 25,
+            "end_index": 29,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 935.9333333333316,
+            "p": 0.0274863361115103,
+            "significant": true
+          }
+        ]
+      },
+      "change_points": [
+        32
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 15.0,
+        "oscillation_indices": [
+          27,
+          28,
+          29,
+          30,
+          31
+        ]
+      }
+    }
+  ]
+}

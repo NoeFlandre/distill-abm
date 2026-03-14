@@ -1,0 +1,22 @@
+The mean quantity of whole milk consumed across the agent population exhibits a marked non-linear decline over the 32 time steps, falling from an initial value of 2654.81 units to a terminal value of 253.10 units. This represents a reduction of approximately 90% in whole milk consumption over the simulated 31-year period.
+
+**Phase 1: Accelerated Abandonment (Steps 0–9)**
+The most precipitous decline occurs during the initial phases, with consumption dropping sharply from 2654.81 to approximately 1000 units by step 10. Statistical analysis identifies steps 5 through 9 as the steepest decline period, with a slope of -221.111 units per step and statistical significance (p=0.027). While steps 0-4 also show significant decline (-115.852 slope), the acceleration between steps 5-9 suggests that after an initial period of habit resistance, the collective influence of health perceptions (initially set at 1.69), environmental perceptions (1.12), and social conformity mechanisms (0.28) rapidly overcomes the initial habit strength of 10.0 once the threshold for behavioral change (2.0) is breached.
+
+**Phase 2: Moderated Decline (Steps 10–14)**
+Between steps 10 and 14, the rate of decline decelerates significantly to a slope of -38.134 units per step, though remaining statistically significant (p=0.027). This moderation suggests that the first wave of habit-breaking has largely concluded, leaving a more resistant population of consumers for whom the psychological justification mechanisms (0.61) and cognitive dissonance threshold (0.15) create friction against further rapid change.
+
+**Phase 3: Stabilization and Oscillation (Steps 15–19)**
+At step 15, the trend reaches an inflection point leading to a temporary plateau between steps 15 and 19, where the Mann-Kendall test indicates no significant trend (p=0.086). Consumption oscillates between a valley of 760.00 units at step 18 and a peak of 773.96 units at step 19. This stabilization reflects the memory lifetime parameter (5.0) interacting with social interaction probabilities (0.3), creating temporary equilibrium where remaining whole milk consumers resist further social influence due to either high social blindness (0.51) or network clustering effects within the Watts-Strogatz topology.
+
+**Phase 4: Resumed Gradual Decline (Steps 20–24)**
+Following the plateau, a second significant decline phase occurs between steps 20 and 24, with a slope of -17.450 units per step (p=0.027). This gentler decline indicates that normative influence, once fully activated, continues to erode habitual behavior among late adopters, though at a diminished rate as the remaining consumer base becomes increasingly homogeneous in their resistance to change.
+
+**Phase 5: Secondary Plateau (Steps 25–29)**
+Steps 25 through 29 exhibit another period of statistical stabilization (p=0.086), with values oscillating between 594.35 units (step 26) and 620.98 units (step 27). This 15-step periodicity in oscillation patterns aligns with the dominant oscillation period identified in the series, suggesting cyclical social influence dynamics where temporary reversals or pauses in abandonment occur as agents process social information within their memory windows.
+
+**Phase 6: Terminal Decline (Steps 30–32)**
+The final phase witnesses a sharp drop from approximately 335.18 units at step 30 to the minimum value of 253.10 units at step 32. This terminal decline represents the final surrender of habit-driven consumers as alternative milk choices achieve complete normative dominance across the social network.
+
+**Implications for Decision Makers**
+The multi-phase decline pattern reveals that market transitions in habitual consumer goods occur through distinct temporal phases: an initial rapid abandonment driven by perception shifts, followed by resistant plateaus where habit retention creates consumer lock-in. The presence of statistically significant oscillation periods suggests that interventions targeting food choice transitions require sustained rather than sporadic efforts, as social influence encounters periodic resistance even after initial breakthroughs. Furthermore, the steep early decline (steps 5-9) indicates that once critical social mass is achieved through network connectivity (parameter 8.0), habit-driven markets can tip rapidly, suggesting that early investment in perception-shaping regarding health and environmental attributes yields disproportionate returns compared to later-stage efforts targeting residual holdouts.

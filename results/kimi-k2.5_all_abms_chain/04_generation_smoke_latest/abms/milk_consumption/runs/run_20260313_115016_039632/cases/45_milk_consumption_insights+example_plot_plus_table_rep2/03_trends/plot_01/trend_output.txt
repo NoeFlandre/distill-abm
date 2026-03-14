@@ -1,0 +1,5 @@
+Mean weekly whole milk consumption per agent begins at approximately 2,655 milliliters and follows a pronounced downward trajectory across the 32-step simulation period, concluding at 253 milliliters. This represents a 90% reduction in mean consumption, reflecting the historical transition from whole milk dominance to alternative varieties.
+
+The initial phase (steps 0–1) exhibits a brief plateau at approximately 2,655 milliliters, consistent with the 1974 market baseline. Subsequently, a steep decline commences, with consumption falling to roughly 2,000 milliliters by step 5. Statistical validation through Mann-Kendall trend analysis confirms significant decreasing trends throughout this initial window (steps 0–4) with high confidence.
+
+Between steps 5 and 13, the rate of decline accelerates, representing the most rapid phase of abandonment. Consumption plummets from approximately 2,000 mill

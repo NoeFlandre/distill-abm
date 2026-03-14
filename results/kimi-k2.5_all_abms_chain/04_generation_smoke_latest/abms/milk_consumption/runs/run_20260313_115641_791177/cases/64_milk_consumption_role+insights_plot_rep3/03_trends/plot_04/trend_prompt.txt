@@ -1,0 +1,41 @@
+You are an expert in Consumer Behavior with a statistic background.
+
+We have a plot from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot, mentioning key time steps and values taken by the metric in the plot, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot or any visual in your description. If a plot has very simple dynamics, simply state them without expanding.
+
+The context and goals of the model are as follows. The model simulates the shifting landscape of British milk consumption between 1974 and 2005, specifically capturing the historical transition from whole milk to skimmed and semi-skimmed varieties. Within this virtual marketplace, individual agents represent adult consumers who begin with preferences reflective of 1974 market conditions, when whole milk dominated consumer choices. These agents exist within a social network structure where they continuously make milk selections based on their perceptions of product attributes, existing habits, and social pressures from network connections. Each agent processes information about health and environmental characteristics of milk options, weighs these against their habitual tendencies, and responds to social influence from other consumers in their network.
+
+The primary objective is to replicate the observed historical adoption patterns of milk consumption in Britain, capturing how individual decision-making factors collectively drive macro-level market shifts. The model specifically examines three core influences on consumer choice: perception formation regarding health and environmental attributes, the role of habitual behavior in maintaining existing choices, and social influence mechanisms that facilitate or inhibit change. The simulation compares two distinct psychological mechanisms for when consumers become willing to reconsider their habitual choices: a threshold-based approach where agents must accumulate sufficient motivation to break habits, and a probability-based approach where openness to change occurs stochastically. Success is measured by the model's ability to reproduce the historical crossover point where skimmed and semi-skimmed milk consumption surpassed whole milk consumption, as well as accurately depicting the curvature of consumption trends over the 31-year period.
+
+**Key Parameters:**
+
+*Memory and Learning:*
+- **memory-lifetime**: Determines how many time steps agents retain information about their past consumption experiences when evaluating future choices. Range: 1.0 to 10.0. Set to: 5.0.
+
+*Initial Perceptions:*
+- **alt-health-mean-initial**: Represents the initial average health perception that agents hold regarding alternative milk options (skimmed/semi-skimmed). Range: 1.0 to 3.0. Set to: 1.69.
+- **alt-env-mean-initial**: Captures the initial environmental perception of alternative milk types. Range: 0.0 to 3.0. Set to: 1.12.
+
+*Habit Formation and Maintenance:*
+- **habit-threshold**: The strength of habitual behavior required to automatically maintain current choices without conscious deliberation. Range: 1.0 to 10.0. Set to: 2.0.
+- **incumbent-initial-habit**: The starting habit strength associated with whole milk (the incumbent choice). Range: 0.0 to 10.0. Set to: 10.0.
+- **habit-on?**: A toggle determining whether habitual mechanisms are active in the model. Set to: True.
+
+*Social Influence Mechanisms:*
+- **p-interact**: The probability that an agent will actually engage with and be influenced by their network connections during any given decision cycle. Range: 0.0 to 1.0. Set to: 0.3.
+- **social-susceptibility**: The degree to which agents are personally receptive to social influence when interactions occur. Range: 0.0 to 1.0. Set to: 0.2.
+- **network-parameter**: Controls the structural connectivity of the social network. Range: 2.0 to 10.0. Set to: 8.0.
+- **network-type**: Specifies the topology of social connections. Set to: "watts-strogatz".
+- **social-blindness**: The extent to which agents ignore or fail to perceive social information. Range: 0.0 to 1.0. Set to: 0.51.
+- **social-conformity**: The weight given to aligning with perceived social norms when making consumption decisions. Set to: 0.28.
+- **norms**: A toggle activating the influence of globally perceived social norms on choice functions. Set to: True.
+
+*Psychological Processing:*
+- **justification**: The psychological mechanism allowing agents to rationalize choices that conflict with their values or previous behaviors. Range: 0.0 to 1.0. Set to: 0.61.
+- **cognitive-dissonance-threshold**: The level of psychological discomfort an agent can tolerate before feeling compelled to change their behavior or attitudes. Range: 0.0 to 1.0. Set to: 0.15.
+
+*Population Structure:*
+- **number-of-agents**: The total population size of virtual consumers in the simulation. Set to: 1000.
+
+When summarizing trends, provide brief insights about their implications for decision makers.
+
+The attachment is the plot representing the total number of times agents have chosen skimmed or semi-skimmed milk.

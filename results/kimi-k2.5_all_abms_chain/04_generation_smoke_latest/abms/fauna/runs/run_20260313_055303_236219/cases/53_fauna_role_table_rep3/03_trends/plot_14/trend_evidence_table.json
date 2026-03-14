@@ -1,0 +1,320 @@
+{
+  "reporter_pattern": "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100",
+  "time_column": null,
+  "matched_columns": [
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.1",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.2",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.3",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.4",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.5",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.6",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.7",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.8",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.9",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.10",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.11",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.12",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.13",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.14",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.15",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.16",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.17",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.18",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.19",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.20",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.21",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.22",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.23",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.24",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.25",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.26",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.27",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.28",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.29",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.30",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.31",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.32",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.33",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.34",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.35",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.36",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.37",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.38",
+    "( ( count patches with [ pcolor = green ] ) / ( count patches ) ) * 100.39"
+  ],
+  "matched_series_count": 40,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_40_matched_series",
+      "sample_count": 2312,
+      "valid_sample_count": 2312,
+      "dropped_non_numeric_count": 0,
+      "start_value": 33.00015722917275,
+      "end_value": 32.997911098133464,
+      "mean": 32.65578500120261,
+      "median": 32.96956128204303,
+      "std": 0.9502571805086394,
+      "variance": 0.9029887091082289,
+      "minimum": 24.91077244446441,
+      "minimum_index": 365,
+      "maximum": 33.00015722917275,
+      "maximum_index": 0,
+      "peaks": [
+        {
+          "index": 1826.0,
+          "source_index": 1826.0,
+          "time": 1826.0,
+          "value": 32.99566496709418,
+          "prominence": 0.0
+        },
+        {
+          "index": 1829.0,
+          "source_index": 1829.0,
+          "time": 1829.0,
+          "value": 32.99566496709418,
+          "prominence": 0.0
+        },
+        {
+          "index": 2191.0,
+          "source_index": 2191.0,
+          "time": 2191.0,
+          "value": 32.99566496709418,
+          "prominence": 0.0
+        },
+        {
+          "index": 1732.0,
+          "source_index": 1732.0,
+          "time": 1732.0,
+          "value": 32.99521574088632,
+          "prominence": 0.0
+        },
+        {
+          "index": 1833.0,
+          "source_index": 1833.0,
+          "time": 1833.0,
+          "value": 32.99491625674775,
+          "prominence": 0.0
+        },
+        {
+          "index": 1837.0,
+          "source_index": 1837.0,
+          "time": 1837.0,
+          "value": 32.99491625674775,
+          "prominence": 0.0
+        },
+        {
+          "index": 1841.0,
+          "source_index": 1841.0,
+          "time": 1841.0,
+          "value": 32.99491625674775,
+          "prominence": 0.0
+        },
+        {
+          "index": 1845.0,
+          "source_index": 1845.0,
+          "time": 1845.0,
+          "value": 32.99491625674775,
+          "prominence": 0.0
+        }
+      ],
+      "valleys": [
+        {
+          "index": 1827.0,
+          "source_index": 1827.0,
+          "time": 1827.0,
+          "value": 32.99416754640132,
+          "prominence": 0.0
+        },
+        {
+          "index": 1831.0,
+          "source_index": 1831.0,
+          "time": 1831.0,
+          "value": 32.99416754640132,
+          "prominence": 0.0
+        },
+        {
+          "index": 1835.0,
+          "source_index": 1835.0,
+          "time": 1835.0,
+          "value": 32.99416754640132,
+          "prominence": 0.0
+        },
+        {
+          "index": 1839.0,
+          "source_index": 1839.0,
+          "time": 1839.0,
+          "value": 32.99416754640132,
+          "prominence": 0.0
+        },
+        {
+          "index": 1843.0,
+          "source_index": 1843.0,
+          "time": 1843.0,
+          "value": 32.99416754640132,
+          "prominence": 0.0
+        },
+        {
+          "index": 1847.0,
+          "source_index": 1847.0,
+          "time": 1847.0,
+          "value": 32.99416754640132,
+          "prominence": 0.0
+        },
+        {
+          "index": 1851.0,
+          "source_index": 1851.0,
+          "time": 1851.0,
+          "value": 32.99416754640132,
+          "prominence": 0.0
+        },
+        {
+          "index": 1855.0,
+          "source_index": 1855.0,
+          "time": 1855.0,
+          "value": 32.99416754640132,
+          "prominence": 0.0
+        }
+      ],
+      "inflection_indices": [
+        176,
+        273,
+        402,
+        640,
+        769,
+        1005,
+        1134,
+        1370,
+        1500,
+        1576,
+        1637,
+        1735,
+        1864,
+        2100,
+        2217
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 232,
+        "windows": [
+          {
+            "start_index": 0,
+            "end_index": 231,
+            "trend": "increasing",
+            "tau": 0.8353112404836542,
+            "slope": 0.0013192378057909052,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 232,
+            "end_index": 463,
+            "trend": "increasing",
+            "tau": 0.44499178981937604,
+            "slope": 0.0019224405590766822,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 464,
+            "end_index": 695,
+            "trend": "increasing",
+            "tau": 0.40655321689804447,
+            "slope": 0.0007196211981002948,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 696,
+            "end_index": 927,
+            "trend": "increasing",
+            "tau": 0.9313703537841469,
+            "slope": 0.00023357589429000603,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 928,
+            "end_index": 1159,
+            "trend": "increasing",
+            "tau": 0.2110016420361248,
+            "slope": 5.4052399692789665e-05,
+            "p": 1.7187975771548736e-06,
+            "significant": true
+          },
+          {
+            "start_index": 1160,
+            "end_index": 1391,
+            "trend": "increasing",
+            "tau": 0.23137781758471412,
+            "slope": 4.299684057558703e-06,
+            "p": 1.5416326148987025e-07,
+            "significant": true
+          },
+          {
+            "start_index": 1392,
+            "end_index": 1623,
+            "trend": "increasing",
+            "tau": 0.4029332736229288,
+            "slope": 1.5279802988337516e-05,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 1624,
+            "end_index": 1855,
+            "trend": "decreasing",
+            "tau": -0.16047171219585013,
+            "slope": -1.2141248860964916e-05,
+            "p": 0.00024038215308919142,
+            "significant": true
+          },
+          {
+            "start_index": 1856,
+            "end_index": 2087,
+            "trend": "decreasing",
+            "tau": -0.4463352739214808,
+            "slope": 0.0,
+            "p": 0.0,
+            "significant": true
+          }
+        ]
+      },
+      "change_points": [
+        150,
+        300,
+        475,
+        725,
+        2310
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 63.0,
+        "oscillation_indices": [
+          55,
+          60,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100,
+          105,
+          110,
+          115,
+          120,
+          125,
+          130,
+          135,
+          140,
+          145,
+          150
+        ]
+      }
+    }
+  ]
+}

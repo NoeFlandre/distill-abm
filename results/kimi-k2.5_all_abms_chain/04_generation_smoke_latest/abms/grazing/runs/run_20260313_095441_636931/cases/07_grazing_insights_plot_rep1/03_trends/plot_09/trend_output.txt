@@ -1,0 +1,11 @@
+Across repeated simulations, the average cumulative number of destocked livestock begins at zero and increases rapidly during the initial approximately 20 time steps, reaching values between 60 and 80.
+
+Following this initial period, simulation outcomes diverge into three general patterns. Approximately one-third of the simulations plateau between time steps 25 and 35, stabilizing at cumulative levels of approximately 58 to 65 with negligible additional destocking through time step 100.
+
+The remaining simulations exhibit continued accumulation at varying rates. By time step 40, cumulative destocking ranges from approximately 75 to 110. By time step 60, values span from roughly 80 to 130.
+
+By the conclusion of the simulations at time step 100, the average cumulative destocking varies by a factor of approximately three, with minimum values near 58 and maximum values reaching approximately 173. Intermediate outcomes cluster primarily between 85 and 135.
+
+The divergence indicates that under stochastic climatic conditions with identical initial parameters and mixed behavioral types (E-RO, E-LBD, and E-RO-SL1), the system either stabilizes after an initial adjustment period or experiences persistent destocking pressure throughout the century-long timeframe.
+
+**Implications for decision makers:** The threefold variation in cumulative destocking outcomes suggests high sensitivity to climatic variability and stochastic events. The existence of low-destocking trajectories (stabilizing near 60 animals) alongside high-destocking trajectories (exceeding 170 animals) indicates that management outcomes are not predetermined but depend critically on early-period dynamics. The initial 20 time steps constitute a crucial adjustment window; supporting households during this phase may prevent entry into persistent high-destocking regimes. The wide outcome range implies that blanket policies may be insufficient, and adaptive mechanisms that help households stabilize destocking early could significantly improve long-term livestock retention and livelihood resilience.

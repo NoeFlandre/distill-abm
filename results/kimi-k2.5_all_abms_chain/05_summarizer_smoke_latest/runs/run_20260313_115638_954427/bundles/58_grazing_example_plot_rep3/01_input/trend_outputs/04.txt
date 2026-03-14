@@ -1,0 +1,7 @@
+The mean green biomass starts at approximately 45,000 units at step 0. Over the first 10 to 20 steps, it declines rapidly to a minimum of roughly 40,000 to 41,000. This initial reduction likely corresponds to the immediate grazing pressure exerted by the initial livestock population on the available vegetation.
+
+Following this decline, the biomass enters a recovery phase beginning around step 20. From step 20 to approximately step 45, the biomass increases gradually from 41,000 to around 45,000. Subsequently, between steps 45 and 60, the system undergoes a period of rapid growth where the biomass escalates steeply from 45,000 to values between 60,000 and 64,000. This growth trajectory reflects the vegetation's response to rainfall inputs and the balance between biomass production and consumption as households manage their herds.
+
+After step 60 to 70, the growth rate decelerates markedly as the system approaches equilibrium. From step 70 through step 100, the biomass stabilizes into a plateau phase, with final values ranging approximately from 55,000 to 64,000 across different simulation runs. This plateau represents the long-term carrying capacity of the system where green biomass production balances grazing consumption under the prevailing climatic and management conditions.
+
+The substantial variation in final biomass values across runs indicates the influence of heterogeneous household behaviors, learning mechanisms, and stochastic environmental factors on system outcomes.

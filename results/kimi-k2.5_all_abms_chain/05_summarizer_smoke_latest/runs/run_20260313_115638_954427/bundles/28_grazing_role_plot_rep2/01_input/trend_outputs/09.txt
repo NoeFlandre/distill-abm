@@ -1,0 +1,22 @@
+Analysis of the mean destock totals across 100 simulation years reveals substantial trajectory divergence among repeated runs, indicating high sensitivity to stochastic environmental variation and interaction effects between learning strategies.
+
+**Initial Adjustment Phase (Years 0-20)**
+All simulations commence with synchronized rapid destocking, as households reduce herds from the initial stocking level of 90 animals. By year 20, mean cumulative destock totals reach values between approximately 50 and 80 animals per household across all runs, representing an initial adjustment toward equilibrium stocking rates under variable rainfall conditions (mean=200, σ=100).
+
+**Divergence Phase (Years 20-60)**
+Beginning around year 20, the simulation runs separate into distinct trajectories. By year 40, the range of mean destock totals expands to approximately 60-110. By year 60, this divergence increases further to roughly 60-130. During this period, some trajectories begin to flatten while others maintain linear or accelerating growth.
+
+**Stabilization Patterns (Years 30-100)**
+Three primary behavioral patterns emerge in the later period:
+
+1. **Early Stabilization Trajectory**: Several simulation runs reach a plateau between years 25-35, stabilizing at cumulative destock values of approximately 58-60 animals. These runs maintain this level with minimal additional destocking through year 100, suggesting households achieved sustainable pasture-livestock balance requiring limited further liquidation.
+
+2. **Moderate Continuous Destocking**: A central cluster of trajectories continues gradual accumulation through year 100, reaching final values between approximately 80 and 125. These runs show decelerating growth rates after year 60, indicating diminishing pressure for additional destocking as the simulation progresses.
+
+3. **Sustained High Destocking**: Multiple trajectories exhibit continuous linear growth throughout the entire 100-year period, reaching cumulative totals of 130-173 animals by year 100. The maximum observed mean destock total reaches approximately 173, while the second-highest trajectory terminates near 146. These patterns indicate scenarios where households engage in ongoing herd reduction or high-turnover management strategies, potentially driven by continued pasture degradation or conservative risk responses to high environmental variability.
+
+**Final Outcome Distribution**
+At year 100, the distribution of mean destock totals spans from approximately 58 to 173, representing a threefold difference between the most and least destocking-intensive outcomes. The interquartile range of terminal values appears to fall between approximately 80 and 110, with several outliers exceeding 130.
+
+**Interpretation**
+The variation from 58 to 173 cumulative destocked animals—exceeding the initial herd size of 90—indicates substantial livestock turnover through purchase and sale cycles under the zero-reproductive-growth parameterization (b=0). The early-stabilization outcomes (~60) suggest successful adaptation where households maintain herds near equilibrium with pasture productivity. Conversely, the high-destocking trajectories (130-173) reflect chronic adjustment pressure, where the combination of high rainfall variability and learning strategy limitations necessitates continuous liquidation or strategic turnover. The widening spread over time demonstrates that initial conditions and early-period stochastic rainfall events propagate into divergent long-term livelihood outcomes, with some households achieving stable herd management while others face persistent destocking pressure throughout the century-long simulation.

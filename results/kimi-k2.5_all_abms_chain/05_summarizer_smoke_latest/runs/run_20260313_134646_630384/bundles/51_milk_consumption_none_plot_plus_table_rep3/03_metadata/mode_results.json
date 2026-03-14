@@ -1,0 +1,65 @@
+{
+  "bundle_id": "51_milk_consumption_none_plot_plus_table_rep3",
+  "case_id": "51_milk_consumption_none_plot_plus_table_rep3",
+  "abm": "milk_consumption",
+  "bundle_dir": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_134646_630384/bundles/51_milk_consumption_none_plot_plus_table_rep3",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_134646_630384/bundles/51_milk_consumption_none_plot_plus_table_rep3/02_summaries/none.txt",
+      "raw_output_path": null,
+      "postprocess_changed": false,
+      "error": null,
+      "duration_seconds": 3.329769242554903e-7,
+      "input_length": 30014,
+      "output_length": 30014
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_134646_630384/bundles/51_milk_consumption_none_plot_plus_table_rep3/02_summaries/bart.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_134646_630384/bundles/51_milk_consumption_none_plot_plus_table_rep3/03_metadata/raw_summaries/bart.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 43.3110822919989,
+      "input_length": 30014,
+      "output_length": 2544
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_134646_630384/bundles/51_milk_consumption_none_plot_plus_table_rep3/02_summaries/bert.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_134646_630384/bundles/51_milk_consumption_none_plot_plus_table_rep3/03_metadata/raw_summaries/bert.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 14.051055374991847,
+      "input_length": 30014,
+      "output_length": 9073
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_134646_630384/bundles/51_milk_consumption_none_plot_plus_table_rep3/02_summaries/t5.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_134646_630384/bundles/51_milk_consumption_none_plot_plus_table_rep3/03_metadata/raw_summaries/t5.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 17.771278000000166,
+      "input_length": 30014,
+      "output_length": 2039
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_134646_630384/bundles/51_milk_consumption_none_plot_plus_table_rep3/02_summaries/longformer_ext.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_134646_630384/bundles/51_milk_consumption_none_plot_plus_table_rep3/03_metadata/raw_summaries/longformer_ext.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 67.07634195801802,
+      "input_length": 30014,
+      "output_length": 3152
+    }
+  ]
+}

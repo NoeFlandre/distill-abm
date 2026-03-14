@@ -1,0 +1,13 @@
+The mean deviation between agents' held health values and the values implied by their milk choices follows a consistent trajectory across all simulation runs, beginning at 0.0 and increasing monotonically throughout the 32-step period representing 1974 to 2005.
+
+During the initial phase (steps 0–10), the deviation increases rapidly, rising from 0.0 to approximately 0.5–0.55. This indicates an initial period of growing misalignment between health perceptions and consumption behaviors as agents begin processing information about alternative milk varieties.
+
+From steps 10 to 25, the rate of increase moderates substantially, with the deviation progressing gradually from approximately 0.55 to 0.6. This middle phase represents a sustained but slower accumulation of discrepancy between held health values and actual milk choices.
+
+Around step 25, the trajectory shifts to a markedly steeper incline that persists through step 32, with the deviation accelerating from approximately 0.6 to final values ranging between 0.7 and 0.75. This late-stage acceleration indicates intensifying misalignment between health perceptions and consumption behaviors during the final years of the transition period.
+
+The tight clustering of trajectories across simulation runs, with final values converging between 0.70 and 0.75, indicates robust and consistent model behavior in generating this pattern of growing value-choice misalignment throughout the historical transition from whole milk to lower-fat alternatives.
+
+**Implications for Decision Makers:**
+
+These trends suggest that during dietary transitions, consumer health perceptions and actual consumption behaviors may diverge significantly and increasingly over time, with particular acceleration occurring in later phases of the transition. This implies that public health interventions may need to address not only information provision but also the behavioral and habit-based barriers that create growing gaps between what consumers believe to be healthy and what they actually consume. The persistent increase in deviation throughout the entire period suggests that cognitive dissonance alone may be insufficient to trigger behavioral alignment with health beliefs without additional intervention mechanisms.

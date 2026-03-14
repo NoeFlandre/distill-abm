@@ -1,0 +1,128 @@
+The model simulates the shifting landscape of British milk consumption between 1974 and 2005, specifically capturing the historical transition from whole milk to skimmed and semi-skimmed varieties. Within this virtual marketplace, individual agents represent adult consumers who begin with preferences reflective of 1974 market conditions, when whole milk dominated consumer choices. These agents exist within a social network structure where they continuously make milk selections based on their perceptions of product attributes, existing habits, and social pressures from network connections. Each agent processes information about health and environmental characteristics of milk options, weighs these against their habitual tendencies, and responds to social influence from other consumers in their network.
+
+The primary objective is to replicate the observed historical adoption patterns of milk consumption in Britain, capturing how individual decision-making factors collectively drive macro-level market shifts. The model specifically examines three core influences on consumer choice: perception formation regarding health and environmental attributes, the role of habitual behavior in maintaining existing choices, and social influence mechanisms that facilitate or inhibit change. The simulation compares two distinct psychological mechanisms for when consumers become willing to reconsider their habitual choices: a threshold-based approach where agents must accumulate sufficient motivation to break habits, and a probability-based approach where openness to change occurs stochastically. Success is measured by the model's ability to reproduce the historical crossover point where skimmed and semi-skimmed milk consumption surpassed whole milk consumption, as well as accurately depicting the curvature of consumption trends over the 31-year period.
+
+**Key Parameters:**
+
+*Memory and Learning:*
+- **memory-lifetime**: Determines how many time steps agents retain information about their past consumption experiences when evaluating future choices. Range: 1.0 to 10.0. Set to: 5.0.
+
+*Initial Perceptions:*
+- **alt-health-mean-initial**: Represents the initial average health perception that agents hold regarding alternative milk options (skimmed/semi-skimmed). Range: 1.0 to 3.0. Set to: 1.69.
+- **alt-env-mean-initial**: Captures the initial environmental perception of alternative milk types. Range: 0.0 to 3.0. Set to: 1.12.
+
+*Habit Formation and Maintenance:*
+- **habit-threshold**: The strength of habitual behavior required to automatically maintain current choices without conscious deliberation. Range: 1.0 to 10.0. Set to: 2.0.
+- **incumbent-initial-habit**: The starting habit strength associated with whole milk (the incumbent choice). Range: 0.0 to 10.0. Set to: 10.0.
+- **habit-on?**: A toggle determining whether habitual mechanisms are active in the model. Set to: True.
+
+*Social Influence Mechanisms:*
+- **p-interact**: The probability that an agent will actually engage with and be influenced by their network connections during any given decision cycle. Range: 0.0 to 1.0. Set to: 0.3.
+- **social-susceptibility**: The degree to which agents are personally receptive to social influence when interactions occur. Range: 0.0 to 1.0. Set to: 0.2.
+- **network-parameter**: Controls the structural connectivity of the social network. Range: 2.0 to 10.0. Set to: 8.0.
+- **network-type**: Specifies the topology of social connections. Set to: "watts-strogatz".
+- **social-blindness**: The extent to which agents ignore or fail to perceive social information. Range: 0.0 to 1.0. Set to: 0.51.
+- **social-conformity**: The weight given to aligning with perceived social norms when making consumption decisions. Set to: 0.28.
+- **norms**: A toggle activating the influence of globally perceived social norms on choice functions. Set to: True.
+
+*Psychological Processing:*
+- **justification**: The psychological mechanism allowing agents to rationalize choices that conflict with their values or previous behaviors. Range: 0.0 to 1.0. Set to: 0.61.
+- **cognitive-dissonance-threshold**: The level of psychological discomfort an agent can tolerate before feeling compelled to change their behavior or attitudes. Range: 0.0 to 1.0. Set to: 0.15.
+
+*Population Structure:*
+- **number-of-agents**: The total population size of virtual consumers in the simulation. Set to: 1000.
+
+The mean whole milk consumption per agent exhibits a consistent downward trajectory across all simulation runs, declining from approximately 2650 units at Step 0 to roughly 250-300 units by the final step around Step 32. 
+
+The decline occurs in three distinct phases. During the initial phase (Steps 0-10), consumption decreases rapidly and steeply, falling by approximately 1650 units to reach levels around 1000 by Step 10. This represents the most dramatic reduction in the series.
+
+In the second phase (Steps 10-20), the rate of decline moderates considerably. Consumption decreases gradually from approximately 1000 units to around 750 units, representing a reduction of roughly 250 units over this ten-step interval.
+
+The final phase (Steps 20-32) shows a continued but slower erosion of consumption levels, interspersed with small plateaus and step-like drops. From approximately 750 units at Step 20, consumption falls to terminal values between 250 and 300 units. Notable incremental drops occur around Steps 26 and 28, where consumption levels step down from roughly 600 to below 400 units within a few steps.
+
+Across all repeated simulation runs, the trajectories remain tightly clustered, indicating robust consistency in the modeled decline pattern with minor stochastic variations in the exact timing and magnitude of specific step-down transitions.
+
+Mean consumption of skimmed and semi-skimmed milk begins at approximately zero to ten units during the initial time steps, representing the 1974 baseline when whole milk dominated the market. Between steps 1 and 10, consumption undergoes a rapid exponential increase, rising sharply from near-zero levels to approximately 1200-1250 units, reflecting the initial adoption phase of alternative milk varieties during the late 1970s and early 1980s.
+
+Following this rapid ascent, the system enters a prolonged plateau phase spanning steps 10 through 25, wherein consumption stabilizes around 1200-1250 units with minor oscillations of approximately 50 units in either direction. During this middle period, a slight temporary decline to roughly 1180 units occurs around step 18 before recovering to baseline plateau levels, representing a period of market stabilization before the final transition.
+
+ commencing around step 25 and continuing through step 32, consumption initiates a second growth phase, ascending from approximately 1250 units to final values ranging between 1450 and 1480 units. This terminal increase corresponds to the late 1990s through 2005 period, culminating in the dominance of skimmed and semi-skimmed milk varieties. Throughout all 32 steps, individual simulation trajectories maintain consistent patterns with minimal variance, indicating stable model behavior across repeated runs.
+
+The metric tracking total whole milk choices exhibits strictly increasing trajectories across all simulation replicates, commencing from near-zero values at initialization and accumulating steadily throughout the 32-step simulation period. At approximately step 10, the cumulative count reaches roughly 700–800 selections. By step 20, values range between approximately 1,300 and 1,500, demonstrating consistent linear growth with a slope corresponding to approximately 60–75 whole milk selections per time step.
+
+Between steps 20 and 32, the dispersion across simulation runs widens considerably, with final cumulative totals spanning from approximately 1,980 to 2,350. The trajectories maintain positive, relatively constant slopes throughout the entire period, indicating sustained rates of whole milk selection without evidence of saturation or deceleration in the cumulative count.
+
+This pattern indicates that despite the modeled transition context, agents continue to select whole milk at steady frequencies, resulting in linear accumulation of total choices over the three-decade simulation timeframe. The expanding variance across replicates suggests that stochastic elements in social network interactions and decision thresholds generate divergent pathway dependencies, with some simulation runs accumulating up to approximately 15–20% more whole milk selections than others by the terminal point.
+
+The cumulative count of skimmed and semi-skimmed milk choices exhibits a monotonic increase from near zero at initialization to approximately 25,000–26,000 by step 32 across all simulation replications, with minimal between-run variation indicating robust dynamics.
+
+The trajectory follows a three-phase pattern:
+
+**Phase 1 (Steps 0–7): Lag Phase**  
+Growth remains subdued, with cumulative choices staying below approximately 2,500. This reflects the strong initial habit strength for whole milk (parameterized at 10.0) combined with low initial health (1.69) and environmental (1.12) perceptions of alternative options, creating substantial inertia against early adoption.
+
+**Phase 2 (Steps 7–12): Acceleration Phase**  
+The growth rate increases markedly, with cumulative choices rising from approximately 2,500 to 5,000–6,000. This inflection point indicates that social influence mechanisms (operating at interaction probability 0.3 and susceptibility 0.2) and perception updating have begun to overcome initial habit barriers, triggering a cascade of adoption through the Watts-Strogatz network structure.
+
+**Phase 3 (Steps 12–32): Linear Growth Phase**  
+From step 12 onward, the cumulative count increases at a constant rate of approximately 900–950 choices per step, reaching roughly 25,000–26,000 by step 32. This linearity implies that adoption has stabilized at a saturation level where approximately 90–95% of the 1,000 agents select alternative milk at each decision point, with the remaining 5–10% (50–100 agents) persisting with whole milk due to residual habit strength or social blindness parameters (0.51).
+
+The consistent linearity in the mature phase, rather than asymptotic saturation, suggests that the model maintains a steady-state adoption rate where habitual whole milk consumption persists among a resistant subpopulation that does not fully convert within the 32-step simulation horizon.
+
+The total number of milk choices made by all agents accumulates linearly throughout the simulation period. At the initial time step (step 0), the cumulative count stands at 0 choices. By the final observed time step (step 32), the total reaches approximately 32,000 choices. 
+
+Given the population of 1,000 agents, this linear trajectory with a slope of 1,000 choices per step indicates that each agent makes exactly one consumption decision per time step throughout the entire simulation. The constant rate of accumulation suggests uniform participation in decision-making across all time steps, with no periods of agent inactivity or multiple choices within a single step. This mechanical regularity reflects the basic temporal structure of the simulation rather than emergent behavioral dynamics, serving as a foundation upon which the actual consumption pattern transitions (from whole milk to skimmed/semi-skimmed varieties) are computed.
+
+The data reveal a consistent downward trajectory in mean whole milk consumption across all simulation runs, declining from approximately 2,650 units at step 0 to roughly 200–300 units by step 32. This 31-step period captures the full transition from 1974 market dominance of whole milk to 2005 market conditions.
+
+The decline occurs through four distinct phases. During the initial phase (steps 0–10), consumption drops sharply by approximately 60%, falling from ~2,650 to ~950–1,100 units. This rapid early reduction reflects the initial disruption of strong incumbent habits (initialized at maximum strength of 10.0) as agents begin processing information about health and environmental attributes of alternative milk varieties.
+
+The second phase (steps 10–25) exhibits a moderated, steady decline from approximately 1,100 to 600–700 units, representing a 35–45% reduction over 15 steps. During this middle period, social influence mechanisms operate through the Watts-Strogatz network structure (with parameter 8.0 and interaction probability 0.3), gradually spreading alternative milk adoption as agents observe and respond to peer behavior with moderate susceptibility (0.2).
+
+The third phase (steps 25–30) shows accelerated decline, dropping from ~650 to ~300–350 units—a reduction of nearly 50% in just 5 steps. This late-stage acceleration suggests a tipping point dynamic where alternative milk varieties achieve critical mass, transforming social norms such that whole milk consumption becomes increasingly stigmatized or peripheral within the consumer network.
+
+The final phase (steps 30–32) stabilizes at residual levels of 200–300 units, indicating a persistent minority of consumers who maintain whole milk consumption despite the dominant market shift. This floor effect likely represents agents with high habit thresholds, low social conformity weights (0.28), or high social blindness (0.51) parameters that insulate them from broader normative pressures.
+
+Across simulation runs, variability remains minimal at initialization (converging at ~2,650) and at termination (converging at ~250), but diverges moderately during the transition phases, particularly between steps 8–12 where different stochastic realizations of social interactions and probabilistic habit-breaking generate temporary dispersion in consumption trajectories before reconvergence toward the historical trend.
+
+The mean quantity of skimmed and semi-skinned milk consumed across the virtual population demonstrates a distinct multi-phase pattern over the 31-step simulation period representing 1974 to 2005. At initialization (step 0), consumption registers near zero, approximately 0–50 units, consistent with the 1974 market conditions where whole milk maintained dominant incumbent status through strong habitual attachments (initial habit strength of 10.0) and alternative milk perceptions remained modest (health perception mean of 1.69, environmental perception mean of 1.12).
+
+The mean habit factor for whole milk initiates at a baseline value of 1.00 at step 0. Within the first two steps, the metric undergoes a pronounced and rapid escalation, surging sharply to approximately 1.02. This represents the most dramatic rate of change observed across the entire temporal sequence.
+
+Following this initial spike, the habit factor transitions into a phase of steady, gradual increase characterized by an approximately linear trajectory from step 2 through step 32. By step 5, values across the ensemble of simulation runs range between approximately 1.023 and 1.027. The upward progression continues such that by step 10, values cluster between roughly 1.028 and 1.033. At the temporal midpoint around step 15, the metric ranges from approximately 1.031 to 1.040.
+
+In the latter half of the simulation, the gradual ascent persists. By step 20, values span from approximately 1.036 to 1.045. The final values at step 32 range between approximately 1.044 and 1.055, representing a cumulative increase of roughly 4.4% to 5.5% above the baseline.
+
+Across the multiple simulation runs, the trajectories exhibit increasing divergence over time. While the runs remain tightly clustered during the initial jump (steps 0-2), the variance expands progressively throughout the simulation. By the conclusion at step 32, the spread between the minimum and maximum values reaches approximately 0.011. Individual trajectories display minor stochastic fluctuations superimposed on the upward trend, with certain runs exhibiting brief plateaus or slight dips, particularly noticeable in some trajectories between steps 5 and 10, before resuming their ascent.
+
+The overall pattern indicates that the habit reinforcement mechanism generates a two-phase process: an immediate and substantial activation of habitual strength within the first two time steps, followed by a sustained, slow accumulation of habitual influence that continues throughout the entire 32-step period corresponding to the 1974-2005 timeframe.
+
+The mean habit factor for skimmed and semi-skimmed milk exhibits a consistent upward trajectory across all simulation runs, beginning at a baseline value of approximately 1.0 at Step 0 and reaching approximately 1.58–1.60 by Step 32. This progression occurs through three distinguishable phases with minimal variance between repeated simulations.
+
+**Initial Stagnation Phase (Steps 0–5):**
+From the outset at Step 0, the metric registers at 1.0, indicating a neutral multiplicative effect on the choice function for alternative milk varieties. The values experience a marginal increase to approximately 1.02 by Step 1, after which the series enters a plateau phase lasting through Step 5. During this period, the habit factor maintains stability around 1.02, suggesting that habitual tendencies toward skimmed and semi-skimmed milk remain underdeveloped while incumbent habits for whole milk dominate consumer decision-making.
+
+**Accelerating Growth Phase (Steps 5–15):**
+Beginning around Step 5, the metric initiates a period of accelerating increase. By Step 10, the mean habit factor reaches approximately 1.07–1.08. The growth rate intensifies through the subsequent five steps, with values climbing to roughly 1.25 by Step 15. This phase demonstrates a curvilinear trajectory where the rate of habit formation increases over time, reflecting accelerating adoption patterns as agents begin to repeatedly select alternative milk options and develop corresponding behavioral routines.
+
+**Sustained Linear Growth Phase (Steps 15–32):**
+From Step 15 onward, the dynamics transition to a roughly linear growth pattern with a consistent slope of approximately 0.019–0.020 per time step. The metric progresses from 1.25 at Step 15 to approximately 1.35 at Step 20, 1.47 at Step 25, and ultimately converges toward 1.58–1.60 by Step 32. Throughout this extended period, the inter-simulation variance remains tight, with the envelope of trajectories spanning a range of less than 0.02 at any given step.
+
+**Interpretation:**
+The temporal evolution of the habit factor captures the endogenous formation of habitual behavior toward alternative milk varieties across the simulated consumer population. The initial plateau corresponds to the early simulation period where agents, endowed with strong incumbent habits for whole milk (initial value of 10.0) and neutral perceptions of alternatives, maintain established consumption patterns. The subsequent acceleration reflects the threshold dynamics or probabilistic reconsideration mechanisms enabling agents to switch choices, after which repeated consumption of skimmed and semi-skimmed milk reinforces positive habit strength. The linear growth phase in the latter half of the simulation indicates that once agents transition to alternative milk, habit formation proceeds at a steady rate, with the multiplicative factor approaching 1.6 by the terminal step—representing a 60% increase in the habitual weighting of these products relative to the neutral baseline. This pattern aligns with the historical transition from whole milk dominance to the establishment of reduced-fat milk varieties as standard consumption choices.
+
+The mean percentage difference between the maximum and minimum choice function scores among agents begins at approximately zero at step 0, indicating initial homogeneity in choice scores across the population. Between step 0 and approximately step 3, the deviation undergoes a sharp increase, rising rapidly to approximately 0.5. This phase of rapid divergence slows between steps 3 and 5, where the metric increases more moderately to roughly 0.58–0.6. Following this transition, from approximately step 5 through step 32, the deviation exhibits a slow, approximately linear increase, gradually rising from 0.6 to approximately 0.75. Throughout the entire simulation period, the deviation never decreases, indicating a persistent and continuous diversification of choice function scores among agents over time. The trajectory suggests that while agents initially exhibit similar choice profiles, they rapidly differentiate during early decision cycles, after which the population continues to diverge at a decelerating but steady rate, eventually settling into a pattern of slow, sustained heterogeneity in consumer choice scores.
+
+The mean value health deviation demonstrates a monotonic upward trajectory across the 31-step simulation period, initiating from a baseline of approximately 0.0 at Step 0 and terminating at values ranging between 0.70 and 0.75 across repeated simulation runs. The temporal dynamics unfold through three distinct phases characterized by varying rates of change.
+
+During the initial phase spanning Steps 0 through approximately 10, the metric exhibits rapid acceleration, following a convex trajectory from the origin to values between 0.50 and 0.55. This represents the most pronounced rate of increase in the series, with the deviation expanding by approximately 0.025 to 0.03 units per step. By Step 5, intermediate values of roughly 0.30 are observed.
+
+The intermediate phase, extending from approximately Step 10 through Step 27, displays markedly decelerated growth. Throughout this extended period, values exhibit gradual, near-linear increase from roughly 0.55 to approximately 0.60, with the growth rate diminishing to less than 0.01 units per step. This plateau-like behavior maintains relatively stable deviation levels between 0.57 and 0.62, with minimal curvature in the aggregate trend. By Step 20, values cluster tightly around 0.56 to 0.58.
+
+The terminal phase, encompassing approximately Steps 27 through 32, witnesses renewed acceleration in the deviation metric. Values climb from approximately 0.60 to the terminal range of 0.70-0.75, representing an uptick in the rate of divergence during the final steps of the simulation. By Step 30, values reach approximately 0.68 to 0.70 before concluding the trajectory.
+
+Across repeated simulation runs, variability remains relatively constrained throughout the observation period, though slight divergence emerges in later steps. At Step 10, cross-run values cluster within a narrow band of approximately 0.48 to 0.52, whereas by Step 32, the inter-run spread extends across a wider range from roughly 0.70 to 0.75, indicating increasing sensitivity to stochastic elements in the model's psychological processing and network interaction mechanisms as the simulation progresses.
+
+Within the context of the British milk consumption transition (1974-2005), these trends suggest an evolving misalignment between consumers' internal health valuations and their actual consumption behaviors. The initial rapid increase (Steps 0-10, corresponding roughly to 1974-1984) indicates a period where agents' health perceptions regarding alternative milk varieties begin shifting through memory and learning processes (memory-lifetime: 5.0), while strong incumbent habits (incumbent-initial-habit: 10.0) and high habit thresholds (habit-threshold: 2.0) maintain existing whole milk consumption patterns. The plateau phase (Steps 10-27, corresponding roughly to 1984-2001) reflects a stabilization period wherein social influence mechanisms (p-interact: 0.3, social-susceptibility: 0.2) and normative pressures (norms: true, social-conformity: 0.28) facilitate gradual habit-breaking for some agents, though the aggregate population maintains significant value-choice inconsistency. The final acceleration (Steps 27-32, corresponding to 2001-2005) suggests that toward the end of the historical period, remaining whole milk consumers exhibit heightened divergence between their socially-influenced health perceptions and their habitual consumption choices, potentially reflecting the model's justification mechanisms (justification: 0.61) enabling agents to tolerate elevated cognitive dissonance (threshold: 0.15) without behavioral change, or alternatively capturing the widening gap as health perceptions of skimmed varieties intensify among the final resistant segments of the population.
+
+:

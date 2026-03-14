@@ -1,0 +1,3 @@
+> The population of active human hunter-gatherer bands maintains a constant value of 20 across all 2,312 observed time steps. This stability reflects the model configuration wherein hunters are immortal and do not reproduce, resulting in a fixed cohort that persists regardless of energy expenditure, hunting yields, or environmental conditions. No peaks, declines, or fluctuations occur in the hunter population throughout the simulation period.
+>
+> For decision makers, this static population size establishes a constant predation pressure baseline, enabling clear assessment of how unchanging hunter numbers influence megaherbivore extinction dynamics separate from feedback effects involving hunter demographic changes.

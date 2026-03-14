@@ -1,0 +1,11 @@
+The aggregate energy reserves of the megaherbivore population commence at approximately 16,667 units, reflecting the initial cohort of 250 animals distributed across the grassland landscape. This metric undergoes a continuous decline throughout the simulation, ultimately reaching complete depletion at step 2,311, signifying total population extinction.
+
+The trajectory of collapse exhibits distinct phases of decelerating decline. During the initial 350 steps, energy reserves plummet rapidly as the 20 human foragers exploit the abundant prey base, representing the immediate impact of hunting pressure on the naive population. This phase is characterized by the steepest rate of decline, with statistical slopes of approximately -25 units per step.
+
+Between steps 350 and 500, the rate of depletion moderates, though remains strongly negative. Superimposed on this decline are regular oscillations with a dominant period of approximately 63 steps, likely corresponding to seasonal vegetation cycles given the high environmental seasonality and the 365-tick annual calibration. These oscillations manifest as minor fluctuations in energy levels, with small peaks occurring around steps 385, 402, and 440, reflecting temporary boosts in animal energy acquisition during favorable seasonal conditions or demographic stochasticity in reproduction.
+
+From step 500 to approximately 875, the decline continues but at progressively attenuated rates. The population enters a prolonged phase of attrition where reduced herd sizes yield diminishing energetic returns for hunters, yet sustained predation pressure and environmental constraints prevent demographic recovery.
+
+Beyond step 875, the energy reserves approach zero asymptotically, with the final extinction occurring at step 2,311. This extended terminal phase reflects the persistence of small, fragmented subpopulations maintaining minimal energy reserves before stochastic extinction, or individual animals with high energy stores surviving in isolated landscape patches.
+
+The median energy value of 146.375 indicates that for the majority of the simulation duration, the population existed at severely reduced biomass levels compared to the initial configuration, underscoring the rapid and irreversible nature of the collapse under the combined pressures of human hunting and environmental seasonality.

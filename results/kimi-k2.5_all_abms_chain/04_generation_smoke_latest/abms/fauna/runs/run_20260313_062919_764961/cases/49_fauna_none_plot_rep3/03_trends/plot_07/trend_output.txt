@@ -1,0 +1,11 @@
+The cumulative number of deaths among prey animals begins at zero steps and increases throughout the simulation period, eventually stabilizing at values between approximately 220 and 250 deaths after 1500 to 2000 steps.
+
+During the initial phase from 0 to approximately 500 steps, the cumulative death count rises rapidly, reaching values between 150 and 230. The rate of increase is highest during this period, with most simulations accumulating between 150 and 200 deaths by step 500.
+
+From approximately 500 to 1000 steps, the accumulation of deaths continues but at a reduced rate compared to the initial phase. During this interval, cumulative death counts increase from roughly 200 to between 220 and 245. The pace of increase slows progressively throughout this period.
+
+After approximately 1000 to 1200 steps, the cumulative death counts stabilize with minimal additional accumulation across most simulation runs. Final values cluster between 220 and 250 deaths, with some variation across individual runs. A few simulations reach stabilization earlier, around step 800 to 1000, while others continue accumulating deaths until approximately step 1500 or beyond.
+
+The variation across simulation runs indicates stochastic differences in mortality timing, with individual runs differing by up to approximately 30 deaths at intermediate time points, though converging to similar final totals. One simulation exhibits slower initial accumulation, reaching only approximately 20 deaths by step 200 compared to 50 to 100 in other runs, but eventually converges to similar final values.
+
+Given the initial prey population of 250 individuals, the final cumulative death counts approaching 220 to 250 indicate that nearly the entire initial cohort experiences mortality over the course of the simulation, with replacements through reproduction maintaining the population while contributing additional deaths to the cumulative count.

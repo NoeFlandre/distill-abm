@@ -1,0 +1,16 @@
+# Best Score Across Dynamic Prompt Elements
+
+| Reference family | ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gpt5.2_short | fauna | bart | qwen/qwen3.5-27b | 0.03 | 0.19 | 0.46 | 0.12 | 0.19 | 38.47 |
+| gpt5.2_short | fauna | bert | qwen/qwen3.5-27b | 0.03 | 0.30 | 0.50 | 0.12 | 0.20 | 31.19 |
+| gpt5.2_short | fauna | longformer_ext | qwen/qwen3.5-27b | 0.05 | 0.22 | 0.46 | 0.10 | 0.18 | 38.54 |
+| gpt5.2_short | fauna | t5 | qwen/qwen3.5-27b | 0.03 | 0.17 | 0.40 | 0.10 | 0.18 | 46.36 |
+| gpt5.2_short | grazing | bart | qwen/qwen3.5-27b | 0.01 | 0.16 | 0.40 | 0.11 | 0.15 | 61.15 |
+| gpt5.2_short | grazing | bert | qwen/qwen3.5-27b | 0.03 | 0.25 | 0.54 | 0.13 | 0.20 | 52.63 |
+| gpt5.2_short | grazing | longformer_ext | qwen/qwen3.5-27b | 0.02 | 0.21 | 0.50 | 0.11 | 0.16 | 72.71 |
+| gpt5.2_short | grazing | t5 | qwen/qwen3.5-27b | 0.01 | 0.14 | 0.37 | 0.10 | 0.15 | 67.22 |
+| gpt5.2_short | milk_consumption | bart | qwen/qwen3.5-27b | 0.03 | 0.17 | 0.41 | 0.13 | 0.19 | 56.10 |
+| gpt5.2_short | milk_consumption | bert | qwen/qwen3.5-27b | 0.07 | 0.28 | 0.54 | 0.18 | 0.22 | 39.97 |
+| gpt5.2_short | milk_consumption | longformer_ext | qwen/qwen3.5-27b | 0.04 | 0.21 | 0.49 | 0.16 | 0.20 | 62.80 |
+| gpt5.2_short | milk_consumption | t5 | qwen/qwen3.5-27b | 0.01 | 0.13 | 0.34 | 0.10 | 0.16 | 70.81 |

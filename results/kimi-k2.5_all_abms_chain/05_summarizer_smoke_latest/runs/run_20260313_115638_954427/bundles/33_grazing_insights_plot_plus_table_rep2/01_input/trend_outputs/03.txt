@@ -1,0 +1,11 @@
+The mean reserve biomass across all patches begins at 90,000 units and exhibits an initial brief fluctuation, reaching approximately 90,523 by step 3. Following this, the system undergoes a significant decline phase lasting through step 26, where the metric reaches its minimum value of approximately 84,114. This represents a degradation of roughly 6.5% from the initial condition.
+
+From step 26 to approximately step 40, the system transitions into a stabilization and early recovery phase, with the metric remaining relatively flat or showing modest increases. Beginning around step 33-44, a pronounced upward trend emerges, accelerating significantly between steps 44 and 54 with an average increase of approximately 1,909 units per step. This rapid growth continues at varying rates through the remainder of the simulation.
+
+By step 100, the mean reserve biomass reaches approximately 121,073, representing an increase of 34.5% above the initial value and 43.9% above the trough observed at step 26. The overall trajectory across the 100 steps follows a U-shaped recovery pattern with an extended growth phase that eventually shows signs of decelerating in the final steps (77-100), though remaining positive.
+
+**Implications for Decision Makers:**
+
+The observed dynamics indicate that grazing systems with mixed learning-capable agents (combining baseline, social learning, and learning-by-doing behaviors) exhibit strong resilience characteristics. The initial 26-step degradation period represents a critical vulnerability window where biomass depletion occurs before learning effects manifest. Decision makers should anticipate this lag phase in intervention planning, recognizing that adaptive management benefits materialize only after approximately one-quarter of the simulation timeframe.
+
+The sustained growth beyond initial levels (reaching 121% of starting biomass) demonstrates that learning-enabled adaptive co-management can improve ecological outcomes beyond baseline conditions, suggesting positive returns on investments in learning infrastructure and social network development. The deceleration of growth in later steps indicates the system approaches a new equilibrium, implying that long-term planning should account for eventual stabilization of biomass conditions rather than indefinite growth.

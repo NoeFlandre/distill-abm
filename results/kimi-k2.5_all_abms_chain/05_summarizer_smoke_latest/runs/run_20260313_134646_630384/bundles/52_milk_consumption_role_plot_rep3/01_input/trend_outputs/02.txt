@@ -1,0 +1,15 @@
+The simulation data reveal a four-phase trajectory in mean weekly skimmed and semi-skimmed milk consumption per agent across the 31-year simulation period. 
+
+**Phase 1: Initial Stagnation (Steps 0–1)**
+Consumption remains negligible at approximately 0–10 units, reflecting the 1974 baseline conditions where whole milk dominated due to high incumbent habit strength (10.0). This persistence despite positive health perceptions (alt-health-mean-initial: 1.69) indicates that habitual barriers initially suppressed adoption.
+
+**Phase 2: Rapid Acceleration (Steps 1–11)**
+A steep, near-linear increase occurs as consumption rises from approximately 10 units to 1,200–1,280 units. This explosive growth suggests that social influence mechanisms (p-interact: 0.3, social-susceptibility: 0.2) and health information processing overcame the initial habit threshold (2.0), triggering mass adoption through the Watts-Strogatz network structure. Peak values around Step 11 reach approximately 1,280 units, representing the initial saturation of early adopters.
+
+**Phase 3: Extended Plateau (Steps 11–25)**
+Growth decelerates substantially, with consumption stabilizing in a fluctuating band of 1,180–1,250 units. A temporary decline to approximately 1,180 occurs around Step 18, followed by recovery to roughly 1,220–1,240 by Step 25. This 14-step stagnation indicates a temporary equilibrium where the influence of social conformity (0.28) and emerging norms balanced against residual habitual attachment to whole milk. The memory lifetime parameter (5.0) likely contributed to this stabilization by allowing agents to accumulate sufficient experience with alternatives without triggering further switches.
+
+**Phase 4: Secondary Growth (Steps 25–32)**
+Consumption resumes an upward trajectory, increasing from approximately 1,250 units to 1,450–1,480 units by the final time step. This late-stage acceleration suggests that justification mechanisms (0.61) and cumulative social norm effects (norms: True) enabled late adopters to overcome cognitive dissonance thresholds (0.15), driving continued diffusion among the remaining holdout population. The final values indicate that skimmed and semi-skimmed varieties achieved dominant market position by 2005.
+
+Across repeated simulations, the trajectories demonstrate high consistency in this multi-phase pattern, with stochastic variation most pronounced during the transition between the rapid growth and plateau phases (Steps 9–13) and during the secondary rise (Steps 26–30).

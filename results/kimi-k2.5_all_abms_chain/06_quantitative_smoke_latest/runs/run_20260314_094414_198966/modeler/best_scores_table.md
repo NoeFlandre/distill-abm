@@ -1,0 +1,12 @@
+# Best Score Across Dynamic Prompt Elements
+
+| Reference family | ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| modeler | fauna | bart | moonshotai/kimi-k2.5 | 0.04 | 0.20 | 0.45 | 0.11 | 0.19 | 33.19 |
+| modeler | fauna | bert | moonshotai/kimi-k2.5 | 0.03 | 0.30 | 0.46 | 0.10 | 0.17 | 10.57 |
+| modeler | fauna | longformer_ext | moonshotai/kimi-k2.5 | 0.04 | 0.24 | 0.47 | 0.11 | 0.20 | 37.49 |
+| modeler | fauna | t5 | moonshotai/kimi-k2.5 | 0.02 | 0.17 | 0.40 | 0.09 | 0.17 | 35.79 |
+| modeler | milk_consumption | bart | moonshotai/kimi-k2.5 | 0.06 | 0.22 | 0.48 | 0.15 | 0.22 | 37.09 |
+| modeler | milk_consumption | bert | moonshotai/kimi-k2.5 | 0.05 | 0.29 | 0.48 | 0.17 | 0.18 | 9.52 |
+| modeler | milk_consumption | longformer_ext | moonshotai/kimi-k2.5 | 0.07 | 0.23 | 0.45 | 0.16 | 0.21 | 42.88 |
+| modeler | milk_consumption | t5 | moonshotai/kimi-k2.5 | 0.04 | 0.20 | 0.42 | 0.13 | 0.18 | 47.49 |

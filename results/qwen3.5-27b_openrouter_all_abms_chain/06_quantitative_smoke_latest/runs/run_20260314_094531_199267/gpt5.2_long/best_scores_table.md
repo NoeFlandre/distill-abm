@@ -1,0 +1,7 @@
+# Best Score Across Dynamic Prompt Elements
+
+| Reference family | ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gpt5.2_long | fauna | none | qwen/qwen3.5-27b | 0.07 | 0.30 | 0.63 | 0.24 | 0.29 | 44.93 |
+| gpt5.2_long | grazing | none | qwen/qwen3.5-27b | 0.07 | 0.30 | 0.63 | 0.23 | 0.29 | 59.42 |
+| gpt5.2_long | milk_consumption | none | qwen/qwen3.5-27b | 0.09 | 0.29 | 0.63 | 0.24 | 0.28 | 50.16 |

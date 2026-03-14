@@ -1,0 +1,143 @@
+{
+  "attempts_made": 1,
+  "errors": [],
+  "request": {
+    "image_attached": true,
+    "max_retries": 2,
+    "max_tokens": 32768,
+    "message_count": 1,
+    "messages": [
+      {
+        "content": "We have a plot from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot, mentioning key time steps and values taken by the metric in the plot, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot or any visual in your description. If a plot has very simple dynamics, simply state them without expanding.\n\nThe context and goals of the model are as follows. This agent-based model is an extension of the RAGE (Resilience of Agent-based Grazing Systems) model, designed to simulate feedbacks between pastures, livestock, and household livelihoods in grazing systems. While the original RAGE model focused on common property grazing with mobile households, this extension applies to smallholder farming contexts where pastures are private property and households remain stationary on their patches. The model introduces learning capabilities to agent decision-making, specifically incorporating learning-by-doing and social learning processes central to adaptive co-management. It implements three new behavioral types: E-RO (baseline behavior), E-RO-SL1 (social learning), and E-LBD (learning-by-doing). Agents are characterized by heterogeneity in uncertainty management, represented by an r-parameter (household-risk-att) that captures factors such as sensing uncertainty, information noise, and risk attitude. The model comprises two main sub-models: Vegetation dynamics and Household decision-making. These operate through a yearly sequence where green biomass updates, households with E-RO-SL1 types update their r-parameters, households update behavioral strategies (if switching is enabled), make livestock placement decisions, livestock feeds on biomass, households observe neighbor performance, reserve biomass updates, and households observe and remember reserve biomass states.\n\nThe model aims to compare the long-term social-ecological performance of different behavioral types (E-RO, E-LBD, and E-RO-SL1) under various ecological and climatic conditions. It seeks to evaluate how learning capabilities affect household resilience and pasture conditions in private property grazing systems. Specific objectives include analyzing the impact of social learning double-loop processes through strategy switching in heterogeneous populations, observing the diffusion and competition between different learning behaviors in mixed populations, and assessing how demographic settings and initial herd sizes influence system outcomes. The model allows for the evaluation of outcomes across social, ecological, and economic dimensions including average herd size, pasture biomass condition, and surviving number of households.\n\n**Parameters:**\n\n- **number-households**: Range 1.0 to 100.0; set to 60.\n- **satisficing-threshold**: Range 0.0 to 100.0; set to 0.\n- **satisficing-trials**: Range 0.0 to 100.0; set to 21.\n- **knowledge-radius**: Range 0.0 to 5.0; set to 1.\n- **resting-threshold**: Range 0.0 to 1.0; set to 0.1.\n- **intrinsic-preference**: Range 0.0 to 1.0; set to 0.\n- **social-susceptibility**: Range 0.0 to 1.0; set to 0.\n- **global-rain?**: Set to True.\n- **start-on-homepatch?**: Set to True.\n- **resting?**: Set to False.\n- **homog-behav-types?**: Set to True.\n- **extension-model?**: Set to True.\n- **SL2-strategy-switch?**: Set to False.\n- **risk-mode?**: Set to True.\n- **behavioral-type**: Set to E-RO.\n- **number-SAT**: Set to 0.\n- **number-E-RO**: Set to 20.\n- **number-TRAD**: Set to 0.\n- **b**: Set to 0 (reproduction not used in extension model).\n- **number-MAX**: Set to 0.\n- **rain-mean**: Set to 200.\n- **risk-att-init**: Set to 0.5.\n- **gr1**: Set to 0.5.\n- **number-E-LBD**: Set to 20.\n- **gr2**: Set to 0.1.\n- **number-E-RO-SL1**: Set to 20.\n- **timesteps**: Set to 100.\n- **w**: Set to 0.8.\n- **number-random**: Set to 0.\n- **livestock-init**: Set to 90.\n- **rain-std**: Set to 100.\n\nThis plot represents the average total number of livestock, including both healthy livestock and those that have been destocked, across all households.",
+        "role": "user"
+      }
+    ],
+    "metadata": {
+      "ollama_format": {
+        "description": "Structured smoke output schema for one text response.",
+        "properties": {
+          "response_text": {
+            "title": "Response Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "response_text"
+        ],
+        "title": "StructuredSmokeText",
+        "type": "object"
+      },
+      "ollama_num_ctx": 0,
+      "preserve_raw_text": true,
+      "structured_output_name": "structured_smoke_text",
+      "structured_output_schema": {
+        "description": "Structured smoke output schema for one text response.",
+        "properties": {
+          "response_text": {
+            "title": "Response Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "response_text"
+        ],
+        "title": "StructuredSmokeText",
+        "type": "object"
+      },
+      "table_downsample_stride": 1
+    },
+    "model": "moonshotai/kimi-k2.5",
+    "prompt_length": 4162,
+    "prompt_signature": "43fe8465e1525a1938181912e980db35dc8854a1b0b0066d6d818d03ebf3588d",
+    "prompt_text": "We have a plot from repeated simulations of an agent based model. Your goal is to describe the trends in details from the plot, mentioning key time steps and values taken by the metric in the plot, and interpreting them based on the context of the model. The report must objectively describe the trends in the data without addressing the quality of the simulation. Do not refer to the plot or any visual in your description. If a plot has very simple dynamics, simply state them without expanding.\n\nThe context and goals of the model are as follows. This agent-based model is an extension of the RAGE (Resilience of Agent-based Grazing Systems) model, designed to simulate feedbacks between pastures, livestock, and household livelihoods in grazing systems. While the original RAGE model focused on common property grazing with mobile households, this extension applies to smallholder farming contexts where pastures are private property and households remain stationary on their patches. The model introduces learning capabilities to agent decision-making, specifically incorporating learning-by-doing and social learning processes central to adaptive co-management. It implements three new behavioral types: E-RO (baseline behavior), E-RO-SL1 (social learning), and E-LBD (learning-by-doing). Agents are characterized by heterogeneity in uncertainty management, represented by an r-parameter (household-risk-att) that captures factors such as sensing uncertainty, information noise, and risk attitude. The model comprises two main sub-models: Vegetation dynamics and Household decision-making. These operate through a yearly sequence where green biomass updates, households with E-RO-SL1 types update their r-parameters, households update behavioral strategies (if switching is enabled), make livestock placement decisions, livestock feeds on biomass, households observe neighbor performance, reserve biomass updates, and households observe and remember reserve biomass states.\n\nThe model aims to compare the long-term social-ecological performance of different behavioral types (E-RO, E-LBD, and E-RO-SL1) under various ecological and climatic conditions. It seeks to evaluate how learning capabilities affect household resilience and pasture conditions in private property grazing systems. Specific objectives include analyzing the impact of social learning double-loop processes through strategy switching in heterogeneous populations, observing the diffusion and competition between different learning behaviors in mixed populations, and assessing how demographic settings and initial herd sizes influence system outcomes. The model allows for the evaluation of outcomes across social, ecological, and economic dimensions including average herd size, pasture biomass condition, and surviving number of households.\n\n**Parameters:**\n\n- **number-households**: Range 1.0 to 100.0; set to 60.\n- **satisficing-threshold**: Range 0.0 to 100.0; set to 0.\n- **satisficing-trials**: Range 0.0 to 100.0; set to 21.\n- **knowledge-radius**: Range 0.0 to 5.0; set to 1.\n- **resting-threshold**: Range 0.0 to 1.0; set to 0.1.\n- **intrinsic-preference**: Range 0.0 to 1.0; set to 0.\n- **social-susceptibility**: Range 0.0 to 1.0; set to 0.\n- **global-rain?**: Set to True.\n- **start-on-homepatch?**: Set to True.\n- **resting?**: Set to False.\n- **homog-behav-types?**: Set to True.\n- **extension-model?**: Set to True.\n- **SL2-strategy-switch?**: Set to False.\n- **risk-mode?**: Set to True.\n- **behavioral-type**: Set to E-RO.\n- **number-SAT**: Set to 0.\n- **number-E-RO**: Set to 20.\n- **number-TRAD**: Set to 0.\n- **b**: Set to 0 (reproduction not used in extension model).\n- **number-MAX**: Set to 0.\n- **rain-mean**: Set to 200.\n- **risk-att-init**: Set to 0.5.\n- **gr1**: Set to 0.5.\n- **number-E-LBD**: Set to 20.\n- **gr2**: Set to 0.1.\n- **number-E-RO-SL1**: Set to 20.\n- **timesteps**: Set to 100.\n- **w**: Set to 0.8.\n- **number-random**: Set to 0.\n- **livestock-init**: Set to 90.\n- **rain-std**: Set to 100.\n\nThis plot represents the average total number of livestock, including both healthy livestock and those that have been destocked, across all households.",
+    "provider": "openrouter",
+    "retry_backoff_seconds": 2.0,
+    "temperature": 1.0
+  },
+  "response": {
+    "clean_text": "{\"response_text\":\"At initialization (step 0), the mean livestock plus destock across households begins at approximately 90 units, consistent with the initial livestock parameter setting. During the first 20 steps, all simulation runs exhibit a steep and synchronized decline, with values dropping sharply to approximately 45. This downward trajectory continues through step 30, reaching a minimum of roughly 40 units around step 40, representing a destocking phase of more than 55% from initial levels.\\n\\nFollowing step 40, the trajectories diverge markedly into distinct recovery patterns that persist through step 100. A subset of households remains stable at low levels, maintaining values between 40 and 45 without significant recovery. Another group exhibits modest increases, stabilizing between 45 and 52 by step 100. Most notably, a distinct set of trajectories demonstrates strong recovery: beginning around step 40-50, these increase steeply through step 70, reaching values between 55 and 62 by step 100. The highest observed values at step 100 approach approximately 62 units, representing a 55% recovery from the trough but remaining roughly 30% below initial levels.\\n\\nThis pattern suggests that initial destocking reflects an adaptive adjustment to private property constraints and initial learning processes. The subsequent divergence indicates heterogeneous adaptive capacities across behavioral types or risk-attitude parameterizations: some households successfully employ learning mechanisms (learning-by-doing or social learning) to rebuild herds, while others stabilize at depleted equilibria, indicating divergent long-term livelihood outcomes within the same ecological and institutional context.\"}",
+    "clean_text_length": 1723,
+    "clean_text_signature": "00bb3d0794aad83016b3b5caaeb4b1f8243d979dff603f229e533eb3b1aa86c5",
+    "model": "moonshotai/kimi-k2.5-0127",
+    "parsed_response": {
+      "response_text": "At initialization (step 0), the mean livestock plus destock across households begins at approximately 90 units, consistent with the initial livestock parameter setting. During the first 20 steps, all simulation runs exhibit a steep and synchronized decline, with values dropping sharply to approximately 45. This downward trajectory continues through step 30, reaching a minimum of roughly 40 units around step 40, representing a destocking phase of more than 55% from initial levels.\n\nFollowing step 40, the trajectories diverge markedly into distinct recovery patterns that persist through step 100. A subset of households remains stable at low levels, maintaining values between 40 and 45 without significant recovery. Another group exhibits modest increases, stabilizing between 45 and 52 by step 100. Most notably, a distinct set of trajectories demonstrates strong recovery: beginning around step 40-50, these increase steeply through step 70, reaching values between 55 and 62 by step 100. The highest observed values at step 100 approach approximately 62 units, representing a 55% recovery from the trough but remaining roughly 30% below initial levels.\n\nThis pattern suggests that initial destocking reflects an adaptive adjustment to private property constraints and initial learning processes. The subsequent divergence indicates heterogeneous adaptive capacities across behavioral types or risk-attitude parameterizations: some households successfully employ learning mechanisms (learning-by-doing or social learning) to rebuild herds, while others stabilize at depleted equilibria, indicating divergent long-term livelihood outcomes within the same ecological and institutional context."
+    },
+    "provider": "openrouter",
+    "raw": {
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "annotations": null,
+            "audio": null,
+            "content": "{\"response_text\":\"At initialization (step 0), the mean livestock plus destock across households begins at approximately 90 units, consistent with the initial livestock parameter setting. During the first 20 steps, all simulation runs exhibit a steep and synchronized decline, with values dropping sharply to approximately 45. This downward trajectory continues through step 30, reaching a minimum of roughly 40 units around step 40, representing a destocking phase of more than 55% from initial levels.\\n\\nFollowing step 40, the trajectories diverge markedly into distinct recovery patterns that persist through step 100. A subset of households remains stable at low levels, maintaining values between 40 and 45 without significant recovery. Another group exhibits modest increases, stabilizing between 45 and 52 by step 100. Most notably, a distinct set of trajectories demonstrates strong recovery: beginning around step 40-50, these increase steeply through step 70, reaching values between 55 and 62 by step 100. The highest observed values at step 100 approach approximately 62 units, representing a 55% recovery from the trough but remaining roughly 30% below initial levels.\\n\\nThis pattern suggests that initial destocking reflects an adaptive adjustment to private property constraints and initial learning processes. The subsequent divergence indicates heterogeneous adaptive capacities across behavioral types or risk-attitude parameterizations: some households successfully employ learning mechanisms (learning-by-doing or social learning) to rebuild herds, while others stabilize at depleted equilibria, indicating divergent long-term livelihood outcomes within the same ecological and institutional context.\"}",
+            "function_call": null,
+            "reasoning": "The user wants me to describe the trends in the plot in detail, mentioning key time steps and values, and interpreting them based on the context of the model. I need to be objective, not refer to the plot or any visual, and simply state the dynamics.\n\n Looking at the plot:\n - The metric is \"Mean Livestock + Destock of Households\"\n - X-axis is \"Steps\" from 0 to 100\n - Y-axis is the mean livestock value from roughly 40 to 90\n\n Key observations:\n 1. At step 0, all lines start at approximately 90.\n 2. There is a sharp decline from step 0 to around step 20-30, reaching a minimum of approximately 40.\n 3. Around step 40, there's a divergence in behavior:\n    - Some lines continue flat or slightly increasing (staying around 40-45)\n    - Some lines start increasing around step 40-50\n    - A few lines increase significantly, reaching values around 60-62 by step 100\n    - Most lines stabilize around 45-50 by step 100\n 4. The divergence appears to create distinct groups:\n    - A lower group stabilizing around 40-45\n    - A middle group stabilizing around 47-50\n    - An upper group reaching 60+ (two distinct lines: one around 61-62, another around 58-59)\n\n Wait, looking more carefully:\n - The orange line goes up to about 61-62\n - The yellow-green line goes up to about 58-59\n - Then there's a cluster around 50\n - Then a cluster around 47-48\n - Then some around 43-45\n - And some flat around 41\n\n Actually, looking at the step 100 values:\n - Highest: ~61.5 (orange)\n - Second highest: ~58.8 (yellowish green)\n - Then a drop to around 50 (several lines)\n - Then around 48-49 (several lines)\n - Then around 46-47 (several lines)\n - Then around 44 (a few)\n - Then around 43 (a few)\n - Lowest: ~41 (a couple)\n\n The decline phase:\n - Step 0: 90\n - Step 10: ~75\n - Step 20: ~45-50\n - Step 30: ~40-42 (minimum)\n - Step 40: ~40-42 (staying low or starting to rise)\n\n The rise phase (for some):\n - Starts around step 40-45 for the fastest risers\n - Steep increase from step 50 to 70\n - Then levels off from step 70-100\n\n Context interpretation:\n This is the RAGE model extension with private property, stationary households, and learning behaviors (E-RO, E-LBD, E-RO-SL1). The initial value of 90 matches the livestock-init parameter. The sharp decline likely represents an initial shock or adjustment period where households destock due to learning, resource constraints, or initial conditions. The divergence after step 40 suggests different learning behaviors or risk attitudes leading to different outcomes: some households successfully rebuild herds (the rising lines), while others stabilize at lower levels or fail to recover. The clustering suggests distinct behavioral types or parameter settings leading to similar outcomes within groups.\n\n I need to describe this without referring to \"the plot\" or \"lines\" or \"visual\". I should use terms like \"the metric\", \"the simulation runs\", \"the trajectories\", or describe the data directly.\n\n Structure:\n 1. Initial condition (step 0): ~90\n 2. Rapid decline phase (steps 0-30): drop to ~40\n 3. Minimum/trough (steps 30-40): ~40\n 4. Divergence phase (steps 40-100):\n    - Low stable group: ~40-45\n    - Middle groups: ~45-52\n    - High recovery group: up to ~62\n 5. Interpretation based on context: initial destocking, then differentiated recovery based on learning/risk behaviors.\n\n I need to be careful not to say \"the orange line\" or \"the plot shows\". Instead: \"One trajectory reaches approximately 62 by step 100\" or \"The highest values observed at step 100 are approximately 62\".\n\n Also, check the parameter settings:\n - 60 households total\n - 20 E-RO, 20 E-LBD, 20 E-RO-SL1\n - So there should be 3 main groups? But the plot shows more diversity, probably due to the r-parameter (risk-att) heterogeneity.\n\n The description should mention:\n - Step 0: ~90\n - Step 20: ~45\n - Step 40: ~40 (minimum)\n - Step 100: ranges from ~40 to ~62\n\n And interpret: The initial decline represents destocking as households adjust to private property constraints and learn. The divergence reflects different adaptive capacities - some households recover and build herds while others remain at depleted levels.\n\n Let me write this properly.",
+            "reasoning_details": [
+              {
+                "format": "unknown",
+                "index": 0,
+                "text": "The user wants me to describe the trends in the plot in detail, mentioning key time steps and values, and interpreting them based on the context of the model. I need to be objective, not refer to the plot or any visual, and simply state the dynamics.\n\n Looking at the plot:\n - The metric is \"Mean Livestock + Destock of Households\"\n - X-axis is \"Steps\" from 0 to 100\n - Y-axis is the mean livestock value from roughly 40 to 90\n\n Key observations:\n 1. At step 0, all lines start at approximately 90.\n 2. There is a sharp decline from step 0 to around step 20-30, reaching a minimum of approximately 40.\n 3. Around step 40, there's a divergence in behavior:\n    - Some lines continue flat or slightly increasing (staying around 40-45)\n    - Some lines start increasing around step 40-50\n    - A few lines increase significantly, reaching values around 60-62 by step 100\n    - Most lines stabilize around 45-50 by step 100\n 4. The divergence appears to create distinct groups:\n    - A lower group stabilizing around 40-45\n    - A middle group stabilizing around 47-50\n    - An upper group reaching 60+ (two distinct lines: one around 61-62, another around 58-59)\n\n Wait, looking more carefully:\n - The orange line goes up to about 61-62\n - The yellow-green line goes up to about 58-59\n - Then there's a cluster around 50\n - Then a cluster around 47-48\n - Then some around 43-45\n - And some flat around 41\n\n Actually, looking at the step 100 values:\n - Highest: ~61.5 (orange)\n - Second highest: ~58.8 (yellowish green)\n - Then a drop to around 50 (several lines)\n - Then around 48-49 (several lines)\n - Then around 46-47 (several lines)\n - Then around 44 (a few)\n - Then around 43 (a few)\n - Lowest: ~41 (a couple)\n\n The decline phase:\n - Step 0: 90\n - Step 10: ~75\n - Step 20: ~45-50\n - Step 30: ~40-42 (minimum)\n - Step 40: ~40-42 (staying low or starting to rise)\n\n The rise phase (for some):\n - Starts around step 40-45 for the fastest risers\n - Steep increase from step 50 to 70\n - Then levels off from step 70-100\n\n Context interpretation:\n This is the RAGE model extension with private property, stationary households, and learning behaviors (E-RO, E-LBD, E-RO-SL1). The initial value of 90 matches the livestock-init parameter. The sharp decline likely represents an initial shock or adjustment period where households destock due to learning, resource constraints, or initial conditions. The divergence after step 40 suggests different learning behaviors or risk attitudes leading to different outcomes: some households successfully rebuild herds (the rising lines), while others stabilize at lower levels or fail to recover. The clustering suggests distinct behavioral types or parameter settings leading to similar outcomes within groups.\n\n I need to describe this without referring to \"the plot\" or \"lines\" or \"visual\". I should use terms like \"the metric\", \"the simulation runs\", \"the trajectories\", or describe the data directly.\n\n Structure:\n 1. Initial condition (step 0): ~90\n 2. Rapid decline phase (steps 0-30): drop to ~40\n 3. Minimum/trough (steps 30-40): ~40\n 4. Divergence phase (steps 40-100):\n    - Low stable group: ~40-45\n    - Middle groups: ~45-52\n    - High recovery group: up to ~62\n 5. Interpretation based on context: initial destocking, then differentiated recovery based on learning/risk behaviors.\n\n I need to be careful not to say \"the orange line\" or \"the plot shows\". Instead: \"One trajectory reaches approximately 62 by step 100\" or \"The highest values observed at step 100 are approximately 62\".\n\n Also, check the parameter settings:\n - 60 households total\n - 20 E-RO, 20 E-LBD, 20 E-RO-SL1\n - So there should be 3 main groups? But the plot shows more diversity, probably due to the r-parameter (risk-att) heterogeneity.\n\n The description should mention:\n - Step 0: ~90\n - Step 20: ~45\n - Step 40: ~40 (minimum)\n - Step 100: ranges from ~40 to ~62\n\n And interpret: The initial decline represents destocking as households adjust to private property constraints and learn. The divergence reflects different adaptive capacities - some households recover and build herds while others remain at depleted levels.\n\n Let me write this properly.",
+                "type": "reasoning.text"
+              }
+            ],
+            "refusal": null,
+            "role": "assistant",
+            "tool_calls": null
+          },
+          "native_finish_reason": "stop"
+        }
+      ],
+      "created": 1773393658,
+      "id": "gen-1773393658-fdJM5CglboBacQVrduAU",
+      "model": "moonshotai/kimi-k2.5-0127",
+      "object": "chat.completion",
+      "provider": "AtlasCloud",
+      "provider_metadata": {
+        "provider": "AtlasCloud",
+        "quantization": "int4"
+      },
+      "service_tier": null,
+      "system_fingerprint": null,
+      "usage": {
+        "completion_tokens": 1381,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 1059,
+          "rejected_prediction_tokens": null
+        },
+        "cost": 0.004768434,
+        "cost_details": {
+          "upstream_inference_completions_cost": 0.0035906,
+          "upstream_inference_cost": 0.0048166,
+          "upstream_inference_prompt_cost": 0.001226
+        },
+        "is_byok": false,
+        "prompt_tokens": 2452,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 0,
+          "video_tokens": 0
+        },
+        "total_tokens": 3833
+      }
+    },
+    "raw_text": "{\"response_text\":\"At initialization (step 0), the mean livestock plus destock across households begins at approximately 90 units, consistent with the initial livestock parameter setting. During the first 20 steps, all simulation runs exhibit a steep and synchronized decline, with values dropping sharply to approximately 45. This downward trajectory continues through step 30, reaching a minimum of roughly 40 units around step 40, representing a destocking phase of more than 55% from initial levels.\\n\\nFollowing step 40, the trajectories diverge markedly into distinct recovery patterns that persist through step 100. A subset of households remains stable at low levels, maintaining values between 40 and 45 without significant recovery. Another group exhibits modest increases, stabilizing between 45 and 52 by step 100. Most notably, a distinct set of trajectories demonstrates strong recovery: beginning around step 40-50, these increase steeply through step 70, reaching values between 55 and 62 by step 100. The highest observed values at step 100 approach approximately 62 units, representing a 55% recovery from the trough but remaining roughly 30% below initial levels.\\n\\nThis pattern suggests that initial destocking reflects an adaptive adjustment to private property constraints and initial learning processes. The subsequent divergence indicates heterogeneous adaptive capacities across behavioral types or risk-attitude parameterizations: some households successfully employ learning mechanisms (learning-by-doing or social learning) to rebuild herds, while others stabilize at depleted equilibria, indicating divergent long-term livelihood outcomes within the same ecological and institutional context.\"}",
+    "raw_text_length": 1723,
+    "raw_text_signature": "00bb3d0794aad83016b3b5caaeb4b1f8243d979dff603f229e533eb3b1aa86c5",
+    "runtime": {
+      "precision": "int4",
+      "provider": "AtlasCloud"
+    },
+    "usage": {
+      "completion_tokens": 1381,
+      "prompt_tokens": 2452,
+      "total_tokens": 3833
+    }
+  }
+}

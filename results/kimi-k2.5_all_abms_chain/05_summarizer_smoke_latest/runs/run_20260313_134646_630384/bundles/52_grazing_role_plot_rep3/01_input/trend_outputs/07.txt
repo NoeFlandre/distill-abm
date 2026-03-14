@@ -1,0 +1,7 @@
+The Gini coefficient for healthy livestock distribution exhibits a consistent monotonic increase across all simulation runs, beginning at approximately zero (indicating perfect equality at initialization) and rising to values ranging between 0.030 and 0.095 by the final timestep of 100. 
+
+During the initial phase (approximately timesteps 0–40), the increase occurs gradually, with the coefficient rising slowly to values typically between 0.010 and 0.030. Around timesteps 40–50, a distinct inflection point occurs across most trajectories, where the rate of increase accelerates markedly. This transition marks the beginning of a divergence phase where individual simulation runs begin to separate significantly from one another.
+
+From approximately timestep 50 onward, the between-run variation expands considerably, with some trajectories maintaining relatively moderate growth rates (reaching 0.030–0.050 by timestep 100) while others exhibit steep, accelerating increases that approach or exceed 0.090. This widening spread indicates that stochastic factors, initial conditions, or differences in learning strategies among agents generate substantially different long-term inequality outcomes despite similar starting conditions.
+
+Overall, the data demonstrate that inequality in the distribution of healthy livestock across households increases continuously over time in this system, with the pace of inequality growth accelerating after an initial lag phase and final outcomes varying considerably depending on specific simulation trajectories.

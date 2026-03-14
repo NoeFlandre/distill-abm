@@ -1,0 +1,8 @@
+{
+  "abm": "fauna",
+  "case_id": "52_fauna_role_plot_rep3",
+  "evidence_mode": "plot",
+  "model": "moonshotai/kimi-k2.5",
+  "prompt_variant": "role",
+  "repetition": 3
+}

@@ -1,0 +1,8 @@
+{
+  "abm": "milk_consumption",
+  "case_id": "47_milk_consumption_all_three_table_rep2",
+  "evidence_mode": "table",
+  "model": "moonshotai/kimi-k2.5",
+  "prompt_variant": "all_three",
+  "repetition": 2
+}

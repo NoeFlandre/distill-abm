@@ -1,0 +1,359 @@
+{
+  "reporter_pattern": "males-killed",
+  "time_column": null,
+  "matched_columns": [
+    "males-killed",
+    "females-killed",
+    "males-killed.1",
+    "females-killed.1",
+    "males-killed.2",
+    "females-killed.2",
+    "males-killed.3",
+    "females-killed.3",
+    "males-killed.4",
+    "females-killed.4",
+    "males-killed.5",
+    "females-killed.5",
+    "males-killed.6",
+    "females-killed.6",
+    "males-killed.7",
+    "females-killed.7",
+    "males-killed.8",
+    "females-killed.8",
+    "males-killed.9",
+    "females-killed.9",
+    "males-killed.10",
+    "females-killed.10",
+    "males-killed.11",
+    "females-killed.11",
+    "males-killed.12",
+    "females-killed.12",
+    "males-killed.13",
+    "females-killed.13",
+    "males-killed.14",
+    "females-killed.14",
+    "males-killed.15",
+    "females-killed.15",
+    "males-killed.16",
+    "females-killed.16",
+    "males-killed.17",
+    "females-killed.17",
+    "males-killed.18",
+    "females-killed.18",
+    "males-killed.19",
+    "females-killed.19",
+    "males-killed.20",
+    "females-killed.20",
+    "males-killed.21",
+    "females-killed.21",
+    "males-killed.22",
+    "females-killed.22",
+    "males-killed.23",
+    "females-killed.23",
+    "males-killed.24",
+    "females-killed.24",
+    "males-killed.25",
+    "females-killed.25",
+    "males-killed.26",
+    "females-killed.26",
+    "males-killed.27",
+    "females-killed.27",
+    "males-killed.28",
+    "females-killed.28",
+    "males-killed.29",
+    "females-killed.29",
+    "males-killed.30",
+    "females-killed.30",
+    "males-killed.31",
+    "females-killed.31",
+    "males-killed.32",
+    "females-killed.32",
+    "males-killed.33",
+    "females-killed.33",
+    "males-killed.34",
+    "females-killed.34",
+    "males-killed.35",
+    "females-killed.35",
+    "males-killed.36",
+    "females-killed.36",
+    "males-killed.37",
+    "females-killed.37",
+    "males-killed.38",
+    "females-killed.38",
+    "males-killed.39",
+    "females-killed.39"
+  ],
+  "matched_series_count": 80,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_80_matched_series",
+      "sample_count": 2312,
+      "valid_sample_count": 2312,
+      "dropped_non_numeric_count": 0,
+      "start_value": 0.0,
+      "end_value": 117.5,
+      "mean": 100.39479922890484,
+      "median": 116.5,
+      "std": 32.5162695642399,
+      "variance": 1057.307786374314,
+      "minimum": 0.0,
+      "minimum_index": 0,
+      "maximum": 120.16666666666667,
+      "maximum_index": 1876,
+      "peaks": [
+        {
+          "index": 1876.0,
+          "source_index": 1876.0,
+          "time": 1876.0,
+          "value": 120.16666666666667,
+          "prominence": 0.0
+        },
+        {
+          "index": 2040.0,
+          "source_index": 2040.0,
+          "time": 2040.0,
+          "value": 119.75,
+          "prominence": 0.0
+        },
+        {
+          "index": 1672.0,
+          "source_index": 1672.0,
+          "time": 1672.0,
+          "value": 119.41666666666667,
+          "prominence": 0.0
+        },
+        {
+          "index": 1732.0,
+          "source_index": 1732.0,
+          "time": 1732.0,
+          "value": 119.4,
+          "prominence": 0.0
+        },
+        {
+          "index": 1208.0,
+          "source_index": 1208.0,
+          "time": 1208.0,
+          "value": 118.57142857142857,
+          "prominence": 0.0
+        },
+        {
+          "index": 1395.0,
+          "source_index": 1395.0,
+          "time": 1395.0,
+          "value": 118.5,
+          "prominence": 0.0
+        },
+        {
+          "index": 1516.0,
+          "source_index": 1516.0,
+          "time": 1516.0,
+          "value": 118.5,
+          "prominence": 0.0
+        },
+        {
+          "index": 1166.0,
+          "source_index": 1166.0,
+          "time": 1166.0,
+          "value": 118.47826086956522,
+          "prominence": 0.0
+        }
+      ],
+      "valleys": [
+        {
+          "index": 1958.0,
+          "source_index": 1958.0,
+          "time": 1958.0,
+          "value": 119.5,
+          "prominence": 0.0
+        },
+        {
+          "index": 1696.0,
+          "source_index": 1696.0,
+          "time": 1696.0,
+          "value": 119.2,
+          "prominence": 0.0
+        },
+        {
+          "index": 1167.0,
+          "source_index": 1167.0,
+          "time": 1167.0,
+          "value": 118.45454545454545,
+          "prominence": 0.0
+        },
+        {
+          "index": 1212.0,
+          "source_index": 1212.0,
+          "time": 1212.0,
+          "value": 118.375,
+          "prominence": 0.0
+        },
+        {
+          "index": 1171.0,
+          "source_index": 1171.0,
+          "time": 1171.0,
+          "value": 118.35714285714286,
+          "prominence": 0.0
+        },
+        {
+          "index": 1757.0,
+          "source_index": 1757.0,
+          "time": 1757.0,
+          "value": 118.25,
+          "prominence": 0.0
+        },
+        {
+          "index": 1546.0,
+          "source_index": 1546.0,
+          "time": 1546.0,
+          "value": 118.21428571428571,
+          "prominence": 0.0
+        },
+        {
+          "index": 1224.0,
+          "source_index": 1224.0,
+          "time": 1224.0,
+          "value": 118.1842105263158,
+          "prominence": 0.0
+        }
+      ],
+      "inflection_indices": [
+        362,
+        1241,
+        1330,
+        1397,
+        1402,
+        1419,
+        1455,
+        1474,
+        1595,
+        1713,
+        1828,
+        2040
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 232,
+        "windows": [
+          {
+            "start_index": 0,
+            "end_index": 231,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.1727678571428571,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 232,
+            "end_index": 463,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.21904167963020582,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 464,
+            "end_index": 695,
+            "trend": "increasing",
+            "tau": 0.9999626809971638,
+            "slope": 0.08524887387387385,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 696,
+            "end_index": 927,
+            "trend": "increasing",
+            "tau": 0.9967532467532467,
+            "slope": 0.02957257556799908,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 928,
+            "end_index": 1159,
+            "trend": "increasing",
+            "tau": 0.9539110314972384,
+            "slope": 0.00842635813369558,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 1160,
+            "end_index": 1391,
+            "trend": "no trend",
+            "tau": -0.07601880877742946,
+            "slope": -0.00046168065878802913,
+            "p": 0.08422787030291556,
+            "significant": false
+          },
+          {
+            "start_index": 1392,
+            "end_index": 1623,
+            "trend": "increasing",
+            "tau": 0.4533512464546947,
+            "slope": 0.001623376623376658,
+            "p": 0.0,
+            "significant": true
+          },
+          {
+            "start_index": 1624,
+            "end_index": 1855,
+            "trend": "no trend",
+            "tau": -0.06624123003433348,
+            "slope": 0.0,
+            "p": 0.1272829462976084,
+            "significant": false
+          },
+          {
+            "start_index": 1856,
+            "end_index": 2087,
+            "trend": "decreasing",
+            "tau": -0.44618599791013586,
+            "slope": 0.0,
+            "p": 0.0,
+            "significant": true
+          }
+        ]
+      },
+      "change_points": [
+        125,
+        250,
+        375,
+        500,
+        625,
+        850,
+        2310
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 63.0,
+        "oscillation_indices": [
+          2170,
+          2175,
+          2180,
+          2185,
+          2190,
+          2195,
+          2200,
+          2205,
+          2210,
+          2215,
+          2220,
+          2225,
+          2230,
+          2235,
+          2240,
+          2245,
+          2250,
+          2255,
+          2260,
+          2265
+        ]
+      }
+    }
+  ]
+}

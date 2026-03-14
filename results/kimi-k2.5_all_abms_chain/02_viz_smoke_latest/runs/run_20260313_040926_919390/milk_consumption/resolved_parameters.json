@@ -1,0 +1,18 @@
+{
+  "alt-env-mean-initial": 1.12,
+  "alt-health-mean-initial": 1.69,
+  "cognitive-dissonance-threshold": 0.15,
+  "habit-on?": true,
+  "habit-threshold": 2,
+  "incumbent-initial-habit": 10,
+  "justification": 0.61,
+  "memory-lifetime": 5,
+  "network-parameter": 8,
+  "network-type": "\"watts-strogatz\"",
+  "norms": true,
+  "number-of-agents": 1000,
+  "p-interact": 0.3,
+  "social-blindness": 0.51,
+  "social-conformity": 0.28,
+  "social-susceptibility": 0.2
+}

@@ -1,0 +1,17 @@
+**Temporal Dynamics of Social Learning Adoption**
+
+All simulation runs initiate with zero households having engaged in social learning. Between approximately steps 5 and 25, the system undergoes a phase of rapid adoption, with the count of households exhibiting social learning increasing monotonically and steeply across all runs. By step 20, the count ranges from approximately 24 to 45 households across different runs, indicating significant early variability in adoption rates.
+
+Following this initial rapid growth, the rate of new adoptions decelerates substantially between steps 25 and 40. During this period, increases occur as discrete jumps rather than continuous growth, with individual runs stabilizing at different time points. After approximately step 40, the vast majority of simulation runs reach a plateau, maintaining a constant count of households with social learning through step 100. A minority of runs continue to exhibit occasional increases until roughly step 60, after which the entire ensemble of runs remains stable with no further adoption or abandonment of social learning behaviors.
+
+**Cross-Sectional Variability and Final Outcomes**
+
+The simulation ensemble displays substantial heterogeneity in the ultimate extent of social learning adoption. Final counts at step 100 range from approximately 18 households at the minimum to 54 households at the maximum, representing roughly 30% to 90% of the total population of 60 households. The distribution of outcomes includes several distinct clusters: approximately 18 households (lower bound), around 30 households, the 36-42 household range (central cluster), around 48 households, and the upper range of 51-54 households.
+
+**Persistence and Irreversibility**
+
+The trajectories demonstrate that social learning adoption is an absorbing state; once a household engages in social learning, indicated by the household-SL variable becoming true, this status persists for the remainder of the simulation. No trajectories exhibit decreases in the count of households with social learning, indicating that agents do not abandon this learning modality once adopted.
+
+**Implications for Decision Makers**
+
+The rapid saturation of adoption within the first 20-30 steps suggests that social learning dynamics operate on a compressed timescale relative to the full 100-step simulation horizon, implying that policy interventions or educational programs aimed at influencing learning strategies must be implemented early in the process to be effective. The wide divergence in final adoption levels—ranging from near-minimal diffusion beyond the initially designated social learning households to widespread penetration across nearly the entire farming community—indicates the presence of strong path dependency or threshold effects. This variability suggests that seemingly similar grazing communities might experience vastly different outcomes in terms of collective learning behavior based on early stochastic events or subtle initial condition differences, necessitating tailored approaches rather than uniform intervention strategies.
