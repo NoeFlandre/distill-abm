@@ -11,6 +11,7 @@ __pycache__/
 coverage.xml
 htmlcov/
 results/*
+!results/README.md
 !results/archive/
 !results/archive/**
 !results/quantitative_master_overview/

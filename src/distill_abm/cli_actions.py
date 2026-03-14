@@ -72,6 +72,12 @@ from distill_abm.run_viewer import render_run_viewer
 
 DEFAULT_LLM_TIMEOUT_SECONDS = 900.0
 DEFAULT_RESULTS_BUCKET_URI = "hf://buckets/NoeFlandre/distill-abms-results"
+DEFAULT_RESULTS_BUCKET_EXCLUDES = (
+    ".DS_Store",
+    "**/.DS_Store",
+    ".cache/**",
+    "**/.cache/**",
+)
 
 
 def execute_run_command(
@@ -791,6 +797,8 @@ def execute_sync_results_bucket_command(
     command = [hf_path, "sync", str(source_root), bucket_uri]
     if delete:
         command.append("--delete")
+    for pattern in DEFAULT_RESULTS_BUCKET_EXCLUDES:
+        command.extend(["--exclude", pattern])
     token = os.environ.get(token_env_var)
     if dry_run:
         if plan_path is not None:

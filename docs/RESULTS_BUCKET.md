@@ -49,13 +49,20 @@ Preferred one-command repo workflow:
 uv run distill-abm sync-results-bucket
 ```
 
+The command excludes local macOS and cache clutter by default, currently:
+
+- `.DS_Store`
+- `**/.DS_Store`
+- `.cache/**`
+- `**/.cache/**`
+
 Dry-run and save a reviewable sync plan:
 
 ```bash
 uv run distill-abm sync-results-bucket --dry-run --plan-path /tmp/distill_abm_results_sync_plan.jsonl
 ```
 
-The command mirrors `./results` to `hf://buckets/NoeFlandre/distill-abms-results`, deletes remote files missing locally by default, and reuses an existing HF login unless `HF_TOKEN` is set.
+The command mirrors `./results` to `hf://buckets/NoeFlandre/distill-abms-results`, deletes remote files missing locally by default, excludes hidden cache clutter, and reuses an existing HF login unless `HF_TOKEN` is set.
 
 `results/quantitative_master_overview/` is the root-level rollup folder for the latest quantitative overviews. It contains one aggregated Markdown file per overview artifact so you can inspect all latest ANOVA, factorial, evidence-summary, best-score, and prompt-compression tables without drilling into each run directory.
 
