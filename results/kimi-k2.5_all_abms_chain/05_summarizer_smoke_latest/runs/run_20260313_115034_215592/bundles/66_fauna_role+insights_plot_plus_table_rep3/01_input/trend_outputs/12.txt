@@ -1,0 +1,22 @@
+The aggregate total energy of female megaherbivores initiated at approximately 12,500 units and underwent a deterministic collapse to zero by tick 2,311 (approximately 6.3 years), indicating complete population extinction across all simulation replicates. The trajectory exhibited distinct phases of decline with varying rates.
+
+**Phase 1: Rapid Depletion (Ticks 0–463)**
+The initial period demonstrated steep monotonic decline with slopes averaging approximately -22.6 to -26.7 units per tick, representing the most rapid loss of female biomass. By tick 375, the aggregate energy had fallen to approximately 2,232 units, marking the first major transition point. This phase lasted approximately 1.3 years.
+
+**Phase 2: Moderate Decline (Ticks 464–927)**
+The rate of depletion slowed considerably to slopes between -5.7 and -1.9 units per tick, though the trend remained significantly decreasing. Brief oscillatory behavior emerged with a dominant period of approximately 63 ticks, evidenced by minor peaks around ticks 376–410 (values fluctuating between approximately 2,098 and 2,233 units) before resuming decline.
+
+**Phase 3: Slow Decline (Ticks 928–1159)**
+The trajectory entered a period of very gradual depletion with a slope of approximately -0.56 units per tick, suggesting a temporary approach toward equilibrium or reduced hunting efficiency at lower population densities.
+
+**Phase 4: Brief Stabilization and Recovery (Ticks 1160–1391)**
+Approximately 3.2–3.8 years into the simulation, the trend reversed to a weak but statistically significant increase (slope +0.019 units per tick), representing a temporary demographic recovery as reduced population density alleviated resource competition or hunting pressure.
+
+**Phase 5: Terminal Decline (Ticks 1392–2311)**
+Following the brief recovery, the population resumed decline with increasing momentum (slopes ranging from -0.024 to -0.167 units per tick), eventually reaching zero at tick 2,311. The final change point at tick 2,310 marked the extinction event.
+
+**Statistical Characteristics**
+The distribution of energy values was highly right-skewed (median: 100 units; mean: 1,569 units; standard deviation: 3,083 units), indicating that the population spent the majority of the simulation period at low energy levels despite high initial values. The coefficient of variation exceeded 196%, reflecting high variability in the rate of decline across simulation replicates.
+
+**Implications for Decision Makers**
+The deterministic collapse within approximately 6.3 years under the specified parameter configuration (20 hunters, 250 initial prey, high seasonality of 0.8) suggests that current hunting pressure exceeds the maximum sustainable yield for this megaherbivore population. The brief recovery phase at years 3–4 indicates that temporary reductions in hunting pressure or population density can delay but not prevent extinction. Management interventions must reduce hunter numbers or foraging radius by at least 50–75% to shift the trajectory from the observed collapse dynamics toward stable coexistence, as the current configuration drives an irreversible decline despite oscillatory fluctuations and temporary demographic recoveries.

@@ -1,0 +1,11 @@
+The combined energy reserves of the male prey population initiate at approximately 12,500 units and exhibit a sustained decline toward eventual extinction by tick 2,284. The trajectory reveals four distinct phases of population change under hunting pressure.
+
+The first phase encompasses an immediate steep decline from the initial value of 12,500 to approximately 11,600 units by tick 65, followed by a rapid reduction to roughly 4,000 units by tick 377. This initial collapse suggests intense hunting pressure on the naive population, rapidly removing high-energy individuals.
+
+Between ticks 377 and 1,391, the population enters a plateau phase characterized by oscillations around 3,800 to 4,000 units with a periodicity of approximately 63 ticks. This pattern likely reflects the interaction between seasonal birth pulses, juvenile recruitment, and sustained hunting mortality, creating a demographic equilibrium where recruitment temporarily balances losses.
+
+A notable transient recovery occurs between ticks 1,392 and 1,623, where the energy trend reverses to increase before resuming decline. This anomaly may indicate reduced hunting efficiency, temporary prey refuge behavior, or demographic stochasticity allowing brief population rebound.
+
+The final phase from tick 1,624 to 2,284 exhibits terminal decline to zero, representing population collapse and functional extinction of males. The eventual disappearance by tick 2,284, just 28 ticks before the simulation termination, indicates that hunting pressure ultimately overwhelmed all demographic compensatory mechanisms, eliminating the male cohort entirely.
+
+This trajectory demonstrates how initial population abundance provides only temporary buffering against sustained hunting pressure, with oscillatory dynamics during decline representing the demographic inertia of long-lived megaherbivores before inevitable extinction under continuous predation pressure.

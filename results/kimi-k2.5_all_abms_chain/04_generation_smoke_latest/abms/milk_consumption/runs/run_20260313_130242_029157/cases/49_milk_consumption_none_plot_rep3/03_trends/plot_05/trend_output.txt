@@ -1,0 +1,1 @@
+The total number of milk choices made accumulates at a constant rate from zero at step 0 to approximately 32,000 at step 32, with roughly 1,000 choices added per step. This reflects each of the 1,000 agents making approximately one milk choice per time step on average throughout the simulation period.

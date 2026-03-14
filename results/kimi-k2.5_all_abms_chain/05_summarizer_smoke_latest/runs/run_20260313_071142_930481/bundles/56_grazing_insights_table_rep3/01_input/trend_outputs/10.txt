@@ -1,0 +1,11 @@
+The number of households employing the E-RO (non-learning) strategy begins at 20 households. During the initial period through approximately time step 8, the count exhibits a modest increase, reaching a maximum value of approximately 21.1 households. Following this initial peak, a consistent downward trajectory dominates the dynamics.
+
+From time step 8 through approximately time step 45, the number of E-RO households declines steadily, passing below 20 households shortly after the peak and continuing downward through key transition points at time steps 20 and 45. By time step 45, the count falls below 16 households.
+
+In the period from approximately time step 60 through the conclusion at time step 100, the decline moderates significantly and the series stabilizes, fluctuating within a narrow range around 14.7 to 15.0 households. Statistical analysis indicates no significant trend in these later periods, suggesting the system reaches a quasi-equilibrium with respect to this behavioral type.
+
+Over the complete time horizon, the metric exhibits a net decrease from 20 to approximately 14.7 households, representing a reduction of roughly 26.5 percent. The mean value across all time steps is approximately 16.4 households.
+
+**Implications for Decision Makers:**
+
+The gradual displacement of non-learning baseline strategies suggests that in competitive grazing environments with learning-capable agents, static decision-making approaches become increasingly untenable. Policy interventions should prioritize supporting adaptive learning mechanisms, including learning-by-doing and social learning processes, to prevent household exit and sustain livelihoods. The stabilization of non-learning populations at approximately 73 percent of initial levels indicates that while some households may persist with baseline strategies, the majority transition toward adaptive behaviors over time. Extension services and capacity building programs should account for this natural trajectory toward learning-based management approaches in private property grazing systems.

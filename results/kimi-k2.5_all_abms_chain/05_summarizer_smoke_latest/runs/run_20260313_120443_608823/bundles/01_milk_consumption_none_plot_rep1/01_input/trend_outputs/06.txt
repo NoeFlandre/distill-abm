@@ -1,0 +1,7 @@
+At initialization (step 0), the mean weekly whole milk consumption per person begins at approximately 2,650 units. During the first ten steps, there is a rapid decline, with consumption falling to roughly 950 units by step 10. This represents a decrease of approximately 64% over the initial phase.
+
+Between steps 10 and 20, the rate of decline moderates considerably. Consumption decreases from approximately 950 units to around 750 units, representing a more gradual reduction of about 21% over this ten-step interval.
+
+From step 20 to the conclusion at step 32, the downward trend continues but exhibits greater variability in the rate of decline. Consumption falls from approximately 750 units to roughly 250 units by the final step. Notable stepwise reductions occur around steps 26-27 and 29-30, suggesting periods of accelerated transition away from whole milk consumption.
+
+Overall, the trajectory demonstrates a sustained transition from whole milk to alternative varieties across the simulated population, with the most rapid shifts occurring in the early stages of the simulation period, followed by progressively slower but persistent declines as the market approaches saturation of alternative milk adoption.

@@ -1,0 +1,5 @@
+The mean value environmental deviation begins at zero at the start of the simulation. During the first five time steps, the metric undergoes a rapid increase, rising steeply from zero to approximately 13. This sharp initial growth gives way to a much slower rate of increase between steps 5 and 12, during which the value gradually rises from 13 to approximately 13.4. 
+
+From step 12 through the remainder of the simulation period ending at step 32, the metric stabilizes completely, maintaining a constant value of approximately 13.4 with negligible fluctuation. The trajectories across all simulation runs demonstrate remarkable consistency, with virtually no variation between runs at any point in the time series. 
+
+This pattern indicates that the misalignment between consumers' environmental values and their actual milk consumption choices emerges almost immediately within the simulation, reaches near-maximum levels within the first five time steps, and becomes a permanently entrenched feature of the consumer system for the duration of the modeled period.

@@ -1,0 +1,1 @@
+structured smoke output contained an empty response_text

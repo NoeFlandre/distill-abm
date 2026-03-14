@@ -1,0 +1,8 @@
+{
+  "abm": "milk_consumption",
+  "case_id": "05_milk_consumption_role_table_rep1",
+  "evidence_mode": "table",
+  "model": "moonshotai/kimi-k2.5",
+  "prompt_variant": "role",
+  "repetition": 1
+}

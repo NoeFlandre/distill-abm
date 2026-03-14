@@ -1,0 +1,7 @@
+The cumulative count of males killed begins at zero at step zero and increases throughout the observation period, reaching approximately 117.5 by step 2312. The maximum value recorded is approximately 120.2, occurring at step 1876.
+
+The series exhibits distinct phases of accumulation. From step 0 to approximately step 1159, the count increases rapidly and monotonically. The rate of increase is highest in the initial intervals, with slopes of 0.173 and 0.219 in the segments ending at steps 231 and 463, respectively. The rate gradually decelerates through this phase, reaching a slope of 0.008 by step 1159.
+
+From step 1160 to step 1391, the accumulation stagnates, showing no significant trend and maintaining an approximately constant value. This is followed by a secondary increase from step 1392 to step 1623, characterized by a moderate positive slope of 0.002. The series then enters another plateau phase from step 1624 to step 1855, with no significant increase or decrease.
+
+From step 1856 to step 2087, the cumulative count decreases slightly, exhibiting a negative trend. Change points in the rate of accumulation occur at steps 125, 250, 375, 500, 625, and 850, marking transitions during the initial rapid growth phase. After step 2170, the series exhibits oscillatory behavior with a dominant period of 63 steps.

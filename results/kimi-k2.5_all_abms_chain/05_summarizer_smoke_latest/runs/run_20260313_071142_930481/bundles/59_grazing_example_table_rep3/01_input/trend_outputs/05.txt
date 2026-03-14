@@ -1,0 +1,9 @@
+The average livestock holdings per household begins at 90 animals and undergoes a pronounced decline over the first 20 time steps, decreasing rapidly. This initial reduction reflects the adjustment period where households destock in response to pasture constraints and initial learning about local ecological conditions.
+
+Following this sharp initial drop, the rate of decline moderates considerably between time steps 22 through 32, as the system transitions toward a stabilization phase. At time step 37, livestock holdings reach their minimum value of approximately 41 animals per household, representing the lowest point of the destocking process.
+
+Between time steps 33 and 43, the trend exhibits no significant directional change, indicating a brief plateau where destocking pressures ease and the system begins to establish new grazing equilibria.
+
+Subsequently, from time step 44 onward, the trajectory shifts to a significant increasing trend that persists through the remainder of the simulation. This recovery phase shows initially strong growth that gradually attenuates over time, with the rate of increase diminishing from 0.313 animals per time step in the range from step 44 to 54, down to 0.002 animals per time step by the final segments. By the conclusion of the simulation at time step 100, livestock holdings stabilize near 47.5 animals per household, slightly above the minimum but well below initial stocking levels.
+
+The system exhibits oscillatory dynamics with a dominant period of approximately 49 time steps, suggesting cyclic adjustments between vegetation recovery and grazing pressure. These oscillations are most pronounced during the middle phases of the simulation, reflecting the interplay between the three behavioral types as they adapt their risk parameters and management strategies through learning-by-doing and social learning processes.

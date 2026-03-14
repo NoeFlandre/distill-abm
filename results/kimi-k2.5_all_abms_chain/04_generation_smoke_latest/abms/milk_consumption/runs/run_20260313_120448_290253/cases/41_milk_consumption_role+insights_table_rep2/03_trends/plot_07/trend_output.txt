@@ -1,0 +1,19 @@
+Over the 33 time steps representing the 1974-2005 period, the consumption of skimmed and semi-skimmed milk exhibits a pronounced S-curve trajectory characterized by four distinct phases of adoption behavior, overlaid with cyclical oscillations.
+
+**Initial Latency and Take-Off (Steps 0-4):**
+The trajectory commences at minimal levels (approximately 5.3 units), reflecting the historical dominance of whole milk in 1974. During the first five steps, consumption experiences statistically significant exponential growth (slope of +112.8 units per step), establishing the foundation for market transition.
+
+**Rapid Acceleration Phase (Steps 5-9):**
+Between steps 5 and 9, the adoption rate reaches its maximum velocity with an average increase of 139 units per step. This represents the critical inflection point where early majority consumers begin overcoming initial habit barriers (consistent with the high incumbent habit strength of 10.0) and health perceptions (initial alt-health mean of 1.69) shift sufficiently to drive mass behavioral change.
+
+**Extended Plateau and Market Turbulence (Steps 10-24):**
+The middle period reveals complex dynamics distinct from smooth logistic growth. Following the steep ascent, consumption stabilizes into an oscillating pattern around a mean of approximately 1,220-1,265 units, with notable peaks at steps 11 (~1,265) and 13 (~1,240) interspersed with valleys at steps 12 (~1,234) and 20 (~1,214). This 15-step cyclical dominance suggests periodic resistance mechanisms where social influence and habit strength create temporary equilibria. The absence of significant monotonic trends during windows 10-14 and 15-19 (slopes near zero or slightly negative at -10.5) indicates a contested market phase where the remaining incumbent consumers exhibit high resistance to switching, possibly due to the social blindness parameter (0.51) limiting influence propagation.
+
+**Renewed Late-Stage Growth (Steps 25-32):**
+After prolonged stagnation, step 25 marks a second inflection point triggering moderate but significant renewed growth (slope of +48.5 units per step through step 29). The trajectory culminates at step 32 with consumption reaching approximately 1,457 units, representing the completed historical transition where alternatives dominate. This late growth suggests that persistent exposure to health and environmental information (operating through the justification mechanism at 0.61) eventually erodes remaining habitual barriers among late adopters.
+
+**Cyclical Dynamics:**
+The oscillation dominant period of 15 time steps manifests as regular fluctuations superimposed on the secular trend, particularly visible between steps 9-24. These cycles likely reflect generational turnover or episodic reconsideration events driven by the memory lifetime parameter of 5.0 steps, creating cohorts of consumers who reassess choices at overlapping intervals.
+
+**Implications for Decision Makers:**
+The pronounced plateau phase (steps 10-24) demonstrates that achieving majority adoption does not guarantee linear progression to total market dominance; sustained intervention is required to overcome the "chasm" of resistant habitual consumers. The dual-growth structure suggests distinct strategies are needed for early market penetration versus late-stage conversion of entrenched whole milk drinkers. Additionally, the cyclical patterns indicate that timing policy interventions or marketing campaigns to coincide with natural reconsideration cycles (every ~15 steps) could improve efficiency, while the late-stage growth validates long-term persistence in health education campaigns even when initial rapid adoption slows.

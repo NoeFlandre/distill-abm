@@ -1,0 +1,13 @@
+The cumulative number of male prey killed exhibits a consistent saturating pattern across simulation replicates, progressing through three distinct phases before reaching asymptotic limits. 
+
+**Phase 1 (Steps 0–500): Rapid Accumulation**
+All simulations initiate at zero males killed and demonstrate steep, approximately linear increases in cumulative mortality. By step 250, kill counts range from approximately 20 to 60 across replicates. By step 500, the cumulative values span roughly 75 to 115 males killed, with the majority of trajectories clustering between 90 and 110. This phase is characterized by the highest rates of hunting success, with some simulations accumulating over 100 kills within this initial 500-step interval.
+
+**Phase 2 (Steps 500–1000): Deceleration**
+The rate of new kill accumulation diminishes substantially during this transitional period. Trajectories that exhibited the steepest initial rises begin plateauing earliest, while slower trajectories continue ascending but at reduced rates. By step 1000, most simulations have reached cumulative values between 105 and 125 males killed, with the between-replicate variability in cumulative totals narrowing considerably compared to the spread observed at step 500.
+
+**Phase 3 (Steps 1000+): Asymptotic Plateau**
+Beyond approximately step 1000, the cumulative kill counts stabilize with minimal to zero additional accumulation across most replicates. The earliest plateau occurs around step 800, while the latest accumulation events extend to approximately step 2000. Terminal cumulative values range from roughly 105 to 125 males killed, with the majority of replicates converging between 110 and 122.
+
+**Interpretation**
+The saturating dynamics suggest that hunting pressure progressively depletes the available male prey population toward functional extinction or densities below viable hunting thresholds. Given the initial ungulate population of 250 animals and assuming roughly equal sex ratios, the asymptotic values approaching 120 males indicate that hunters successfully encounter and kill the vast majority of males present in the system. The substantial variation in the timing of saturation (ranging from step 800 to step 2000) reflects stochasticity in hunter-prey encounter rates, spatial dynamics, and the demographic responses of prey populations to sustained hunting pressure under seasonal environmental conditions.

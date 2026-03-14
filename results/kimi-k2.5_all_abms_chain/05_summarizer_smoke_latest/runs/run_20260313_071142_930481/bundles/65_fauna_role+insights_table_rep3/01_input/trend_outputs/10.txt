@@ -1,0 +1,17 @@
+The megaherbivore population exhibits a deterministic trajectory toward extinction under the modeled conditions. At initiation, the population begins at approximately 167 individuals and undergoes a severe collapse within the first 700 time steps, plummeting to fewer than 12 individuals by this point. This initial decline is particularly acute during the first 125 ticks, by which point the population has already fallen substantially from its starting value, and continues sharply through tick 475.
+
+Following the initial crash, the system enters a protracted phase of low-density fluctuation persisting from approximately tick 700 through tick 1400. During this interval, the population oscillates at very low levels, varying between roughly 2 and 11 individuals. Notably, between ticks 1390 and 1630, the population exhibits a modest temporary recovery, reversing the decline trajectory briefly before resuming attrition. A second minor recovery attempt occurs between ticks 1850 and 2090, though this also fails to establish sustained growth.
+
+The decline rate moderates considerably after the initial crash, transitioning from steep negative slopes in the first two years to gradual attrition punctuated by oscillations with a periodicity of approximately 63 ticks. These regular fluctuations suggest seasonal demographic bottlenecks affecting population dynamics even during the collapse phase. Despite these temporary stabilizations and minor rebounds, the long-term trend remains monotonically decreasing. By tick 2310, the population enters its terminal decline, reaching complete extinction at tick 2311 with zero individuals remaining.
+
+The overall pattern indicates that the combination of 20 human foragers operating under optimal foraging constraints, high environmental seasonality (0.8), and the specific life-history parameters of the ungulates creates unsustainable predation pressure. The initial population cannot maintain viability against continuous hunting pressure, and once densities drop below approximately 10 individuals, stochastic fluctuations and Allee effects prevent recovery despite temporary increases in numbers.
+
+**Insights for Decision Makers:**
+
+- **Critical Intervention Window:** The first 700 time steps (approximately two years) represent the only viable period for conservation intervention; once populations drop below 10 individuals, recovery becomes statistically improbable despite temporary stabilization periods.
+
+- **Seasonal Bottlenecks:** The persistent 63-tick oscillation cycle superimposed on the decline suggests that resource seasonality creates predictable mortality pulses; management strategies must account for these temporal bottlenecks in forage availability.
+
+- **Hunting Pressure Threshold:** The current configuration of 20 foragers with energy storage capabilities and zero mortality risk exceeds the sustainable offtake rate for this landscape, necessitating either reduction in hunter numbers or restriction of hunting access during critical periods to prevent inevitable extinction.
+
+- **Low-Density Persistence:** The prolonged persistence at 1-11 individuals between ticks 700-1400 indicates that populations can hover near extinction for extended periods before final collapse, potentially creating a false sense of stability that delays necessary management responses.

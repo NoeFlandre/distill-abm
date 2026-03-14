@@ -1,0 +1,5 @@
+: The population of human forager agents remains constant at the initial value of 20 individuals throughout the entire simulation period, from step 0 through approximately step 2200, with no observed fluctuations, growth, or decline in hunter numbers across any time interval.
+
+This static population dynamic reflects the model parameter configuration in which foragers are designated as immortal and immune to mortality from energy depletion. With the absence of any demographic processes governing hunter recruitment, reproduction, or attrition, the initial cohort of 20 foragers persists indefinitely without turnover.
+
+**Implications for decision makers:** The fixed hunter population represents a constant predation pressure that does not respond to changes in prey availability or foraging returns. When evaluating model outcomes regarding megaherbivore population trajectories, decision makers should recognize that hunting pressure remains static regardless of prey density, which may produce different extinction dynamics compared to scenarios featuring density-dependent hunter populations that could self-limit or disperse following resource decline.

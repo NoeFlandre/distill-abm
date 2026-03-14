@@ -1,0 +1,7 @@
+# Best Score Across Dynamic Prompt Elements
+
+| Reference family | ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gpt5.2_long | fauna | none | moonshotai/kimi-k2.5 | 0.05 | 0.32 | 0.59 | 0.21 | 0.25 | 27.90 |
+| gpt5.2_long | grazing | none | moonshotai/kimi-k2.5 | 0.05 | 0.32 | 0.64 | 0.24 | 0.26 | 25.43 |
+| gpt5.2_long | milk_consumption | none | moonshotai/kimi-k2.5 | 0.08 | 0.31 | 0.61 | 0.23 | 0.24 | 28.04 |

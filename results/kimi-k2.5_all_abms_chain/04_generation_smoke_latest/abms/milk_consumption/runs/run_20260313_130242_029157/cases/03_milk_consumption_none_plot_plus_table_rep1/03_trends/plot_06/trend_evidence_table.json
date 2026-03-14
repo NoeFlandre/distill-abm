@@ -1,0 +1,190 @@
+{
+  "reporter_pattern": "mean [incum-quantity] of turtles",
+  "time_column": null,
+  "matched_columns": [
+    "mean [incum-quantity] of turtles",
+    "mean [incum-quantity] of turtles.1",
+    "mean [incum-quantity] of turtles.2",
+    "mean [incum-quantity] of turtles.3",
+    "mean [incum-quantity] of turtles.4",
+    "mean [incum-quantity] of turtles.5",
+    "mean [incum-quantity] of turtles.6",
+    "mean [incum-quantity] of turtles.7",
+    "mean [incum-quantity] of turtles.8",
+    "mean [incum-quantity] of turtles.9",
+    "mean [incum-quantity] of turtles.10",
+    "mean [incum-quantity] of turtles.11",
+    "mean [incum-quantity] of turtles.12",
+    "mean [incum-quantity] of turtles.13",
+    "mean [incum-quantity] of turtles.14",
+    "mean [incum-quantity] of turtles.15",
+    "mean [incum-quantity] of turtles.16",
+    "mean [incum-quantity] of turtles.17",
+    "mean [incum-quantity] of turtles.18",
+    "mean [incum-quantity] of turtles.19",
+    "mean [incum-quantity] of turtles.20",
+    "mean [incum-quantity] of turtles.21",
+    "mean [incum-quantity] of turtles.22",
+    "mean [incum-quantity] of turtles.23",
+    "mean [incum-quantity] of turtles.24",
+    "mean [incum-quantity] of turtles.25",
+    "mean [incum-quantity] of turtles.26",
+    "mean [incum-quantity] of turtles.27",
+    "mean [incum-quantity] of turtles.28",
+    "mean [incum-quantity] of turtles.29"
+  ],
+  "matched_series_count": 30,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_30_matched_series",
+      "sample_count": 33,
+      "valid_sample_count": 33,
+      "dropped_non_numeric_count": 0,
+      "start_value": 2654.8100000000427,
+      "end_value": 253.1040307985741,
+      "mean": 1078.2026948376988,
+      "median": 816.8547856644497,
+      "std": 693.0786089798969,
+      "variance": 480357.9582255088,
+      "minimum": 253.1040307985741,
+      "minimum_index": 32,
+      "maximum": 2654.8100000000427,
+      "maximum_index": 0,
+      "peaks": [
+        {
+          "index": 19.0,
+          "source_index": 19.0,
+          "time": 19.0,
+          "value": 773.9572276024736,
+          "prominence": 0.0
+        },
+        {
+          "index": 27.0,
+          "source_index": 27.0,
+          "time": 27.0,
+          "value": 620.9759177215152,
+          "prominence": 0.0
+        },
+        {
+          "index": 30.0,
+          "source_index": 30.0,
+          "time": 30.0,
+          "value": 335.17873434148413,
+          "prominence": 0.0
+        }
+      ],
+      "valleys": [
+        {
+          "index": 18.0,
+          "source_index": 18.0,
+          "time": 18.0,
+          "value": 760.0036497734859,
+          "prominence": 0.0
+        },
+        {
+          "index": 26.0,
+          "source_index": 26.0,
+          "time": 26.0,
+          "value": 594.3464165123241,
+          "prominence": 0.0
+        },
+        {
+          "index": 29.0,
+          "source_index": 29.0,
+          "time": 29.0,
+          "value": 323.46008016171186,
+          "prominence": 0.0
+        }
+      ],
+      "inflection_indices": [
+        5,
+        13,
+        16,
+        19,
+        24,
+        25,
+        27,
+        30
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 5,
+        "windows": [
+          {
+            "start_index": 0,
+            "end_index": 4,
+            "trend": "decreasing",
+            "tau": -1.0,
+            "slope": -115.85151071389771,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 5,
+            "end_index": 9,
+            "trend": "decreasing",
+            "tau": -1.0,
+            "slope": -221.1105213465013,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 10,
+            "end_index": 14,
+            "trend": "decreasing",
+            "tau": -1.0,
+            "slope": -38.133574620818095,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 15,
+            "end_index": 19,
+            "trend": "no trend",
+            "tau": -0.8,
+            "slope": -23.277196778912156,
+            "p": 0.08641073297370006,
+            "significant": false
+          },
+          {
+            "start_index": 20,
+            "end_index": 24,
+            "trend": "decreasing",
+            "tau": -1.0,
+            "slope": -17.450073252760582,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 25,
+            "end_index": 29,
+            "trend": "no trend",
+            "tau": -0.8,
+            "slope": -83.37067662051399,
+            "p": 0.08641073297370006,
+            "significant": false
+          }
+        ]
+      },
+      "change_points": [
+        32
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 15.0,
+        "oscillation_indices": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          12,
+          13,
+          14
+        ]
+      }
+    }
+  ]
+}

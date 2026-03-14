@@ -1,0 +1,19 @@
+:
+
+The aggregate energy stored in the female ungulate population initiates at 12,500 energy units but follows a deterministic trajectory toward complete depletion, reaching zero by tick 2,311 (approximately 6.3 years). This decline is characterized by extreme volatility, evidenced by a standard deviation of 3,083 energy units and a median value of 100—indicating that the population spends the majority of the simulation period operating at severely depleted energy reserves relative to initial conditions.
+
+**Phase One: Immediate Collapse (Ticks 0–375)**
+
+From initialization, the population undergoes a monotonic depletion with maximum statistical significance (Mann-Kendall τ = -1.000, p < 0.001), losing energy at an initial rate of 22.6 units per tick. This steep decline transitions at tick 375 (year 1.03), marking the first structural change point where the rate of loss moderates but does not reverse.
+
+**Phase Two: Oscillatory Plateau (Ticks 375–875)**
+
+Between approximately years 1.0 and 2.4, the decline temporarily stabilizes into a regime of seasonal fluctuation superimposed on gradual attrition. Local energy maxima occur between ticks 376 and 410, oscillating between 2,097 and 2,233 energy units. Despite these punctuated highs, rolling trend analyses reveal continued negative trajectories across windows ending at tick 463 (τ = -0.997), tick 695 (τ = -0.999), and tick 927 (τ = -0.848). Change points at ticks 500, 625, and 875 demarcate successive shifts in decline velocity, suggesting the system passes through unstable quasi-equilibria. Throughout this phase, a dominant oscillatory period of 63 ticks manifests, reflecting the strong environmental seasonality (0.8) creating regular pulses of resource availability and deficit.
+
+**Phase Three: Terminal Decline with Transient Recoveries (Ticks 875–2311)**
+
+After tick 875, the trajectory enters a protracted collapse punctuated by two statistically significant but ultimately insufficient recovery periods. Between ticks 1,160 and 1,391 (years 3.2–3.8), the trend briefly reverses to increasing (τ = 0.113, p = 0.011), followed by a second, more pronounced recovery between ticks 1,856 and 2,087 (years 5.1–5.7) with τ = 0.453 (p < 0.001). These intermittent gains likely reflect temporary reductions in hunting pressure or seasonal resource booms that allow partial energy accumulation. However, following the change point at tick 2,310, the population experiences final energy exhaustion.
+
+**Implications for Decision Makers**
+
+The trajectory demonstrates that under sustained hunting pressure combined with high environmental seasonality, megaherbivore populations exhibit a false recovery phenomenon: transient energy plateaus and brief positive trends occurring between years 1–6 create the appearance of population resilience while masking an underlying extinction vortex. The 63-tick seasonal cycle generates predictable energy bottlenecks that compound anthropogenic mortality. Conservation strategies must recognize that temporary stabilization in female energy stores—particularly the plateaus observed around 2,100 units—does not indicate sustainable coexistence, but rather a delayed collapse mechanism. Interventions must address both continuous hunting pressure and seasonal resource deficits simultaneously; managing only one factor appears insufficient to prevent the terminal depletion observed by year 6.

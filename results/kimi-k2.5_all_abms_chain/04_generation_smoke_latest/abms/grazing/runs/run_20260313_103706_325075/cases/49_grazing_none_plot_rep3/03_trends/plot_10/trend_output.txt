@@ -1,0 +1,11 @@
+The count of E-RO households exhibits high variability across simulation runs, diverging rapidly from the initial value of 20 households at time step 0. Within the first 10-20 time steps, the population spreads across the full range from near-zero to 40-42 households.
+
+Several runs show transient peaks of 35-42 E-RO households occurring between time steps 15 and 40, followed by declines to stabilization levels of 23-28 households by time step 50. These populations persist through time step 100 with minor fluctuations between 22 and 27 households.
+
+Other runs stabilize at intermediate levels, maintaining populations of 15-25 households from approximately time step 40 onward, with continued variability ranging between 15 and 30 households.
+
+A third group experiences sustained declines to low population levels. By time step 30, these runs reach counts of 0-10 households. Several achieve complete extinction (0 households) by time steps 60-65, maintaining zero levels through the remainder of the simulation. Others stabilize at low non-zero levels of approximately 5-10 households from time step 60 to 100.
+
+By time step 100, the E-RO population is distributed across three main clusters: a high cluster at 23-26 households, a middle cluster at 15-18 households, and a low cluster at 0-8 households.
+
+The dynamics suggest that under stochastic rainfall conditions (mean 200, standard deviation 100) and competition with learning-capable strategies (E-LBD and E-RO-SL1), the non-learning E-RO strategy experiences path-dependent outcomes. The strategy can achieve temporary dominance with counts exceeding 35-40 households, can stabilize at levels comparable to or exceeding the initial population, or can be displaced to extinction. The decline from transient peaks of 40+ to stable levels of 25-27 in high-performing runs indicates competitive pressure from adaptive strategies or differential household mortality favoring non-E-RO types over the medium term.

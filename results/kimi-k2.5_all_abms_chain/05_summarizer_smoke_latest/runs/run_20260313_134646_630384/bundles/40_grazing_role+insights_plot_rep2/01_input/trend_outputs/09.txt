@@ -1,0 +1,9 @@
+The data reveal distinct trajectories in cumulative livestock destocking across simulation runs over 100 steps. All trajectories initiate at zero, then exhibit a rapid increase during the first 20 steps, reaching values generally between 60 and 80. Following this initial phase, the trajectories diverge substantially. 
+
+Between steps 20 and 100, distinct patterns emerge. A subset of trajectories plateaus completely, stabilizing at approximately 58 to 60 for the remaining duration. Other trajectories continue ascending at varying rates: some increase moderately to reach 80-110 by step 100, while others maintain steep linear growth, culminating at values ranging from 130 up to approximately 172.
+
+By the final step, the spread between the lowest and highest cumulative destocking values spans roughly 114 units (58 to 172), indicating vastly different long-term outcomes across the parameter configurations or behavioral strategies tested.
+
+**Implications for Decision Makers**
+
+These results suggest that initial management decisions and learning strategies lead to fundamentally divergent long-term stocking outcomes. Trajectories with high cumulative destocking may indicate risk-averse strategies requiring continued livestock liquidation, potentially threatening long-term herd viability. Conversely, trajectories plateauing at low destocking levels suggest successful maintenance of breeding stock, though this may also reflect rigid adherence to suboptimal stocking levels. The wide outcome variability implies that learning strategy selection and risk disposition calibration are critical determinants of household economic resilience, warranting careful attention in extension programming and policy design.

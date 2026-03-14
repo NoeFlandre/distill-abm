@@ -1,0 +1,9 @@
+The total energy of foragers begins at 2000 units and undergoes a continuous, steep decline throughout the simulation, reaching approximately -38229 units by step 2312. This represents a consistent energy deficit accumulated by human hunter agents over the temporal extent of the model.
+
+In the initial phase (steps 0-358), the decline begins with a slope of approximately -11 units per step, as indicated by trend analysis of the early window. An inflection occurs around step 358, after which the rate of energy loss intensifies. Between steps 464 and 695, the rate increases to approximately -15.7 units per step, and by steps 928-1159, it stabilizes at roughly -20 units per step, where it remains for the duration of the simulation.
+
+Change point analysis identifies significant shifts in the dynamics at steps 650, 1075, 1500, 1925, and 2310, corresponding to transitions in the rate of energy depletion or behavioral shifts in the forager populations. The most pronounced change occurs at step 2310, marking the minimum energy value of -38233.
+
+In the final phase (steps 2170-2265), low-amplitude oscillations with a dominant period of approximately 63 steps are superimposed on the steep linear decline. These late-stage fluctuations likely reflect seasonal variations in foraging success or stochastic hunting outcomes as forager energy reserves become increasingly negative.
+
+The consistent downward trajectory across all 40 simulation runs indicates that, under the parameterized conditions of 20 initial foragers and 250 initial prey with high seasonality (0.8), the energy expenditure of hunting and movement consistently exceeds the caloric returns from prey acquisition. The immortality of foragers allows this energy debt to accumulate indefinitely without population collapse, resulting in the observed linear decline to extreme negative values.

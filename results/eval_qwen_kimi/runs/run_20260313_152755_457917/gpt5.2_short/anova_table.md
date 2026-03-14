@@ -1,0 +1,11 @@
+# ANOVA Table
+
+| Variable / metric | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |
+| --- | --- | --- | --- | --- | --- | --- |
+| Agent-Based Model | <0.01 | <0.01 | 0.03 | <0.01 | <0.01 | <0.01 |
+| Summarization algorithm | <0.01 | <0.01 | <0.01 | <0.01 | <0.01 | <0.01 |
+| Simulation evidence | 0.05 | 0.86 | <0.01 | <0.01 | <0.01 | <0.01 |
+| LLM | <0.01 | <0.01 | 0.26 | <0.01 | <0.01 | <0.01 |
+| Use of roles | <0.01 | 0.08 | <0.01 | <0.01 | <0.01 | 0.76 |
+| Generating insights | 0.83 | 0.33 | 0.16 | <0.01 | <0.01 | <0.01 |
+| Providing examples | 0.95 | 0.10 | 0.16 | 0.82 | 0.58 | <0.01 |

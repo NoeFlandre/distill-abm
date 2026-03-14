@@ -1,0 +1,5 @@
+The mean weekly consumption of skimmed and semi-skimmed milk per agent begins at approximately zero during the initial steps (0-1). Between steps 1 and 10, consumption undergoes a rapid, steep increase, rising from near zero to approximately 1,200-1,280 units. This represents the primary adoption phase where agents transition from whole milk to lower-fat alternatives.
+
+Following this initial surge, the consumption trajectory enters a plateau phase lasting from approximately step 10 to step 25. During this period, values stabilize within a relatively narrow band of roughly 1,180 to 1,280 units, exhibiting minor fluctuations including a slight dip around steps 18-19. This plateau suggests a temporary stabilization of market preferences or saturation among early and middle adopters.
+
+From step 25 onwards, consumption resumes growth, climbing from approximately 1,220-1,250 units to final values of roughly 1,440-1,480 units by step 32. This secondary growth phase indicates continued adoption among remaining agents or reinforcement of consumption habits, completing the transition pattern from 1974 baseline levels to 2005 levels.

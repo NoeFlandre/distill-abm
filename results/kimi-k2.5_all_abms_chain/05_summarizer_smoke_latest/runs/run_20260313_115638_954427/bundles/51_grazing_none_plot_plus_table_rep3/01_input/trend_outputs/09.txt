@@ -1,0 +1,7 @@
+The cumulative number of destocked livestock increases monotonically throughout the 100-timestep simulation period. Beginning at zero, the metric rises continuously to approximately 96.78 by timestep 100, with an overall mean of 75.48 and median of 81.17 across all timesteps.
+
+The trajectory exhibits a decelerating growth pattern characterized by distinct phases. During the initial approximately 25 timesteps, the rate of increase is steepest, with slopes exceeding 4.9 units per timestep in the earliest intervals. Subsequently, the growth rate moderates considerably, declining to approximately 1.5 units per timestep between timesteps 11-21, then to roughly 0.69 units per timestep between timesteps 22-32. From approximately timestep 33 onward, the rate stabilizes around 0.31-0.36 units per timestep for the remainder of the simulation.
+
+Notable transitions in the trajectory occur around timesteps 25, 60, and 100, with multiple inflection points in curvature concentrated between timesteps 45 and 75. These features indicate shifts in the underlying dynamics of household destocking decisions as the system evolves.
+
+By the conclusion of the simulation, the cumulative destocking reaches its maximum value of approximately 96.78, representing the total livestock removed from herds per household on average across the population over the 100-timestep period.

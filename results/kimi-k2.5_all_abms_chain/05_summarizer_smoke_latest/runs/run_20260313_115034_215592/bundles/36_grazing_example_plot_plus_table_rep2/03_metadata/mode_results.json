@@ -1,0 +1,65 @@
+{
+  "bundle_id": "36_grazing_example_plot_plus_table_rep2",
+  "case_id": "36_grazing_example_plot_plus_table_rep2",
+  "abm": "grazing",
+  "bundle_dir": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_115034_215592/bundles/36_grazing_example_plot_plus_table_rep2",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_115034_215592/bundles/36_grazing_example_plot_plus_table_rep2/02_summaries/none.txt",
+      "raw_output_path": null,
+      "postprocess_changed": false,
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 21840,
+      "output_length": 21840
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_115034_215592/bundles/36_grazing_example_plot_plus_table_rep2/02_summaries/bart.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_115034_215592/bundles/36_grazing_example_plot_plus_table_rep2/03_metadata/raw_summaries/bart.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 21840,
+      "output_length": 1889
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_115034_215592/bundles/36_grazing_example_plot_plus_table_rep2/02_summaries/bert.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_115034_215592/bundles/36_grazing_example_plot_plus_table_rep2/03_metadata/raw_summaries/bert.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 21840,
+      "output_length": 6651
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_115034_215592/bundles/36_grazing_example_plot_plus_table_rep2/02_summaries/t5.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_115034_215592/bundles/36_grazing_example_plot_plus_table_rep2/03_metadata/raw_summaries/t5.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 21840,
+      "output_length": 1702
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_115034_215592/bundles/36_grazing_example_plot_plus_table_rep2/02_summaries/longformer_ext.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_115034_215592/bundles/36_grazing_example_plot_plus_table_rep2/03_metadata/raw_summaries/longformer_ext.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 0.0,
+      "input_length": 21840,
+      "output_length": 1607
+    }
+  ]
+}

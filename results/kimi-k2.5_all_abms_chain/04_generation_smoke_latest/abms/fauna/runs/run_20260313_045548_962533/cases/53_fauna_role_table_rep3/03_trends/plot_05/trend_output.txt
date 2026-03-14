@@ -1,0 +1,19 @@
+The cumulative number of postpartum female prey animals killed by forager bands exhibits a trajectory characterized by rapid early accumulation, followed by deceleration, plateau, and terminal fluctuation. 
+
+**Initial Phase (Ticks 0–850): Rapid Accumulation**
+The metric initiates at zero and undergoes steep, sustained growth throughout the first 850 ticks, with pronounced inflections occurring around ticks 245, 262, and 285. Statistical trends during this interval are strongly positive, with monotonic increases characteristic of efficient targeting of reproductive females by forager bands. Change points at ticks 475, 625, and 850 demarcate shifts in accumulation rates, with the slope magnitude diminishing progressively after each transition.
+
+**Middle Phase (Ticks 850–1400): Decelerating Growth**
+Between ticks 850 and 1400, the cumulative count continues to rise but at markedly reduced rates. The positive trend persists yet weakens substantially, indicating that the per-tick addition of hunted postpartum females is declining. This deceleration likely reflects either depletion of the most vulnerable reproductive cohorts or density-dependent changes in herd structure.
+
+**Plateau Phase (Ticks 1400–1600): Stabilization**
+From approximately tick 1400 to 1600, the metric stabilizes around values of 116–117, exhibiting no statistically significant trend. Multiple inflection points cluster in this region (ticks 1311, 1394, 1404, 1485), indicating complex curvature changes as the system approaches equilibrium. The median value of the entire series (116.86) falls within this plateau range, suggesting that the majority of the simulation duration maintains this stabilized hunting pressure on reproductive females.
+
+**Late Phase (Ticks 1600–1826): Final Increase to Maximum**
+Following the plateau, the cumulative count resumes a modest increasing trend, reaching its maximum value of 119 at tick 1826. This represents the peak hunting mortality inflicted upon postpartum females across the entire simulation horizon.
+
+**Terminal Phase (Ticks 1826–2312): Decline and Oscillation**
+In the final 486 ticks, the metric exhibits an anomalous decline from 119 to 117, accompanied by significant negative trends between ticks 1856 and 2087. Notably, the terminal 150 ticks (from approximately tick 2170 onward) display oscillatory behavior with a dominant periodicity of approximately 63 ticks. Given the strong environmental seasonality parameter (0.8) configured in the model, these terminal oscillations likely reflect cyclic pulses in the availability of postpartum females tied to seasonal breeding patterns, modulated by the declining cumulative base in the simulation's final phase.
+
+**Summary Statistics**
+Across the full temporal extent, the mean cumulative kill count stands at 102.4, with the discrepancy between this mean and the median (116.9) indicating left-skewed dynamics where early low values dominate the average until the late-phase plateau and peak values are achieved.

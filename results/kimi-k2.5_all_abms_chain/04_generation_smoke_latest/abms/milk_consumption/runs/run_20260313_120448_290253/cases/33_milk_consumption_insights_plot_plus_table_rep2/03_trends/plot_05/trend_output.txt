@@ -1,0 +1,3 @@
+The total number of milk choices made by all agents increases linearly from 0 at the initial time step to 32,000 at the final time step (step 32), maintaining a constant rate of exactly 1,000 choices per step throughout the 1974-2005 simulation period.
+
+Implications for decision makers: This indicates that the model assumes consistent, universal participation in milk consumption decisions across all consumers and time periods, without accounting for demographic changes, market entry/exit, or variations in purchase frequency.

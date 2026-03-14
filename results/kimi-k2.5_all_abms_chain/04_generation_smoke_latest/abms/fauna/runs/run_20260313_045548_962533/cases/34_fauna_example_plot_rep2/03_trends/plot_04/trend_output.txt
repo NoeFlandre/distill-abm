@@ -1,0 +1,9 @@
+The cumulative number of female prey killed begins at zero and increases rapidly during the initial approximately 500 time steps, rising to values between 80 and 120 across different simulation runs. This phase exhibits a steep, stepwise accumulation pattern, reflecting discrete hunting events occurring at irregular intervals as foragers encounter and pursue female herds. 
+
+Between approximately 500 and 1000 time steps, the rate of increase slows considerably for most runs, with cumulative totals reaching 110 to 125 individuals. The stepwise pattern continues but with longer intervals between increments, suggesting reduced hunting frequency or success rates as the simulation progresses.
+
+After approximately 1000 to 1500 time steps, the cumulative counts stabilize and plateau for the majority of simulation runs, maintaining final values predominantly between 115 and 125 female prey killed. Some runs exhibit earlier stabilization around 108 to 115 individuals by approximately 800 to 1000 time steps, while others continue accumulating kills until near 2000 time steps before reaching similar asymptotic values.
+
+One simulation run demonstrates markedly delayed dynamics, with negligible accumulation during the first 200 time steps followed by rapid catch-up growth between 200 and 600 steps, eventually converging to the same plateau range of approximately 120 individuals by 1000 steps.
+
+The convergence of final cumulative values across runs suggests an upper bound on total hunting mortality of female prey under the specified parameter configuration, likely reflecting prey population depletion, shifts in forager energy optimization strategies, or the finite temporal window of the simulation. The discrete stepwise progression throughout indicates that hunting events occur as punctuated successes rather than continuous processes, consistent with the model's design of pursuit decisions based on dynamic optimal foraging calculations.

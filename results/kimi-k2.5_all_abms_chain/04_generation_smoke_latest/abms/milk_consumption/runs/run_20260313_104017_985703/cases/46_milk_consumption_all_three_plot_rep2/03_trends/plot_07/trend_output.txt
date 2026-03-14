@@ -1,0 +1,7 @@
+The mean quantity of skimmed and semi-skimmed milk consumed by agents begins at approximately zero and increases rapidly over the first ten time steps, reaching values between 1200 and 1300. This initial surge represents the early adoption phase of low-fat milk alternatives as consumers begin shifting away from whole milk.
+
+Between steps 10 and 25, the consumption trajectory enters a plateau phase with values fluctuating narrowly around 1200 to 1250, showing a slight dip near step 18 to approximately 1180 before recovering. This stabilization suggests a temporary equilibrium in the market where early adopters have switched, but the majority of consumers maintain established habits, slowing the overall transition rate.
+
+From step 25 onward, the mean quantity enters a second growth phase, increasing steadily from approximately 1220 to reach values between 1400 and 1460 by step 32. This late-stage increase indicates a renewed acceleration in the adoption of skimmed and semi-skimmed milk, potentially driven by accumulated social influence and shifting normative perceptions among remaining holdout consumers.
+
+For decision makers, these distinct phases suggest that interventions targeting milk consumption behavior should be timed strategically: initial educational campaigns should support early adoption, while sustained engagement is necessary during plateau periods to prevent stagnation, and renewed promotional efforts may be required to capture late adopters during the final growth phase.

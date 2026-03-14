@@ -1,0 +1,146 @@
+{
+  "reporter_pattern": "mean [habit-factor-incum] of turtles",
+  "time_column": null,
+  "matched_columns": [
+    "mean [habit-factor-incum] of turtles",
+    "mean [habit-factor-incum] of turtles.1",
+    "mean [habit-factor-incum] of turtles.2",
+    "mean [habit-factor-incum] of turtles.3",
+    "mean [habit-factor-incum] of turtles.4",
+    "mean [habit-factor-incum] of turtles.5",
+    "mean [habit-factor-incum] of turtles.6",
+    "mean [habit-factor-incum] of turtles.7",
+    "mean [habit-factor-incum] of turtles.8",
+    "mean [habit-factor-incum] of turtles.9",
+    "mean [habit-factor-incum] of turtles.10",
+    "mean [habit-factor-incum] of turtles.11",
+    "mean [habit-factor-incum] of turtles.12",
+    "mean [habit-factor-incum] of turtles.13",
+    "mean [habit-factor-incum] of turtles.14",
+    "mean [habit-factor-incum] of turtles.15",
+    "mean [habit-factor-incum] of turtles.16",
+    "mean [habit-factor-incum] of turtles.17",
+    "mean [habit-factor-incum] of turtles.18",
+    "mean [habit-factor-incum] of turtles.19",
+    "mean [habit-factor-incum] of turtles.20",
+    "mean [habit-factor-incum] of turtles.21",
+    "mean [habit-factor-incum] of turtles.22",
+    "mean [habit-factor-incum] of turtles.23",
+    "mean [habit-factor-incum] of turtles.24",
+    "mean [habit-factor-incum] of turtles.25",
+    "mean [habit-factor-incum] of turtles.26",
+    "mean [habit-factor-incum] of turtles.27",
+    "mean [habit-factor-incum] of turtles.28",
+    "mean [habit-factor-incum] of turtles.29"
+  ],
+  "matched_series_count": 30,
+  "series_summary_mode": "aggregate_mean",
+  "compression_tier": 0,
+  "series": [
+    {
+      "column": "aggregate_mean_of_30_matched_series",
+      "sample_count": 33,
+      "valid_sample_count": 33,
+      "dropped_non_numeric_count": 0,
+      "start_value": 1.0,
+      "end_value": 1.05023131856491,
+      "mean": 1.035872127137561,
+      "median": 1.0376124129713877,
+      "std": 0.01103546263473179,
+      "variance": 0.00012178143556256153,
+      "minimum": 1.0,
+      "minimum_index": 0,
+      "maximum": 1.05023131856491,
+      "maximum_index": 32,
+      "peaks": [],
+      "valleys": [],
+      "inflection_indices": [
+        7,
+        12
+      ],
+      "rolling_mann_kendall": {
+        "status": "ok",
+        "window_length": 5,
+        "windows": [
+          {
+            "start_index": 0,
+            "end_index": 4,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.0014534601509325062,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 5,
+            "end_index": 9,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.000798230825034163,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 10,
+            "end_index": 14,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.001326094170597203,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 15,
+            "end_index": 19,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.0010712713693595277,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 20,
+            "end_index": 24,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.000839122658809921,
+            "p": 0.0274863361115103,
+            "significant": true
+          },
+          {
+            "start_index": 25,
+            "end_index": 29,
+            "trend": "increasing",
+            "tau": 1.0,
+            "slope": 0.0006728999035663374,
+            "p": 0.0274863361115103,
+            "significant": true
+          }
+        ]
+      },
+      "change_points": [
+        32
+      ],
+      "oscillation": {
+        "status": "ok",
+        "dominant_period": 15.0,
+        "oscillation_indices": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          15,
+          16,
+          17,
+          18,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      }
+    }
+  ]
+}

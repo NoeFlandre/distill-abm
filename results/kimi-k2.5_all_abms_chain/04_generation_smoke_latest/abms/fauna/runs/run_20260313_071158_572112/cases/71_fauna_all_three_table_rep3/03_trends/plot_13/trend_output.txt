@@ -1,0 +1,21 @@
+The total energy available across the entire prey population initiates at approximately 16,667 units and follows a deterministic trajectory toward complete depletion, reaching zero by tick 2,311 (approximately 6.3 years). This pattern indicates that the initial parameter configuration produces predation pressure that exceeds the population's capacity for demographic replacement, resulting in extinction well before the maximum simulation timeframe.
+
+**Early Collapse Phase (Ticks 0–500)**
+
+The initial decline is steep and marked by high-amplitude oscillations with a dominant periodicity of approximately 63 ticks. Superimposed on the downward trajectory, local energetic peaks occur at tick 385 (4,102 units), tick 388 (4,092 units), and again at ticks 402, 408, 433, and 440 (ranging from 3,709 to 3,995 units). These early fluctuations reflect strong seasonal forcing (seasonality parameter 0.8) interacting with the standing crop of 250 initial animals, creating pulses of available energy as vegetation cycles and herd movement patterns shift. Despite these oscillations, the underlying trend decreases sharply, with the steepest rate of decline occurring between ticks 232 and 463, indicating rapid depletion of the initial adult biomass by 20 optimally-foraging hunters.
+
+**Demographic Constriction Phase (Ticks 500–875)**
+
+Following the initial crash, the rate of energy decline moderates but remains consistently negative, with significant change points at ticks 625 and 875 marking transitions in system dynamics. The amplitude of seasonal oscillations dampens considerably during this interval; by tick 730, peak energy values have fallen to approximately 1,083 units, representing a 74% reduction from early cyclic highs. This compression reflects a shift in population structure toward smaller, younger individuals or depleted energy reserves across remaining animals, as selective predation on high-value males (food value 30) and females (food value 27) removes the most energetically substantial individuals from the system.
+
+**Transient Recovery Attempts (Ticks 1,392–2,087)**
+
+A notable departure from the prevailing decline emerges between ticks 1,392 and 1,623 (years 3.8–4.4), where aggregate energy exhibits a statistically significant increasing trend. This temporary recovery likely corresponds to the maturation of the first reproductive cohort, given the 730-tick (2-year) interbirth interval, temporarily boosting total biomass as offspring accumulate sufficient energy. However, this pulse proves insufficient for population stabilization, as hunting pressure from immortal, energy-storing foragers immediately resumes extraction. A second weaker positive trend appears between ticks 1,856 and 2,087, though with negligible magnitude, suggesting failed demographic rebounds as the population approaches critical thresholds.
+
+**Terminal Collapse (Ticks 2,156–2,311)**
+
+The final phase exhibits accelerating decline with multiple inflection points indicating increasingly unstable population dynamics. Energy levels fluctuate erratically before the final exhaustion at tick 2,311. The transition from oscillatory decline to final collapse suggests that the prey population falls below a critical density where Allee effects or mate limitation, compounded by continued predation, prevent any further energetic accumulation in the remaining individuals.
+
+**Implications**
+
+The configuration produces deterministic extinction within approximately six years, indicating that sustainable coexistence requires regulatory mechanisms absent in the current setup—specifically the introduction of hunter mortality to create density-dependent feedback, reduction of initial hunter numbers below the threshold of 20, or removal of unlimited food storage capabilities that enable continuous predation regardless of immediate energetic needs. The brief recovery windows around years 4 and 5 demonstrate that biological reproduction can temporarily outpace mortality under specific demographic structures, but without constraints on hunting pressure, these demographic pulses merely postpone inevitable collapse rather than preventing it.

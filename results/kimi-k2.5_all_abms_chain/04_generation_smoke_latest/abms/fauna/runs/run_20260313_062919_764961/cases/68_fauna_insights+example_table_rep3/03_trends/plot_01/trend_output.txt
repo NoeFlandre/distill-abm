@@ -1,0 +1,3 @@
+The number of active human hunter-gatherer bands remains constant at 20 throughout the entire simulation period of 2,312 time steps. This static population level reflects the model configuration where foragers are immortal and do not reproduce, beginning with an initial cohort of 20 individuals. 
+
+Since the hunter population neither grows nor declines, hunting pressure remains uniform over time, eliminating demographic stochasticity in the predator population as a variable affecting prey extinction dynamics. This stability allows for clear attribution of any observed megaherbivore population changes to factors such as environmental conditions, prey life history traits, or hunting efficiency parameters, rather than to fluctuations in hunter numbers.

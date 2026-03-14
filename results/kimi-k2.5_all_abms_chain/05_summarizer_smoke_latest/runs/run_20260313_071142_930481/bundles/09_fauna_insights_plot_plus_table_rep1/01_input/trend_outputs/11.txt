@@ -1,0 +1,19 @@
+The simulation series tracking total energy in the male prey population reveals a deterministic trajectory toward extinction over 2,312 time steps, initiated at 12,500 energy units and terminating at zero by step 2,284. The dynamics unfold through four distinct phases characterized by varying rates of decline and demographic instability.
+
+**Phase 1: Initial Rapid Depletion (Steps 0–350)**
+The system opens with an immediate and steep reduction in male energy reserves, dropping from 12,500 to approximately 4,000 by step 350. This phase exhibits high volatility with an oscillation period of 63 steps, superimposed on the downward trend. A local peak at step 65 (11,608 energy units) interrupts the decline temporarily before the descent resumes. The Mann-Kendall trend analysis confirms statistically significant decreasing slopes ranging from -14.798 to -28.062 units per step during this interval, indicating intense hunting pressure overwhelming natural recruitment.
+
+**Phase 2: Transient Stabilization (Steps 350–500)**
+Between steps 377 and 408, the decline temporarily arrests, establishing a fluctuating equilibrium around 3,850–4,000 energy units. Multiple peaks and valleys cluster tightly in this range (e.g., step 377: 4,003; step 408: 3,848), suggesting a brief period where hunting mortality balances herd reproduction and growth. However, this stabilization proves unsustainable, as evidenced by change points detected at steps 350 and 500 that demarcate shifts in system behavior.
+
+**Phase 3: Secondary Collapse (Steps 500–1,000)**
+Following the breakdown of the temporary equilibrium, the population enters a second phase of decline, though at reduced rates compared to the initial phase (slopes ranging from -0.831 to -2.812). The energy level drops from approximately 3,800 to below 500 units. Brief stabilization attempts occur around steps 825 and 875, but these represent minor decelerations rather than true equilibria.
+
+**Phase 4: Protracted Low-Density Persistence (Steps 1,000–2,284)**
+The final phase involves extended persistence at minimal energy levels (median: 134.5; mean: 1,984), with the population fluctuating near extinction for over 1,200 steps before final elimination at step 2,284. This period shows weak directional trends with alternating slightly increasing and decreasing Mann-Kendall signatures (slopes near zero: -0.155 to +0.091), characteristic of a stochastic drift toward absorption at zero. Notable inflection points at steps 1,262, 1,337, 1,547, and 2,156 mark transient adjustments in the extinction trajectory.
+
+**Interpretation and Implications**
+Given the model parameters where male animals possess higher food value (30) than females (27) despite marginally higher processing costs (6 vs. 3), the pronounced male energy depletion indicates selective hunting pressure targeting higher-yield prey items consistent with optimal foraging predictions. The early oscillations reflect predator-prey feedback dynamics where hunting reduces male density, temporarily reducing encounter rates and allowing partial recovery, before continued pressure drives the population below viability thresholds.
+
+**Insights for Decision Makers:**
+The absence of sustained equilibrium states and the deterministic progression toward extinction across all 40 simulation replicates suggests that the parameter combination of 20 hunters with the specified male-targeting incentives creates unsustainable hunting pressure. The 63-step oscillation cycle in early phases provides a critical window for intervention; management strategies must reduce hunter encounter rates or alter prey selectivity within the first 350 steps to prevent the irreversible collapse observed after step 500. The protracted low-density phase (1,000+ steps at near-zero levels) indicates that population recovery becomes practically impossible once male energy reserves drop below 500 units, even though the population technically persists.

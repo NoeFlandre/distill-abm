@@ -1,0 +1,7 @@
+:
+
+The simulation results indicate a consistent long-term decline in mean whole milk consumption across all runs, beginning at approximately 2650 units per agent at step 0 and falling to roughly 200-300 units by step 32. 
+
+The trajectory exhibits three distinct phases. During the initial period from step 0 to step 10, consumption decreases sharply from approximately 2650 to 900-1000 units, representing the most rapid rate of decline in the simulation. This transitions into a phase of moderate decline between steps 10 and 25, where consumption decreases gradually to approximately 600-650 units. From step 25 to step 32, a second period of accelerated decline occurs, with values dropping steeply from roughly 600 to 200-300 units.
+
+Variation across the repeated simulation runs remains minimal throughout the temporal sequence, with all trajectories maintaining similar values at each time step. This pattern reflects the modeled transition from the 1974 market dominance of whole milk toward substantially reduced consumption levels by 2005, consistent with the historical shift toward skimmed and semi-skimmed varieties. The trajectory suggests that despite high initial habit strength, the interaction of health perceptions, social influence, and disposition mechanisms drives a systematic reorientation of consumer preferences away from whole milk over the three-decade simulation period.

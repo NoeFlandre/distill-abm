@@ -1,0 +1,9 @@
+The simulation of British milk consumption from 1974 to 2005 reveals a consistent and substantial decline in mean whole milk consumption per agent over the 33 time steps. Beginning at approximately 2,655 units, consumption undergoes a steep initial decline over the first ten steps, losing roughly 1,600 units to reach approximately 1,000 units by step 10. The most rapid decrease occurs between steps 5 and 9, where the rate of decline reaches approximately 221 units per step.
+
+Following this initial phase, the rate of decline moderates significantly. Between steps 10 and 14, consumption decreases at a reduced pace of approximately 38 units per step. From steps 15 to 19, the trajectory stabilizes with no statistically significant directional trend, fluctuating around 770 units with a temporary peak at step 19 reaching approximately 774 units.
+
+From steps 20 to 24, consumption resumes a gradual decline, decreasing by approximately 17 units per step. The period from steps 25 to 29 exhibits high variability with no significant directional trend, though featuring a pronounced drop from approximately 621 units at step 27 to roughly 323 units at step 29.
+
+In the final phase from steps 30 to 32, consumption settles at approximately 253 units, representing a total decline of about 90% from the initial value. The series exhibits multiple inflection points at steps 5, 13, 16, 19, 24, 25, 27, and 30, indicating shifts in the curvature of the decline throughout the transition period.
+
+Across the full simulation period, the mean consumption is approximately 1,080 units with a median of 817 units, reflecting the right-skewed distribution dominated by the high initial values. The standard deviation of 697 units indicates substantial variation throughout the transition period, with statistically significant decreasing trends detected in multiple rolling windows, particularly during the initial steep decline phase.

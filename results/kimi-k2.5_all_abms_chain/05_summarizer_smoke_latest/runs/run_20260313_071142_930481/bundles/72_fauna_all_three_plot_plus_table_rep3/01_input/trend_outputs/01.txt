@@ -1,0 +1,5 @@
+The number of active human forager bands remains constant at 20 throughout the observed simulation period spanning from step 0 to approximately step 2,312. The metric exhibits no temporal variation, maintaining an unchanging value of 20.000 with zero variance and zero standard deviation across all recorded observations.
+
+This static population dynamic reflects the model parameterization that disables forager mortality from energetic depletion and includes no mechanisms for hunter recruitment, reproduction, or agent turnover. Consequently, the initialized cohort of 20 human hunter agents persists at a fixed size irrespective of prey availability, environmental seasonality, or landscape resource distribution.
+
+Implications for decision makers: The simulation maintains a constant and deterministic anthropogenic predation pressure throughout the experimental duration. This allows for clear isolation of the effects of environmental variability, vegetation dynamics, and prey life history traits on megaherbivore population trajectories without confounding changes in hunter abundance or hunting pressure intensity.

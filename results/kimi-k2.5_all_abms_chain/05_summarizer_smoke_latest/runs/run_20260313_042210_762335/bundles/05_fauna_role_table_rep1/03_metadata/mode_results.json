@@ -1,0 +1,65 @@
+{
+  "bundle_id": "05_fauna_role_table_rep1",
+  "case_id": "05_fauna_role_table_rep1",
+  "abm": "fauna",
+  "bundle_dir": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_042210_762335/bundles/05_fauna_role_table_rep1",
+  "success": true,
+  "source_validation_error": null,
+  "modes": [
+    {
+      "mode": "none",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_042210_762335/bundles/05_fauna_role_table_rep1/02_summaries/none.txt",
+      "raw_output_path": null,
+      "postprocess_changed": false,
+      "error": null,
+      "duration_seconds": 6.249902071431279e-7,
+      "input_length": 39033,
+      "output_length": 39033
+    },
+    {
+      "mode": "bart",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_042210_762335/bundles/05_fauna_role_table_rep1/02_summaries/bart.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_042210_762335/bundles/05_fauna_role_table_rep1/03_metadata/raw_summaries/bart.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 68.84431629200117,
+      "input_length": 39033,
+      "output_length": 3509
+    },
+    {
+      "mode": "bert",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_042210_762335/bundles/05_fauna_role_table_rep1/02_summaries/bert.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_042210_762335/bundles/05_fauna_role_table_rep1/03_metadata/raw_summaries/bert.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 10.728795500006527,
+      "input_length": 39033,
+      "output_length": 11706
+    },
+    {
+      "mode": "t5",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_042210_762335/bundles/05_fauna_role_table_rep1/02_summaries/t5.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_042210_762335/bundles/05_fauna_role_table_rep1/03_metadata/raw_summaries/t5.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 28.172120959003223,
+      "input_length": 39033,
+      "output_length": 3048
+    },
+    {
+      "mode": "longformer_ext",
+      "success": true,
+      "output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_042210_762335/bundles/05_fauna_role_table_rep1/02_summaries/longformer_ext.txt",
+      "raw_output_path": "results/kimi-k2.5_all_abms_chain/05_summarizer_smoke_latest/runs/run_20260313_042210_762335/bundles/05_fauna_role_table_rep1/03_metadata/raw_summaries/longformer_ext.txt",
+      "postprocess_changed": true,
+      "error": null,
+      "duration_seconds": 113.80784566700459,
+      "input_length": 39033,
+      "output_length": 4542
+    }
+  ]
+}

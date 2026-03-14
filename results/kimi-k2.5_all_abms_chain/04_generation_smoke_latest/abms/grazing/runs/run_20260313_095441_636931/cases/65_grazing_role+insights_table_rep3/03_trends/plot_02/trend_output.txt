@@ -1,0 +1,16 @@
+The trajectory of average deviation from recommended livestock levels over the 100-year simulation reveals a three-phase adaptive process characterized by an initial escalation, a subsequent correction, and final stabilization.
+
+**Phase 1: Initial Escalation (Years 0–33)**
+The metric begins at effectively zero (approximately 0.007 in year 3), indicating near-complete adherence to recommendations initially. A rapid increase ensues, with the most pronounced escalation occurring between years 11 and 21, where the deviation increases steeply. By year 33, the metric reaches its maximum value of approximately 0.38. This pattern suggests that as farmers engage in learning-by-doing and social observation, their stocking decisions initially diverge significantly from recommended levels, possibly due to experimentation, localized adaptation to variable rainfall conditions, or initial overconfidence in private pasture management.
+
+**Phase 2: Correction (Years 33–65)**
+Following the peak at year 33, the deviation enters a sustained decline lasting approximately 32 years. The metric decreases from 0.38 to roughly 0.19 by year 65, with significant downward trends persisting through year 43 and again between years 55 and 65. This correction phase indicates that learning mechanisms eventually moderate the initial extreme deviations, as farmers adjust their strategies based on feedback from pasture conditions and neighbor outcomes, moving back toward recommendations while accounting for local realities.
+
+**Phase 3: Stabilization (Years 65–100)**
+After year 65, the metric stabilizes around 0.19, exhibiting no significant trend through the remainder of the simulation. This plateau suggests that the system converges on a persistent, moderate level of deviation from recommendations, representing an equilibrium where farmers balance adherence to guidelines with adaptive management necessary for variable ecological conditions.
+
+**Cyclical Dynamics**
+Underlying these phases is a cyclical pattern with a dominant period of approximately 49 years, aligning closely with the observed peak-to-trough structure of the deviation trajectory.
+
+**Implications for Decision Makers**
+The trajectory indicates that when introducing private pasture management with learning-based decision strategies, policymakers should anticipate an initial decades-long period where farmer behavior diverges from recommendations, peaking around year 30 before self-correcting. Interventions targeting stocking rates may be most critical during the escalation phase (years 10–30) to prevent excessive deviation. The persistent stabilization at approximately 0.19 suggests that perfect compliance with centralized recommendations is neither achievable nor necessarily desirable under variable rainfall conditions; instead, moderate deviation represents successful local adaptation. Finally, the long oscillation period (49 years) implies that evaluation of policy effectiveness requires multi-decadal observation windows rather than short-term assessments.
