@@ -23,7 +23,9 @@ The current validated behavior is:
 3. Publication/evaluation artifacts are compatibility-filtered:
    - `author`, `modeler`, and `gpt5.2_short` evaluate summarized outputs only (`bart`, `bert`, `t5`, `longformer_ext`)
    - `gpt5.2_long` evaluates the `none` output only
-   - factorial analysis excludes `none` entirely and therefore does not include `gpt5.2_long`
+   - factorial analysis is split by reference family:
+     - summary-compatible references keep `Summarizer` as a factor and exclude the `none` ablation
+     - `gpt5.2_long` gets a separate full-report factorial that keeps the prompt/design factors but drops `Summarizer`
 4. DOE factor detection must include low-cardinality prompt-factor columns even when pandas stores them as string dtype. `Role`, `Insights`, and `Example` are part of the fitted factorial model when present.
 5. Factorial output must distinguish three states:
    - `—` means the term is not estimable or absent from the fitted result
@@ -39,6 +41,7 @@ The current validated behavior is:
 9. Each overview table spans all available reference families rather than collapsing them into one unlabeled aggregate table.
 10. Higher-precision machine-readable outputs remain in `combined/`, while `overview/` stays compact and publication-oriented.
 11. `review.csv`, `quantitative_rows.csv`, `structured_results.csv`, and per-record bundles remain the full scored cross-product so previously computed metrics can be reused without rescoring.
+12. A repository-level aggregation folder at `results/quantitative_master_overview/` mirrors the overview file set across the current latest quantitative roots under `results/`.
 
 ## Validation Evidence
 

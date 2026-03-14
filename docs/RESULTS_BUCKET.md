@@ -20,6 +20,7 @@ Practical split:
 The bucket mirrors the local `results/` tree. The currently maintained top-level folders are:
 
 - `archive/`
+- `quantitative_master_overview/`
 - `kimi-k2.5_all_abms_chain/`
 - `mistral-medium-latest_all_abms_chain/`
 - `qwen3.5-27b_openrouter_all_abms_chain/`
@@ -55,6 +56,8 @@ uv run distill-abm sync-results-bucket --dry-run --plan-path /tmp/distill_abm_re
 ```
 
 The command mirrors `./results` to `hf://buckets/NoeFlandre/distill-abms-results`, deletes remote files missing locally by default, and reuses an existing HF login unless `HF_TOKEN` is set.
+
+`results/quantitative_master_overview/` is the root-level rollup folder for the latest quantitative overviews. It contains one aggregated Markdown file per overview artifact so you can inspect all latest ANOVA, factorial, evidence-summary, best-score, and prompt-compression tables without drilling into each run directory.
 
 Equivalent raw CLI form:
 

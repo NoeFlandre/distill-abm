@@ -594,6 +594,9 @@ def test_run_quantitative_smoke_filters_evaluation_outputs_by_reference_compatib
     raw_rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
     best_score_rows = list(csv.DictReader(result.optimal_csv_path.open(encoding="utf-8")))
     factorial_rows = list(csv.DictReader((result.factorial_csv_path.parent / "factorial_input.csv").open(encoding="utf-8")))
+    long_factorial_rows = list(
+        csv.DictReader((result.run_root / "gpt5.2_long" / "factorial_input.csv").open(encoding="utf-8"))
+    )
     anova_markdown = result.anova_table_markdown_path.read_text(encoding="utf-8")
     overview_factorial_markdown = result.factorial_table_markdown_path.read_text(encoding="utf-8")
 
@@ -611,9 +614,80 @@ def test_run_quantitative_smoke_filters_evaluation_outputs_by_reference_compatib
         "longformer_ext",
     }
     assert {row["Summary"] for row in best_score_rows if row["Reference family"] == "gpt5.2_long"} == {"none"}
-    assert {row["Summarizer"] for row in factorial_rows} == {"bart", "bert", "t5", "longformer_ext"}
+    assert {row["Summarizer"] for row in factorial_rows if row["Summarizer"]} == {
+        "bart",
+        "bert",
+        "t5",
+        "longformer_ext",
+    }
+    assert any(not row["Summarizer"] for row in factorial_rows)
+    assert long_factorial_rows
+    assert "Summarizer" not in long_factorial_rows[0]
     assert "gpt5.2_long" in anova_markdown
-    assert "gpt5.2_long" not in overview_factorial_markdown
+    assert "gpt5.2_long" in overview_factorial_markdown
+
+
+def test_run_quantitative_smoke_writes_global_master_overview_for_results_tree(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    reference_dir = tmp_path / "refs"
+    reference_dir.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setattr(
+        quantitative_smoke_module,
+        "resolve_quantitative_reference_paths",
+        lambda abm: {
+            "author": _write_text(reference_dir / f"{abm}_author.txt", "author"),
+            "gpt5.2_short": _write_text(reference_dir / f"{abm}_short.txt", "short"),
+            "gpt5.2_long": _write_text(reference_dir / f"{abm}_long.txt", "long"),
+        },
+    )
+    qwen_root, _ = _build_source_roots(
+        tmp_path,
+        root_name="summ_qwen",
+        matrix_name="matrix_qwen",
+        model="qwen/qwen3.5-27b",
+    )
+    mistral_root, _ = _build_source_roots(
+        tmp_path,
+        root_name="summ_mistral",
+        matrix_name="matrix_mistral",
+        model="mistral-medium-latest",
+    )
+
+    qwen_result = run_quantitative_smoke(
+        source_root=qwen_root,
+        output_root=tmp_path / "results" / "qwen3.5-27b_openrouter_all_abms_chain" / "06_quantitative_smoke_latest",
+        score_summary_fn=_fake_score_summary,
+    )
+    mistral_result = run_quantitative_smoke(
+        source_root=mistral_root,
+        output_root=tmp_path / "results" / "mistral-medium-latest_all_abms_chain" / "06_quantitative_smoke_latest",
+        score_summary_fn=_fake_score_summary,
+    )
+    multi_result = run_quantitative_smoke_multi_llm(
+        source_roots=(qwen_result.output_root, mistral_result.output_root),
+        output_root=tmp_path / "results" / "eval_qwen_mistral",
+        score_summary_fn=_fake_score_summary,
+    )
+
+    master_root = tmp_path / "results" / "quantitative_master_overview"
+    assert master_root.exists() is True
+    assert sorted(path.name for path in master_root.iterdir()) == [
+        "anova_table.md",
+        "best_scores_table.md",
+        "evidence_summary_table.md",
+        "factorial_table.md",
+        "prompt_compression_summary.md",
+    ]
+    anova_text = (master_root / "anova_table.md").read_text(encoding="utf-8")
+    factorial_text = (master_root / "factorial_table.md").read_text(encoding="utf-8")
+    assert "qwen3.5-27b_openrouter_all_abms_chain/06_quantitative_smoke_latest" in anova_text
+    assert "eval_qwen_mistral" in anova_text
+    assert "gpt5.2_long" in factorial_text
+    assert "eval_qwen_mistral" in factorial_text
+    assert multi_result.success is True
 
 
 def test_run_quantitative_smoke_writes_prompt_compression_summary_when_metadata_exists(tmp_path: Path) -> None:
