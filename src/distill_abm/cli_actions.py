@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
+import shutil
+import subprocess
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Literal, cast
@@ -29,6 +32,7 @@ from distill_abm.cli_models import (
     IngestSuiteCommandResult,
     RunCommandResult,
     SmokeCommandResult,
+    SyncResultsBucketResult,
     build_artifact_descriptors,
     describe_artifact,
 )
@@ -67,6 +71,7 @@ from distill_abm.pipeline.smoke import SmokeSuiteInputs
 from distill_abm.run_viewer import render_run_viewer
 
 DEFAULT_LLM_TIMEOUT_SECONDS = 900.0
+DEFAULT_RESULTS_BUCKET_URI = "hf://buckets/NoeFlandre/distill-abms-results"
 
 
 def execute_run_command(
@@ -767,6 +772,60 @@ def execute_smoke_quantitative_multi_llm_command(
         json_label="multi-llm quantitative smoke report (json)",
         failure_label="multi-llm quantitative smoke failed",
     )
+
+
+def execute_sync_results_bucket_command(
+    *,
+    source_root: Path,
+    bucket_uri: str,
+    dry_run: bool,
+    delete: bool,
+    plan_path: Path | None,
+    json_output: bool,
+    token_env_var: str,
+) -> None:
+    hf_path = shutil.which("hf")
+    if hf_path is None:
+        raise typer.BadParameter("missing `hf` CLI on PATH. Install or upgrade it before syncing the results bucket.")
+
+    command = [hf_path, "sync", str(source_root), bucket_uri]
+    if delete:
+        command.append("--delete")
+    token = os.environ.get(token_env_var)
+    if dry_run:
+        if plan_path is not None:
+            plan_path.parent.mkdir(parents=True, exist_ok=True)
+            command.extend(["--plan", str(plan_path)])
+        else:
+            command.append("--dry-run")
+    if token:
+        command.extend(["--token", token])
+
+    completed = subprocess.run(command, capture_output=True, text=True)
+    result = SyncResultsBucketResult(
+        source_root=source_root,
+        bucket_uri=bucket_uri,
+        dry_run=dry_run,
+        delete=delete,
+        plan_path=plan_path,
+        used_token_env_var=token_env_var if token else None,
+        success=completed.returncode == 0,
+        exit_code=completed.returncode,
+    )
+    if json_output:
+        typer.echo(result.model_dump_json(indent=2))
+    else:
+        mode = "dry-run" if dry_run else "applied"
+        typer.echo(f"results bucket sync {mode}: {source_root} -> {bucket_uri}")
+        if plan_path is not None:
+            typer.echo(f"plan: {plan_path}")
+        typer.echo(f"exit_code: {completed.returncode}")
+    if completed.stdout:
+        typer.echo(completed.stdout.rstrip())
+    if completed.stderr:
+        typer.echo(completed.stderr.rstrip(), err=True)
+    if completed.returncode != 0:
+        raise typer.Exit(code=completed.returncode)
 
 
 def execute_smoke_full_case_command(

@@ -16,7 +16,7 @@ from pathlib import Path
 import pandas as pd
 from pydantic import BaseModel, Field
 
-from distill_abm.cli_support import resolve_quantitative_reference_paths
+from distill_abm.cli_support import resolve_quantitative_reference_kind, resolve_quantitative_reference_paths
 from distill_abm.eval.doe_full import analyze_factorial_anova
 from distill_abm.eval.metrics import SummaryScores, score_summary
 from distill_abm.pipeline.prompt_compression_artifacts import (
@@ -922,14 +922,17 @@ def _write_analysis_bundle(
         rows=review_rows,
     )
 
-    analysis_frame = pd.DataFrame(record_rows)
+    evaluation_record_rows = _filter_record_rows_for_quantitative_artifact(record_rows, artifact_kind="evaluation")
+    factorial_record_rows = _filter_record_rows_for_quantitative_artifact(record_rows, artifact_kind="factorial")
+
+    analysis_frame = pd.DataFrame(evaluation_record_rows)
     anova_rows = _compute_anova_rows(analysis_frame)
     _write_anova_csv(anova_csv_path, anova_rows)
     anova_table_markdown_path.write_text(_render_anova_markdown_table(anova_rows), encoding="utf-8")
     anova_table_latex_path.write_text(_render_anova_latex_table(anova_rows), encoding="utf-8")
 
     factorial_input_path = bundle_root / "factorial_input.csv"
-    factorial_frame = build_factorial_input_frame_fn(record_rows)
+    factorial_frame = build_factorial_input_frame_fn(factorial_record_rows)
     factorial_frame.to_csv(factorial_input_path, index=False)
     factorial_result = analyze_factorial_anova_fn(factorial_input_path, factorial_csv_path, 2)
     normalized_factorial = _normalize_factorial_table(factorial_result)
@@ -937,7 +940,7 @@ def _write_analysis_bundle(
     factorial_table_markdown_path.write_text(_render_factorial_markdown_table(normalized_factorial), encoding="utf-8")
     factorial_table_latex_path.write_text(_render_factorial_latex_table(normalized_factorial), encoding="utf-8")
 
-    optimal_rows = _build_optimal_score_rows(record_rows)
+    optimal_rows = _build_optimal_score_rows(evaluation_record_rows)
     _write_optimal_csv(optimal_csv_path, optimal_rows)
     optimal_table_markdown_path.write_text(_render_optimal_markdown_table(optimal_rows), encoding="utf-8")
     optimal_table_latex_path.write_text(_render_optimal_latex_table(optimal_rows), encoding="utf-8")
@@ -1003,20 +1006,22 @@ def _write_overview_tables(
     factorial_frames: list[pd.DataFrame] = []
     optimal_rows: list[dict[str, str]] = []
     for reference_family, record_rows in sorted(reference_record_rows.items()):
-        frame = pd.DataFrame(record_rows)
+        evaluation_record_rows = _filter_record_rows_for_quantitative_artifact(record_rows, artifact_kind="evaluation")
+        factorial_record_rows = _filter_record_rows_for_quantitative_artifact(record_rows, artifact_kind="factorial")
+        frame = pd.DataFrame(evaluation_record_rows)
         for row in _compute_anova_rows(frame):
             anova_rows.append({"Reference family": reference_family, **row})
-        evidence_summary_rows.extend(_build_evidence_summary_rows(record_rows))
+        evidence_summary_rows.extend(_build_evidence_summary_rows(evaluation_record_rows))
         factorial_input_path = scratch_root / f"{reference_family}_overview_factorial_input.csv"
         factorial_output_path = scratch_root / f"{reference_family}_overview_factorial_contributions.csv"
-        factorial_input_frame = build_factorial_input_frame_fn(record_rows)
+        factorial_input_frame = build_factorial_input_frame_fn(factorial_record_rows)
         factorial_input_frame.to_csv(factorial_input_path, index=False)
         factorial_result = analyze_factorial_anova_fn(factorial_input_path, factorial_output_path, 2)
         factorial_frame = _normalize_factorial_table(factorial_result)
         if not factorial_frame.empty:
             factorial_frame.insert(0, "Reference family", reference_family)
             factorial_frames.append(factorial_frame)
-        optimal_rows.extend(_build_optimal_score_rows(record_rows))
+        optimal_rows.extend(_build_optimal_score_rows(evaluation_record_rows))
 
     combined_factorial = (
         pd.concat(factorial_frames, ignore_index=True)
@@ -1262,6 +1267,26 @@ def _normalize_factorial_table(frame: pd.DataFrame | None) -> pd.DataFrame:
     normalized["_order"] = normalized["Feature"].apply(_factorial_feature_sort_key)
     normalized = normalized.sort_values(["_order", "Feature"]).drop(columns=["_order"]).reset_index(drop=True)
     return normalized
+
+
+def _filter_record_rows_for_quantitative_artifact(
+    record_rows: list[dict[str, str]],
+    *,
+    artifact_kind: str,
+) -> list[dict[str, str]]:
+    filtered_rows: list[dict[str, str]] = []
+    for row in record_rows:
+        reference_kind = resolve_quantitative_reference_kind(row["reference_family"])
+        summarizer = row["summarizer"]
+        if artifact_kind == "evaluation":
+            if reference_kind == "summary" and summarizer != "none":
+                filtered_rows.append(row)
+            elif reference_kind == "full_report" and summarizer == "none":
+                filtered_rows.append(row)
+            continue
+        if artifact_kind == "factorial" and reference_kind == "summary" and summarizer != "none":
+            filtered_rows.append(row)
+    return filtered_rows
 
 
 def _build_optimal_score_rows(record_rows: list[dict[str, str]]) -> list[dict[str, str]]:

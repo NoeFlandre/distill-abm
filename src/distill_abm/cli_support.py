@@ -21,6 +21,8 @@ BENCHMARK_MODELS: set[tuple[str, str]] = {
     ("openrouter", "qwen/qwen3.5-27b"),
 }
 SUPPORTED_SUMMARIZERS: tuple[SummarizerId, ...] = ("bart", "bert", "t5", "longformer_ext")
+SUMMARY_QUANTITATIVE_REFERENCE_FAMILIES = frozenset({"author", "modeler", "gpt5.2_short"})
+FULL_REPORT_QUANTITATIVE_REFERENCE_FAMILIES = frozenset({"gpt5.2_long"})
 
 
 def load_experiment_parameters(path: Path | None) -> dict[str, bool | int | float | str]:
@@ -253,6 +255,15 @@ def resolve_additional_scoring_reference_paths(abm: str) -> dict[str, Path]:
 def resolve_quantitative_reference_paths(abm: str) -> dict[str, Path]:
     """Resolve all reviewer-facing scoring reference families for one supported ABM."""
     return {"author": resolve_scoring_reference_path(abm), **resolve_additional_scoring_reference_paths(abm)}
+
+
+def resolve_quantitative_reference_kind(reference_family: str) -> Literal["summary", "full_report"]:
+    """Classify quantitative reference families by the text form they should be compared against."""
+    if reference_family in SUMMARY_QUANTITATIVE_REFERENCE_FAMILIES:
+        return "summary"
+    if reference_family in FULL_REPORT_QUANTITATIVE_REFERENCE_FAMILIES:
+        return "full_report"
+    raise ValueError(f"unsupported quantitative reference family: {reference_family}")
 
 
 def validate_model_policy(provider: str, model: str, allow_debug_model: bool) -> None:

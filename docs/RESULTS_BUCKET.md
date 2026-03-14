@@ -17,26 +17,23 @@ Practical split:
 
 ## Mirrored Layout
 
-The bucket mirrors the four top-level folders found under local `results/`:
+The bucket mirrors the local `results/` tree. The currently maintained top-level folders are:
 
 - `archive/`
+- `kimi-k2.5_all_abms_chain/`
 - `mistral-medium-latest_all_abms_chain/`
 - `qwen3.5-27b_openrouter_all_abms_chain/`
 - `eval_qwen_mistral/`
-
-Local-to-remote mapping:
-
-- `results/archive/` -> `hf://buckets/NoeFlandre/distill-abms-results/archive/`
-- `results/mistral-medium-latest_all_abms_chain/` -> `hf://buckets/NoeFlandre/distill-abms-results/mistral-medium-latest_all_abms_chain/`
-- `results/qwen3.5-27b_openrouter_all_abms_chain/` -> `hf://buckets/NoeFlandre/distill-abms-results/qwen3.5-27b_openrouter_all_abms_chain/`
-- `results/eval_qwen_mistral/` -> `hf://buckets/NoeFlandre/distill-abms-results/eval_qwen_mistral/`
+- `eval_qwen_kimi/`
+- `eval_mistral_kimi/`
+- `eval_qwen_mistral_kimi/`
 
 ## Sync Commands
 
-Install the official CLI:
+Install a recent official CLI:
 
 ```bash
-uv tool install hf
+python -m pip install --upgrade "huggingface_hub[hf_xet]"
 ```
 
 Authenticate:
@@ -45,16 +42,24 @@ Authenticate:
 hf auth login
 ```
 
-Upload the current local results tree:
+Preferred one-command repo workflow:
 
 ```bash
-hf sync ./results hf://buckets/NoeFlandre/distill-abms-results
+uv run distill-abm sync-results-bucket
 ```
 
-Equivalent bucket-native form:
+Dry-run and save a reviewable sync plan:
 
 ```bash
-hf buckets sync ./results hf://buckets/NoeFlandre/distill-abms-results
+uv run distill-abm sync-results-bucket --dry-run --plan-path /tmp/distill_abm_results_sync_plan.jsonl
+```
+
+The command mirrors `./results` to `hf://buckets/NoeFlandre/distill-abms-results`, deletes remote files missing locally by default, and reuses an existing HF login unless `HF_TOKEN` is set.
+
+Equivalent raw CLI form:
+
+```bash
+hf sync ./results hf://buckets/NoeFlandre/distill-abms-results --delete
 ```
 
 Download the mirrored tree back locally:

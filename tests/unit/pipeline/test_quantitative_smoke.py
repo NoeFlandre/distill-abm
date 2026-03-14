@@ -567,8 +567,53 @@ def test_run_quantitative_smoke_writes_best_score_table(tmp_path: Path) -> None:
         rows[0].keys()
     )
     assert {row["Reference family"] for row in rows} == {"author", "gpt5.2_short", "gpt5.2_long"}
-    assert {row["Summary"] for row in rows} == {"none", "bart", "bert", "t5", "longformer_ext"}
+    assert {row["Summary"] for row in rows if row["Reference family"] == "author"} == {
+        "bart",
+        "bert",
+        "t5",
+        "longformer_ext",
+    }
+    assert {row["Summary"] for row in rows if row["Reference family"] == "gpt5.2_short"} == {
+        "bart",
+        "bert",
+        "t5",
+        "longformer_ext",
+    }
+    assert {row["Summary"] for row in rows if row["Reference family"] == "gpt5.2_long"} == {"none"}
     assert {row["LLM"] for row in rows} == {"nvidia/nemotron-nano-12b-v2-vl:free"}
+
+
+def test_run_quantitative_smoke_filters_evaluation_outputs_by_reference_compatibility(tmp_path: Path) -> None:
+    summarizer_root, _matrix_root = _build_source_roots(tmp_path)
+    result = run_quantitative_smoke(
+        source_root=summarizer_root,
+        output_root=tmp_path / "quant",
+        score_summary_fn=_fake_score_summary,
+    )
+
+    raw_rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
+    best_score_rows = list(csv.DictReader(result.optimal_csv_path.open(encoding="utf-8")))
+    factorial_rows = list(csv.DictReader((result.factorial_csv_path.parent / "factorial_input.csv").open(encoding="utf-8")))
+    anova_markdown = result.anova_table_markdown_path.read_text(encoding="utf-8")
+    overview_factorial_markdown = result.factorial_table_markdown_path.read_text(encoding="utf-8")
+
+    assert len(raw_rows) == 60
+    assert {row["Summary"] for row in best_score_rows if row["Reference family"] == "author"} == {
+        "bart",
+        "bert",
+        "t5",
+        "longformer_ext",
+    }
+    assert {row["Summary"] for row in best_score_rows if row["Reference family"] == "gpt5.2_short"} == {
+        "bart",
+        "bert",
+        "t5",
+        "longformer_ext",
+    }
+    assert {row["Summary"] for row in best_score_rows if row["Reference family"] == "gpt5.2_long"} == {"none"}
+    assert {row["Summarizer"] for row in factorial_rows} == {"bart", "bert", "t5", "longformer_ext"}
+    assert "gpt5.2_long" in anova_markdown
+    assert "gpt5.2_long" not in overview_factorial_markdown
 
 
 def test_run_quantitative_smoke_writes_prompt_compression_summary_when_metadata_exists(tmp_path: Path) -> None:
@@ -689,7 +734,7 @@ def test_best_score_table_optimizes_each_metric_independently(tmp_path: Path) ->
         score_summary_fn=fake_score,
     )
     rows = list(csv.DictReader(result.optimal_csv_path.open(encoding="utf-8")))
-    none_row = next(row for row in rows if row["Summary"] == "none")
+    none_row = next(row for row in rows if row["Summary"] == "none" and row["Reference family"] == "gpt5.2_long")
     assert none_row["BLEU"] == "0.90"
     assert none_row["Reading ease"] == "91.00"
 

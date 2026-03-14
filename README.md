@@ -109,12 +109,13 @@ For result artifacts, start with the Hugging Face bucket:
 
 GitHub remains the code/method repository. The bucket is the primary storage/download surface for the exported smoke and evaluation outputs.
 
-The tracked snapshot mirrored from this repository currently contains:
+The tracked and mirrored results tree currently includes the single-LLM chains plus the pairwise and three-way evaluation folders under `results/`.
 
-- `results/archive/`
-- `results/mistral-medium-latest_all_abms_chain/`
-- `results/qwen3.5-27b_openrouter_all_abms_chain/`
-- `results/eval_qwen_mistral/`
+The repository now exposes a one-command bucket sync:
+
+```bash
+uv run distill-abm sync-results-bucket
+```
 
 See [docs/RESULTS_BUCKET.md](docs/RESULTS_BUCKET.md) for the bucket contract, sync commands, the direct bucket link, and the local-to-remote folder mapping.
 

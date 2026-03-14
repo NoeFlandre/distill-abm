@@ -119,6 +119,20 @@ class HealthCheckResult(BaseModel):
     checks: dict[str, HealthCheckItem]
 
 
+class SyncResultsBucketResult(BaseModel):
+    """Structured result for results-bucket sync operations."""
+
+    command: str = "sync-results-bucket"
+    source_root: Path
+    bucket_uri: str
+    dry_run: bool
+    delete: bool
+    plan_path: Path | None = None
+    used_token_env_var: str | None = None
+    success: bool
+    exit_code: int
+
+
 def build_artifact_descriptors(paths: Mapping[str, Path | None]) -> dict[str, ArtifactDescriptor]:
     """Describe a set of artifact paths with stable metadata."""
     return {key: describe_artifact(path) for key, path in paths.items() if path is not None}

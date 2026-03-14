@@ -30,6 +30,7 @@ from distill_abm.cli_actions import (
     execute_smoke_quantitative_multi_llm_command,
     execute_smoke_qwen_command,
     execute_smoke_summarizers_command,
+    execute_sync_results_bucket_command,
     execute_smoke_viz_command,
     execute_validate_workspace_command,
 )
@@ -115,6 +116,7 @@ __all__ = [
     "smoke_qwen",
     "smoke_summarizers",
     "smoke_viz",
+    "sync_results_bucket",
     "validate_workspace",
 ]
 
@@ -664,7 +666,7 @@ def smoke_summarizers(
 def smoke_quantitative(
     source_root: Annotated[
         Path,
-        typer.Option(help="Root directory containing a completed summarizer smoke run."),
+        typer.Option(help="Root directory containing a completed summarizer smoke run or single-LLM quantitative run."),
     ] = ARCHIVE_RESULTS_ROOT / "summarizer_smoke_latest",
     output_root: Annotated[
         Path,
@@ -679,7 +681,7 @@ def smoke_quantitative(
     ] = True,
     json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
 ) -> None:
-    """Score completed summarizer outputs and build quantitative DOE analysis tables."""
+    """Score completed summarizer outputs or reuse quantitative rows and build DOE analysis tables."""
     execute_smoke_quantitative_command(
         source_root=source_root,
         output_root=output_root,
@@ -721,6 +723,46 @@ def smoke_quantitative_multi_llm(
         resume=resume,
         json_output=json_output,
         run_quantitative_smoke_multi_llm_fn=run_quantitative_smoke_multi_llm,
+    )
+
+
+@app.command("sync-results-bucket")
+def sync_results_bucket(
+    source_root: Annotated[
+        Path,
+        typer.Option(exists=True, file_okay=False, dir_okay=True, help="Local results directory to mirror to the bucket."),
+    ] = Path("results"),
+    bucket_uri: Annotated[
+        str,
+        typer.Option(help="Destination Hugging Face bucket URI."),
+    ] = "hf://buckets/NoeFlandre/distill-abms-results",
+    dry_run: Annotated[
+        bool,
+        typer.Option("--dry-run/--apply", help="Preview the sync instead of executing it."),
+    ] = False,
+    delete: Annotated[
+        bool,
+        typer.Option("--delete/--no-delete", help="Delete remote files missing from the local results tree."),
+    ] = True,
+    plan_path: Annotated[
+        Path | None,
+        typer.Option(help="Optional JSONL path for saving a dry-run sync plan."),
+    ] = None,
+    token_env_var: Annotated[
+        str,
+        typer.Option(help="Environment variable to read a Hugging Face token from, if needed."),
+    ] = "HF_TOKEN",
+    json_output: Annotated[bool, typer.Option("--json", help="Print structured JSON to stdout.")] = False,
+) -> None:
+    """Mirror the local results tree to the Hugging Face results bucket with one command."""
+    execute_sync_results_bucket_command(
+        source_root=source_root,
+        bucket_uri=bucket_uri,
+        dry_run=dry_run,
+        delete=delete,
+        plan_path=plan_path,
+        token_env_var=token_env_var,
+        json_output=json_output,
     )
 
 
