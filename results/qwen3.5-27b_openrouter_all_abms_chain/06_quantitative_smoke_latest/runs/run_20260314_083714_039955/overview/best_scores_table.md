@@ -1,0 +1,39 @@
+# Best Score Across Dynamic Prompt Elements
+
+| Reference family | ABM | Summary | LLM | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| author | fauna | bart | qwen/qwen3.5-27b | 0.04 | 0.24 | 0.45 | 0.12 | 0.20 | 38.47 |
+| author | fauna | bert | qwen/qwen3.5-27b | 0.03 | 0.30 | 0.45 | 0.10 | 0.18 | 31.19 |
+| author | fauna | longformer_ext | qwen/qwen3.5-27b | 0.03 | 0.27 | 0.43 | 0.10 | 0.19 | 38.54 |
+| author | fauna | t5 | qwen/qwen3.5-27b | 0.03 | 0.23 | 0.46 | 0.12 | 0.20 | 46.36 |
+| author | grazing | bart | qwen/qwen3.5-27b | 0.04 | 0.21 | 0.47 | 0.17 | 0.22 | 61.15 |
+| author | grazing | bert | qwen/qwen3.5-27b | 0.04 | 0.33 | 0.52 | 0.16 | 0.22 | 52.63 |
+| author | grazing | longformer_ext | qwen/qwen3.5-27b | 0.05 | 0.29 | 0.52 | 0.15 | 0.22 | 72.71 |
+| author | grazing | t5 | qwen/qwen3.5-27b | 0.03 | 0.21 | 0.43 | 0.12 | 0.20 | 67.22 |
+| author | milk_consumption | bart | qwen/qwen3.5-27b | 0.05 | 0.20 | 0.48 | 0.17 | 0.24 | 56.10 |
+| author | milk_consumption | bert | qwen/qwen3.5-27b | 0.10 | 0.33 | 0.62 | 0.21 | 0.25 | 39.97 |
+| author | milk_consumption | longformer_ext | qwen/qwen3.5-27b | 0.07 | 0.25 | 0.56 | 0.18 | 0.23 | 62.80 |
+| author | milk_consumption | t5 | qwen/qwen3.5-27b | 0.03 | 0.14 | 0.38 | 0.13 | 0.19 | 70.81 |
+| gpt5.2_long | fauna | none | qwen/qwen3.5-27b | 0.07 | 0.30 | 0.63 | 0.24 | 0.29 | 44.93 |
+| gpt5.2_long | grazing | none | qwen/qwen3.5-27b | 0.07 | 0.30 | 0.63 | 0.23 | 0.29 | 59.42 |
+| gpt5.2_long | milk_consumption | none | qwen/qwen3.5-27b | 0.09 | 0.29 | 0.63 | 0.24 | 0.28 | 50.16 |
+| gpt5.2_short | fauna | bart | qwen/qwen3.5-27b | 0.03 | 0.19 | 0.46 | 0.12 | 0.19 | 38.47 |
+| gpt5.2_short | fauna | bert | qwen/qwen3.5-27b | 0.03 | 0.30 | 0.50 | 0.12 | 0.20 | 31.19 |
+| gpt5.2_short | fauna | longformer_ext | qwen/qwen3.5-27b | 0.05 | 0.22 | 0.46 | 0.10 | 0.18 | 38.54 |
+| gpt5.2_short | fauna | t5 | qwen/qwen3.5-27b | 0.03 | 0.17 | 0.40 | 0.10 | 0.18 | 46.36 |
+| gpt5.2_short | grazing | bart | qwen/qwen3.5-27b | 0.01 | 0.16 | 0.40 | 0.11 | 0.15 | 61.15 |
+| gpt5.2_short | grazing | bert | qwen/qwen3.5-27b | 0.03 | 0.25 | 0.54 | 0.13 | 0.20 | 52.63 |
+| gpt5.2_short | grazing | longformer_ext | qwen/qwen3.5-27b | 0.02 | 0.21 | 0.50 | 0.11 | 0.16 | 72.71 |
+| gpt5.2_short | grazing | t5 | qwen/qwen3.5-27b | 0.01 | 0.14 | 0.37 | 0.10 | 0.15 | 67.22 |
+| gpt5.2_short | milk_consumption | bart | qwen/qwen3.5-27b | 0.03 | 0.17 | 0.41 | 0.13 | 0.19 | 56.10 |
+| gpt5.2_short | milk_consumption | bert | qwen/qwen3.5-27b | 0.07 | 0.28 | 0.54 | 0.18 | 0.22 | 39.97 |
+| gpt5.2_short | milk_consumption | longformer_ext | qwen/qwen3.5-27b | 0.04 | 0.21 | 0.49 | 0.16 | 0.20 | 62.80 |
+| gpt5.2_short | milk_consumption | t5 | qwen/qwen3.5-27b | 0.01 | 0.13 | 0.34 | 0.10 | 0.16 | 70.81 |
+| modeler | fauna | bart | qwen/qwen3.5-27b | 0.01 | 0.14 | 0.37 | 0.10 | 0.18 | 38.47 |
+| modeler | fauna | bert | qwen/qwen3.5-27b | 0.07 | 0.29 | 0.52 | 0.14 | 0.21 | 31.19 |
+| modeler | fauna | longformer_ext | qwen/qwen3.5-27b | 0.02 | 0.21 | 0.45 | 0.11 | 0.21 | 38.54 |
+| modeler | fauna | t5 | qwen/qwen3.5-27b | 0.01 | 0.12 | 0.32 | 0.08 | 0.15 | 46.36 |
+| modeler | milk_consumption | bart | qwen/qwen3.5-27b | 0.04 | 0.16 | 0.39 | 0.14 | 0.20 | 56.10 |
+| modeler | milk_consumption | bert | qwen/qwen3.5-27b | 0.06 | 0.27 | 0.53 | 0.17 | 0.22 | 39.97 |
+| modeler | milk_consumption | longformer_ext | qwen/qwen3.5-27b | 0.06 | 0.21 | 0.51 | 0.15 | 0.22 | 62.80 |
+| modeler | milk_consumption | t5 | qwen/qwen3.5-27b | 0.02 | 0.14 | 0.36 | 0.11 | 0.17 | 70.81 |

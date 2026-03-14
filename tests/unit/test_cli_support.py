@@ -1,6 +1,9 @@
 from pathlib import Path
 
-from distill_abm.cli_support import resolve_additional_scoring_reference_paths
+from distill_abm.cli_support import (
+    resolve_additional_scoring_reference_paths,
+    resolve_quantitative_reference_kind,
+)
 
 
 def test_resolve_additional_scoring_reference_paths_returns_expected_reference_families() -> None:
@@ -16,3 +19,10 @@ def test_resolve_additional_scoring_reference_paths_returns_expected_reference_f
     milk_references = resolve_additional_scoring_reference_paths("milk_consumption")
     assert set(milk_references) == {"modeler", "gpt5.2_short", "gpt5.2_long"}
     assert milk_references["modeler"] == Path("data/summaries/modelers/milk_modeler_ground_truth.txt")
+
+
+def test_resolve_quantitative_reference_kind_classifies_summary_and_full_report_references() -> None:
+    assert resolve_quantitative_reference_kind("author") == "summary"
+    assert resolve_quantitative_reference_kind("modeler") == "summary"
+    assert resolve_quantitative_reference_kind("gpt5.2_short") == "summary"
+    assert resolve_quantitative_reference_kind("gpt5.2_long") == "full_report"
