@@ -190,9 +190,14 @@ def test_openrouter_adapter_forwards_structured_output_metadata() -> None:
         "json_schema": {
             "name": "structured_smoke_text",
             "schema": request.metadata["structured_output_schema"],
+            "strict": True,
         },
     }
-    assert seen["extra_body"] == {"provider": {"require_parameters": True}}
+    assert seen["extra_body"] == {
+        "provider": {"require_parameters": True},
+        "plugins": [{"id": "response-healing"}],
+    }
+    assert "plugins" not in seen
     assert "provider" not in seen
 
 
@@ -213,6 +218,7 @@ def test_openrouter_adapter_leaves_unstructured_payload_unchanged() -> None:
     assert "response_format" not in seen
     assert "provider" not in seen
     assert "extra_body" not in seen
+    assert "plugins" not in seen
 
 
 def test_openrouter_adapter_enriches_runtime_precision_from_provider_endpoints() -> None:

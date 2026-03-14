@@ -7,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+import distill_abm.pipeline.quantitative_smoke as quantitative_smoke_module
 from distill_abm.eval.metrics import SummaryScores
 from distill_abm.pipeline.quantitative_smoke import (
     _build_evidence_summary_rows,
@@ -853,6 +854,56 @@ def test_run_quantitative_smoke_reuses_valid_rows_when_resuming(tmp_path: Path) 
 
     assert resumed.success is True
     assert resumed.run_root != first.run_root
+
+
+def test_run_quantitative_smoke_resume_scores_only_new_reference_family(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    summarizer_root, _matrix_root = _build_source_roots(tmp_path)
+    modeler_reference = _write_text(tmp_path / "modeler_reference.txt", "modeler reference")
+
+    score_calls: list[tuple[str, str]] = []
+
+    def _counting_score_summary(reference: str, candidate: str) -> SummaryScores:
+        score_calls.append((reference, candidate))
+        return _fake_score_summary(reference, candidate)
+
+    monkeypatch.setattr(
+        quantitative_smoke_module,
+        "resolve_quantitative_reference_paths",
+        lambda abm: {"author": Path("data/summaries/authors/grazing_scoring_ground_truth.txt")},
+    )
+    first = run_quantitative_smoke(
+        source_root=summarizer_root,
+        output_root=tmp_path / "quant",
+        score_summary_fn=_counting_score_summary,
+    )
+
+    assert first.success is True
+    assert len(score_calls) == 20
+
+    score_calls.clear()
+    monkeypatch.setattr(
+        quantitative_smoke_module,
+        "resolve_quantitative_reference_paths",
+        lambda abm: {
+            "author": Path("data/summaries/authors/grazing_scoring_ground_truth.txt"),
+            "modeler": modeler_reference,
+        },
+    )
+    resumed = run_quantitative_smoke(
+        source_root=summarizer_root,
+        output_root=tmp_path / "quant",
+        resume=True,
+        score_summary_fn=_counting_score_summary,
+    )
+
+    assert resumed.success is True
+    assert resumed.run_root != first.run_root
+    assert len(score_calls) == 20
+    rows = list(csv.DictReader(resumed.quantitative_rows_path.open(encoding="utf-8")))
+    assert {row["reference_family"] for row in rows} == {"author", "modeler"}
+    assert len(rows) == 40
 
 
 def test_run_quantitative_smoke_includes_modeler_only_for_supported_abms(tmp_path: Path) -> None:

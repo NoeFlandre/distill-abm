@@ -21,6 +21,8 @@ from distill_abm.pipeline.full_case_matrix_smoke import (
 from distill_abm.pipeline.full_case_smoke import (
     FullCasePlotInput,
     FullCaseSmokeInput,
+    FullCaseValidationState,
+    _backfill_validation_state_from_artifacts,
     resolve_parallel_trend_workers,
     run_full_case_smoke,
 )
@@ -137,6 +139,35 @@ class _ContextOverflowThenSuccessAdapter(LLMAdapter):
                 "choices": [{"message": {"content": f'{{"response_text":"response-{self._calls}"}}'}}],
             },
         )
+
+
+def test_backfill_validation_state_skips_empty_artifacts(tmp_path: Path) -> None:
+    context_dir = tmp_path / "02_context"
+    trends_dir = tmp_path / "03_trends"
+    context_dir.mkdir(parents=True)
+    (trends_dir / "plot_01").mkdir(parents=True)
+    (context_dir / "context_output.txt").write_text("", encoding="utf-8")
+    (context_dir / "context_trace.json").write_text("{}", encoding="utf-8")
+    (trends_dir / "plot_01" / "trend_output.txt").write_text("", encoding="utf-8")
+    (trends_dir / "plot_01" / "trend_trace.json").write_text("{}", encoding="utf-8")
+
+    validation_state = FullCaseValidationState(context={}, trends={})
+    _backfill_validation_state_from_artifacts(
+        validation_state=validation_state,
+        context_dir=context_dir,
+        trends_dir=trends_dir,
+        plots=(
+            FullCasePlotInput(
+                plot_index=1,
+                reporter_pattern="metric one",
+                plot_description="This plot represents herd size.",
+                plot_path=tmp_path / "plot.png",
+            ),
+        ),
+    )
+
+    assert validation_state.context == {}
+    assert validation_state.trends == {}
 
 
 class _RuntimeMetadataAdapter(LLMAdapter):
