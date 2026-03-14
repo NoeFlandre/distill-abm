@@ -117,6 +117,10 @@ The repository now exposes a one-command bucket sync:
 uv run distill-abm sync-results-bucket
 ```
 
+For the latest quantitative paper tables across all current single- and multi-LLM runs, start in:
+
+- `results/quantitative_master_overview/`
+
 See [docs/RESULTS_BUCKET.md](docs/RESULTS_BUCKET.md) for the bucket contract, sync commands, the direct bucket link, and the local-to-remote folder mapping.
 
 Recent internal refactors preserved the public smoke/monitor contracts while splitting a few dense modules into narrower helpers:

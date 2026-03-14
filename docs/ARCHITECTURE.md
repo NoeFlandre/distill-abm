@@ -44,7 +44,8 @@
   - It writes machine-readable CSVs together with paper-oriented Markdown/LaTeX tables under the same run-separated, resumable contract.
   - The lexical scoring logic is intentionally aligned with the retired legacy notebooks: BLEU with NLTK `method4` smoothing, tokenized METEOR, stemmed ROUGE-1/2/L, and Flesch Reading Ease on the candidate summary text.
   - It also emits a normalized `structured_results.csv` sheet that generalizes the old notebook “final sheet” layout to the current factors: ABM, summary mode, LLM, role, example, insight, evidence, repetition, and the six paper metrics.
-  - Publication artifacts are compatibility-filtered: `author`, `modeler`, and `gpt5.2_short` compare summaries with summaries, `gpt5.2_long` compares the `none` output with the long-form reference, and factorial analysis excludes the `none` ablation entirely.
+  - Publication artifacts are compatibility-filtered: `author`, `modeler`, and `gpt5.2_short` compare summaries with summaries, `gpt5.2_long` compares the `none` output with the long-form reference, summary-reference factorials exclude the `none` ablation, and `gpt5.2_long` gets its own no-summarizer factorial.
+  - When a quantitative run root lives under `results/`, the runner also refreshes `results/quantitative_master_overview/` so the latest single- and multi-LLM overview tables are gathered in one place.
   - The current quantitative evaluation and overview contract is frozen after validation; see `docs/EVALUATION_FREEZE.md`.
 - Exposes `monitor-local-qwen` and `monitor-run` for a compact live dashboard over case-based smoke output directories.
   - The monitor surfaces current case status, configured `num_ctx`, configured `max_tokens`, prompt lengths, observed token totals, and recent errors.

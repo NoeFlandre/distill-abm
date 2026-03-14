@@ -86,6 +86,7 @@ __all__ = [
 ]
 
 QUANTITATIVE_REPORT_FILENAME = "smoke_quantitative_report.json"
+QUANTITATIVE_MASTER_OVERVIEW_DIRNAME = "quantitative_master_overview"
 ANOVA_ROW_SPECS: tuple[tuple[str, str], ...] = (
     ("Agent-Based Model", "ABM"),
     ("Summarization algorithm", "Summarizer"),
@@ -425,6 +426,7 @@ def _run_quantitative_smoke_impl(
         report_markdown_path=result.report_markdown_path,
         markdown=_render_markdown_report(result),
     )
+    _write_global_quantitative_master_overview(output_root=output_root)
     return result
 
 
@@ -923,7 +925,9 @@ def _write_analysis_bundle(
     )
 
     evaluation_record_rows = _filter_record_rows_for_quantitative_artifact(record_rows, artifact_kind="evaluation")
-    factorial_record_rows = _filter_record_rows_for_quantitative_artifact(record_rows, artifact_kind="factorial")
+    reference_record_rows: dict[str, list[dict[str, str]]] = {}
+    for row in record_rows:
+        reference_record_rows.setdefault(row["reference_family"], []).append(row)
 
     analysis_frame = pd.DataFrame(evaluation_record_rows)
     anova_rows = _compute_anova_rows(analysis_frame)
@@ -932,13 +936,26 @@ def _write_analysis_bundle(
     anova_table_latex_path.write_text(_render_anova_latex_table(anova_rows), encoding="utf-8")
 
     factorial_input_path = bundle_root / "factorial_input.csv"
-    factorial_frame = build_factorial_input_frame_fn(factorial_record_rows)
-    factorial_frame.to_csv(factorial_input_path, index=False)
-    factorial_result = analyze_factorial_anova_fn(factorial_input_path, factorial_csv_path, 2)
-    normalized_factorial = _normalize_factorial_table(factorial_result)
-    normalized_factorial.to_csv(factorial_csv_path, index=False, float_format="%.8f")
-    factorial_table_markdown_path.write_text(_render_factorial_markdown_table(normalized_factorial), encoding="utf-8")
-    factorial_table_latex_path.write_text(_render_factorial_latex_table(normalized_factorial), encoding="utf-8")
+    normalized_factorial = _build_factorial_outputs_for_reference_rows(
+        reference_record_rows=reference_record_rows,
+        scratch_root=bundle_root,
+        combined_input_path=factorial_input_path,
+        combined_output_path=factorial_csv_path,
+        analyze_factorial_anova_fn=analyze_factorial_anova_fn,
+        build_summary_factorial_input_frame_fn=build_factorial_input_frame_fn,
+    )
+    if "Reference family" in normalized_factorial.columns:
+        factorial_table_markdown_path.write_text(
+            _render_overview_factorial_markdown_table(normalized_factorial),
+            encoding="utf-8",
+        )
+        factorial_table_latex_path.write_text(
+            _render_overview_factorial_latex_table(normalized_factorial),
+            encoding="utf-8",
+        )
+    else:
+        factorial_table_markdown_path.write_text(_render_factorial_markdown_table(normalized_factorial), encoding="utf-8")
+        factorial_table_latex_path.write_text(_render_factorial_latex_table(normalized_factorial), encoding="utf-8")
 
     optimal_rows = _build_optimal_score_rows(evaluation_record_rows)
     _write_optimal_csv(optimal_csv_path, optimal_rows)
@@ -1007,19 +1024,21 @@ def _write_overview_tables(
     optimal_rows: list[dict[str, str]] = []
     for reference_family, record_rows in sorted(reference_record_rows.items()):
         evaluation_record_rows = _filter_record_rows_for_quantitative_artifact(record_rows, artifact_kind="evaluation")
-        factorial_record_rows = _filter_record_rows_for_quantitative_artifact(record_rows, artifact_kind="factorial")
         frame = pd.DataFrame(evaluation_record_rows)
         for row in _compute_anova_rows(frame):
             anova_rows.append({"Reference family": reference_family, **row})
         evidence_summary_rows.extend(_build_evidence_summary_rows(evaluation_record_rows))
-        factorial_input_path = scratch_root / f"{reference_family}_overview_factorial_input.csv"
-        factorial_output_path = scratch_root / f"{reference_family}_overview_factorial_contributions.csv"
-        factorial_input_frame = build_factorial_input_frame_fn(factorial_record_rows)
-        factorial_input_frame.to_csv(factorial_input_path, index=False)
-        factorial_result = analyze_factorial_anova_fn(factorial_input_path, factorial_output_path, 2)
-        factorial_frame = _normalize_factorial_table(factorial_result)
+        factorial_frame = _build_factorial_outputs_for_reference_rows(
+            reference_record_rows={reference_family: record_rows},
+            scratch_root=scratch_root,
+            combined_input_path=scratch_root / f"{reference_family}_overview_factorial_input.csv",
+            combined_output_path=scratch_root / f"{reference_family}_overview_factorial_contributions.csv",
+            analyze_factorial_anova_fn=analyze_factorial_anova_fn,
+            build_summary_factorial_input_frame_fn=build_factorial_input_frame_fn,
+        )
         if not factorial_frame.empty:
-            factorial_frame.insert(0, "Reference family", reference_family)
+            if "Reference family" not in factorial_frame.columns:
+                factorial_frame.insert(0, "Reference family", reference_family)
             factorial_frames.append(factorial_frame)
         optimal_rows.extend(_build_optimal_score_rows(evaluation_record_rows))
 
@@ -1145,6 +1164,20 @@ def _render_overview_factorial_markdown_table(frame: pd.DataFrame) -> str:
     return "# Factorial Contributions\n\n" + "\n".join([header, *body]) + "\n"
 
 
+def _render_overview_factorial_latex_table(frame: pd.DataFrame) -> str:
+    lines = [
+        r"\begin{tabular}{llrrrrrr}",
+        r"\toprule",
+        r"Reference family & Feature & BLEU & METEOR & R-1 & R-2 & R-L & Reading ease \\",
+        r"\midrule",
+    ]
+    for row in frame.to_dict(orient="records"):
+        values = [_format_contribution_cell(row[column]) for column in METRIC_COLUMN_NAMES]
+        lines.append(" & ".join([str(row["Reference family"]), str(row["Feature"]), *values]) + r" \\")
+    lines.extend([r"\bottomrule", r"\end{tabular}", ""])
+    return "\n".join(lines)
+
+
 def _compute_anova_rows(frame: pd.DataFrame) -> list[dict[str, float | str | None]]:
     rows: list[dict[str, float | str | None]] = []
     for label, factor_column in ANOVA_ROW_SPECS:
@@ -1194,52 +1227,71 @@ def _write_anova_csv(path: Path, rows: list[dict[str, float | str | None]]) -> N
 
 
 def _build_factorial_input_frame(record_rows: list[dict[str, str]]) -> pd.DataFrame:
+    return _build_factorial_input_frame_generic(
+        record_rows=record_rows,
+        include_llm=False,
+        include_summarizer=True,
+    )
+
+
+def _build_factorial_input_frame_without_summarizer(record_rows: list[dict[str, str]]) -> pd.DataFrame:
+    return _build_factorial_input_frame_generic(
+        record_rows=record_rows,
+        include_llm=False,
+        include_summarizer=False,
+    )
+
+
+def _build_factorial_input_frame_generic(
+    *,
+    record_rows: list[dict[str, str]],
+    include_llm: bool,
+    include_summarizer: bool,
+) -> pd.DataFrame:
+    factor_columns: list[str] = []
+    if include_llm:
+        factor_columns.append("LLM")
+    if include_summarizer:
+        factor_columns.append("Summarizer")
+    factor_columns.extend(["Evidence", "Role", "Insights", "Example"])
     if not record_rows:
-        return pd.DataFrame(columns=["Summarizer", "Evidence", "Role", "Insights", "Example", *METRIC_COLUMN_NAMES])
+        return pd.DataFrame(columns=[*factor_columns, *METRIC_COLUMN_NAMES])
     normalized_rows: list[dict[str, object]] = []
     for row in record_rows:
-        normalized_rows.append(
-            {
-                "Summarizer": row["summarizer"],
-                "Evidence": row["evidence"],
-                "Role": "on" if row["role"] == "True" else "off",
-                "Insights": "on" if row["insights"] == "True" else "off",
-                "Example": "on" if row["example"] == "True" else "off",
-                "BLEU": float(row["BLEU"]),
-                "METEOR": float(row["METEOR"]),
-                "R-1": float(row["R-1"]),
-                "R-2": float(row["R-2"]),
-                "R-L": float(row["R-L"]),
-                "Reading ease": float(row["Reading ease"]),
-            }
-        )
+        normalized: dict[str, object] = {
+            "Evidence": row["evidence"],
+            "Role": "on" if row["role"] == "True" else "off",
+            "Insights": "on" if row["insights"] == "True" else "off",
+            "Example": "on" if row["example"] == "True" else "off",
+            "BLEU": float(row["BLEU"]),
+            "METEOR": float(row["METEOR"]),
+            "R-1": float(row["R-1"]),
+            "R-2": float(row["R-2"]),
+            "R-L": float(row["R-L"]),
+            "Reading ease": float(row["Reading ease"]),
+        }
+        if include_llm:
+            normalized["LLM"] = row["llm"]
+        if include_summarizer:
+            normalized["Summarizer"] = row["summarizer"]
+        normalized_rows.append(normalized)
     return pd.DataFrame(normalized_rows)
 
 
 def _build_factorial_input_frame_with_llm(record_rows: list[dict[str, str]]) -> pd.DataFrame:
-    if not record_rows:
-        return pd.DataFrame(
-            columns=["LLM", "Summarizer", "Evidence", "Role", "Insights", "Example", *METRIC_COLUMN_NAMES]
-        )
-    normalized_rows: list[dict[str, object]] = []
-    for row in record_rows:
-        normalized_rows.append(
-            {
-                "LLM": row["llm"],
-                "Summarizer": row["summarizer"],
-                "Evidence": row["evidence"],
-                "Role": "on" if row["role"] == "True" else "off",
-                "Insights": "on" if row["insights"] == "True" else "off",
-                "Example": "on" if row["example"] == "True" else "off",
-                "BLEU": float(row["BLEU"]),
-                "METEOR": float(row["METEOR"]),
-                "R-1": float(row["R-1"]),
-                "R-2": float(row["R-2"]),
-                "R-L": float(row["R-L"]),
-                "Reading ease": float(row["Reading ease"]),
-            }
-        )
-    return pd.DataFrame(normalized_rows)
+    return _build_factorial_input_frame_generic(
+        record_rows=record_rows,
+        include_llm=True,
+        include_summarizer=True,
+    )
+
+
+def _build_factorial_input_frame_with_llm_without_summarizer(record_rows: list[dict[str, str]]) -> pd.DataFrame:
+    return _build_factorial_input_frame_generic(
+        record_rows=record_rows,
+        include_llm=True,
+        include_summarizer=False,
+    )
 
 
 def _normalize_factorial_table(frame: pd.DataFrame | None) -> pd.DataFrame:
@@ -1287,6 +1339,66 @@ def _filter_record_rows_for_quantitative_artifact(
         if artifact_kind == "factorial" and reference_kind == "summary" and summarizer != "none":
             filtered_rows.append(row)
     return filtered_rows
+
+
+def _build_factorial_outputs_for_reference_rows(
+    *,
+    reference_record_rows: dict[str, list[dict[str, str]]],
+    scratch_root: Path,
+    combined_input_path: Path,
+    combined_output_path: Path,
+    analyze_factorial_anova_fn: Callable[[Path, Path, int], pd.DataFrame | None],
+    build_summary_factorial_input_frame_fn: Callable[[list[dict[str, str]]], pd.DataFrame],
+) -> pd.DataFrame:
+    scratch_root.mkdir(parents=True, exist_ok=True)
+    combined_inputs: list[pd.DataFrame] = []
+    combined_outputs: list[pd.DataFrame] = []
+    single_reference_family = len(reference_record_rows) == 1
+    summary_uses_llm = "LLM" in build_summary_factorial_input_frame_fn([]).columns
+    full_report_builder = (
+        _build_factorial_input_frame_with_llm_without_summarizer
+        if summary_uses_llm
+        else _build_factorial_input_frame_without_summarizer
+    )
+    empty_input_frame = build_summary_factorial_input_frame_fn([])
+    for reference_family, rows in sorted(reference_record_rows.items()):
+        reference_kind = resolve_quantitative_reference_kind(reference_family)
+        if reference_kind == "summary":
+            factorial_rows = _filter_record_rows_for_quantitative_artifact(rows, artifact_kind="factorial")
+            builder = build_summary_factorial_input_frame_fn
+        else:
+            factorial_rows = [
+                row
+                for row in _filter_record_rows_for_quantitative_artifact(rows, artifact_kind="evaluation")
+                if row["summarizer"] == "none"
+            ]
+            builder = full_report_builder
+            empty_input_frame = builder([])
+        factorial_input_frame = builder(factorial_rows)
+        reference_input_path = scratch_root / f"{reference_family}_factorial_input.csv"
+        reference_output_path = scratch_root / f"{reference_family}_factorial_contributions.csv"
+        factorial_input_frame.to_csv(reference_input_path, index=False)
+        factorial_result = analyze_factorial_anova_fn(reference_input_path, reference_output_path, 2)
+        factorial_frame = _normalize_factorial_table(factorial_result)
+        if not factorial_input_frame.empty:
+            combined_inputs.append(factorial_input_frame)
+        if not factorial_frame.empty:
+            if not single_reference_family:
+                factorial_frame.insert(0, "Reference family", reference_family)
+            combined_outputs.append(factorial_frame)
+    if combined_inputs:
+        pd.concat(combined_inputs, ignore_index=True).to_csv(combined_input_path, index=False)
+    else:
+        empty_input_frame.to_csv(combined_input_path, index=False)
+    if combined_outputs:
+        combined_frame = pd.concat(combined_outputs, ignore_index=True)
+    else:
+        columns = ["Feature", *METRIC_COLUMN_NAMES]
+        if not single_reference_family:
+            columns = ["Reference family", *columns]
+        combined_frame = pd.DataFrame(columns=columns)
+    combined_frame.to_csv(combined_output_path, index=False, float_format="%.8f")
+    return combined_frame
 
 
 def _build_optimal_score_rows(record_rows: list[dict[str, str]]) -> list[dict[str, str]]:
@@ -1345,6 +1457,68 @@ def _build_evidence_summary_rows(record_rows: list[dict[str, str]]) -> list[dict
         )
     )
     return rows
+
+
+def _write_global_quantitative_master_overview(*, output_root: Path) -> None:
+    cwd = Path.cwd().resolve()
+    try:
+        relative = output_root.resolve().relative_to(cwd)
+    except ValueError:
+        return
+    if not relative.parts or relative.parts[0].lower() != "results":
+        return
+    results_root = Path("results")
+    latest_runs = _discover_latest_quantitative_runs(results_root)
+    if not latest_runs:
+        return
+    master_root = results_root / QUANTITATIVE_MASTER_OVERVIEW_DIRNAME
+    master_root.mkdir(parents=True, exist_ok=True)
+    for filename, title in (
+        ("anova_table.md", "Master ANOVA Table"),
+        ("best_scores_table.md", "Master Best Scores Table"),
+        ("evidence_summary_table.md", "Master Evidence Summary Table"),
+        ("factorial_table.md", "Master Factorial Contributions"),
+        ("prompt_compression_summary.md", "Master Prompt Compression Summary"),
+    ):
+        sections: list[str] = [f"# {title}", ""]
+        included = 0
+        for label, run_root in latest_runs:
+            source_path = run_root / "overview" / filename
+            if not source_path.exists():
+                continue
+            sections.append(f"## {label}")
+            sections.append("")
+            sections.append(_strip_leading_markdown_heading(source_path.read_text(encoding="utf-8")))
+            sections.append("")
+            included += 1
+        if included == 0:
+            sections.extend(["No sections available.", ""])
+        (master_root / filename).write_text("\n".join(sections).rstrip() + "\n", encoding="utf-8")
+
+
+def _discover_latest_quantitative_runs(results_root: Path) -> list[tuple[str, Path]]:
+    discovered: list[tuple[str, Path]] = []
+    for latest_run_path in sorted(results_root.rglob("latest_run.txt")):
+        output_root = latest_run_path.parent
+        value = latest_run_path.read_text(encoding="utf-8").strip()
+        run_root = Path(value)
+        if not run_root.is_absolute():
+            run_root = Path(value) if value.startswith("results/") else output_root / "runs" / value
+        if not (run_root / QUANTITATIVE_REPORT_FILENAME).exists():
+            continue
+        try:
+            label = str(output_root.relative_to(results_root))
+        except ValueError:
+            label = str(output_root)
+        discovered.append((label, run_root))
+    return discovered
+
+
+def _strip_leading_markdown_heading(text: str) -> str:
+    lines = text.splitlines()
+    if lines and lines[0].startswith("# "):
+        lines = lines[2:] if len(lines) > 1 and lines[1] == "" else lines[1:]
+    return "\n".join(lines).strip()
 
 
 def _write_optimal_csv(path: Path, rows: list[dict[str, str]]) -> None:
