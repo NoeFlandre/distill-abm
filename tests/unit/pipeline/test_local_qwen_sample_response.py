@@ -113,3 +113,13 @@ def test_should_retry_without_structured_output_error_matches_openrouter_interna
         )
         is True
     )
+
+
+def test_should_retry_without_structured_output_error_matches_empty_openrouter_structured_response() -> None:
+    assert (
+        should_retry_without_structured_output_error(
+            provider="openrouter",
+            error="openrouter request failed after 3 attempt(s): structured response was empty",
+        )
+        is True
+    )

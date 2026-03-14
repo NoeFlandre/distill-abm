@@ -183,6 +183,8 @@ def invoke_adapter_with_trace(
                 clean_text = response.text
             else:
                 clean_text = clean_markdown_symbols(strip_think_prefix(response.text))
+            if request.metadata.get("structured_output_schema") and not clean_text.strip():
+                raise LLMProviderError("structured response was empty")
             record_success(provider=adapter.provider, model=model)
             log_event(
                 LOGGER,

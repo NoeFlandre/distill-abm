@@ -628,27 +628,23 @@ def _backfill_validation_state_from_artifacts(
     trends_dir: Path,
     plots: tuple[FullCasePlotInput, ...],
 ) -> None:
-    if "status" not in validation_state.context and _context_artifacts_exist(context_dir):
+    if "status" not in validation_state.context and _context_artifacts_are_valid(context_dir):
         validation_state.context = {"status": "accepted", "error": None}
     for plot in plots:
         plot_key = str(plot.plot_index)
         if plot_key in validation_state.trends:
             continue
         trend_dir = trends_dir / f"plot_{plot.plot_index:02d}"
-        if _trend_artifacts_exist(trend_dir):
+        if _trend_artifacts_are_valid(trend_dir):
             validation_state.trends[plot_key] = {"status": "accepted", "error": None}
 
 
 def _is_context_accepted(*, context_dir: Path, validation_state: FullCaseValidationState) -> bool:
     if (
         validation_state.context.get("status") != "accepted"
-        or not _context_artifacts_exist(context_dir)
+        or not _context_artifacts_are_valid(context_dir)
         or (context_dir / "error.txt").exists()
     ):
-        return False
-    try:
-        validate_structured_smoke_text_content((context_dir / "context_output.txt").read_text(encoding="utf-8"))
-    except ValueError:
         return False
     return True
 
@@ -657,13 +653,9 @@ def _is_trend_accepted(*, plot_index: int, trend_dir: Path, validation_state: Fu
     status_payload = validation_state.trends.get(str(plot_index), {})
     if (
         status_payload.get("status") != "accepted"
-        or not _trend_artifacts_exist(trend_dir)
+        or not _trend_artifacts_are_valid(trend_dir)
         or (trend_dir / "error.txt").exists()
     ):
-        return False
-    try:
-        validate_structured_smoke_text_content((trend_dir / "trend_output.txt").read_text(encoding="utf-8"))
-    except ValueError:
         return False
     return True
 
@@ -674,3 +666,23 @@ def _context_artifacts_exist(context_dir: Path) -> bool:
 
 def _trend_artifacts_exist(trend_dir: Path) -> bool:
     return (trend_dir / "trend_output.txt").exists() and (trend_dir / "trend_trace.json").exists()
+
+
+def _context_artifacts_are_valid(context_dir: Path) -> bool:
+    if not _context_artifacts_exist(context_dir):
+        return False
+    try:
+        validate_structured_smoke_text_content((context_dir / "context_output.txt").read_text(encoding="utf-8"))
+    except ValueError:
+        return False
+    return True
+
+
+def _trend_artifacts_are_valid(trend_dir: Path) -> bool:
+    if not _trend_artifacts_exist(trend_dir):
+        return False
+    try:
+        validate_structured_smoke_text_content((trend_dir / "trend_output.txt").read_text(encoding="utf-8"))
+    except ValueError:
+        return False
+    return True

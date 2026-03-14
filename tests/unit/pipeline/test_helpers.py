@@ -248,6 +248,43 @@ def test_invoke_adapter_with_trace_extracts_runtime_precision_from_provider_meta
     assert response["runtime"] == {"provider": "Alibaba", "precision": "int8"}
 
 
+def test_invoke_adapter_with_trace_retries_empty_structured_response() -> None:
+    class EmptyThenValidStructuredAdapter(LLMAdapter):
+        provider = "openrouter"
+
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def complete(self, request: LLMRequest) -> LLMResponse:
+            self.calls += 1
+            if self.calls == 1:
+                return LLMResponse(provider=self.provider, model=request.model, text="", raw={})
+            return LLMResponse(
+                provider=self.provider,
+                model=request.model,
+                text='{"response_text":"ok"}',
+                raw={},
+            )
+
+    text, trace = helpers.invoke_adapter_with_trace(
+        adapter=EmptyThenValidStructuredAdapter(),
+        model="moonshotai/kimi-k2.5",
+        prompt="hello",
+        request_metadata={
+            "structured_output_schema": {
+                "type": "object",
+                "properties": {"response_text": {"type": "string"}},
+                "required": ["response_text"],
+            }
+        },
+        max_retries=1,
+        retry_backoff_seconds=0.0,
+    )
+
+    assert text == '{"response_text":"ok"}'
+    assert trace["attempts_made"] == 2
+
+
 def test_build_stats_csv_uses_expected_column_order() -> None:
     stats_table = pd.DataFrame(
         {

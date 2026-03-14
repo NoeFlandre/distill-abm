@@ -4,6 +4,7 @@ ground_truth:
   milk_consumption: data/summaries/authors/milk_scoring_ground_truth.txt
 
 modeler_ground_truth:
+  fauna: data/summaries/modelers/fauna_modeler_ground_truth.txt
   milk_consumption: data/summaries/modelers/milk_modeler_ground_truth.txt
 
 gpt5.2_short_ground_truth:

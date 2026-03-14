@@ -106,7 +106,11 @@ def should_retry_without_structured_output_error(*, provider: str, error: str) -
     if provider.strip().lower() != "openrouter":
         return False
     lowered = error.lower()
-    return "error code: 500" in lowered or "internal server error" in lowered
+    return (
+        "error code: 500" in lowered
+        or "internal server error" in lowered
+        or "structured response was empty" in lowered
+    )
 
 
 def _candidate_json_payloads(raw_text: str) -> list[str]:

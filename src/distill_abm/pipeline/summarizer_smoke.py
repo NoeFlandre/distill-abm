@@ -13,6 +13,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from distill_abm.pipeline.local_qwen_sample_response import validate_structured_smoke_text_content
 from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, read_active_run_lock, run_log_path
 from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
@@ -619,6 +620,10 @@ def _build_live_validated_bundle(case_dir: Path, *, fallback_abm: str) -> Valida
     context_payload = validation_payload.get("context", {})
     if not isinstance(context_payload, dict) or context_payload.get("status") != "accepted":
         return None
+    try:
+        validate_structured_smoke_text_content(context_output_path.read_text(encoding="utf-8"))
+    except ValueError:
+        return None
     trend_payloads = validation_payload.get("trends", {})
     if not isinstance(trend_payloads, dict):
         return None
@@ -629,6 +634,10 @@ def _build_live_validated_bundle(case_dir: Path, *, fallback_abm: str) -> Valida
         plot_index = int(key)
         trend_output_path = case_dir / "03_trends" / f"plot_{plot_index:02d}" / "trend_output.txt"
         if not trend_output_path.exists():
+            return None
+        try:
+            validate_structured_smoke_text_content(trend_output_path.read_text(encoding="utf-8"))
+        except ValueError:
             return None
         trend_output_paths.append(trend_output_path)
     if not trend_output_paths:

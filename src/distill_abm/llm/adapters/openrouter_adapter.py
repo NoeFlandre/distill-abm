@@ -55,7 +55,17 @@ class OpenRouterAdapter(LLMAdapter):
         payload = build_openai_compatible_payload(request)
         payload["model"] = self.model or request.model
         if "response_format" in payload:
-            payload["extra_body"] = {"provider": {"require_parameters": True}}
+            response_format = payload.get("response_format")
+            if isinstance(response_format, dict):
+                json_schema = response_format.get("json_schema")
+                if isinstance(json_schema, dict):
+                    json_schema.setdefault("strict", True)
+            extra_body = payload.get("extra_body")
+            if not isinstance(extra_body, dict):
+                extra_body = {}
+            extra_body["provider"] = {"require_parameters": True}
+            extra_body["plugins"] = [{"id": "response-healing"}]
+            payload["extra_body"] = extra_body
         completion = run_with_timeout(
             timeout_seconds=self.timeout_seconds,
             label="openrouter completion",
