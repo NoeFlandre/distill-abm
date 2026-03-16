@@ -23,6 +23,11 @@ def test_dockerignore_excludes_local_artifacts() -> None:
         ".pytest_cache",
         ".mypy_cache",
         ".ruff_cache",
+        "dist",
+        "*.egg-info",
+        "archive",
+        "notes",
+        ".coverage",
         "results",
         "Results",
     ]:
