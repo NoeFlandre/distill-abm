@@ -122,7 +122,7 @@ def test_retired_low_value_docs_are_absent() -> None:
 def test_unused_doc_assets_are_absent() -> None:
     assert not Path("docs/assets/plot_example.png").exists()
     assert not Path("docs/assets/stats_table_example.png").exists()
-    assert not Path("docs/images/.DS_Store").exists()
+    assert not Path("data/images/.DS_Store").exists()
 
 
 def test_tracked_macos_metadata_files_are_absent_from_source_tree() -> None:
