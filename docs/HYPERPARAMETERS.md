@@ -1,6 +1,8 @@
 # Hyperparameters
 
-## LLM Request Defaults (`configs/runtime_defaults.yaml`)
+## LLM Request Defaults
+
+From `configs/runtime_defaults.yaml`:
 
 | Parameter | Default |
 |---|---|
@@ -10,10 +12,12 @@
 | `retry_backoff_seconds` | `2.0` |
 
 Provider-specific override:
-- `mistral` requests use `temperature=0.2`
-- all other providers keep the runtime default `temperature=1.0`
 
-## Run Defaults
+- `mistral` requests use `temperature=0.2`
+- other configured providers keep the runtime default `temperature=1.0`
+- the Gemini optimization smoke chain therefore runs at `temperature=1.0`
+
+## Pipeline Defaults
 
 | Parameter | Default |
 |---|---|
@@ -23,7 +27,9 @@ Provider-specific override:
 | `text_source_mode` | `summary_only` |
 | `summarizers` | `bart, bert, t5, longformer_ext` |
 
-## Canonical Model Registry (`configs/models.yaml`)
+## Canonical Model Registry
+
+From `configs/models.yaml`:
 
 | ID | Provider | Model |
 |---|---|---|
@@ -34,6 +40,8 @@ Provider-specific override:
 | `mistral_large_2512` | `mistral` | `mistral-large-2512` |
 | `mistral_medium_debug` | `mistral` | `mistral-medium-latest` |
 
+The paper-facing benchmark roster is the subset documented in the root `README.md`.
+
 ## Summarizer Runtimes
 
 | Summarizer | Model | Defaults |
@@ -43,26 +51,24 @@ Provider-specific override:
 | `t5` | `t5-small` | `max_input=1024, min=40, max=120` |
 | `longformer_ext` | `allenai/led-base-16384` | `max_input=2048, min=64, max=180` |
 
-## ABM Ground Truth Mapping (`configs/experiment_settings.yaml`)
+## Reference Text Mapping
 
-| ABM | Ground Truth File |
+Primary author references from `configs/experiment_settings.yaml`:
+
+| ABM | Reference File |
 |---|---|
 | `fauna` | `data/summaries/authors/fauna_scoring_ground_truth.txt` |
 | `grazing` | `data/summaries/authors/grazing_scoring_ground_truth.txt` |
 | `milk_consumption` | `data/summaries/authors/milk_scoring_ground_truth.txt` |
 
-## GPT-5.2 Ground Truth Mapping (`configs/experiment_settings.yaml`)
+Additional configured references:
 
-| ABM | GPT-5.2_short | GPT-5.2_long |
+| ABM | Reference Family | Reference File |
 |---|---|---|
-| `fauna` | `data/summaries/gpt5.2/fauna_gpt5.2_short_ground_truth.txt` | `data/summaries/gpt5.2/fauna_gpt5.2_long_ground_truth.txt` |
-| `grazing` | `data/summaries/gpt5.2/grazing_gpt5.2_short_ground_truth.txt` | `data/summaries/gpt5.2/grazing_gpt5.2_long_ground_truth.txt` |
-| `milk_consumption` | `data/summaries/gpt5.2/milk_gpt5.2_short_ground_truth.txt` | `data/summaries/gpt5.2/milk_gpt5.2_long_ground_truth.txt` |
-
-## Optional Modeler Ground Truth Mapping (`configs/experiment_settings.yaml`)
-
-These references are scored in addition to the primary author reference when present.
-
-| ABM | Modeler Ground Truth File |
-|---|---|
-| `milk_consumption` | `data/summaries/modelers/milk_modeler_ground_truth.txt` |
+| `fauna` | `gpt5.2_short` | `data/summaries/gpt5.2/fauna_gpt5.2_short_ground_truth.txt` |
+| `fauna` | `gpt5.2_long` | `data/summaries/gpt5.2/fauna_gpt5.2_long_ground_truth.txt` |
+| `grazing` | `gpt5.2_short` | `data/summaries/gpt5.2/grazing_gpt5.2_short_ground_truth.txt` |
+| `grazing` | `gpt5.2_long` | `data/summaries/gpt5.2/grazing_gpt5.2_long_ground_truth.txt` |
+| `milk_consumption` | `gpt5.2_short` | `data/summaries/gpt5.2/milk_gpt5.2_short_ground_truth.txt` |
+| `milk_consumption` | `gpt5.2_long` | `data/summaries/gpt5.2/milk_gpt5.2_long_ground_truth.txt` |
+| `milk_consumption` | `modeler` | `data/summaries/modelers/milk_modeler_ground_truth.txt` |

@@ -63,14 +63,26 @@ def test_public_docs_surface_matches_publication_contract() -> None:
     docs_index = Path("docs/README.md").read_text(encoding="utf-8")
     results_bucket = Path("docs/RESULTS_BUCKET.md").read_text(encoding="utf-8")
     results_readme = Path("results/README.md").read_text(encoding="utf-8")
+    citation = Path("CITATION.cff").read_text(encoding="utf-8")
 
     assert "Published run outputs live in the Hugging Face results bucket, not in Git." in readme
+    assert "If you use this repository, cite the software record in [CITATION.cff](CITATION.cff)." in readme
     assert "The Git repository is publication-facing source code." in results_bucket
     assert "uv run distill-abm sync-results-bucket --dry-run" in results_bucket
     assert "hf sync --apply /tmp/distill_abm_bucket_cleanup_plan.jsonl" in results_bucket
     assert "hf sync --apply /tmp/distill_abm_bucket_cleanup_plan.jsonl" in results_readme
-    assert "AGENT_BACKLOG.md" not in docs_index
-    assert "AGENT_WORKFLOW.md" not in docs_index
+    assert "ARCHITECTURE.md" in docs_index
+    assert "RESULTS_BUCKET.md" in docs_index
+    assert "HYPERPARAMETERS.md" in docs_index
+    assert "EVALUATION_FREEZE.md" in docs_index
+    assert "DECISION_LOG.md" in docs_index
+    assert "RUN_EXECUTION_ORDER.md" not in docs_index
+    assert "WALKTHROUGH.md" not in docs_index
+    assert "FAILURE_SEMANTICS.md" not in docs_index
+    assert "MANUAL_VALIDATION.md" not in docs_index
+    assert "TRACEABILITY_MATRIX.md" not in docs_index
+    assert 'title: "distill-abm"' in citation
+    assert "preferred-citation:" in citation
 
 
 def test_stale_root_level_supplementary_docs_are_absent() -> None:
@@ -78,3 +90,14 @@ def test_stale_root_level_supplementary_docs_are_absent() -> None:
     assert not Path("docs/GROUND_TRUTHS_GPT5.2.pdf").exists()
     assert Path("docs/supplementary_material/TESTING_REPORT.md").exists()
     assert Path("docs/supplementary_material/GROUND_TRUTHS_GPT5.2.pdf").exists()
+
+
+def test_retired_low_value_docs_are_absent() -> None:
+    for retired_path in [
+        "docs/RUN_EXECUTION_ORDER.md",
+        "docs/WALKTHROUGH.md",
+        "docs/FAILURE_SEMANTICS.md",
+        "docs/MANUAL_VALIDATION.md",
+        "docs/TRACEABILITY_MATRIX.md",
+    ]:
+        assert not Path(retired_path).exists()

@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite the software record below."
+title: "distill-abm"
+version: "0.1.0"
+type: software
+license: "MIT"
+repository-code: "https://github.com/NoeFlandre/distill-abm"
+authors:
+  - family-names: "Flandre"
+    given-names: "Noe Y."
+    email: "noeflandre@gmail.com"
+  - family-names: "Giabbanelli"
+    given-names: "Philippe J."
+preferred-citation:
+  type: article
+  title: "Distilling the Complexity of Agent-Based Simulations into Textual Explanations via Large Language Models"
+  year: 2025
+  authors:
+    - family-names: "Flandre"
+      given-names: "Noe Y."
+    - family-names: "Giabbanelli"
+      given-names: "Philippe J."
+  notes: "Accompanying manuscript included in this repository under data/paper/."

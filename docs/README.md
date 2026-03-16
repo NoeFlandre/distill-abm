@@ -1,9 +1,7 @@
 # Documentation Index
 
-- `ARCHITECTURE.md` - module boundaries and end-to-end data flow.
-- `RESULTS_BUCKET.md` - canonical location and sync contract for published results.
-- `HYPERPARAMETERS.md` - runtime defaults and provider-specific request settings.
-- `RUN_EXECUTION_ORDER.md` - step-by-step execution order for the main pipeline run.
-- `EVALUATION_FREEZE.md` - frozen evaluation/reporting contract for the paper-facing outputs.
-- `WALKTHROUGH.md` - command-level walkthroughs for the main smoke and analysis workflows.
-- `DECISION_LOG.md` - important implementation decisions that affect reproducibility.
+- `ARCHITECTURE.md` - runtime flow, module boundaries, and artifact flow.
+- `RESULTS_BUCKET.md` - canonical location and maintenance workflow for published results.
+- `HYPERPARAMETERS.md` - runtime defaults, model aliases, and reference-file mappings.
+- `EVALUATION_FREEZE.md` - frozen quantitative evaluation and reporting contract.
+- `DECISION_LOG.md` - reproducibility decisions that shape the public workflow.
