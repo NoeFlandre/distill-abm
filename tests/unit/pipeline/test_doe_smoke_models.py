@@ -10,7 +10,7 @@ from distill_abm.pipeline.doe_smoke_models import (
 
 
 def test_canonical_doe_model_and_evidence_defaults_are_stable() -> None:
-    assert CANONICAL_DOE_MODEL_IDS == ("qwen3_5_27b", "kimi_k2_5", "gemini_3_1_pro_preview")
+    assert CANONICAL_DOE_MODEL_IDS == ("qwen3_5_27b", "kimi_k2_5", "gemini_3_1_pro_preview", "claude_opus_4_6")
     assert CANONICAL_EVIDENCE_MODES == ("plot", "table", "plot+table")
     assert CANONICAL_REPETITIONS == (1, 2, 3)
 
