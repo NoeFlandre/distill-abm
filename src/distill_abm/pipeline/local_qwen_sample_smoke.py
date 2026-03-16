@@ -517,6 +517,7 @@ def _invoke_structured_smoke_text(
         "ollama_num_ctx": ollama_num_ctx,
         "ollama_format": StructuredSmokeText.model_json_schema(),
         "preserve_raw_text": True,
+        "allow_empty_structured_response_trace": True,
         **(request_metadata or {}),
     }
     initial_error: LLMProviderError | None = None
@@ -528,7 +529,7 @@ def _invoke_structured_smoke_text(
             image_b64=image_b64,
             max_tokens=max_tokens,
             request_metadata=structured_request_metadata,
-            max_retries=max_retries,
+            max_retries=0,
             retry_backoff_seconds=retry_backoff_seconds,
         )
     except LLMProviderError as exc:
@@ -547,7 +548,13 @@ def _invoke_structured_smoke_text(
     fallback_metadata = {
         key: value
         for key, value in structured_request_metadata.items()
-        if key not in {"structured_output_name", "structured_output_schema"}
+        if key
+        not in {
+            "structured_output_name",
+            "structured_output_schema",
+            "ollama_format",
+            "allow_empty_structured_response_trace",
+        }
     }
 
     if initial_error is not None:

@@ -68,6 +68,7 @@ from distill_abm.pipeline.local_qwen_monitor import (
     stream_local_qwen_monitor,
 )
 from distill_abm.pipeline.run import EvidenceMode, PipelineInputs, TextSourceMode
+from distill_abm.pipeline.run_artifact_contracts import resolve_run_root
 from distill_abm.pipeline.smoke import SmokeSuiteInputs
 from distill_abm.run_viewer import render_run_viewer
 
@@ -469,6 +470,10 @@ def execute_smoke_doe_command(
     models_path: Path,
     model_ids: list[str] | None,
     output_root: Path,
+    evidence_modes: tuple[Literal["plot", "table", "plot+table"], ...],
+    summarization_specs: tuple[Any, ...],
+    prompt_variants: tuple[str, ...],
+    repetitions: tuple[int, ...],
     json_output: bool,
     discover_abms: Callable[[], tuple[str, ...]],
     resolve_model_from_registry: Callable[[Path, str], tuple[str, str]],
@@ -514,10 +519,12 @@ def execute_smoke_doe_command(
         prompts=prompts,
         model_specs=model_specs,
         output_root=output_root,
-        evidence_modes=CANONICAL_EVIDENCE_MODES,
-        summarization_specs=canonical_summarization_specs(),
-        prompt_variants=canonical_prompt_variants(),
-        repetitions=CANONICAL_REPETITIONS,
+        evidence_modes=evidence_modes,
+        summarization_specs=summarization_specs,
+        prompt_variants=tuple(
+            variant for variant in canonical_prompt_variants() if variant.variant_id in prompt_variants
+        ),
+        repetitions=repetitions,
     )
     command_result = SmokeCommandResult(
         command="smoke-doe",
@@ -677,6 +684,7 @@ def execute_smoke_summarizers_command(
     resume: bool,
     watch: bool,
     poll_interval_seconds: float,
+    summarizer_modes: tuple[SummarizerId, ...] | None,
     json_output: bool,
     run_summarizer_smoke_fn: Callable[..., Any],
 ) -> None:
@@ -687,6 +695,7 @@ def execute_smoke_summarizers_command(
         resume=resume,
         watch=watch,
         poll_interval_seconds=poll_interval_seconds,
+        summarizer_modes=summarizer_modes,
     )
     command_result = SmokeCommandResult(
         command="smoke-summarizers",
@@ -706,6 +715,138 @@ def execute_smoke_summarizers_command(
         json_label="summarizer smoke report (json)",
         failure_label="summarizer smoke failed",
     )
+
+
+def execute_smoke_optimization_gemini_chain_command(
+    *,
+    models_root: Path,
+    netlogo_home: str,
+    prompts_path: Path,
+    models_path: Path,
+    output_root: Path,
+    evidence_modes: tuple[Literal["plot", "table", "plot+table"], ...],
+    prompt_variants: tuple[str, ...],
+    repetitions: tuple[int, ...],
+    summarization_modes: tuple[SummarizerId, ...],
+    model_id: str,
+    max_tokens: int,
+    resume: bool,
+    execute_smoke_ingest_command_fn: Callable[..., None],
+    execute_smoke_viz_command_fn: Callable[..., None],
+    execute_smoke_doe_command_fn: Callable[..., None],
+    execute_smoke_full_case_suite_command_fn: Callable[..., None],
+    execute_smoke_summarizers_command_fn: Callable[..., None],
+    execute_smoke_quantitative_command_fn: Callable[..., None],
+    run_ingest_smoke_suite_fn: Callable[..., Any],
+    resolve_viz_smoke_specs_fn: Callable[..., Any],
+    run_viz_smoke_suite_fn: Callable[..., Any],
+    discover_abms_fn: Callable[[], tuple[str, ...]],
+    resolve_model_from_registry_fn: Callable[[Path, str], tuple[str, str]],
+    resolve_model_path_fn: Callable[..., Path],
+    run_doe_smoke_suite_fn: Callable[..., Any],
+    load_abm_config_fn: Callable[[Path], Any],
+    load_prompts_config_fn: Callable[[Path], Any],
+    create_adapter_fn: Callable[[str, str], Any],
+    run_full_case_suite_smoke_fn: Callable[..., Any],
+    validate_model_policy_fn: Callable[..., None],
+    run_summarizer_smoke_fn: Callable[..., Any],
+    run_quantitative_smoke_fn: Callable[..., Any],
+) -> None:
+    """Run the fixed-factor Gemini optimization chain across the standard six smoke stages."""
+    ingest_root = output_root / "01_ingest_smoke_latest"
+    viz_root = output_root / "02_viz_smoke_latest"
+    doe_root = output_root / "03_doe_smoke_latest"
+    full_case_root = output_root / "04_full_case_suite_smoke_latest"
+    summarizer_root = output_root / "05_summarizer_smoke_latest"
+    quantitative_root = output_root / "06_quantitative_smoke_latest"
+
+    execute_smoke_ingest_command_fn(
+        abms=None,
+        models_root=models_root,
+        output_root=ingest_root,
+        stage=None,
+        require_stage=None,
+        json_output=False,
+        run_ingest_smoke_suite_fn=run_ingest_smoke_suite_fn,
+    )
+    execute_smoke_viz_command_fn(
+        abms=None,
+        models_root=models_root,
+        netlogo_home=netlogo_home,
+        stage=None,
+        require_stage=None,
+        output_root=viz_root,
+        json_output=False,
+        resolve_viz_smoke_specs=resolve_viz_smoke_specs_fn,
+        run_viz_smoke_suite_fn=run_viz_smoke_suite_fn,
+    )
+    ingest_run_root = resolve_run_root(ingest_root)
+    viz_run_root = resolve_run_root(viz_root)
+    execute_smoke_doe_command_fn(
+        abms=None,
+        models_root=models_root,
+        ingest_root=ingest_run_root,
+        viz_root=viz_run_root,
+        prompts_path=prompts_path,
+        models_path=models_path,
+        model_ids=[model_id],
+        output_root=doe_root,
+        evidence_modes=evidence_modes,
+        summarization_specs=(
+            canonical_summarization_specs()[0],
+            *tuple(spec for spec in canonical_summarization_specs() if spec.summarization_mode in summarization_modes),
+        ),
+        prompt_variants=prompt_variants,
+        repetitions=repetitions,
+        json_output=False,
+        discover_abms=discover_abms_fn,
+        resolve_model_from_registry=resolve_model_from_registry_fn,
+        resolve_model_path=resolve_model_path_fn,
+        run_doe_smoke_suite_fn=run_doe_smoke_suite_fn,
+        load_abm_config_fn=load_abm_config_fn,
+        load_prompts_config_fn=load_prompts_config_fn,
+    )
+    execute_smoke_full_case_suite_command_fn(
+        models_root=models_root,
+        ingest_root=ingest_run_root,
+        viz_root=viz_run_root,
+        models_path=models_path,
+        model_id=model_id,
+        output_root=full_case_root,
+        evidence_modes=evidence_modes,
+        prompt_variants=prompt_variants,
+        repetitions=repetitions,
+        max_tokens=max_tokens,
+        resume=resume,
+        json_output=False,
+        allow_debug_model=False,
+        resolve_model_from_registry=resolve_model_from_registry_fn,
+        resolve_model_path=lambda abm, models_root: resolve_model_path_fn(abm=abm, models_root=models_root),
+        create_adapter_fn=create_adapter_fn,
+        load_abm_config_fn=load_abm_config_fn,
+        validate_model_policy=validate_model_policy_fn,
+        run_full_case_suite_smoke_fn=run_full_case_suite_smoke_fn,
+    )
+    full_case_run_root = resolve_run_root(full_case_root)
+    execute_smoke_summarizers_command_fn(
+        source_root=full_case_run_root,
+        abms=None,
+        output_root=summarizer_root,
+        resume=resume,
+        watch=False,
+        poll_interval_seconds=5.0,
+        summarizer_modes=summarization_modes,
+        json_output=False,
+        run_summarizer_smoke_fn=run_summarizer_smoke_fn,
+    )
+    execute_smoke_quantitative_command_fn(
+        source_root=summarizer_root,
+        output_root=quantitative_root,
+        resume=resume,
+        json_output=False,
+        run_quantitative_smoke_fn=run_quantitative_smoke_fn,
+    )
+    typer.echo(f"optimization chain prepared and executed under: {output_root}")
 
 
 def execute_smoke_quantitative_command(

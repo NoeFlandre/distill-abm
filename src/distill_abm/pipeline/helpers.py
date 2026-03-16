@@ -184,6 +184,36 @@ def invoke_adapter_with_trace(
             else:
                 clean_text = clean_markdown_symbols(strip_think_prefix(response.text))
             if request.metadata.get("structured_output_schema") and not clean_text.strip():
+                if request.metadata.get("allow_empty_structured_response_trace"):
+                    record_success(provider=adapter.provider, model=model)
+                    log_event(
+                        LOGGER,
+                        "llm_request_success",
+                        provider=adapter.provider,
+                        model=model,
+                        attempt=attempt + 1,
+                        prompt_signature=request_block["prompt_signature"],
+                        clean_text_signature=hashlib.sha256(clean_text.encode("utf-8")).hexdigest(),
+                        clean_text_length=len(clean_text),
+                    )
+                    return clean_text, {
+                        "request": request_block,
+                        "response": {
+                            "provider": response.provider,
+                            "model": response.model,
+                            "runtime": _extract_runtime_metadata_from_raw(response.raw, response.provider),
+                            "raw_text": response.text,
+                            "raw_text_length": len(response.text),
+                            "raw_text_signature": hashlib.sha256(response.text.encode("utf-8")).hexdigest(),
+                            "clean_text": clean_text,
+                            "clean_text_length": len(clean_text),
+                            "clean_text_signature": hashlib.sha256(clean_text.encode("utf-8")).hexdigest(),
+                            "usage": _extract_usage_from_raw(response.raw),
+                            "raw": response.raw,
+                        },
+                        "attempts_made": attempt + 1,
+                        "errors": list(errors),
+                    }
                 raise LLMProviderError("structured response was empty")
             record_success(provider=adapter.provider, model=model)
             log_event(

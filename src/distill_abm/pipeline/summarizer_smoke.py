@@ -13,6 +13,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from distill_abm.configs.models import SummarizerId
 from distill_abm.pipeline.local_qwen_sample_response import validate_structured_smoke_text_content
 from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, read_active_run_lock, run_log_path
@@ -124,6 +125,7 @@ def run_summarizer_smoke(
     poll_interval_seconds: float = 5.0,
     include_abms: tuple[str, ...] | None = None,
     validated_bundles: tuple[ValidatedSmokeBundle, ...] | None = None,
+    summarizer_modes: tuple[SummarizerId, ...] | None = None,
     summarizer_fns: dict[SummarizerSmokeMode, Callable[[str], str]] | None = None,
 ) -> SummarizerSmokeResult:
     """Run all summarizers over validated full-case text bundles and persist review artifacts."""
@@ -142,6 +144,13 @@ def run_summarizer_smoke(
         "t5": summarize_with_t5,
         "longformer_ext": summarize_with_longformer_ext,
     }
+    selected_summarizer_modes = summarizer_modes or tuple(
+        mode for mode in ("bart", "bert", "t5", "longformer_ext") if mode in resolved_summarizers
+    )
+    missing_modes = [mode for mode in selected_summarizer_modes if mode not in resolved_summarizers]
+    if missing_modes:
+        missing = ", ".join(missing_modes)
+        raise ValueError(f"missing summarizer implementation(s) for requested mode(s): {missing}")
     bundle_results: list[SummarizerBundleResult] = []
     review_rows: list[dict[str, str]] = []
     failed_bundle_ids: list[str] = []
@@ -167,6 +176,7 @@ def run_summarizer_smoke(
                 resume=resume,
                 logger=logger,
                 resolved_summarizers=resolved_summarizers,
+                selected_summarizer_modes=selected_summarizer_modes,
                 bundle_results=bundle_results,
                 review_rows=review_rows,
                 failed_bundle_ids=failed_bundle_ids,
@@ -215,6 +225,7 @@ def _process_bundle(
     resume: bool,
     logger: object,
     resolved_summarizers: dict[SummarizerSmokeMode, Callable[[str], str]],
+    selected_summarizer_modes: tuple[SummarizerId, ...],
     bundle_results: list[SummarizerBundleResult],
     review_rows: list[dict[str, str]],
     failed_bundle_ids: list[str],
@@ -271,7 +282,7 @@ def _process_bundle(
 
     mode_results: list[SummarizerModeResult] = []
     if source_validation_error is None:
-        for mode in ("none", "bart", "bert", "t5", "longformer_ext"):
+        for mode in ("none", *selected_summarizer_modes):
             output_path = summary_dir / f"{mode}.txt"
             raw_output_path = None if mode == "none" else raw_summary_dir / f"{mode}.txt"
             existing_result = _load_resumable_mode_result(

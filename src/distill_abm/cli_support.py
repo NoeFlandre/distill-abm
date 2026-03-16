@@ -11,6 +11,7 @@ import typer
 from distill_abm.configs.loader import load_abm_config, load_experiment_settings, load_models_config
 from distill_abm.configs.models import ModelEntry, SummarizerId
 from distill_abm.ingest.netlogo_workflow import resolve_experiment_parameters
+from distill_abm.pipeline.doe_smoke_models import DoESmokeSummarizationSpec, canonical_summarization_specs
 from distill_abm.pipeline.smoke import SmokeCase, default_branch_smoke_cases, default_smoke_cases
 from distill_abm.viz.plots import MetricPlotBundle
 from distill_abm.viz.viz_smoke import VizSmokeSpec
@@ -185,6 +186,22 @@ def parse_summarizers(values: list[str] | None, fallback: tuple[SummarizerId, ..
             "unsupported summarizer(s): " f"{', '.join(invalid)}. Allowed: {', '.join(SUPPORTED_SUMMARIZERS)}."
         )
     return cast(tuple[SummarizerId, ...], normalized)
+
+
+def resolve_doe_summarization_specs(values: list[str] | None) -> tuple[DoESmokeSummarizationSpec, ...]:
+    """Validate and optionally filter DOE summarization conditions while preserving canonical order."""
+    canonical_specs = canonical_summarization_specs()
+    available = {spec.summarization_mode: spec for spec in canonical_specs}
+    if values is None:
+        return canonical_specs
+    normalized = tuple(dict.fromkeys(value.strip() for value in values))
+    invalid = [value for value in normalized if value not in available]
+    if invalid:
+        raise typer.BadParameter(
+            "unsupported summarization mode(s): "
+            f"{', '.join(invalid)}. Allowed: {', '.join(available)}."
+        )
+    return tuple(available[value] for value in normalized)
 
 
 def resolve_model_from_registry(models_path: Path, model_id: str) -> tuple[str, str]:
