@@ -1,6 +1,6 @@
 # distill-abm
 
-`distill-abm` is the publication-facing repository for the ABM-to-LLM distillation pipeline used in the accompanying paper. The repository contains code, configs, tests, and minimal documentation. Published run outputs live in the Hugging Face results bucket, not in Git.
+`distill-abm` is the publication-facing repository for the ABM-to-LLM distillation pipeline used in the accompanying paper. The repository contains code, configs, tests, and minimal documentation. Published run outputs live in the [Hugging Face results bucket](https://huggingface.co/buckets/NoeFlandre/distill-abms-results), not in Git.
 
 ## Scope
 
