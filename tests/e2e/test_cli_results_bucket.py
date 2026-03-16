@@ -38,4 +38,5 @@ def test_cli_sync_results_bucket_invokes_action(tmp_path: Path, monkeypatch) -> 
     assert captured["bucket_uri"] == "hf://buckets/NoeFlandre/distill-abms-results"
     assert captured["dry_run"] is True
     assert captured["delete"] is True
+    assert captured["allow_empty_source"] is False
     assert captured["json_output"] is True

@@ -744,6 +744,13 @@ def sync_results_bucket(
         bool,
         typer.Option("--delete/--no-delete", help="Delete remote files missing from the local results tree."),
     ] = True,
+    allow_empty_source: Annotated[
+        bool,
+        typer.Option(
+            "--allow-empty-source/--no-allow-empty-source",
+            help="Allow an apply sync even when the local results tree has no syncable result files after exclusions.",
+        ),
+    ] = False,
     plan_path: Annotated[
         Path | None,
         typer.Option(help="Optional JSONL path for saving a dry-run sync plan."),
@@ -760,6 +767,7 @@ def sync_results_bucket(
         bucket_uri=bucket_uri,
         dry_run=dry_run,
         delete=delete,
+        allow_empty_source=allow_empty_source,
         plan_path=plan_path,
         token_env_var=token_env_var,
         json_output=json_output,
