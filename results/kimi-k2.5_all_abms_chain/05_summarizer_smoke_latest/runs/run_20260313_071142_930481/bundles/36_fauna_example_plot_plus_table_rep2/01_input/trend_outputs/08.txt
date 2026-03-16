@@ -1,9 +1,0 @@
-The male megaherbivore population begins at 125 individuals. A rapid decline occurs over the first 500 time steps, reducing the population to approximately 5–25 individuals. This steep initial decrease reflects intensive hunting pressure on males, who possess higher food value (30) compared to females (27), despite requiring greater processing costs.
-
-Between steps 500 and 1000, the decline continues at a decelerated but variable rate across simulation runs. While some runs maintain small populations of 5–10 males, others approach zero. By step 1000, the median population across runs falls below 2 individuals.
-
-From step 1000 to 1500, most simulation runs reach extinction of male animals. However, several runs exhibit prolonged persistence, maintaining 1–5 individuals until after step 1500, with extreme cases persisting beyond step 2000.
-
-Complete extinction across all runs occurs by step 2284. The population exhibits a mean of 21.03 individuals across the full simulation period, substantially higher than the median of 1.35, indicating a strongly right-skewed distribution where high initial abundances persist only briefly before extended periods of scarcity.
-
-The trajectory is characterized by a monotonic decrease with high variance in extinction timing, suggesting that while hunting pressure consistently drives male populations toward extinction, stochastic factors in herd movement, hunter foraging decisions, or demographic fluctuations create variability in the rate of decline across different simulation realizations.

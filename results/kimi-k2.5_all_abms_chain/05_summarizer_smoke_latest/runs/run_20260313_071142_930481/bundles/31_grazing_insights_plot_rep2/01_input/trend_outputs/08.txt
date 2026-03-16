@@ -1,9 +1,0 @@
-The data tracks the diffusion of social learning behaviors across 60 households over 100 time steps across multiple simulation runs. 
-
-Initially, at step 0, no households have engaged in social learning (count = 0). Between approximately steps 5 and 25, all simulation runs exhibit rapid, step-like increases in the count of households with social learning, characterized by discrete jumps followed by brief plateaus. This staircase pattern indicates that adoption occurs in discrete events rather than continuously.
-
-The rate of diffusion varies substantially across simulations. Some runs reach saturation as early as step 30, while others continue accumulating adopting households until approximately step 60. By step 60, nearly all simulation runs have stabilized, maintaining constant counts through step 100.
-
-Final adoption levels at step 100 vary widely across the simulation ensemble, ranging from approximately 18 households (30% of the population) to approximately 54 households (90% of the population). The most common terminal values cluster between 42 and 48 households, though significant outliers exist at both the lower and upper extremes.
-
-**Implications for decision makers:** The rapid initial diffusion (within 25 steps) suggests that social learning interventions can spread quickly through smallholder communities, but the wide variation in final adoption rates (30-90%) indicates that network structure, spatial configuration, or initial conditions significantly influence whether behaviors become community-wide or remain limited to sub-populations. The persistence of plateaus after step 60 suggests that once diffusion stabilizes, the behavior is durable, making early intervention critical for maximizing adoption.

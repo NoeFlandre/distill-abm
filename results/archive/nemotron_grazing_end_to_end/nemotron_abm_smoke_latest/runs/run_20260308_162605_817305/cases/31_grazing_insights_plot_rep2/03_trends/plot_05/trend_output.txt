@@ -1,9 +1,0 @@
-Analyzing the figure of simulation results demonstrates some consistent trends across all behavior types. All the plots in this figure depict a less or more constant trajectory which has been influenced by the stochastic character of the simulations.
-
-During the initial years of the simulation, there’s a sharp decrease in the mean livestock per household. This shows a period of overexploitation of the pastures during which pastures are overgrazed to the point that livestock numbers decrease sharply. The drop takes place in less than five steps (years of simulation).
-
-In the long term there’s a very different behavior in the system determined by external factors and resulting sudden changes in the mean livestock per household. The randomized rainfall results in these sudden fluctuations, there are years in which the pasture resources increase and thus households can increase their herds and there are years in which weather events decrease the pasture availability.
-
-The more resilient are households that have more adequate and robust strategies in place to deal with food resource fluctuations as shown by the E-LBD population. These households demonstrate greater stability in their livestock numbers.
-
-Knowing all these patterns is a vital part in shaping sustainable grazing practices. It’s a way for managing pastures and household resilience especially when external climatic factors are highly uncertain.

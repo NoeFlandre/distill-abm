@@ -1,7 +1,0 @@
-The simulation of the Megaherbivore Hunting Pressure Model (MHPM) shows a clear and consistent decline in the number of female prey animals over time. Initially, the population starts at 125 female prey animals. The most rapid decline occurs in the early stages of the simulation, with significant decreases observed up to around the 927th tick. During this period, the population drops steeply, indicating a high rate of decline. 
-
-Following this initial steep decline, the rate of decrease slows down, but the overall trend remains downward. There are some minor fluctuations and brief periods of stabilization or slight increases, particularly around the 1160-1391 and 1856-2087 tick intervals, but these are not sustained, and the general trend continues to be a decrease in the population. 
-
-Key time steps highlight the gradual nature of the decline after the initial sharp drop. For instance, notable points include slight peaks and valleys around the 700-900 tick range, but these are minor compared to the overall downward trend. The population eventually approaches zero, with the final value at the end of the simulation being zero female prey animals. 
-
-The statistical analysis indicates that the decline is significant and consistent, with various phases of the simulation showing significant decreasing trends. The oscillation summary suggests some periodic fluctuations, but these are minor and do not alter the overall declining trend. The dominant period of oscillation is around 63 ticks, indicating some regularity in the minor fluctuations observed.

@@ -1,8 +1,0 @@
-The data shows a consistent pattern across simulations: an initial phase of stability, followed by a significant decline, then a recovery phase converging to a stable equilibrium. Here are the key observations:
-
-- **Initial Stability (Steps 0-20):** All simulations start near 45,000 biomass, suggesting baseline environmental conditions before systematic agent interactions emerge.
-- **Transition Phase (Steps 20-60):** A clear decline to ~40,000 occurs across runs, reflecting system response to grazing pressure. This phase correlates with the model's parameters showing moderate stress conditions (rain-std=100, rain-mean=200 with significant variability).
-- **Recovery Phase (Steps 60-100):** All trajectories show rapid convergence to ~60,000 biomass (~12-15% increase from start), with variance decreasing significantly. This aligns with the resting-threshold=0.1 preventing catastrophic collapse while allowing recovery through controlled grazing feedback.
-
-Interpretation:
-The dynamics reflect agent-based equilibrium-seeking behavior - initial conditions within the "satisficing" zone lead to gradual exploration (dip) followed by reinforced conservation behaviors. The 2024 parameters (homogeneous E-RO agents with global rainfall variability) enable this pattern through stochastic environmental feedback. The convergence to higher biomass levels than initial conditions suggests learning from historical episodes, despite no explicit typological heterogeneity being simulated. The lack of differentiation among individual agent strategies (all E-RO) implies this equilibrium arises from environmental feedback rather than social dynamics in this particular scenario.

@@ -1,3 +1,0 @@
-Estock refers to the amount of livestock that is stored in a region for use in future dry seasons.
-
-We can see from the figure that for all the colored lines, regardless of the social or behavioral type, the mean destock total of households increases with the number of steps, regardless of the behavioral type. The gray line that represents the estimation of the mean destock total of households using a Gaussian kernel smoothing filter increases much faster than all other behavioral types.

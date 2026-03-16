@@ -1,8 +1,0 @@
-{
-  "abm": "grazing",
-  "case_id": "26_grazing_none_table_rep2",
-  "evidence_mode": "table",
-  "model": "moonshotai/kimi-k2.5",
-  "prompt_variant": "none",
-  "repetition": 2
-}

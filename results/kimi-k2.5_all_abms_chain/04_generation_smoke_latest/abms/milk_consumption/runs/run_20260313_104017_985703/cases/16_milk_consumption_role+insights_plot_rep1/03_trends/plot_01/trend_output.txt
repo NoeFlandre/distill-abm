@@ -1,7 +1,0 @@
-The time series begins with mean whole milk consumption holding steady at approximately 2650-2700 units during the initial step, followed immediately by a steep downward trajectory. Between steps 1 and 10, consumption plummets rapidly from roughly 2650 to approximately 950-1000 units, representing the most dramatic phase of decline. 
-
-From step 10 to step 25, the descent moderates considerably, with consumption gradually decreasing from around 1000 to approximately 650 units. This period of relative stability in the rate of change suggests a consolidation phase in consumer behavioral patterns.
-
-Beginning around step 25, a second sharp decline emerges, driving consumption down from roughly 650 to approximately 250-280 units by step 32. This final phase indicates an acceleration in the transition away from whole milk consumption as the simulation concludes.
-
-For decision makers, the non-linear trajectory reveals distinct behavioral regimes within consumer populations, characterized by periods of rapid change interspersed with phases of gradual adaptation. This pattern suggests that market transitions may exhibit tipping points where intervention strategies could be most effectively timed to coincide with naturally occurring acceleration phases, rather than during periods of high inertia. Additionally, the persistence of whole milk consumption even at reduced levels throughout the entire simulation period indicates that complete market substitution may require extended time horizons or more intensive behavioral disruption mechanisms.

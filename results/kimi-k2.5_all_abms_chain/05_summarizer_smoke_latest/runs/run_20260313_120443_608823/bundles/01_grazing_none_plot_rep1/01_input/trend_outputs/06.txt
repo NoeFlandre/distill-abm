@@ -1,9 +1,0 @@
-In the initial phase spanning approximately the first five time steps, the mean destock metric rises sharply from initial values near zero to peak levels ranging between approximately 6 and 7.5, representing the maximum values observed across all simulation trajectories.
-
-Between approximately steps 5 and 30, the metric undergoes a steep decline characterized by high variability across runs. By step 10, values have decreased to ranges between approximately 1 and 4. By step 20, most trajectories have fallen below 2.5, though individual runs exhibit considerable dispersion with some maintaining values near 2.0-2.5 while others drop below 1.0.
-
-During the transition period spanning roughly steps 20 to 50, the trajectories display pronounced oscillatory behavior with intermittent spikes superimposed on the downward trend. Values during this phase range widely from near zero to approximately 2.0, with the amplitude of fluctuations gradually diminishing over time.
-
-From approximately step 50 through step 100, the system reaches a steady-state regime where mean destock values stabilize at distinct constant levels with minimal temporal variation within individual trajectories. These asymptotic values span a continuous range from approximately 0 to 1.0, with multiple trajectories clustering at discrete equilibrium levels. Specifically, the highest trajectory stabilizes near 1.0, while others settle at intermediate levels of approximately 0.8, 0.5-0.7, and 0.1-0.3, with a subset approaching values near zero.
-
-The long-term behavior demonstrates persistent heterogeneity in outcomes, with the spread between the highest and lowest stable values maintained at approximately 1.0 unit throughout the final 40-50 steps of the simulation. This suggests that while all trajectories eventually reach stable destocking regimes, systematic differences in long-term performance persist based on behavioral type or stochastic factors.

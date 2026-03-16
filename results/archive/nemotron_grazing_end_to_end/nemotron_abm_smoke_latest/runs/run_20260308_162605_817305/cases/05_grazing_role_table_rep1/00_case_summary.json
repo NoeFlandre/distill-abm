@@ -1,8 +1,0 @@
-{
-  "abm": "grazing",
-  "case_id": "05_grazing_role_table_rep1",
-  "evidence_mode": "table",
-  "model": "nvidia/nemotron-nano-12b-v2-vl:free",
-  "prompt_variant": "role",
-  "repetition": 1
-}

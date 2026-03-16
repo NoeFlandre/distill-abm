@@ -1,1 +1,0 @@
-The average initial risk attitude of all social learning agents remains constant at 0.0074 throughout the 100 time steps of the simulation. The metric does not exhibit any temporal variation, peaks, or trend shifts from the start to the end of the period.

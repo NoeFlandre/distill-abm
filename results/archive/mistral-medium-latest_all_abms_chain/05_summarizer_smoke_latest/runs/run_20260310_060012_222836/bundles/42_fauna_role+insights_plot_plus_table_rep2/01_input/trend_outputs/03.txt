@@ -1,9 +1,0 @@
-The cumulative number of male prey animals hunted and killed by forager bands in the Megaherbivore Hunting Pressure Model (MHPM) shows distinct trends over the simulation period. Initially, there is a rapid increase in the number of males killed, starting from 0 and rising steeply. This trend continues with varying rates of increase until around 1,160 ticks, where the rate of increase begins to slow down significantly. 
-
-From approximately 1,160 to 1,391 ticks, there is no significant trend, indicating a stabilization in the number of males killed. Following this period, there is a slight increase again from 1,392 to 1,623 ticks. From 1,624 to 1,855 ticks, the trend stabilizes once more, showing no significant change. After 1,856 ticks, a decreasing trend is observed, indicating a reduction in the number of males killed. 
-
-Key points in the simulation include notable changes at around 125, 250, 375, 500, 625, and 850 ticks, where the rate of increase shifts. The maximum number of males killed is observed around 1,876 ticks, reaching a peak value of approximately 120.17. After this peak, the number stabilizes with minor fluctuations and a slight overall decrease towards the end of the simulation. 
-
-The dominant period of oscillation is around 63 ticks, suggesting a cyclical pattern in the number of males killed. This cyclical behavior, along with the overall trends, provides insights into the dynamics of hunting pressure and its effects on male prey populations over time. 
-
-For decision makers, understanding these trends can help in assessing the impact of hunting pressure on megaherbivore populations and in designing strategies to mitigate potential extinctions. The initial rapid increase highlights the immediate impact of hunting, while the subsequent stabilization and slight decrease suggest possible adaptation or saturation effects in the hunting dynamics.

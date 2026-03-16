@@ -1,9 +1,0 @@
-The average weekly consumption of whole milk per agent starts at approximately 2654.81 units and exhibits a sharp and consistent decline in the initial steps. By the fifth step, the consumption drops significantly to around 1600 units. This downward trend continues, and by the tenth step, the average consumption further decreases to roughly 1000 units. 
-
-Between steps 10 and 20, the rate of decline slows down, and the consumption values stabilize somewhat, fluctuating around 800 units. During this period, there are minor peaks and valleys, indicating small oscillations in consumption patterns. For instance, there is a slight increase around step 19, reaching approximately 773.96 units, followed by a minor decrease. 
-
-From step 20 onwards, the consumption continues to decrease but at a slower and more gradual rate. By step 25, the average consumption is around 600 units. There are minor fluctuations observed, such as a small peak at step 27 with a value of approximately 620.98 units, followed by a slight decrease. 
-
-Towards the final steps, the consumption further declines, reaching around 335.18 units at step 30. The trend continues downward, and by the last recorded step (step 32), the average weekly consumption of whole milk per agent is approximately 253.10 units. 
-
-Throughout the simulation, the overall trend is a significant and steady decline in the average weekly consumption of whole milk per agent, with periods of stabilization and minor fluctuations. The initial sharp decline slows down and becomes more gradual as the steps progress, indicating a significant shift in consumption patterns over time.

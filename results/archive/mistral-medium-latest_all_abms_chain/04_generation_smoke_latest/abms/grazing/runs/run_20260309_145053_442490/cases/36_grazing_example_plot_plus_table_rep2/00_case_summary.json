@@ -1,8 +1,0 @@
-{
-  "abm": "grazing",
-  "case_id": "36_grazing_example_plot_plus_table_rep2",
-  "evidence_mode": "plot+table",
-  "model": "mistral-medium-latest",
-  "prompt_variant": "example",
-  "repetition": 2
-}

@@ -1,9 +1,0 @@
-The cumulative mortality trajectories exhibit monotonic increases from zero initial deaths at the start of each simulation, eventually plateauing at terminal values ranging between approximately 225 and 250 cumulative deaths. Given the initial prey population of 250 animals, these terminal counts correspond to mortality rates of 90% to 100%, indicating near-complete or total population extinction across all replicates.
-
-Substantial heterogeneity exists in the temporal rate of mortality accumulation. The most rapid trajectories accumulate over 200 deaths by approximately step 400 and reach terminal plateaus by steps 600-800. In these instances, mortality occurs predominately during the early simulation phase, with cumulative counts stabilizing at 240-250 deaths.
-
-Intermediate trajectories show mortality accumulation extending through step 1000, reaching cumulative death counts of 220-240 by this point and attaining terminal values between steps 800 and 1500. By step 500, these trajectories have accumulated between 200 and 230 deaths.
-
-The slowest trajectories demonstrate prolonged mortality accumulation, with cumulative death counts reaching only 175-200 by step 500 and continuing to rise through steps 1000-1500. Some replicates require approximately 2000 steps to approach terminal death counts of 225-240. These extended trajectories show continued though decelerating mortality accumulation well beyond the point where faster trajectories have stabilized.
-
-By step 1000, the majority of replicates have accumulated 220 or more deaths, with cumulative mortality across all replicates converging toward the 230-250 range. The cessation of mortality accumulation indicated by the plateauing trajectories suggests either complete extinction or the survival of small remnant populations of fewer than 25 individuals.

@@ -1,5 +1,0 @@
-{
-  "reporter_pattern": "sum [energy] of foragers",
-  "series_path": "results/qwen3.5-27b_openrouter_all_abms_chain/03_doe_smoke_latest/runs/run_20260312_073618_612192/10_shared/fauna/02_evidence/tables/plot_2_series.csv",
-  "summary_path": "results/qwen3.5-27b_openrouter_all_abms_chain/03_doe_smoke_latest/runs/run_20260312_073618_612192/10_shared/fauna/02_evidence/tables/plot_2.txt"
-}

@@ -1,7 +1,0 @@
-The total energy of female animals begins at approximately 12,000 to 12,500 units across all simulation runs. Over the course of the simulations, this metric exhibits a consistent downward trajectory, ultimately approaching or reaching zero.
-
-The decline follows a steep, non-linear pattern. During the initial 200 to 300 steps, energy levels drop rapidly to approximately 4,000 to 6,000 units. Between steps 300 and 600, the rate of decline continues but with varying trajectories across different runs. By step 600, most simulations have reduced total energy to below 1,000 units, with many approaching zero.
-
-Considerable variation exists between simulation runs regarding the timing and rate of energy depletion. While the majority of runs reach near-zero energy levels between steps 500 and 1000, some simulations maintain small residual energy levels—ranging from approximately 100 to 500 units—persisting as late as step 1500 to 2000 before eventually declining to zero or near-zero values.
-
-The final state across all runs shows total female animal energy converging at or very near zero, indicating the complete depletion of energy reserves in the female prey population over the simulated time period.

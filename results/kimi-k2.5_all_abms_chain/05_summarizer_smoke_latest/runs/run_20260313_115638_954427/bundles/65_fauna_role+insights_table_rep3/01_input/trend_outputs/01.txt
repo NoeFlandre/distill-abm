@@ -1,5 +1,0 @@
-The number of human hunter-gatherer bands remains constant at 20 individuals throughout the entire simulation period from initialization through tick 2312. This metric exhibits no variation, maintaining the initial population size without deviation across all observed time steps.
-
-This stasis reflects the model's parameter configuration where forager mortality is disabled and no mechanisms for hunter recruitment or reproduction are active. Consequently, the 20 hunters present at the simulation's outset persist indefinitely, creating a fixed baseline of hunting pressure on the megaherbivore population.
-
-For decision makers, this indicates that any observed fluctuations in megaherbivore abundance or distribution throughout the simulation arise solely from environmental factors, prey life history dynamics, or hunting efficiency rather than changes in hunter population density. The constant human agent count simplifies attribution of causality when analyzing megaherbivore decline or persistence scenarios, as demographic stochasticity in the human population is eliminated as a confounding variable.

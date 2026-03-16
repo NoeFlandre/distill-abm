@@ -1,7 +1,0 @@
-The cumulative number of deaths among the prey animal population, from both natural causes and predation by foragers, exhibits distinct trends over time. Initially, the number of deaths increases rapidly, with a steep rise from 0 to approximately 200 deaths within the first 500 steps. This rapid increase continues at a slightly slower rate until around 1000 steps, where the cumulative deaths reach about 230. 
-
-Following this period, the rate of increase in the number of deaths slows down significantly. Between 1000 and 2000 steps, the cumulative deaths fluctuate slightly but generally stabilize around 235 to 240 deaths. This stabilization indicates a plateau in the death rate, suggesting that the population dynamics have reached a form of equilibrium where the number of deaths per time step is relatively constant. 
-
-Key time steps and values highlight the initial rapid increase in deaths, with notable points at around 500 steps (approximately 200 deaths) and 1000 steps (approximately 230 deaths). The stabilization phase is marked by minor fluctuations around the mean value of approximately 235 deaths. 
-
-For decision makers, these trends suggest that initial conditions and early interactions between hunters and prey are critical in determining the rapid increase in mortality. The subsequent stabilization indicates that the system may reach a dynamic equilibrium where the death rate balances out over time. Understanding these phases can help in designing interventions or policies aimed at managing wildlife populations and hunting pressures effectively.

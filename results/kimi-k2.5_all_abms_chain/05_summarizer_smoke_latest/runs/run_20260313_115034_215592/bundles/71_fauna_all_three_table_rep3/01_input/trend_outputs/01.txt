@@ -1,7 +1,0 @@
-The number of active human hunter-gatherer bands remains absolutely constant at 20 individuals throughout the entire simulation duration of 2,312 time steps. The metric exhibits zero variance, with no detectable peaks, valleys, or deviations from this initial value at any point in the temporal sequence.
-
-This static trajectory directly reflects the model's parameter configuration designating foragers as immortal and non-reproductive. With mortality from starvation eliminated and no mechanism for population recruitment or dispersal, the hunter population functions as a fixed constant rather than a dynamic variable. Consequently, the per-capita hunting pressure exerted on the megaherbivore population remains unwavering and entirely deterministic throughout the simulation period.
-
-**Implications for Decision Makers:**
-
-This experimental configuration effectively isolates prey population dynamics from human demographic stochasticity, creating a controlled environment where any megaherbivore population declines can be attributed solely to the interaction between constant hunting pressure, environmental conditions, and prey life history traits. For policymakers and conservation scientists, this represents a baseline "sustained pressure" scenario useful for determining minimum viable population thresholds for megaherbivores under steady predation, though it excludes real-world complexities such as hunter population responses to prey scarcity or cultural demographic changes.

@@ -1,9 +1,0 @@
-The cumulative number of postpartum females killed in the Megaherbivore Hunting Pressure Model (MHPM) shows a rapid increase in the early stages of the simulation, followed by a gradual stabilization. Initially, the number of postpartum females killed rises sharply from 0 to approximately 117 over the first 2000 steps. This rapid increase indicates a high hunting pressure on postpartum females during the early phase of the simulation. 
-
-Following this initial surge, the rate of increase slows down significantly, and the cumulative number of postpartum females killed stabilizes around 117 to 119. This stabilization suggests that the hunting pressure reaches a point where the rate of postpartum females being killed balances out, leading to minimal changes in the cumulative count. 
-
-Key statistical points include a mean value of approximately 102.44 and a median of 116.86, indicating that while the central tendency is around these values, there is a significant initial increase before stabilization. The standard deviation of 30.00 and variance of 900.13 highlight the variability in the early stages of the simulation. The minimum value remains at 0 at the start, while the maximum value reaches 119 around step 1826. 
-
-The trend analysis using the rolling Mann-Kendall test shows significant increasing trends in the early phases, with tau values close to 1 and significant p-values, indicating strong upward trends. As the simulation progresses, the trend weakens, and by the later stages, there is no significant trend, reflecting the stabilization in the number of postpartum females killed. 
-
-Change points identified at steps 475, 625, 850, and 2310 mark significant shifts in the trend, likely corresponding to phases where the rate of increase slows down or stabilizes. The oscillation summary indicates a dominant period of 63 steps, suggesting periodic fluctuations around the stabilized value in the later stages of the simulation.

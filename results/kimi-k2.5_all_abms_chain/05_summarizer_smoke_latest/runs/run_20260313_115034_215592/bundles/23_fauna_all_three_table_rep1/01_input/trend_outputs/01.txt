@@ -1,7 +1,0 @@
-The number of human hunter-gatherer bands remains constant at 20 throughout the entire simulation duration, from initialization at tick 0 through the terminal time step. This value shows no deviation across any recorded interval, maintaining the initial population size without fluctuation.
-
-This static population dynamic arises directly from the model's configuration disabling forager mortality while omitting mechanisms for hunter recruitment or reproduction. With the immortal-foragers parameter activated, the initial cohort of 20 hunters persists indefinitely regardless of energy reserves, hunting success, prey availability, or environmental conditions. The absence of population turnover means that hunting pressure, measured as the number of active foragers, remains invariant irrespective of landscape productivity or megaherbivore population density.
-
-**Implications for Decision Makers**
-
-This configuration establishes a baseline of constant anthropogenic pressure, enabling clear isolation of environmental and biological factors affecting megaherbivore populations without confounding feedback from hunter demography. However, the lack of density-dependent hunter dynamics limits the model's ability to explore how human populations might naturally respond to resource scarcity or abundance, restricting insights into coupled socio-ecological system behaviors and potential sustainable coexistence scenarios.

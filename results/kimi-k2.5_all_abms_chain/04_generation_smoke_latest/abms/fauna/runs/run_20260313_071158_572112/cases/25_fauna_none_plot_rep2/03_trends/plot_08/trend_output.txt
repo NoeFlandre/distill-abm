@@ -1,5 +1,0 @@
-The number of male animals begins at approximately 125 individuals. Over the course of the simulations, this population exhibits a consistent downward trajectory toward extinction. The decline is monotonic across all runs, with the number of male animals decreasing as individual animals die.
-
-The rate of decline is most rapid during the initial phase, with populations typically falling to between 20 and 40 individuals by approximately step 500, though there is considerable variation in the exact timing and pace of decline across different simulation runs. Some populations persist longer than others, with extinction occurring at varying time points ranging from roughly step 400 to beyond step 2000.
-
-As populations dwindle to fewer than 20 individuals, the decline slows in many runs, with small numbers of males persisting for extended periods before eventually reaching zero. Ultimately, all simulation runs result in the complete extinction of the male population, with the final individuals disappearing by approximately step 2200 in the most persistent cases.

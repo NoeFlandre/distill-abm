@@ -1,1 +1,0 @@
-The number of human hunter-gatherer bands remains constant throughout the simulation. It starts at 20 and maintains this value consistently over the entire duration of 2000 time steps. This indicates that there is no change in the number of active hunter-gatherer bands, suggesting a stable population of human hunters within the simulation parameters.

@@ -1,9 +1,0 @@
-The mean weekly whole milk consumption per person initiates at approximately 2,650 units at step 0. A steep decline occurs throughout the first ten steps, with values decreasing to roughly 950-1,100 units by step 10. This represents a reduction of approximately 60% from initial levels.
-
-From step 10 to step 25, the rate of decline moderates substantially. Consumption decreases gradually from approximately 1,000 units to 600-650 units, with minor fluctuations observed around steps 18-20.
-
-Between step 25 and the conclusion at step 32, the decline accelerates once more. Values drop from approximately 650 units to 250-300 units by the final time step.
-
-Across all 32 steps, the multiple simulation runs maintain consistent trajectories with limited variance. While some divergence appears during steps 8-12, with certain runs recording values near 1,100 while others approach 950, the runs reconverge by step 15 and remain tightly clustered thereafter.
-
-Insights for decision makers: The three-phase pattern suggests that dietary transitions proceed through distinct stages: an initial rapid shift driven by changing health perceptions, a prolonged intermediate period where habit persistence slows adoption, and a final acceleration as social norms consolidate around alternatives. Public health interventions may be most effective during the initial rapid decline phase to maximize impact, though sustained efforts remain necessary to overcome habit persistence during the middle phase. The model's consistency across runs indicates these dynamics are structurally robust rather than dependent on specific random variations.

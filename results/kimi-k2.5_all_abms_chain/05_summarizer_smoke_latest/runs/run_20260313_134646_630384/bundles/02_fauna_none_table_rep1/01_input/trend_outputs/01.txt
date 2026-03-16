@@ -1,1 +1,0 @@
-The number of active human hunter-gatherer bands remains constant at 20 throughout the entire simulation duration of 2312 ticks. This static value reflects the model configuration wherein hunter agents neither reproduce nor experience mortality from energy depletion, maintaining the initial population established at the simulation's outset.

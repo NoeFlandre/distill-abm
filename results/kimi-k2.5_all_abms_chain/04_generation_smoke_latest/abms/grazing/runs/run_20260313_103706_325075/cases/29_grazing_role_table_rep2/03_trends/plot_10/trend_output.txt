@@ -1,7 +1,0 @@
-The simulation initializes with 20 households employing the E-RO (experiential rule-of-thumb) strategy. During the initial decade, the number of households following this approach exhibits a modest increase, peaking at approximately 21 households around year 8. 
-
-Following this early peak, the system undergoes a marked transition characterized by a sustained decline in E-RO household counts. Between approximately years 10 and 65, the number of households decreases significantly, dropping from values near 20 to roughly 15. This downward trajectory is punctuated by change points around years 20 and 45, indicating shifts in the rate of decline. By year 45, the count falls to approximately 15.6, continuing to diminish toward a minimum near 14.7 reached by year 92.
-
-In the final decades of the simulation (years 65 through 100), the decline attenuates and the series stabilizes, showing no statistically significant trend. The terminal value of approximately 14.7 households indicates that roughly one-quarter of the initially assigned E-RO households exit the system over the century-long simulation.
-
-Overall, the trajectory reveals an early expansion or stability followed by a prolonged period of household attrition among non-learning agents, ultimately settling into a steady-state with reduced numbers persisting through the final third of the simulation period.

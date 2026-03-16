@@ -1,4 +1,0 @@
-metric,uses_ground_truth,ground_truth_source,candidate_source,notes
-token_f1 / precision / recall,yes,reference_path,summary_output_path,Token overlap between the generated summary and the selected ground-truth text.
-BLEU / METEOR / R-1 / R-2 / R-L,yes,reference_path,summary_output_path,Computed against the selected ground-truth file for the row's reference_family.
-Reading ease,no,,summary_output_path,Flesch Reading Ease of the candidate summary text only.

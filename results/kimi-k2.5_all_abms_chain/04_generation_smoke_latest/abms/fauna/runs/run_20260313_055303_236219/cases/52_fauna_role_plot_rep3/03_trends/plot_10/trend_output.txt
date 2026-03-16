@@ -1,9 +1,0 @@
-The simulations consistently begin with a total prey population of 250 individuals. Across all replicates, the population exhibits a persistent downward trajectory from the initial state.
-
-The rate of decline varies substantially among simulation runs. In the most rapid cases, populations collapse from 250 to below 50 individuals within approximately 400 to 500 ticks, with extinction or near-extinction (fewer than 10 individuals) occurring by tick 600. In contrast, the most gradual declines show populations maintaining 100 or more individuals until approximately tick 600-800, with some runs retaining 20-40 individuals until beyond tick 1000.
-
-Most trajectories display a steep initial decline phase during the first 200-400 ticks, where populations typically fall from 250 to between 100 and 150 individuals. This is followed by a continued but somewhat more variable rate of decline.
-
-By approximately tick 1000, the majority of simulation runs have reduced to fewer than 20 individuals. A small subset of replicates shows prolonged persistence, with populations hovering between 10 and 30 individuals until roughly tick 1500, and one or two runs maintaining small populations (5-10 individuals) until beyond tick 2000.
-
-Eventually, all trajectories converge toward zero, with complete or effective extinction (0-3 individuals) occurring in all observed runs by approximately tick 2200. The heterogeneity in extinction timing suggests stochastic variation in the interaction dynamics between the 20 human foragers and the prey population, despite identical initial parameters across runs.

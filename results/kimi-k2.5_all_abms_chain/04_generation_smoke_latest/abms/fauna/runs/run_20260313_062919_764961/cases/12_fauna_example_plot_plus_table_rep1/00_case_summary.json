@@ -1,8 +1,0 @@
-{
-  "abm": "fauna",
-  "case_id": "12_fauna_example_plot_plus_table_rep1",
-  "evidence_mode": "plot+table",
-  "model": "moonshotai/kimi-k2.5",
-  "prompt_variant": "example",
-  "repetition": 1
-}

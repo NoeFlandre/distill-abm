@@ -1,9 +1,0 @@
-The aggregate energy contained within the megaherbivore population initiates at approximately 16,667 units and undergoes a precipitous decline throughout the simulation, ultimately reaching zero at tick 2,311. This trajectory indicates a complete depletion of the prey energy base over approximately 6.3 years (given the temporal calibration of 365 ticks per year).
-
-The decline exhibits distinct phases. An initial rapid decrease occurs from the outset through approximately tick 350, with the rate of loss moderating thereafter. This early phase includes notable inflection points at ticks 309 and 460, suggesting shifts in the underlying dynamics of energy extraction or population structure.
-
-Superimposed on the downward trend are oscillatory fluctuations with a dominant period of approximately 63 ticks, consistent with seasonal resource pulses given the high seasonality parameter (0.8) and 365-day annual cycle. These oscillations manifest as local peaks in aggregate energy around ticks 385-440, where values temporarily stabilize between approximately 3,700 and 4,100 units before resuming decline.
-
-A transient deceleration in the rate of energy loss occurs between ticks 500 and 625, followed by continued decline. Notably, between approximately ticks 1,392 and 1,623, the trend briefly reverses to a weak increase (tau = 0.206), suggesting a temporary rebound in prey energy reserves, possibly due to reduced hunting pressure or demographic recovery, before the downward trajectory resumes.
-
-The final phase, from approximately tick 875 onward, shows a protracted decline toward extinction, with the rate of energy loss becoming progressively slower as the population approaches zero, characteristic of a depleted prey base with few remaining individuals. The population reaches complete energy depletion (zero biomass) at tick 2,311, representing total megaherbivore extinction under the modeled hunting and environmental conditions.

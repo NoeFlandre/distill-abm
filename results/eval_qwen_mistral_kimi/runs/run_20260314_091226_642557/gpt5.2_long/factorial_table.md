@@ -1,4 +1,0 @@
-# Factorial Contributions
-
-| Feature | BLEU | METEOR | R-1 | R-2 | R-L | Reading ease |
-| --- | --- | --- | --- | --- | --- | --- |

@@ -1,7 +1,0 @@
-The count of non-learning households begins at exactly 20.0000 at step 0. During the initial phase through approximately step 10, the population exhibits a modest increase, reaching a maximum average value of 21.1000 at step 8. Following this brief early peak, the system enters a prolonged decline phase lasting from step 11 through step 65, characterized by statistically significant decreasing trends across rolling windows. This middle period contains two notable change points at steps 20 and 45, marking shifts in the rate or pattern of decline as the population adjusts to ecological and economic pressures.
-
-After step 65, the trajectory stabilizes, showing no significant directional trend through the remainder of the simulation, though fluctuations persist around a reduced equilibrium level. The series reaches a minimum average value of 14.6667 at step 92 and concludes at 14.7000 at step 100, representing an overall net reduction of approximately 26.5% from initial population levels.
-
-Substantial variability exists across the 30 simulation runs, with the aggregate standard deviation of 1.9174 indicating divergent outcomes among individual realizations. While the mean trajectory shows a gradual decline to roughly 15 households, individual simulation paths range from near-complete attrition to levels persistently exceeding the initial count, with some runs showing spikes as high as 40 households in early steps before subsequent declines.
-
-This pattern suggests that non-learning households face a

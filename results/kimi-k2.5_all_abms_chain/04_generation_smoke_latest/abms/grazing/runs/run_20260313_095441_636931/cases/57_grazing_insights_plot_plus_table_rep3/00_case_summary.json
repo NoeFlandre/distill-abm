@@ -1,8 +1,0 @@
-{
-  "abm": "grazing",
-  "case_id": "57_grazing_insights_plot_plus_table_rep3",
-  "evidence_mode": "plot+table",
-  "model": "moonshotai/kimi-k2.5",
-  "prompt_variant": "insights",
-  "repetition": 3
-}

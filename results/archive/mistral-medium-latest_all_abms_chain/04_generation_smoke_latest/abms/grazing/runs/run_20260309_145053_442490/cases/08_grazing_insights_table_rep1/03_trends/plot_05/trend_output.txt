@@ -1,7 +1,0 @@
-The average total number of livestock, including both healthy livestock and those that have been destocked, across all households shows a distinct trend over the 100 timesteps. Initially, the number of livestock starts at 90.0000. There is a significant decreasing trend in the early timesteps, with the number of livestock dropping sharply. This decline continues until around timestep 37, where the lowest value of 41.0089 is observed. 
-
-Following this low point, the trend shifts, and the number of livestock begins to increase gradually. This increasing trend is consistent and significant, although the rate of increase slows down over time. The inflection points at timesteps 3 and 46 indicate changes in the rate of decline and the beginning of the recovery phase, respectively. 
-
-The change points at timesteps 20, 55, and 100 mark significant shifts in the trend dynamics. The initial decrease in livestock numbers could imply a period of adjustment or stress in the system, potentially due to environmental factors or management practices. The subsequent recovery and gradual increase suggest an adaptation phase where households might be learning and adjusting their strategies to better manage their livestock. 
-
-For decision-makers, understanding these trends is crucial for developing policies that support household resilience during periods of decline and facilitate adaptive management practices that can sustain and gradually improve livestock numbers over time.

@@ -1,7 +1,0 @@
-The simulations of the agent-based model show distinct trends in the mean livestock and destock of households over 100 steps. Initially, the mean livestock starts at a high value of approximately 90. This value rapidly decreases within the first 20 steps, reaching a minimum value of around 40. This sharp decline indicates a significant reduction in livestock, possibly due to initial adjustments and environmental factors affecting livestock survival. 
-
-Following this decline, the mean livestock remains relatively stable, fluctuating slightly around the value of 40 from step 20 to step 60. This period of stability suggests that households have adapted to the conditions, maintaining a balance in their livestock numbers. 
-
-After step 60, there is a gradual increase in the mean livestock, which continues until the end of the simulation at step 100. The mean livestock rises to values ranging between 50 and 60, indicating a recovery phase where households are possibly benefiting from improved conditions or adaptive strategies. 
-
-For decision makers, the initial sharp decline highlights the importance of preparing for significant early adjustments in livestock management. The subsequent stability period suggests that households can adapt and maintain livestock numbers under steady conditions. The final gradual increase implies that long-term strategies can lead to recovery and growth in livestock numbers, which is crucial for planning sustainable livestock management practices.

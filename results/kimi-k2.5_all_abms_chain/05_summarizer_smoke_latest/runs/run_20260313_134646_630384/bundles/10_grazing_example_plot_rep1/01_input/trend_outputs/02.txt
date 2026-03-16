@@ -1,9 +1,0 @@
-The mean household risk attitude starts at values concentrated between -0.1 and 0.2 across simulation runs. It increases rapidly during the first 20 steps, with most runs reaching values between 0.2 and 0.8. This initial rapid adjustment reflects the activation of learning processes as households begin updating their risk parameters based on observations of pasture conditions and neighbor performance.
-
-Between steps 20 and 40, the trajectories diverge into distinct clusters. Approximately one-third of the runs stabilize at high levels near 0.7 to 0.8, while others establish equilibria at moderate levels ranging from 0.3 to 0.6. Several runs begin declining during this period, dropping from peaks around 0.4 to 0.5 toward values near 0.1 or below.
-
-Around steps 40 to 60, a subset of simulations exhibits sharp downward transitions, with risk attitude values falling precipitously from moderate positive levels to negative values between -0.2 and -0.4. These declines suggest critical threshold crossings where social learning or repeated negative feedbacks drive households toward risk-seeking or high-uncertainty strategies.
-
-After step 60, the metric stabilizes across nearly all runs with minimal fluctuation. By step 100, the values span a wide range from approximately -0.35 to 0.78. This persistent divergence indicates that initial heterogeneity and stochastic ecological conditions, amplified by social learning dynamics, lead to path-dependent outcomes where household risk attitudes lock into markedly different long-term configurations.
-
-The high variance in final values suggests that the adaptive co-management process does not converge to a uniform risk attitude across the population, but rather supports the coexistence of conservative, moderate, and risk-seeking behavioral strategies in the grazing system.

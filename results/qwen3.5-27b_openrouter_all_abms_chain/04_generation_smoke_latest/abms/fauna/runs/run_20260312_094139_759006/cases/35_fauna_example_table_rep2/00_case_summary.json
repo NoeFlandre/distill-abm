@@ -1,8 +1,0 @@
-{
-  "abm": "fauna",
-  "case_id": "35_fauna_example_table_rep2",
-  "evidence_mode": "table",
-  "model": "qwen/qwen3.5-27b",
-  "prompt_variant": "example",
-  "repetition": 2
-}

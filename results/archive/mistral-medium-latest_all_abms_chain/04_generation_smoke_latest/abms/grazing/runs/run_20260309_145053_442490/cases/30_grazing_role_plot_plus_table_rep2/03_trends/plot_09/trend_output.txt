@@ -1,9 +1,0 @@
-The average cumulative number of destocked livestock across all households in the grazing system shows a consistent increasing trend over the 101 time steps. Initially, the mean destock total starts at 0 and rises sharply in the early stages, reflecting a rapid increase in destocking activities. This initial phase is followed by a gradual tapering off in the rate of increase, indicating a slowdown in the rate of destocking as time progresses. 
-
-Key time steps and values highlight the trend: at the beginning (time step 0), the mean destock total is 0, and by the end of the simulation (time step 100), it reaches approximately 96.78. The mean value over the entire period is 75.48, with a median of 81.17, suggesting that the destocking values are somewhat skewed towards the lower end. The standard deviation of 20.30 and variance of 411.93 indicate variability in the destocking totals across the time steps. 
-
-The rolling Mann-Kendall test results indicate a consistent increasing trend across all time windows, with significant p-values, reinforcing the observation of a steady rise in destocking activities. The change points at time steps 25, 60, and 100 suggest notable shifts in the rate of increase, potentially reflecting underlying changes in household decision-making or environmental conditions. 
-
-Inflection points are observed at several time steps (45, 47, 53, 56, 57, 62, 67, 72, 74, and 75), indicating periods where the rate of increase in destocking changes. The oscillation summary reveals a dominant period of 49 time steps, with strong oscillation indices suggesting periodic fluctuations in the destocking rates. 
-
-Overall, the data reflects a system where destocking activities increase over time, with periods of varying rates of increase and notable inflection points, indicating dynamic interactions between household behaviors and ecological conditions in the grazing system.

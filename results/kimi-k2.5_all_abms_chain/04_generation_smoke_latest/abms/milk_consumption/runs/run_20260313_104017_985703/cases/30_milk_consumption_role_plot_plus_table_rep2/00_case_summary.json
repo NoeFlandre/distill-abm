@@ -1,8 +1,0 @@
-{
-  "abm": "milk_consumption",
-  "case_id": "30_milk_consumption_role_plot_plus_table_rep2",
-  "evidence_mode": "plot+table",
-  "model": "moonshotai/kimi-k2.5",
-  "prompt_variant": "role",
-  "repetition": 2
-}

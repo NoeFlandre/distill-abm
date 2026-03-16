@@ -1,7 +1,0 @@
-The simulations show a variety of trends in the number of households engaging in social learning over the 100 steps. The majority of the simulations exhibit a rapid increase in the number of households adopting social learning within the first 20 steps, followed by a plateau. 
-
-In several simulations, the number of households engaging in social learning stabilizes around 48 to 54 households. This trend suggests that nearly all households eventually adopt social learning behaviors given the parameters of the model. Another set of simulations shows a stabilization around 42 households, indicating a slightly lower but still substantial adoption rate. 
-
-A smaller group of simulations demonstrates a more modest increase, stabilizing around 30 households. This indicates a scenario where only half of the households adopt social learning behaviors. Additionally, there are simulations where the number of households engaging in social learning plateaus at lower values, around 18 households, suggesting limited adoption of social learning in these cases. 
-
-The initial rapid increase in the number of households adopting social learning across most simulations indicates a strong initial influence or benefit perceived from social learning. The subsequent plateau suggests that after a certain point, the rate of adoption slows down and stabilizes, potentially due to the saturation of benefits or the constraints within the model parameters.

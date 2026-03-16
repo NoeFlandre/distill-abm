@@ -1,7 +1,0 @@
-The mean quantity of skimmed and semi-skimmed milk consumed by agents starts at a low value close to zero. It then increases rapidly within the first 10 steps, reaching approximately 1200 units. This rapid increase suggests a swift adoption of skimmed and semi-skimmed milk by the agents, potentially driven by initial social influence and perceived health benefits. 
-
-Following this sharp rise, the mean quantity stabilizes and fluctuates slightly around the 1200 to 1300 units range from step 10 to step 25. This period of stability indicates that the adoption rate has plateaued, with most agents having incorporated skimmed and semi-skimmed milk into their consumption habits. The fluctuations could be due to minor variations in social influence or individual agent behaviors. 
-
-After step 25, there is a noticeable increase again, reaching around 1400 units by step 30. This secondary rise might indicate a renewed interest or additional factors influencing the agents to further increase their consumption of skimmed and semi-skimmed milk. 
-
-For decision makers, the initial rapid adoption phase suggests that interventions or campaigns promoting the health benefits of skimmed and semi-skimmed milk can be highly effective in a short period. The subsequent stabilization phase implies that maintaining these consumption levels requires continuous reinforcement of these benefits. The final increase indicates potential opportunities for further promoting these milk types, possibly through new information or social trends.

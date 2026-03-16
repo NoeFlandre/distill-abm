@@ -1,8 +1,0 @@
-{
-  "abm": "grazing",
-  "case_id": "50_grazing_none_table_rep3",
-  "evidence_mode": "table",
-  "model": "qwen/qwen3.5-27b",
-  "prompt_variant": "none",
-  "repetition": 3
-}

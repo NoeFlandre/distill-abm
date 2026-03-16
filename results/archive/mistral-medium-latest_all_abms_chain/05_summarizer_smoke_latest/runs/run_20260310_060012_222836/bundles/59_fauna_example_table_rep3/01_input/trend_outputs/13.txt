@@ -1,9 +1,0 @@
-The combined total energy available in all prey animals within the simulation starts at approximately 16,666.67 units. This value experiences a rapid decline in the initial phase, dropping significantly within the first few hundred time steps. This sharp decrease could be attributed to the high initial hunting pressure and the immediate availability of prey, leading to a swift reduction in the total energy pool as prey animals are hunted and their energy is consumed. 
-
-Following this initial decline, the total energy shows a series of fluctuations with notable peaks and valleys. For instance, around time steps 385 and 388, there are peaks with energy values of approximately 4,102.18 and 4,092.42 units, respectively. These peaks are followed by slight declines, indicating periodic variations in the energy levels. Similar patterns are observed around time steps 402, 408, 433, and 440, where the energy values fluctuate but generally continue to decline. 
-
-A significant change point occurs around time step 730, where the energy value is approximately 1,083.15 units. This marks a notable shift in the trend, indicating a slower rate of decline in the total energy available. The energy levels continue to decrease but at a more gradual pace, reflecting a potential stabilization in the prey population dynamics or a reduction in hunting efficiency. 
-
-The simulation exhibits strong oscillations with a dominant period of 63 time steps, suggesting regular cyclic patterns in the energy levels. These oscillations could be due to periodic environmental factors or behavioral patterns of the prey and hunters. 
-
-Towards the end of the simulation, the total energy available in prey animals approaches zero, indicating a near-complete depletion of the prey population. This final phase suggests that the system has reached a state where the prey population can no longer sustain itself under the given hunting pressure and environmental conditions.

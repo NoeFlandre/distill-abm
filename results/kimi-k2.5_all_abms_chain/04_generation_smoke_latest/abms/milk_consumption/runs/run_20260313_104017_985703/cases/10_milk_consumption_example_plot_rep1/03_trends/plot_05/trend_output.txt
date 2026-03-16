@@ -1,2 +1,0 @@
-: 
-The total number of milk choices made by all agents increases linearly from 0 to approximately 32,000 over the course of the simulation. This steady accumulation occurs at a constant rate of roughly 1,000 choices per time step, reflecting that each of the 1,000 agents makes one consumption decision at every step. By the final time step, the cumulative count reaches approximately 32,000, indicating sustained participation of the entire agent population throughout the 32-step period representing the years 1974 to 2005.

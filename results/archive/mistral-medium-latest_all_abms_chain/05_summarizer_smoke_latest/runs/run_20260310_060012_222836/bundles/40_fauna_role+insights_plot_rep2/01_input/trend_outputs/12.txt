@@ -1,7 +1,0 @@
-The combined total energy available in the population of female prey animals starts at a high value of approximately 12,000 units. This initial high energy level indicates a healthy and abundant population of female prey at the beginning of the simulation. 
-
-Within the first 500 steps, there is a sharp decline in the total energy, dropping to around 2,000 units. This significant reduction suggests a rapid decrease in the population or energy reserves of female prey, potentially due to high predation pressure, environmental factors, or a combination of both. 
-
-Following this steep decline, the total energy continues to decrease but at a slower rate, stabilizing around 1,000 steps. By approximately 1,500 steps, the total energy levels off and remains close to zero for the remainder of the simulation. This trend indicates that the population of female prey has been nearly depleted, with very few individuals remaining. 
-
-For decision-makers, these trends highlight the vulnerability of the female prey population under the given conditions. The rapid initial decline suggests that early intervention might be crucial to prevent population collapse. Understanding the factors contributing to this decline, such as hunting pressure or environmental changes, could inform strategies to mitigate the impact on the prey population.

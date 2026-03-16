@@ -1,8 +1,0 @@
-{
-  "abm": "fauna",
-  "case_id": "14_fauna_role+example_table_rep1",
-  "evidence_mode": "table",
-  "model": "moonshotai/kimi-k2.5",
-  "prompt_variant": "role+example",
-  "repetition": 1
-}

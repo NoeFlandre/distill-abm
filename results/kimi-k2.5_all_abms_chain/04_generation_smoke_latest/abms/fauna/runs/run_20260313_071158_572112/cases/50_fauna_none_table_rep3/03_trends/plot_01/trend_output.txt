@@ -1,2 +1,0 @@
-:
-The number of active human hunter-gatherer bands remains constant at 20 throughout the entire simulation duration. Beginning from the initial time step, the population maintains this value without deviation through to the conclusion of the observation period. This stability reflects the model configuration wherein foragers are immortal and do not reproduce, resulting in a fixed hunter population density that provides a constant baseline of hunting pressure across the temporal sequence.

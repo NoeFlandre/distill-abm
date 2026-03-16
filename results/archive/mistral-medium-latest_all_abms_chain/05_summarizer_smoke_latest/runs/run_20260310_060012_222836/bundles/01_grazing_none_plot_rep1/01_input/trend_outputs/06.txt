@@ -1,7 +1,0 @@
-In the initial time steps, the mean destock of households starts at a high value, with some simulations beginning at a mean destock value of around 7. This high initial destocking rapidly decreases within the first 10 steps, showing a steep downward trend. By step 10, the mean destock value drops to approximately 2.5 or lower across all simulations. 
-
-Between steps 10 and 30, the destocking continues to decrease but at a slower rate, with values fluctuating and gradually stabilizing. By step 30, the mean destock values generally fall below 1.5. 
-
-From step 30 onwards, the destocking values exhibit minor fluctuations and gradually converge towards a stable state. By step 50, most simulations show mean destock values around 1 or lower, with the fluctuations becoming less pronounced. 
-
-From step 50 to step 100, the mean destock values remain relatively stable, with slight variations around a mean value close to 1. The overall trend indicates that after an initial period of high destocking, the system stabilizes, and the rate of destocking significantly reduces and maintains a steady state for the remainder of the simulation period.

@@ -1,7 +1,0 @@
-The mean choice function deviation starts at a value close to 0 and rapidly increases within the first 5 steps, reaching approximately 0.55. This initial phase indicates a period of significant divergence in choice function scores among agents, suggesting that early in the simulation, agents quickly develop varied perceptions and habits regarding milk choices. 
-
-Following this rapid increase, the rate of deviation growth slows down. From step 5 to step 15, the mean choice function deviation gradually increases from around 0.55 to approximately 0.65. This phase represents a stabilization period where the influence of social interactions, habits, and other parameters starts to balance out, leading to a more gradual change in choice function scores. 
-
-After step 15, the deviation continues to increase but at an even slower rate, eventually plateauing around a value of 0.75 by step 30. This final phase suggests that the agents' choice functions have reached a relatively stable state with persistent but minor variations. 
-
-For decision-makers, the initial rapid increase in deviation highlights the importance of early interventions to guide consumer perceptions and habits. The subsequent stabilization phases suggest that while initial influences are crucial, ongoing efforts are necessary to maintain and gradually adjust consumer behaviors over time.

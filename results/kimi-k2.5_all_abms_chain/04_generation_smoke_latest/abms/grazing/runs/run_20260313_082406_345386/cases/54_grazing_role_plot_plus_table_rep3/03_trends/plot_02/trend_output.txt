@@ -1,5 +1,0 @@
-The mean household risk attitude, representing the average deviation from recommended livestock numbers, initiates at a near-neutral value of 0.0074, indicating initial conformity to recommended stocking levels. Over the first 33 steps, the metric undergoes a statistically significant increasing trend, reaching a maximum value of 0.3814. This rapid ascent suggests an initial phase of active learning or experimentation where households collectively deviate toward higher-risk strategies.
-
-Following the peak at step 33, the system transitions into a significant decreasing trend that persists through approximately step 65, during which the average risk attitude declines substantially. A change point at step 50 marks the shift from active adjustment toward stabilization. From step 66 through the conclusion at step 100, the series exhibits no significant directional trend, ultimately settling at 0.1911. This long-term equilibrium represents a persistent positive deviation from recommendations, with the overall temporal average stabilizing at 0.2333—substantially above initial levels but moderated from peak risk-taking.
-
-Despite identical initialization parameters
