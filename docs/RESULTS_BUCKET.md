@@ -21,8 +21,13 @@ The bucket mirrors the local `results/` tree. The currently maintained top-level
 
 - `archive/`
 - `quantitative_master_overview/`
+- `pipeline/`
+- `side_studies/`
 - `kimi-k2.5_all_abms_chain/`
 - `mistral-medium-latest_all_abms_chain/`
+- `mistral-large-2512_optimization_all_abms_chain/`
+- `gemini-3.1-pro-preview_optimization_all_abms_chain/`
+- `claude-opus-4.6_optimization_all_abms_chain/`
 - `qwen3.5-27b_openrouter_all_abms_chain/`
 - `eval_qwen_mistral/`
 - `eval_qwen_kimi/`
