@@ -8,7 +8,7 @@ If you are looking for run outputs, quantitative tables, or smoke artifacts, sta
 
 ## Purpose
 
-The repository keeps a tracked `results/` tree for the most important validated artifacts. The Hugging Face bucket mirrors that tree so the results can also be copied, downloaded, and shared as a single storage surface without inventing a second layout.
+The Git repository is publication-facing source code. The Hugging Face bucket is the publication-facing results store.
 
 Practical split:
 
@@ -64,7 +64,7 @@ uv run distill-abm sync-results-bucket --dry-run --plan-path /tmp/distill_abm_re
 
 The command mirrors `./results` to `hf://buckets/NoeFlandre/distill-abms-results`, deletes remote files missing locally by default, excludes hidden cache clutter, and reuses an existing HF login unless `HF_TOKEN` is set.
 
-`results/quantitative_master_overview/` is the root-level rollup folder for the latest quantitative overviews. It contains one aggregated Markdown file per overview artifact so you can inspect all latest ANOVA, factorial, evidence-summary, best-score, and prompt-compression tables without drilling into each run directory.
+The main paper-facing entrypoint inside the bucket is `quantitative_master_overview/`, which collects the latest overview tables without requiring you to inspect each run directory manually.
 
 Equivalent raw CLI form:
 
