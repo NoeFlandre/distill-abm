@@ -7,6 +7,7 @@ import os
 import shutil
 import subprocess
 from collections.abc import Callable
+from fnmatch import fnmatch
 from pathlib import Path
 from typing import Any, Literal, cast
 
@@ -78,6 +79,7 @@ DEFAULT_RESULTS_BUCKET_EXCLUDES = (
     ".cache/**",
     "**/.cache/**",
 )
+LOCAL_RESULTS_POINTER_FILES = ("README.md",)
 
 
 def execute_run_command(
@@ -786,6 +788,7 @@ def execute_sync_results_bucket_command(
     bucket_uri: str,
     dry_run: bool,
     delete: bool,
+    allow_empty_source: bool,
     plan_path: Path | None,
     json_output: bool,
     token_env_var: str,
@@ -793,6 +796,14 @@ def execute_sync_results_bucket_command(
     hf_path = shutil.which("hf")
     if hf_path is None:
         raise typer.BadParameter("missing `hf` CLI on PATH. Install or upgrade it before syncing the results bucket.")
+
+    syncable_file_count = _count_syncable_results_files(source_root=source_root)
+    if delete and not dry_run and not allow_empty_source and syncable_file_count == 0:
+        raise typer.BadParameter(
+            "refusing destructive bucket sync: the local results tree has no syncable result files after exclusions. "
+            "Fetch results first, rerun with --dry-run, disable deletion with --no-delete, or override with "
+            "--allow-empty-source if this is intentional."
+        )
 
     command = [hf_path, "sync", str(source_root), bucket_uri]
     if delete:
@@ -815,8 +826,10 @@ def execute_sync_results_bucket_command(
         bucket_uri=bucket_uri,
         dry_run=dry_run,
         delete=delete,
+        allow_empty_source=allow_empty_source,
         plan_path=plan_path,
         used_token_env_var=token_env_var if token else None,
+        syncable_file_count=syncable_file_count,
         success=completed.returncode == 0,
         exit_code=completed.returncode,
     )
@@ -834,6 +847,24 @@ def execute_sync_results_bucket_command(
         typer.echo(completed.stderr.rstrip(), err=True)
     if completed.returncode != 0:
         raise typer.Exit(code=completed.returncode)
+
+
+def _count_syncable_results_files(*, source_root: Path) -> int:
+    count = 0
+    for path in source_root.rglob("*"):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(source_root).as_posix()
+        if relative in LOCAL_RESULTS_POINTER_FILES:
+            continue
+        if any(_matches_sync_pattern(relative, pattern) for pattern in DEFAULT_RESULTS_BUCKET_EXCLUDES):
+            continue
+        count += 1
+    return count
+
+
+def _matches_sync_pattern(relative_path: str, pattern: str) -> bool:
+    return fnmatch(relative_path, pattern) or Path(relative_path).match(pattern)
 
 
 def execute_smoke_full_case_command(

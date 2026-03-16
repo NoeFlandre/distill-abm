@@ -54,6 +54,7 @@ uv run distill-abm sync-results-bucket
 
 This command mirrors `./results` to the HF bucket and removes remote files that are no longer present locally by default.
 It also ignores local macOS/cache noise (`.DS_Store`, `**/.DS_Store`, `.cache/**`, `**/.cache/**`).
+For safety, apply-mode sync refuses to run when the local tree has no syncable result files after exclusions and `--delete` is still enabled.
 
 Dry run + reviewable plan:
 

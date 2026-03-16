@@ -56,6 +56,8 @@ The command excludes local macOS and cache clutter by default, currently:
 - `.cache/**`
 - `**/.cache/**`
 
+Apply-mode sync also refuses to run with `--delete` when the local tree has no syncable result files after exclusions. This prevents an almost-empty checkout from wiping the remote bucket by mistake.
+
 Dry-run and save a reviewable sync plan:
 
 ```bash

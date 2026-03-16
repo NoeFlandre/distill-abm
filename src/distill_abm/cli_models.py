@@ -127,8 +127,10 @@ class SyncResultsBucketResult(BaseModel):
     bucket_uri: str
     dry_run: bool
     delete: bool
+    allow_empty_source: bool = False
     plan_path: Path | None = None
     used_token_env_var: str | None = None
+    syncable_file_count: int
     success: bool
     exit_code: int
 
