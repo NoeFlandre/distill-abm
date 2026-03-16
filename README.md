@@ -95,8 +95,6 @@ Results store:
 - bucket URI: `hf://buckets/NoeFlandre/distill-abms-results`
 - bucket web UI: `https://huggingface.co/buckets/NoeFlandre/distill-abms-results`
 
-The paper sources are stored in `data/paper/Main.txt` and `data/paper/Main.pdf`.
-
 ## Repository Layout
 
 ```text

@@ -23,5 +23,4 @@ Results/
 results/**/.DS_Store
 !tests/fixtures/notebook_parity/archive_assets/**
 *.log
-data/paper/
 AGENTS.md
