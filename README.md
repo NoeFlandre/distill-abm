@@ -18,6 +18,9 @@ Paper-facing benchmark runs are restricted to:
 1. `moonshotai/kimi-k2.5`
 2. `google/gemini-3.1-pro-preview`
 3. `qwen/qwen3.5-27b`
+4. `anthropic/claude-opus-4.6`
+
+All other configured models are for debugging and development purposes only.
 
 Supported summarizers are `bart`, `bert`, `t5`, and `longformer_ext`.
 
