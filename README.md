@@ -126,8 +126,6 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the current runtime flow an
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - [docs/RESULTS_BUCKET.md](docs/RESULTS_BUCKET.md)
 - [docs/HYPERPARAMETERS.md](docs/HYPERPARAMETERS.md)
-- [docs/EVALUATION_FREEZE.md](docs/EVALUATION_FREEZE.md)
-- [docs/DECISION_LOG.md](docs/DECISION_LOG.md)
 
 ## Citation
 
