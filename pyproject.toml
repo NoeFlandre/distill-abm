@@ -23,7 +23,6 @@ dependencies = [
 [project.optional-dependencies]
 llm = [
   "openai>=1.40.0",
-  "requests>=2.32.3",
 ]
 metrics = [
   "nltk>=3.9.1",
@@ -43,7 +42,6 @@ dev = [
   "ruff>=0.6.9",
   "mypy>=1.11.2",
   "pre-commit>=4.0.1",
-  "nbformat>=5.10.4",
   "pandas-stubs>=2.2.2.240807",
   "types-PyYAML>=6.0.12.20240917",
 ]
@@ -97,12 +95,9 @@ packages = ["distill_abm"]
 module = [
   "yaml",
   "nltk.*",
-  "nbformat",
   "openai",
-  "requests",
   "rouge_score",
   "textstat",
-  "unidecode",
 ]
 ignore_missing_imports = true
 
