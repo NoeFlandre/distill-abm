@@ -119,3 +119,14 @@ def test_unused_doc_assets_are_absent() -> None:
 def test_tracked_macos_metadata_files_are_absent_from_source_tree() -> None:
     assert not Path("src/.DS_Store").exists()
     assert not Path("src/distill_abm/.DS_Store").exists()
+
+
+def test_retired_archive_parity_scripts_are_absent() -> None:
+    for retired_path in [
+        "scripts/archive_audit.py",
+        "scripts/build_notebook_inventory_docs.py",
+        "scripts/build_runtime_notebook_dependency_docs.py",
+        "scripts/materialize_archive_migrations.py",
+        "scripts/refresh_parity_artifacts.py",
+    ]:
+        assert not Path(retired_path).exists()
