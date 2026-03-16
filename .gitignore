@@ -17,7 +17,6 @@ coverage.xml
 htmlcov/
 dist/
 archive/
-notes/
 results/*
 Results/
 !results/README.md
