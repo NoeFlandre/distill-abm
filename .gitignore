@@ -6,11 +6,20 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .DS_Store
+*.swp
+*.swo
+*~
 .ipynb_checkpoints/
 .coverage
+.coverage.*
+*.egg-info
 coverage.xml
 htmlcov/
+dist/
+archive/
+notes/
 results/*
+Results/
 !results/README.md
 results/**/.DS_Store
 !tests/fixtures/notebook_parity/archive_assets/**
