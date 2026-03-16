@@ -80,11 +80,14 @@ def _analyze_metric(
     analysis = frame.dropna(subset=[metric, *factors]).copy()
     if analysis.empty:
         return []
+    varying_factors: list[str] = []
     for factor in factors:
         analysis[factor] = analysis[factor].astype(str)
-        if analysis[factor].nunique() < 2:
-            return []
-    anova = _fit_anova(analysis, metric, factors, max_interaction_order)
+        if analysis[factor].nunique() >= 2:
+            varying_factors.append(factor)
+    if not varying_factors:
+        return []
+    anova = _fit_anova(analysis, metric, varying_factors, max_interaction_order)
     if anova is None or anova.empty:
         return []
     total = float(anova["sum_sq"].sum())

@@ -57,6 +57,27 @@ def test_run_summarizer_smoke_writes_bundle_outputs(tmp_path: Path) -> None:
     rows = list(csv.DictReader(result.review_csv_path.open(encoding="utf-8")))
     assert len(rows) == 5
     assert {row["mode"] for row in rows} == {"none", "bart", "bert", "t5", "longformer_ext"}
+
+
+def test_run_summarizer_smoke_can_restrict_active_summarizer_modes(tmp_path: Path) -> None:
+    result = run_summarizer_smoke(
+        source_root=tmp_path,
+        output_root=tmp_path / "smoke",
+        validated_bundles=(_bundle(tmp_path),),
+        summarizer_modes=("bart", "bert", "t5"),
+        summarizer_fns={
+            "bart": lambda text: f"bart::{text}",
+            "bert": lambda text: f"bert::{text}",
+            "t5": lambda text: f"t5::{text}",
+            "longformer_ext": lambda text: f"longformer::{text}",
+        },
+    )
+
+    bundle_dir = result.run_root / "bundles" / "bundle_one"
+    written_modes = {path.stem for path in (bundle_dir / "02_summaries").glob("*.txt")}
+
+    assert written_modes == {"none", "bart", "bert", "t5"}
+    assert not (bundle_dir / "02_summaries" / "longformer_ext.txt").exists()
     assert json.loads(result.validated_sources_path.read_text(encoding="utf-8"))[0]["bundle_id"] == "bundle_one"
 
 

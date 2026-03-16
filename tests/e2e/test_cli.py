@@ -804,6 +804,168 @@ def test_cli_smoke_doe_treats_candidate_models_as_design_factors_only(
     assert captured_model_specs[0].preflight_error is None
 
 
+def test_cli_smoke_doe_forwards_filtered_design_axes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    model_root = tmp_path / "data"
+    _write_min_nlogo_model_dir(model_root, "fauna", "Fauna doc")
+    _write_min_nlogo_model_dir(model_root, "grazing", "Grazing doc")
+    _write_min_nlogo_model_dir(model_root, "milk_consumption", "Milk doc")
+
+    ingest_root = tmp_path / "ingest"
+    viz_root = tmp_path / "viz"
+    for abm in ["fauna", "grazing", "milk_consumption"]:
+        txt_dir = ingest_root / abm / "TXT"
+        txt_dir.mkdir(parents=True, exist_ok=True)
+        (txt_dir / "narrative_combined.txt").write_text("parameters", encoding="utf-8")
+        (txt_dir / "final_documentation.txt").write_text("documentation", encoding="utf-8")
+        abm_viz = viz_root / abm
+        (abm_viz / "plots").mkdir(parents=True, exist_ok=True)
+        (abm_viz / "simulation.csv").write_text("[step],mean\n0,1\n", encoding="utf-8")
+        (abm_viz / "plots" / "1.png").write_bytes(b"png")
+        (abm_viz / "artifact_source.txt").write_text("fallback\n", encoding="utf-8")
+
+    captured: dict[str, Any] = {}
+
+    def fake_run_doe_smoke_suite(  # type: ignore[no-untyped-def]
+        *,
+        abm_inputs,
+        prompts,
+        model_specs,
+        output_root,
+        evidence_modes,
+        summarization_specs,
+        prompt_variants,
+        repetitions,
+    ):
+        _ = abm_inputs, prompts, model_specs, output_root
+        captured["evidence_modes"] = evidence_modes
+        captured["summarization_modes"] = tuple(spec.summarization_mode for spec in summarization_specs)
+        captured["prompt_variants"] = tuple(variant.variant_id for variant in prompt_variants)
+        captured["repetitions"] = repetitions
+        return SimpleNamespace(
+            success=True,
+            failed_case_ids=[],
+            report_markdown_path=Path("doe_smoke.md"),
+            report_json_path=Path("doe_smoke.json"),
+            design_matrix_csv_path=Path("design_matrix.csv"),
+            request_matrix_csv_path=Path("request_matrix.csv"),
+        )
+
+    monkeypatch.setattr(cli_module, "run_doe_smoke_suite", fake_run_doe_smoke_suite)
+
+    result = runner.invoke(
+        app,
+        [
+            "smoke-doe",
+            "--models-root",
+            str(model_root),
+            "--ingest-root",
+            str(ingest_root),
+            "--viz-root",
+            str(viz_root),
+            "--model-id",
+            "gemini_3_1_pro_preview",
+            "--evidence-mode",
+            "plot",
+            "--prompt-variant",
+            "example",
+            "--repetition",
+            "1",
+            "--repetition",
+            "3",
+            "--summarization-mode",
+            "none",
+            "--summarization-mode",
+            "bart",
+            "--summarization-mode",
+            "bert",
+            "--summarization-mode",
+            "t5",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["evidence_modes"] == ("plot",)
+    assert captured["prompt_variants"] == ("example",)
+    assert captured["repetitions"] == (1, 3)
+    assert captured["summarization_modes"] == ("none", "bart", "bert", "t5")
+
+
+def test_cli_smoke_summarizers_forwards_selected_summarizer_modes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    captured: dict[str, Any] = {}
+    source_root = tmp_path / "source"
+    source_root.mkdir()
+
+    def fake_run_summarizer_smoke(**kwargs):  # type: ignore[no-untyped-def]
+        captured.update(kwargs)
+        run_root = Path(kwargs["output_root"]) / "runs" / "run_1"
+        return SimpleNamespace(
+            success=True,
+            failed_bundle_ids=[],
+            report_json_path=run_root / "report.json",
+            report_markdown_path=run_root / "report.md",
+            review_csv_path=run_root / "review.csv",
+            validated_sources_path=run_root / "validated.json",
+        )
+
+    monkeypatch.setattr(cli_module, "run_summarizer_smoke", fake_run_summarizer_smoke)
+
+    result = runner.invoke(
+        app,
+        [
+            "smoke-summarizers",
+            "--source-root",
+            str(source_root),
+            "--summarizer",
+            "bart",
+            "--summarizer",
+            "bert",
+            "--summarizer",
+            "t5",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["summarizer_modes"] == ("bart", "bert", "t5")
+
+
+def test_cli_smoke_optimization_gemini_chain_uses_expected_defaults(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_execute_smoke_optimization_gemini_chain_command(**kwargs):  # type: ignore[no-untyped-def]
+        captured.update(kwargs)
+
+    monkeypatch.setattr(
+        cli_module,
+        "execute_smoke_optimization_gemini_chain_command",
+        fake_execute_smoke_optimization_gemini_chain_command,
+    )
+
+    result = runner.invoke(
+        app,
+        [
+            "smoke-optimization-gemini-chain",
+            "--netlogo-home",
+            "/fake/netlogo",
+            "--output-root",
+            str(tmp_path / "results" / "gemini-3.1-pro-preview_optimization_all_abms_chain"),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["model_id"] == "gemini_3_1_pro_preview"
+    assert captured["evidence_modes"] == ("plot",)
+    assert captured["prompt_variants"] == ("example",)
+    assert captured["repetitions"] == (1, 2, 3)
+    assert captured["summarization_modes"] == ("bart", "bert", "t5")
+    assert captured["output_root"] == tmp_path / "results" / "gemini-3.1-pro-preview_optimization_all_abms_chain"
+
+
 def test_cli_ingest_netlogo_suite_supports_root_level_model_files(tmp_path: Path) -> None:
     model_root = tmp_path / "data"
     model_root.mkdir()

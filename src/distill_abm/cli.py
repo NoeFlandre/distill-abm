@@ -25,6 +25,7 @@ from distill_abm.cli_actions import (
     execute_smoke_full_case_matrix_command,
     execute_smoke_full_case_suite_command,
     execute_smoke_ingest_command,
+    execute_smoke_optimization_gemini_chain_command,
     execute_smoke_local_qwen_command,
     execute_smoke_quantitative_command,
     execute_smoke_quantitative_multi_llm_command,
@@ -54,6 +55,7 @@ from distill_abm.cli_support import (
     parse_summarizers,
     resolve_abm_model_path,
     resolve_additional_scoring_reference_paths,
+    resolve_doe_summarization_specs,
     resolve_model_from_registry,
     resolve_scoring_reference_path,
     resolve_viz_smoke_specs,
@@ -74,6 +76,8 @@ from distill_abm.pipeline.full_case_matrix_smoke import run_full_case_matrix_smo
 from distill_abm.pipeline.full_case_smoke import run_full_case_smoke
 from distill_abm.pipeline.full_case_suite_smoke import run_full_case_suite_smoke
 from distill_abm.pipeline.local_qwen_sample_smoke import run_local_qwen_sample_smoke
+from distill_abm.pipeline.exploitation_factor_study import run_exploitation_factor_study
+from distill_abm.pipeline.llm_same_settings_study import run_llm_same_settings_study
 from distill_abm.pipeline.quantitative_smoke import (
     run_quantitative_smoke,
     run_quantitative_smoke_multi_llm,
@@ -112,7 +116,10 @@ __all__ = [
     "smoke_full_case",
     "smoke_ingest_netlogo",
     "smoke_local_qwen",
+    "smoke_optimization_gemini_chain",
     "smoke_quantitative",
+    "study_llm_same_settings",
+    "study_exploitation_factors",
     "smoke_qwen",
     "smoke_summarizers",
     "smoke_viz",
@@ -502,6 +509,43 @@ def smoke_doe(
             ),
         ),
     ] = None,
+    evidence_mode: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--evidence-mode",
+            help=(
+                "Evidence modes to include. Repeat for multiple. "
+                f"Defaults to {', '.join(DEFAULT_FULL_CASE_MATRIX_EVIDENCE_MODES)}."
+            ),
+        ),
+    ] = None,
+    prompt_variant: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--prompt-variant",
+            help=(
+                "Prompt variants to include. Repeat for multiple. "
+                f"Defaults to {', '.join(DEFAULT_FULL_CASE_MATRIX_PROMPT_VARIANTS)}."
+            ),
+        ),
+    ] = None,
+    repetition: Annotated[
+        list[int] | None,
+        typer.Option(
+            "--repetition",
+            help=(
+                "Repetitions to include. Repeat for multiple. "
+                f"Defaults to {', '.join(str(item) for item in DEFAULT_FULL_CASE_MATRIX_REPETITIONS)}."
+            ),
+        ),
+    ] = None,
+    summarization_mode: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--summarization-mode",
+            help="Summarization conditions to include. Repeatable: none, bart, bert, t5, longformer_ext.",
+        ),
+    ] = None,
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for DOE smoke reports, shared artifacts, and compact case indexes."),
@@ -518,6 +562,10 @@ def smoke_doe(
         models_path=models_path,
         model_ids=model_ids,
         output_root=output_root,
+        evidence_modes=resolve_full_case_matrix_evidence_modes(evidence_mode),
+        summarization_specs=resolve_doe_summarization_specs(summarization_mode),
+        prompt_variants=resolve_full_case_matrix_prompt_variants(prompt_variant),
+        repetitions=resolve_full_case_matrix_repetitions(repetition),
         json_output=json_output,
         discover_abms=discover_configured_abms,
         resolve_model_from_registry=resolve_model_from_registry,
@@ -625,6 +673,13 @@ def smoke_summarizers(
             help="Optional ABM filter when the source root is a multi-ABM suite run. Repeat for multiple.",
         ),
     ] = None,
+    summarizer: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--summarizer",
+            help="Summarizer backends to include in addition to the implicit none/full-text path.",
+        ),
+    ] = None,
     output_root: Annotated[
         Path,
         typer.Option(help="Directory for summarizer smoke artifacts."),
@@ -657,6 +712,7 @@ def smoke_summarizers(
         resume=resume,
         watch=watch,
         poll_interval_seconds=poll_interval_seconds,
+        summarizer_modes=_parse_summarizers(summarizer, fallback=DEFAULT_SUMMARIZERS) if summarizer else None,
         json_output=json_output,
         run_summarizer_smoke_fn=run_summarizer_smoke,
     )
@@ -726,6 +782,77 @@ def smoke_quantitative_multi_llm(
     )
 
 
+@app.command("smoke-optimization-gemini-chain")
+def smoke_optimization_gemini_chain(
+    models_root: Annotated[
+        Path,
+        typer.Option(help="Root directory containing ABM model files for asset discovery."),
+    ] = Path("data"),
+    netlogo_home: Annotated[
+        str,
+        typer.Option(
+            envvar="DISTILL_ABM_NETLOGO_HOME",
+            help="NetLogo installation directory used by pynetlogo. Can also be provided via DISTILL_ABM_NETLOGO_HOME.",
+        ),
+    ] = "",
+    prompts_path: Annotated[
+        Path,
+        typer.Option(exists=True),
+    ] = Path("configs/prompts.yaml"),
+    models_path: Annotated[
+        Path,
+        typer.Option(exists=True, help="Model registry YAML path."),
+    ] = Path("configs/models.yaml"),
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Root directory for the Gemini optimization chain."),
+    ] = Path("results/gemini-3.1-pro-preview_optimization_all_abms_chain"),
+    max_tokens: Annotated[
+        int,
+        typer.Option(help="Maximum output token budget for each call in the full-case suite smoke."),
+    ] = 32768,
+    resume: Annotated[
+        bool,
+        typer.Option("--resume/--no-resume", help="Reuse successful stage outputs and rerun only failed or missing work."),
+    ] = True,
+) -> None:
+    """Run the fixed-factor Gemini optimization chain across the standard six smoke stages."""
+    execute_smoke_optimization_gemini_chain_command(
+        models_root=models_root,
+        netlogo_home=netlogo_home,
+        prompts_path=prompts_path,
+        models_path=models_path,
+        output_root=output_root,
+        evidence_modes=("plot",),
+        prompt_variants=("example",),
+        repetitions=(1, 2, 3),
+        summarization_modes=("bart", "bert", "t5"),
+        model_id="gemini_3_1_pro_preview",
+        max_tokens=max_tokens,
+        resume=resume,
+        execute_smoke_ingest_command_fn=execute_smoke_ingest_command,
+        execute_smoke_viz_command_fn=execute_smoke_viz_command,
+        execute_smoke_doe_command_fn=execute_smoke_doe_command,
+        execute_smoke_full_case_suite_command_fn=execute_smoke_full_case_suite_command,
+        execute_smoke_summarizers_command_fn=execute_smoke_summarizers_command,
+        execute_smoke_quantitative_command_fn=execute_smoke_quantitative_command,
+        run_ingest_smoke_suite_fn=run_ingest_smoke_suite,
+        resolve_viz_smoke_specs_fn=_resolve_viz_smoke_specs,
+        run_viz_smoke_suite_fn=run_viz_smoke_suite,
+        discover_abms_fn=discover_configured_abms,
+        resolve_model_from_registry_fn=resolve_model_from_registry,
+        resolve_model_path_fn=lambda abm, models_root: resolve_abm_model_path(abm=abm, models_root=models_root),
+        run_doe_smoke_suite_fn=run_doe_smoke_suite,
+        load_abm_config_fn=load_abm_config,
+        load_prompts_config_fn=load_prompts_config,
+        create_adapter_fn=create_adapter,
+        run_full_case_suite_smoke_fn=run_full_case_suite_smoke,
+        validate_model_policy_fn=_validate_model_policy,
+        run_summarizer_smoke_fn=run_summarizer_smoke,
+        run_quantitative_smoke_fn=run_quantitative_smoke,
+    )
+
+
 @app.command("sync-results-bucket")
 def sync_results_bucket(
     source_root: Annotated[
@@ -772,6 +899,81 @@ def sync_results_bucket(
         token_env_var=token_env_var,
         json_output=json_output,
     )
+
+
+@app.command("study-exploitation-factors")
+def study_exploitation_factors(
+    source_root: Annotated[
+        Path,
+        typer.Option(
+            "--source-root",
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            help=(
+                "One completed quantitative smoke root or concrete run directory to analyze."
+            ),
+        ),
+    ],
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for the side-study artifacts."),
+    ] = Path("results/archive/side_studies/exploitation_factor_followup"),
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Run a side-study over existing quantitative artifacts to clarify factor behavior for exploitation."""
+    result = run_exploitation_factor_study(
+        source_root=source_root,
+        output_root=output_root,
+    )
+    if json_output:
+        typer.echo(result.model_dump_json(indent=2))
+        return
+    typer.echo(f"run_root: {result.run_root}")
+    typer.echo(f"report_json: {result.report_json_path}")
+    typer.echo(f"report_markdown: {result.report_markdown_path}")
+
+
+@app.command("study-llm-same-settings")
+def study_llm_same_settings(
+    anchor_source_root: Annotated[
+        Path,
+        typer.Option(
+            "--anchor-source-root",
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            help="Completed anchor quantitative smoke root or concrete run directory to use as the settings anchor.",
+        ),
+    ],
+    comparison_source_roots: Annotated[
+        list[Path],
+        typer.Option(
+            "--comparison-source-root",
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            help="Completed comparison quantitative smoke roots or concrete run directories.",
+        ),
+    ],
+    output_root: Annotated[
+        Path,
+        typer.Option(help="Directory for the same-settings LLM comparison artifacts."),
+    ] = Path("results/side_studies/optimization_same_settings_llm_comparison"),
+    json_output: Annotated[bool, typer.Option("--json", help="Print a structured JSON result to stdout.")] = False,
+) -> None:
+    """Compare optimization-phase LLM runs on one shared same-settings slice."""
+    result = run_llm_same_settings_study(
+        anchor_source_root=anchor_source_root,
+        comparison_source_roots=comparison_source_roots,
+        output_root=output_root,
+    )
+    if json_output:
+        typer.echo(result.model_dump_json(indent=2))
+        return
+    typer.echo(f"run_root: {result.run_root}")
+    typer.echo(f"report_json: {result.report_json_path}")
+    typer.echo(f"report_markdown: {result.report_markdown_path}")
 
 
 @app.command("smoke-full-case")
