@@ -1,56 +1,39 @@
 # Decision Log
 
+This file keeps only the decisions that shape the public, paper-facing workflow.
+
 ## DL-001
+
 - Date: 2026-03-04
-- Decision: Restrict the benchmark model roster to `qwen/qwen3.5-27b`, `moonshotai/kimi-k2.5`, and `google/gemini-3.1-pro-preview`, with `nvidia/nemotron-nano-12b-v2-vl:free` and `mistral-medium-latest` kept as debug-only models.
-- Rationale: benchmark and debug workflows should share the same API-only runtime shape while keeping production-vs-debug model policy explicit. Legacy local-model, Janus, and Qwen-VL paths create stale configuration and review ambiguity.
+- Decision: Restrict the benchmark model roster to `moonshotai/kimi-k2.5`, `google/gemini-3.1-pro-preview`, and `qwen/qwen3.5-27b`.
+- Rationale: the publication benchmark should stay API-only and use one stable, reviewable model roster.
 
 ## DL-002
+
 - Date: 2026-03-04
-- Decision: Treat `bart`, `bert`, `t5`, `longformer_ext` as first-class summarizers.
-- Rationale: requested extension to baseline paper setup.
+- Decision: Treat `bart`, `bert`, `t5`, and `longformer_ext` as the supported summarizers.
+- Rationale: these are the summarizers reflected in the current pipeline defaults and paper-facing evaluation path.
 
 ## DL-003
-- Date: 2026-03-04
-- Decision: Standardize evidence mode names to `plot`, `table`, `plot+table`.
-- Rationale: align outputs and simplify ablation labeling.
+
+- Date: 2026-03-04 and 2026-03-09
+- Decision: Preserve the public evidence labels `plot`, `table`, and `plot+table`, where `table` means statistical evidence derived from the plot-relevant simulation series.
+- Rationale: this keeps prompt and output naming stable while avoiding raw CSV dumps in the evidence contract.
 
 ## DL-004
+
 - Date: 2026-03-04
-- Decision: Standardize text-source modes to `summary_only` and `full_text_only`.
-- Rationale: explicit ablation axis without implicit mode coupling.
+- Decision: Preserve the two public text-source modes `summary_only` and `full_text_only`.
+- Rationale: these modes define the main ablation axis used by the current pipeline and evaluation workflow.
 
 ## DL-005
+
 - Date: 2026-03-06
-- Decision: Freeze the validated NetLogo ingestion pipeline unless a task explicitly requests changes.
-- Rationale: the current benchmark-model ingestion flow, including experiment-parameter extraction, GUI-parameter extraction, updated-parameter generation, narrative generation, documentation extraction and cleanup, final-documentation export, code extraction, and stage-level smoke validation, has been manually validated end-to-end and should not be modified casually or reworked speculatively.
+- Decision: Keep `docs/supplementary_material/` frozen unless a task explicitly requests changes there.
+- Rationale: those files are part of the paper supplement and are intentionally outside the main repository documentation sweep.
 
 ## DL-006
-- Date: 2026-03-06
-- Decision: Freeze the validated visualization smoke pipeline unless a task explicitly requests changes.
-- Rationale: the current pre-LLM visualization workflow, including ABM-specific NetLogo visualization configuration, repo-local model inputs, preserved legacy reference CSV/plot artifacts, fallback-first smoke generation, artifact-source reporting, and ordered plot emission for all three benchmark ABMs, has been validated as the desired debugging path and should not be reworked casually.
 
-## DL-007
-- Date: 2026-03-06
-- Decision: Freeze `docs/supplementary_material/TESTING_REPORT.md` unless a task explicitly requests changes.
-- Rationale: the testing supplementary material has been manually edited into the publication-ready checklist style requested for this project and should not be rewritten or reformatted casually.
-
-## DL-008
-- Date: 2026-03-06
-- Decision: Freeze `docs/supplementary_material/GROUND_TRUTHS_GPT5.2.pdf` unless a task explicitly requests changes.
-- Rationale: the GPT-5.2 ground-truth supplementary material has been manually curated into the validated structure expected for the paper supplement and should not be modified casually.
-
-## DL-009
-- Date: 2026-03-07
-- Decision: Freeze the validated pre-LLM DOE smoke workflow unless a task explicitly requests changes.
-- Rationale: the current DOE smoke path has been manually validated as the review surface for the full pre-LLM experiment design, including grouped shared artifacts, exact context/trend prompt materialization, context-placeholder handoff semantics, evidence-mode-specific prompt wording, plot-relevant statistical table evidence, compact request/case indexes, and the request-review CSV used to verify prompt-to-evidence pairing. This path should not be modified casually once validated.
-
-## DL-010
-- Date: 2026-03-09
-- Decision: Preserve the public evidence labels `plot`, `table`, and `plot+table`, but redefine `table` as statistical evidence derived only from the plot-relevant simulation series.
-- Rationale: reviewer guidance explicitly asks for statistical summaries rather than raw CSV dumps. This must be implemented at the shared helper/core pipeline layer so DOE, smoke workflows, and real runs all use the same evidence semantics.
-
-## DL-011
 - Date: 2026-03-11
-- Decision: Freeze the validated quantitative evaluation path unless a task explicitly requests evaluation changes.
-- Rationale: the current quantitative path has been manually debugged and revalidated to remove silent lexical-metric fallbacks, preserve additive multi-reference scoring, include string-dtype prompt factors in DOE/factorial analysis, distinguish absent factorial terms from tiny nonzero effects, and publish exactly three cross-reference overview tables. This contract should not drift casually after validation.
+- Decision: Freeze the current quantitative evaluation contract unless a task explicitly asks for an evaluation change.
+- Rationale: the quantitative surface has already been debugged and validated, and publication work should not change metric or reporting semantics casually.

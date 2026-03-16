@@ -101,3 +101,9 @@ def test_retired_low_value_docs_are_absent() -> None:
         "docs/TRACEABILITY_MATRIX.md",
     ]:
         assert not Path(retired_path).exists()
+
+
+def test_unused_doc_assets_are_absent() -> None:
+    assert not Path("docs/assets/plot_example.png").exists()
+    assert not Path("docs/assets/stats_table_example.png").exists()
+    assert not Path("docs/images/.DS_Store").exists()
