@@ -39,7 +39,7 @@ Runtime notes:
 
 - `uv run pytest` currently completes in about one minute in this workspace
 - NetLogo and API-backed runs are slower and depend on local hardware, provider latency, and model choice
-- provider defaults and model aliases are documented in [docs/HYPERPARAMETERS.md](docs/HYPERPARAMETERS.md)
+- provider defaults and model aliases are documented in [docs/CONFIG_REFERENCE.md](docs/CONFIG_REFERENCE.md)
 
 ## Canonical Commands
 
@@ -125,7 +125,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the current runtime flow an
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - [docs/RESULTS_BUCKET.md](docs/RESULTS_BUCKET.md)
-- [docs/HYPERPARAMETERS.md](docs/HYPERPARAMETERS.md)
+- [docs/CONFIG_REFERENCE.md](docs/CONFIG_REFERENCE.md)
 
 ## Citation
 

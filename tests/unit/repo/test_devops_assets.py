@@ -88,7 +88,7 @@ def test_public_docs_surface_matches_publication_contract() -> None:
     assert "hf sync --apply /tmp/distill_abm_bucket_cleanup_plan.jsonl" in results_readme
     assert "ARCHITECTURE.md" in docs_index
     assert "RESULTS_BUCKET.md" in docs_index
-    assert "HYPERPARAMETERS.md" in docs_index
+    assert "CONFIG_REFERENCE.md" in docs_index
     assert "RUN_EXECUTION_ORDER.md" not in docs_index
     assert "WALKTHROUGH.md" not in docs_index
     assert "FAILURE_SEMANTICS.md" not in docs_index
