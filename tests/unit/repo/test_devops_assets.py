@@ -56,3 +56,14 @@ def test_gitignore_keeps_results_repo_lightweight() -> None:
         "!results/qwen3.5-27b_openrouter_all_abms_chain/**",
     ]:
         assert retired_entry not in content
+
+
+def test_public_docs_surface_matches_publication_contract() -> None:
+    readme = Path("README.md").read_text(encoding="utf-8")
+    docs_index = Path("docs/README.md").read_text(encoding="utf-8")
+    results_bucket = Path("docs/RESULTS_BUCKET.md").read_text(encoding="utf-8")
+
+    assert "Published run outputs live in the Hugging Face results bucket, not in Git." in readme
+    assert "The Git repository is publication-facing source code." in results_bucket
+    assert "AGENT_BACKLOG.md" not in docs_index
+    assert "AGENT_WORKFLOW.md" not in docs_index

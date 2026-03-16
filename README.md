@@ -1,141 +1,67 @@
 # distill-abm
 
-Paper-aligned ABM distillation pipeline with reproducible experiment orchestration.
+`distill-abm` is the publication-facing codebase for the ABM-to-LLM distillation pipeline used in the accompanying paper. The repository contains the code, configs, benchmark assets, and reproducibility logic. Published run outputs live in the Hugging Face results bucket, not in Git.
 
-## What This Repository Does
-`distill-abm` implements the workflow described in `data/paper/Main.txt`:
+## Repository Scope
 
-1. Build ABM context from parameters + documentation.
-2. Generate trend narratives from simulation evidence.
-3. Optionally summarize trend narratives.
-4. Score outputs with BLEU, METEOR, ROUGE-1/2/L, and Flesch.
-5. Run DOE/ANOVA analysis over experiment outputs.
-6. Produce publication-oriented summary tables from completed smoke runs.
+The pipeline supports six main stages:
 
-## Benchmark Model Policy
-Benchmark runs are restricted to:
+1. ingest ABM parameters and documentation
+2. generate simulation plots and statistical evidence
+3. generate trend narratives from evidence
+4. optionally summarize the generated narratives
+5. score outputs against reference texts
+6. produce quantitative summary tables
 
-1. `moonshotai/kimi-k2.5` via OpenRouter
-2. `google/gemini-3.1-pro-preview` via OpenRouter
-3. `qwen/qwen3.5-27b` via OpenRouter
+Benchmark model policy is enforced in the CLI. Paper-facing benchmark runs are restricted to:
 
-The CLI enforces this policy.
+1. `moonshotai/kimi-k2.5`
+2. `google/gemini-3.1-pro-preview`
+3. `qwen/qwen3.5-27b`
 
-Debug-only model note:
-- `nemotron_nano_12b_v2_vl_free` is available for smoke/debug work only.
-- It is not part of the benchmark model policy.
-- Use it only with `--allow-debug-model`.
-- `mistral_medium_debug` is available for smoke/debug work only.
-- It is not part of the benchmark model policy.
-- Use it only with `--allow-debug-model` and `MISTRAL_API_KEY` set.
-- `mistral_large_2512` is available for smoke/debug work only.
-- It is not part of the benchmark model policy.
-- Use it only with `--allow-debug-model` and `MISTRAL_API_KEY` set.
-- Mistral debug requests use `temperature=0.2`; other providers remain at `1.0` unless explicitly overridden.
-- The all-ABMs generation audit run is exposed through `smoke-full-case-suite`.
-- `smoke-full-case-suite` writes a stable suite root with:
-  - `suite_progress.json`
-  - one nested matrix run per ABM under `abms/<abm>/runs/`
-  - one stable `abms/<abm>/current/` view with the latest report, CSV, and log for that ABM
-- Mistral suite execution is paced and worker-limited specifically for its API budget, so the scheduler stays below the provider request ceiling instead of overscheduling pointlessly.
+Supported summarizers are `bart`, `bert`, `t5`, and `longformer_ext`.
 
-## Summarizers
-First-class summarizers:
+## Canonical Setup
 
-1. `bart`
-2. `bert`
-3. `t5`
-4. `longformer_ext`
-
-## Core Ablation Axes
-1. Evidence mode: `plot`, `table`, `plot+table`
-   - `table` means a statistical evidence dump computed from the plot-relevant simulation series only, not a raw CSV dump
-   - when a reporter pattern matches many repeated-simulation series, the detailed signal analysis is computed on their tick-wise mean so the audit path stays robust and reviewable
-2. Text source mode: `summary_only`, `full_text_only`
-
-## Repository Layout
-
-```text
-configs/
-  abms/                      ABM presets
-  models.yaml                canonical model registry
-  runtime_defaults.yaml      runtime defaults (modes, summarizers, requests)
-  experiment_settings.yaml   ABM ground-truth mapping
-  prompts.yaml               prompt templates + style factors
-  prompt_assets/             qualitative prompt examples
-  
-data/summaries/
-  authors/                   primary scoring references by ABM
-  modelers/                  optional modeler-authored references
-  gpt5.2/                    GPT-5.2 reference family references
-data/abms/
-  fauna/                     fauna ABM assets
-  grazing/                   grazing ABM assets
-  milk_consumption/          milk consumption ABM assets
-
-src/distill_abm/
-  cli.py                     Typer entrypoint
-  pipeline/                  run + sweep + smoke orchestration
-  llm/                       provider adapters and factory
-  summarize/                 summarizer runners + text cleanup
-  eval/                      lexical metrics + DOE analysis
-  ingest/                    CSV and NetLogo preprocessing
-  viz/                       plotting and stats table generation
-
-docs/
-  ARCHITECTURE.md
-  RUN_EXECUTION_ORDER.md
-  EVALUATION_FREEZE.md
-  RESULTS_BUCKET.md
-  QUALITY_SWEEP_2026-03-11.md
-  WALKTHROUGH.md
-  HYPERPARAMETERS.md
-  TESTING_REPORT.md
-  TRACEABILITY_MATRIX.md
-  DECISION_LOG.md
-
-tests/
-  e2e/
-  integration/
-  unit/
-```
-
-## Results Storage
-
-For result artifacts, start with the Hugging Face bucket:
-
-- `hf://buckets/NoeFlandre/distill-abms-results`
-- `https://huggingface.co/buckets/NoeFlandre/distill-abms-results`
-
-GitHub remains the code/method repository. The bucket is the primary storage/download surface for the exported smoke and evaluation outputs.
-
-The tracked and mirrored results tree currently includes the single-LLM chains plus the pairwise and three-way evaluation folders under `results/`.
-
-The repository now exposes a one-command bucket sync:
-
-```bash
-uv run distill-abm sync-results-bucket
-```
-
-For the latest quantitative paper tables across all current single- and multi-LLM runs, start in:
-
-- `results/quantitative_master_overview/`
-
-See [docs/RESULTS_BUCKET.md](docs/RESULTS_BUCKET.md) for the bucket contract, sync commands, the direct bucket link, and the local-to-remote folder mapping.
-
-Recent internal refactors preserved the public smoke/monitor contracts while splitting a few dense modules into narrower helpers:
-- `pipeline/local_qwen_monitor.py` now keeps the TUI/rendering surface, while `pipeline/local_qwen_monitor_snapshots.py` owns sampled/full-case/tuning/suite snapshot collection.
-- `pipeline/full_case_suite_progress.py` owns the stable suite progress/current-view contract used by `smoke-full-case-suite`.
-- `pipeline/full_case_review_csv.py` owns the shared per-case full-case review CSV writer used by both single-case and matrix smoke runs.
-- `run_viewer_payloads.py` owns typed payload construction for the static `review.html` viewer.
-
-## Quick Start
+The supported setup path is local `uv` on Python 3.11.
 
 ```bash
 uv sync --frozen --extra dev
 ```
 
-Run one pipeline execution:
+Environment assumptions:
+
+- tested on macOS and Linux with Python 3.11
+- NetLogo-based workflows require a working local NetLogo installation
+- API-backed workflows require provider credentials such as `OPENROUTER_API_KEY` and, for debug-only Mistral paths, `MISTRAL_API_KEY`
+
+Runtime notes:
+
+- `uv run pytest` currently completes in about one minute in this workspace
+- NetLogo and API-backed smoke or paper runs are substantially slower and depend on local hardware, provider latency, and model choice
+- provider defaults are documented in [docs/HYPERPARAMETERS.md](docs/HYPERPARAMETERS.md)
+
+## Canonical Workflows
+
+Validate the local workspace without calling any LLM:
+
+```bash
+uv run distill-abm validate-workspace --json
+```
+
+Fetch published results from the Hugging Face bucket:
+
+```bash
+hf sync hf://buckets/NoeFlandre/distill-abms-results ./results
+```
+
+Sync a local `results/` tree back to the bucket:
+
+```bash
+uv run distill-abm sync-results-bucket
+```
+
+Run the full pipeline on one input bundle:
 
 ```bash
 uv run distill-abm run \
@@ -148,107 +74,64 @@ uv run distill-abm run \
   --summarizer bart --summarizer bert --summarizer t5 --summarizer longformer_ext
 ```
 
-Run debug smoke suite:
+Run the standard fixed-factor optimization smoke chain used for the current exploitation preset:
 
 ```bash
-uv run distill-abm smoke-qwen \
-  --csv-path data/samples/sim.csv \
-  --parameters-path data/samples/params.txt \
-  --documentation-path data/samples/docs.txt \
-  --allow-debug-model
+uv run distill-abm smoke-optimization-gemini-chain \
+  --netlogo-home /path/to/NetLogo
 ```
 
-Run granular NetLogo ingestion smoke checks:
+## Reproducing the Paper Outputs
 
-```bash
-uv run distill-abm smoke-ingest-netlogo \
-  --models-root data \
-  --stage documentation \
-  --stage final-documentation
+The publication contract is:
+
+1. set up the repository with `uv`
+2. fetch the frozen results bucket into `./results`
+3. inspect the paper-facing quantitative rollups in `results/quantitative_master_overview/`
+4. rerun selected analysis or smoke commands only if you need to regenerate derived artifacts locally
+
+The fastest entrypoint for the published outputs is:
+
+- bucket URI: `hf://buckets/NoeFlandre/distill-abms-results`
+- bucket web UI: `https://huggingface.co/buckets/NoeFlandre/distill-abms-results`
+
+The paper itself is stored in `data/paper/Main.txt` and `data/paper/Main.pdf`.
+
+## Repository Layout
+
+```text
+src/distill_abm/        package source
+configs/                runtime, model, prompt, and ABM configs
+data/abms/              benchmark ABM assets and repo-local fallback artifacts
+data/summaries/         reference texts used for scoring
+tests/                  unit, integration, and e2e tests
+docs/                   focused reader-facing technical documentation
+results/README.md       pointer to the external published results store
 ```
 
-Run granular visualization smoke checks:
+## Architecture and Module Roles
 
-```bash
-uv run distill-abm smoke-viz \
-  --models-root data \
-  --netlogo-home /path/to/NetLogo \
-  --stage simulation-csv \
-  --stage plot-1 \
-  --json
-```
+The main runtime boundaries are:
 
-Run pre-LLM DOE smoke checks:
+- `distill_abm.cli`: CLI entrypoint and workflow routing
+- `distill_abm.ingest`: CSV and NetLogo ingestion
+- `distill_abm.viz`: simulation plots and statistical evidence generation
+- `distill_abm.pipeline`: orchestration for pipeline runs, smokes, suites, and reports
+- `distill_abm.summarize`: summarizer runners and text cleanup
+- `distill_abm.eval`: lexical metrics, reference scoring, DOE, and ANOVA utilities
+- `distill_abm.llm`: provider adapters and request defaults
 
-```bash
-uv run distill-abm smoke-doe \
-  --ingest-root results/archive/ingest_smoke_latest \
-  --viz-root results/archive/viz_smoke_latest \
-  --json
-```
+For the fuller runtime/data-flow description, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-Run a small real local-Qwen smoke for prompt/evidence/output inspection:
+## Additional Documentation
 
-```bash
-uv run distill-abm smoke-local-qwen \
-  --ingest-root results/archive/ingest_smoke_latest \
-  --viz-root results/archive/viz_smoke_latest \
-  --json
-```
-
-Run a lightweight repository health check:
-
-```bash
-uv run distill-abm health-check \
-  --models-root data \
-  --ingest-root results/archive/ingest_smoke_latest \
-  --viz-root results/archive/viz_smoke_latest \
-  --json
-```
-
-Monitor a case-based smoke run live:
-
-```bash
-uv run distill-abm monitor-local-qwen --watch --interval-seconds 2
-
-uv run distill-abm monitor-run \
-  --output-root results/archive/nemotron_abm_smoke_latest \
-  --watch --interval-seconds 2
-```
-
-DOE smoke notes:
-
-- `smoke-doe` does not call any LLM.
-- It materializes the full pre-LLM DOE matrix across ABMs, benchmark models, evidence modes, summarization conditions, prompt variants, and repetitions.
-- It treats candidate models as design factors only, so local model availability does not affect DOE smoke success or failure.
-- It groups shared DOE factors under `results/archive/doe_smoke_latest/10_shared/global/`, shared ABM artifacts under `results/archive/doe_smoke_latest/10_shared/<abm>/`, and compact case/request indexes under `results/archive/doe_smoke_latest/20_case_index/`.
-- It writes the exact context prompt, the exact trend prompt for each plot, the per-request model and hyperparameter settings, the exact image/table evidence paths, and the unresolved context placeholder that would still exist before the first LLM call.
-- Table evidence is generated from the matched plot series only and includes descriptive statistics, extrema, inflection points, rolling Mann-Kendall, change points, and oscillation summaries.
-- It uses the latest ingest and visualization smoke outputs as the default pre-LLM inputs, so the report makes it easy to catch wrong documentation, wrong parameter narrative, wrong simulation CSV, wrong evidence image, wrong prompt composition, wrong model choice, or placeholder leakage before any model execution.
-- It writes `design_matrix.csv`, `request_matrix.csv`, `cases.jsonl`, `requests.jsonl`, and a grouped markdown/json report under `results/archive/doe_smoke_latest/`.
-
-Visualization smoke caveat:
-
-- Unlike the older CSV-driven debug path, `smoke-viz` now resolves ABM-specific NetLogo settings from `configs/abms/<name>.yaml`.
-- Each ABM must define a `netlogo_viz` section in `configs/abms/<name>.yaml` with the experiment name, reporter list, and ordered plot list.
-- The command writes one simulation CSV plus ordered plot PNGs under `results/archive/viz_smoke_latest/<abm>/`.
-- The repository now preserves validated reference CSVs and plot images under `data/<abm>_abm/legacy/` so production smoke runs can emit deterministic debug artifacts without depending on the temporary notebook folder.
-- The report records the artifact source per ABM as either `simulated` or `fallback`.
-- The workflow depends on `pynetlogo` and a working NetLogo installation directory passed via `--netlogo-home` or `DISTILL_ABM_NETLOGO_HOME`.
-- The NetLogo execution path remains available and repo-local for all benchmark models; milk-specific input CSVs and grazing include files are now stored in the project data directories instead of external notebook paths.
-
-NetLogo ingestion caveat:
-
-- These artifacts are extracted dynamically from the provided `.nlogo` files; they are not static repository fixtures.
-- The extraction logic is designed for standard NetLogo model structure and for the model patterns used in this repository.
-- It is expected to work for these benchmark models and similar NetLogo files, but it is not guaranteed to work unchanged for every arbitrary `.nlogo` file.
-- In particular, documentation extraction assumes a recognizable NetLogo info section or usable top-of-file comments, and parameter extraction assumes interface/experiment sections in formats the parser already supports.
-
-Run the preferred non-LLM validation suite for coding-agent verification:
-
-```bash
-uv run distill-abm validate-workspace --json
-```
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [docs/RESULTS_BUCKET.md](docs/RESULTS_BUCKET.md)
+- [docs/HYPERPARAMETERS.md](docs/HYPERPARAMETERS.md)
+- [docs/RUN_EXECUTION_ORDER.md](docs/RUN_EXECUTION_ORDER.md)
+- [docs/EVALUATION_FREEZE.md](docs/EVALUATION_FREEZE.md)
+- [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md)
+- [docs/DECISION_LOG.md](docs/DECISION_LOG.md)
 
 Scope-oriented convenience wrapper:
 
@@ -283,6 +166,15 @@ Agent-oriented CLI additions:
 - `smoke-local-qwen` is the legacy command name for the sampled real-inference smoke. It now runs through the configured API model and writes one self-contained folder per sampled case plus a review CSV with exact prompt text, evidence paths, hyperparameters, outputs, and a minimalist static `review.html` viewer.
 - `smoke-local-qwen` supports `--resume` and reuses only successful case artifacts; failed or incomplete cases are rerun.
 - `smoke-full-case-matrix` runs one ABM across evidence modes, prompt variants, and repetitions, with one context prompt plus all ordered trend prompts per case. It uses the same run separation, resume behavior, `run.log.jsonl`, and `review.html` reviewer surface as the sampled smoke.
+- `smoke-optimization-gemini-chain` prepares the standard six smoke stages for the exploitation preset under `results/gemini-3.1-pro-preview_optimization_all_abms_chain/`:
+  - `01_ingest_smoke_latest`
+  - `02_viz_smoke_latest`
+  - `03_doe_smoke_latest`
+  - `04_full_case_suite_smoke_latest`
+  - `05_summarizer_smoke_latest`
+  - `06_quantitative_smoke_latest`
+- The current optimization preset is fixed to Gemini (`gemini_3_1_pro_preview`) with the existing provider default `temperature=1.0`, `Evidence=plot`, `Role=off`, `Insights=off`, `Example=on`, repetitions `1..3`, and summarizers `bart`, `bert`, and `t5`.
+- `smoke-summarizers` now supports repeated `--summarizer` flags so later runs can intentionally restrict the active summarizer set while preserving the implicit `none` bundle used by the long-reference quantitative path.
 - `render-run-viewer` builds the same minimalist static HTML viewer for any existing case-based run directory, including both one-trend sampled smokes and full-case multi-trend runs, or for the latest run when you point it at a root containing `latest_run.txt`.
 - `monitor-local-qwen` and `monitor-run` render the same compact live dashboard for case-based smoke runs, including current case or trial, configured `num_ctx`, `max_tokens`, prompt lengths, and observed token usage.
 - For all-ABM suite runs, `monitor-run` now reads the suite root directly and uses `suite_progress.json` plus the nested ABM run state so you can monitor the whole run from one place in the terminal.

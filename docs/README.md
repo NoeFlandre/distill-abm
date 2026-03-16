@@ -1,11 +1,9 @@
 # Documentation Index
 
-- `ARCHITECTURE.md` - runtime architecture and module boundaries.
-- `AGENT_BACKLOG.md` - highest-value remaining agent-friendly quality improvements.
-- `AGENT_WORKFLOW.md` - repository-specific agentic engineering workflow and verification order.
-- `MANUAL_VALIDATION.md` - evidence-style manual verification record for the pre-LLM workflow surfaces.
-- `WALKTHROUGH.md` - command-level walkthrough for standard and ablation runs.
-- `HYPERPARAMETERS.md` - runtime/model/summarizer parameter catalog.
-- `TESTING_REPORT.md` - quality gates, test scope, and verification commands.
-- `TRACEABILITY_MATRIX.md` - paper requirement to code mapping.
-- `DECISION_LOG.md` - approved deviations and implementation decisions.
+- `ARCHITECTURE.md` - module boundaries and end-to-end data flow.
+- `RESULTS_BUCKET.md` - canonical location and sync contract for published results.
+- `HYPERPARAMETERS.md` - runtime defaults and provider-specific request settings.
+- `RUN_EXECUTION_ORDER.md` - step-by-step execution order for the main pipeline run.
+- `EVALUATION_FREEZE.md` - frozen evaluation/reporting contract for the paper-facing outputs.
+- `WALKTHROUGH.md` - command-level walkthroughs for the main smoke and analysis workflows.
+- `DECISION_LOG.md` - important implementation decisions that affect reproducibility.
