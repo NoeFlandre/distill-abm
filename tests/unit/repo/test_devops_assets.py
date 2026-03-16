@@ -50,7 +50,16 @@ def test_gitignore_keeps_results_repo_lightweight() -> None:
     gitignore = Path(".gitignore")
     content = gitignore.read_text(encoding="utf-8")
     assert "results/*" in content
+    assert "Results/" in content
     assert "!results/README.md" in content
+    assert "*.swp" in content
+    assert "*.swo" in content
+    assert "*~" in content
+    assert ".coverage.*" in content
+    assert "*.egg-info" in content
+    assert "dist/" in content
+    assert "archive/" in content
+    assert "notes/" in content
     for retired_entry in [
         "!results/archive/**",
         "!results/quantitative_master_overview/**",
