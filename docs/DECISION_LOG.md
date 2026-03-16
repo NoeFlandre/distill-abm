@@ -32,13 +32,13 @@
 
 ## DL-007
 - Date: 2026-03-06
-- Decision: Freeze `docs/TESTING_REPORT.md` unless a task explicitly requests changes.
+- Decision: Freeze `docs/supplementary_material/TESTING_REPORT.md` unless a task explicitly requests changes.
 - Rationale: the testing supplementary material has been manually edited into the publication-ready checklist style requested for this project and should not be rewritten or reformatted casually.
 
 ## DL-008
 - Date: 2026-03-06
-- Decision: Freeze `docs/GROUND_TRUTHS_GPT5.2.md` unless a task explicitly requests changes.
-- Rationale: the GPT-5.2 ground-truth supplementary material has been manually curated into the validated structure and wording expected for the paper supplement, while preserving prompt and model-output content, and should not be modified casually.
+- Decision: Freeze `docs/supplementary_material/GROUND_TRUTHS_GPT5.2.pdf` unless a task explicitly requests changes.
+- Rationale: the GPT-5.2 ground-truth supplementary material has been manually curated into the validated structure expected for the paper supplement and should not be modified casually.
 
 ## DL-009
 - Date: 2026-03-07

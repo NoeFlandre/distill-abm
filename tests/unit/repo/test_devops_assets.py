@@ -71,3 +71,10 @@ def test_public_docs_surface_matches_publication_contract() -> None:
     assert "hf sync --apply /tmp/distill_abm_bucket_cleanup_plan.jsonl" in results_readme
     assert "AGENT_BACKLOG.md" not in docs_index
     assert "AGENT_WORKFLOW.md" not in docs_index
+
+
+def test_stale_root_level_supplementary_docs_are_absent() -> None:
+    assert not Path("docs/TESTING_REPORT.md").exists()
+    assert not Path("docs/GROUND_TRUTHS_GPT5.2.pdf").exists()
+    assert Path("docs/supplementary_material/TESTING_REPORT.md").exists()
+    assert Path("docs/supplementary_material/GROUND_TRUTHS_GPT5.2.pdf").exists()
