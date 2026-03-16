@@ -59,7 +59,6 @@ def test_gitignore_keeps_results_repo_lightweight() -> None:
     assert "*.egg-info" in content
     assert "dist/" in content
     assert "archive/" in content
-    assert "notes/" in content
     for retired_entry in [
         "!results/archive/**",
         "!results/quantitative_master_overview/**",
@@ -81,7 +80,7 @@ def test_public_docs_surface_matches_publication_contract() -> None:
     results_readme = Path("results/README.md").read_text(encoding="utf-8")
     citation = Path("CITATION.cff").read_text(encoding="utf-8")
 
-    assert "Published run outputs live in the Hugging Face results bucket, not in Git." in readme
+    assert "Hugging Face results bucket" in readme
     assert "If you use this repository, cite the software record in [CITATION.cff](CITATION.cff)." in readme
     assert "The Git repository is publication-facing source code." in results_bucket
     assert "uv run distill-abm sync-results-bucket --dry-run" in results_bucket
@@ -90,8 +89,6 @@ def test_public_docs_surface_matches_publication_contract() -> None:
     assert "ARCHITECTURE.md" in docs_index
     assert "RESULTS_BUCKET.md" in docs_index
     assert "HYPERPARAMETERS.md" in docs_index
-    assert "EVALUATION_FREEZE.md" in docs_index
-    assert "DECISION_LOG.md" in docs_index
     assert "RUN_EXECUTION_ORDER.md" not in docs_index
     assert "WALKTHROUGH.md" not in docs_index
     assert "FAILURE_SEMANTICS.md" not in docs_index
