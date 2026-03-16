@@ -50,8 +50,5 @@ def test_load_experiment_settings_config() -> None:
     assert "data/summaries/gpt5.2/" in settings.gpt5_2_long_ground_truth.grazing
     assert "data/summaries/gpt5.2/" in settings.gpt5_2_long_ground_truth.milk_consumption
 
-    assert settings.qualitative_example_text_dir is not None
-    assert "prompt_assets" in settings.qualitative_example_text_dir
-
     assert settings.human_reference_dir == "data/summaries"
     assert Path(settings.human_reference_dir).exists()

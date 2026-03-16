@@ -17,5 +17,4 @@ gpt5.2_long_ground_truth:
   grazing: data/summaries/gpt5.2/grazing_gpt5.2_long_ground_truth.txt
   milk_consumption: data/summaries/gpt5.2/milk_gpt5.2_long_ground_truth.txt
 
-qualitative_example_text_dir: configs/prompt_assets/Evaluation/Qualitative Assessment using LLMs/Examples/Text
 human_reference_dir: data/summaries
