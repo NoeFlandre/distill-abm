@@ -9,6 +9,8 @@ def test_dockerfile_exists_and_uses_reproducible_python_env() -> None:
     content = dockerfile.read_text(encoding="utf-8")
     assert "FROM python:3.11-slim" in content
     assert "WORKDIR /app" in content
+    assert "COPY pyproject.toml uv.lock README.md ./" in content
+    assert "COPY src ./src" in content
     assert "uv sync --frozen --extra dev" in content
 
 
