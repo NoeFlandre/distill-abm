@@ -112,3 +112,8 @@ def test_unused_doc_assets_are_absent() -> None:
     assert not Path("docs/assets/plot_example.png").exists()
     assert not Path("docs/assets/stats_table_example.png").exists()
     assert not Path("docs/images/.DS_Store").exists()
+
+
+def test_tracked_macos_metadata_files_are_absent_from_source_tree() -> None:
+    assert not Path("src/.DS_Store").exists()
+    assert not Path("src/distill_abm/.DS_Store").exists()
