@@ -1,5 +1,0 @@
-The simulation results demonstrate a decisive downward trajectory in the average weekly consumption of whole milk per agent. Starting at a value of 2654.81 at index 0, the metric decreases to 253.10 at index 32. Statistical evidence from rolling Mann-Kendall tests confirms significant decreasing trends across the initial and middle phases of the series.
-
-The trend structure includes multiple inflection points at indices 5, 13, 16, 19, 24, 25, 27, and 30, indicating shifts in the rate of decline. Local extrema are observed, such as a peak at index 19 (value 773.96) and a valley at index 18 (value 760.00). The standard deviation of 696.67 against a mean of 1079.81 highlights variance in individual paths contributing to the aggregate decline.
-
-From a consumer behavior perspective, this rapid depletion of the incumbent product's market share reflects the model's representation of shifting habits and social influence. For decision makers, the non-linear nature of the decline, marked by multiple inflection points, suggests that consumer transitions are driven by cumulative social pressures and threshold effects rather than a linear phase-out.

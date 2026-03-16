@@ -1,9 +1,0 @@
-The mean value health deviation starts at a low value close to zero and exhibits a rapid increase in the early steps of the simulation. By around step 5, the deviation reaches approximately 0.3. This initial phase indicates a significant shift in the agents' health perceptions as they begin to adopt new milk types, reflecting a period of adjustment and exploration.
-
-Following this rapid increase, the rate of change in the mean value health deviation begins to slow down. Between steps 5 and 15, the deviation continues to rise but at a more gradual pace, reaching around 0.5 by step 15. This phase suggests a stabilization period where agents are refining their preferences and habits based on their interactions and experiences.
-
-From step 15 to step 25, the mean value health deviation remains relatively stable, fluctuating slightly around the 0.55 mark. This stability indicates that agents have largely settled into their new consumption patterns and that the social and personal influences on their choices have reached a dynamic equilibrium.
-
-After step 25, there is a slight upward trend in the mean value health deviation, which continues until the end of the simulation at step 30, where it reaches approximately 0.65. This final phase suggests a minor but consistent adjustment in health perceptions, possibly due to ongoing social interactions and the reinforcement of habits.
-
-For decision makers, these trends highlight the importance of the initial phase in shaping consumer behavior. The rapid increase in health deviation early on underscores the impact of initial perceptions and social influences. The subsequent stabilization indicates that once habits are formed, they tend to persist, but there is still room for gradual adjustments. This insight can inform strategies aimed at introducing new products or changing consumer habits, emphasizing the need for strong initial messaging and ongoing reinforcement to sustain behavioral changes.

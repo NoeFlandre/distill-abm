@@ -1,5 +1,0 @@
-: 
-
-The total number of choices made accumulates linearly from approximately zero at initialization to roughly 32,000 total decisions by the final time step (step 32), maintaining a constant rate of approximately 1,000 choices per step throughout the 1974-2005 simulation period. This consistent slope indicates that the full population of 1,000 consumer agents submitted consumption decisions at every discrete time interval without attrition, dropout, or interruption, resulting in a perfectly additive accumulation of behavioral data across the modeled timeframe.
-
-**Implications for decision makers:** This uniform participation ensures complete temporal coverage of the agent population, providing statistically robust longitudinal data for analyzing the milk market transition. However, decision makers should note that the absence of engagement decay or intermittent participation patterns suggests an idealized model environment where habitual consumption triggers continuous evaluation cycles, potentially differing from real-world survey attrition or intermittent purchasing behaviors that could introduce noise in empirical datasets.

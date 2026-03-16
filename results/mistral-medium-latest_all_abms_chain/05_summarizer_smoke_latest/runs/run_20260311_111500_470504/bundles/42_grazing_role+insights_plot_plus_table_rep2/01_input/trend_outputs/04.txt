@@ -1,7 +1,0 @@
-The mean green biomass in the grazing system exhibits distinct trends over the 100 steps of the simulation. Initially, the mean green biomass starts at approximately 45,000 units. In the early stages, there is a slight increase, reaching around 45,261 units by step 4. This is followed by a notable decline, with the biomass decreasing to its minimum value of approximately 42,057 units at step 27. 
-
-Following this decline, there is a significant and sustained increase in mean green biomass. This upward trend begins around step 27 and continues steadily, with the biomass reaching approximately 60,535 units by the final step of the simulation. The increase is particularly pronounced between steps 33 and 100, where the rolling Mann-Kendall test indicates a consistent and significant increasing trend. 
-
-Key inflection points are observed at steps 9 and 49, marking transitions in the rate of change of the biomass. The oscillation analysis suggests periodic fluctuations with a dominant period of 49 steps, indicating some regularity in the biomass dynamics over time. 
-
-For decision makers, these trends highlight the initial stress on the grazing system, as indicated by the decline in biomass, followed by a robust recovery and growth phase. This suggests that the system, under the given parameters and conditions, can recover and even thrive over time, which is crucial for long-term planning and sustainability efforts in grazing management.

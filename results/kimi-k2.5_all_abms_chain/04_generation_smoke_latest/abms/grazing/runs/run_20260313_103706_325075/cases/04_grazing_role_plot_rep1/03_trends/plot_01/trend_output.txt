@@ -1,5 +1,0 @@
-The metric remains constant across all 100 time steps for each simulation run, exhibiting no temporal variation. Values range from approximately -0.11 to +0.18, with multiple distinct horizontal trajectories maintained throughout the simulation period.
-
-This metric represents the initial disposition of social learning agents (E-RO-SL1 type) to deviate from recommended livestock numbers, where negative values indicate a conservative tendency to under-stock relative to recommendations, and positive values indicate an aggressive tendency to over-stock. The constant values across time steps confirm that initial risk attitudes are fixed parameters assigned at the start of each simulation run and do not change during the 100-year period.
-
-The spread of values from -0.11 to +0.18 indicates that different simulation runs initialized social learning agents with varying risk dispositions, spanning from risk-averse (conservative stocking) to risk-seeking (aggressive stocking) behaviors relative to the recommended stocking levels.

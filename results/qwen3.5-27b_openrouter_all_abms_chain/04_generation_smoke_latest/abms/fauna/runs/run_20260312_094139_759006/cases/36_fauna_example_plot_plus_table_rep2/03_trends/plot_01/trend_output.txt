@@ -1,1 +1,0 @@
-The number of active human hunter-gatherer bands remains constant at 20 throughout the simulation. No changes occur over time, maintaining a steady value from the initial step to the final step. This stability is consistent with the model configuration where hunter mortality is disabled, ensuring that the initial population of foragers is preserved.

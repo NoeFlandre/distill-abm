@@ -1,3 +1,0 @@
-The number of active human hunter-gatherer bands remains constant at 20 throughout the entire simulation period. This static trajectory reflects the model configuration in which hunters neither reproduce nor die from energy depletion, maintaining the initial population density of 20 bands established at initialization without fluctuation from start to end.
-
-For decision makers, this constant predator density provides a stable baseline for experiments, ensuring that observed changes in megaherbivore extinction dynamics or herd behavior can be attributed to environmental variables, prey life history traits, or hunting selectivity rather than variations in hunter population pressure.

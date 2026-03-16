@@ -1,4 +1,0 @@
-The number of human hunter-gatherer bands remains constant at 20 throughout the entire simulation period, from the initial time step through all 2,312 recorded observations. This absolute stability reflects the parametric configuration where foragers are immortal (imortal-foragers = True) and do not reproduce, resulting in a static hunting population that experiences no mortality from energy depletion or other causes, nor any recruitment.
-
-**Implications for Decision Makers:**
-This constant hunter density provides a controlled experimental condition where hunting pressure remains invariant over time. Researchers can therefore isolate the effects of prey life history traits, environmental degradation, and seasonal resource fluctuations on extinction dynamics without the confounding variable of changing predator density or hunter energetic constraints affecting population viability.

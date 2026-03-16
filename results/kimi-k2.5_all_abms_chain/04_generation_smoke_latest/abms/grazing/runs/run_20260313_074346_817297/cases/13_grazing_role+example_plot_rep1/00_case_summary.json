@@ -1,8 +1,0 @@
-{
-  "abm": "grazing",
-  "case_id": "13_grazing_role+example_plot_rep1",
-  "evidence_mode": "plot",
-  "model": "moonshotai/kimi-k2.5",
-  "prompt_variant": "role+example",
-  "repetition": 1
-}

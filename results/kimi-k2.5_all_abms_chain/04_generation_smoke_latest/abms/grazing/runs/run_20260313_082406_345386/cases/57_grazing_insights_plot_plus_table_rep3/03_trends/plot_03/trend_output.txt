@@ -1,9 +1,0 @@
-The mean reserve biomass begins at approximately 90,000 units and undergoes an initial decline phase lasting through step 26, reaching a minimum value of approximately 84,114 units. This downward trend is statistically significant during the first 21 steps, indicating a consistent drawdown of reserve biomass during the early simulation period.
-
-Following the minimum at step 26, the system enters a brief transitional phase through approximately step 32 where the decline stabilizes and no significant trend is detected. From step 33 onward, a pronounced recovery begins, with biomass increasing significantly through step 54. This growth phase exhibits steep upward trajectories, particularly between steps 44 and 54 where the increase is most rapid.
-
-After step 54, the rate of increase gradually decelerates through step 76, though remaining statistically significant. The system approaches a new equilibrium state after approximately step 80, with growth rates slowing considerably but continuing a slight upward trend through the final step at 100, where biomass reaches approximately 121,073 units.
-
-The overall trajectory represents a recovery from initial degradation to a higher steady-state biomass level approximately 34% above initial conditions. The minimum biomass at step 26 represents a critical threshold where reserve stocks are at their lowest before recovery mechanisms take effect.
-
-For decision makers, the results suggest that despite an initial period of biomass depletion lasting roughly 26 steps, the system's learning and adaptive management capabilities facilitate a robust recovery that ultimately exceeds initial biomass levels by approximately 34%. The critical low point at step 26 serves as a key monitoring threshold, while the sustained growth through step 100 indicates long-term viability under the modeled behavioral adaptations.

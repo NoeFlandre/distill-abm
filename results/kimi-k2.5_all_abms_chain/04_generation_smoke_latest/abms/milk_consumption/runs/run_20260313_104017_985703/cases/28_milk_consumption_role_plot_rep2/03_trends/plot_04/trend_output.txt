@@ -1,9 +1,0 @@
-The cumulative count of skimmed and semi-skimmed milk selections initiates at approximately zero at step 0 and exhibits a consistent upward trajectory across all simulation runs, terminating at values between 25,500 and 26,000 by step 32.
-
-During the initial phase spanning steps 0 through approximately 7, the growth follows a slightly convex curve characterized by gradual acceleration. By step 5, the cumulative count reaches approximately 1,000 to 1,500 selections, expanding to roughly 2,500 to 3,000 by step 7.
-
-From step 7 through step 30, the trajectory transitions to a markedly linear pattern with a constant positive slope, indicating a steady rate of adoption. Within this interval, the cumulative count increases by approximately 750 to 800 selections per step.
-
-The consistency across simulation runs remains high throughout the entire period, with minimal variance between trajectories. By step 32, the final values cluster tightly within a range of approximately 500 units, with most simulations concluding between 25,500 and 26,000 total skimmed or semi-skimmed milk choices.
-
-Within the context of the 1974-2005 British milk consumption transition, these results indicate a sustained, steady shift from whole milk to alternative varieties following an initial adoption period characterized by slower growth rates.

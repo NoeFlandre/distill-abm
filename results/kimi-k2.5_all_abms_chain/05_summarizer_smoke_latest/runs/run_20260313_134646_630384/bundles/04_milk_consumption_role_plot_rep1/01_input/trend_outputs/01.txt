@@ -1,9 +1,0 @@
-The mean whole milk consumption per agent exhibits a consistent downward trajectory across all simulation runs, declining from approximately 2650 units at Step 0 to roughly 250-300 units by the final step around Step 32. 
-
-The decline occurs in three distinct phases. During the initial phase (Steps 0-10), consumption decreases rapidly and steeply, falling by approximately 1650 units to reach levels around 1000 by Step 10. This represents the most dramatic reduction in the series.
-
-In the second phase (Steps 10-20), the rate of decline moderates considerably. Consumption decreases gradually from approximately 1000 units to around 750 units, representing a reduction of roughly 250 units over this ten-step interval.
-
-The final phase (Steps 20-32) shows a continued but slower erosion of consumption levels, interspersed with small plateaus and step-like drops. From approximately 750 units at Step 20, consumption falls to terminal values between 250 and 300 units. Notable incremental drops occur around Steps 26 and 28, where consumption levels step down from roughly 600 to below 400 units within a few steps.
-
-Across all repeated simulation runs, the trajectories remain tightly clustered, indicating robust consistency in the modeled decline pattern with minor stochastic variations in the exact timing and magnitude of specific step-down transitions.

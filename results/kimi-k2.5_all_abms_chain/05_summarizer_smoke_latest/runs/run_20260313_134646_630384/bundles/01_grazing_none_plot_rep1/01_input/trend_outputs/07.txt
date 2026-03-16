@@ -1,9 +1,0 @@
-At initialization (step 0), the Gini coefficient equals zero, reflecting identical initial livestock endowments of 90 animals across all 60 households in the system.  
-
-During the first 20 steps, inequality increases universally across all simulation runs, with the Gini coefficient rising rapidly to values between approximately 0.005 and 0.015. This indicates the initial emergence of differentiation in healthy livestock holdings among households.
-
-Between steps 20 and 50, the simulation trajectories begin to diverge substantially. While all paths continue to exhibit increasing inequality, the rate of increase varies markedly across runs. By step 50, the Gini coefficient values span a range from approximately 0.015 to 0.040, with some simulation outcomes showing more than double the inequality levels of others.
-
-From step 50 to step 100, this divergence accelerates and becomes more pronounced. By the final timestep, the Gini coefficient values spread across a broad spectrum from approximately 0.030 to 0.095. Specifically, certain simulation runs reach high inequality levels exceeding 0.090, while others stabilize at moderate levels between 0.060 and 0.080, and a minority maintains relatively lower inequality in the range of 0.030 to 0.045.
-
-The overall pattern demonstrates a consistent trend toward increasing inequality in healthy livestock distribution over the 100-step period for all behavioral configurations (20 E-RO, 20 E-LBD, and 20 E-RO-SL1 households). However, the threefold variation in final Gini values indicates significant path dependency, wherein stochastic rainfall variability (mean 200, standard deviation 100) and heterogeneous learning mechanisms generate divergent distributional outcomes among private property households.

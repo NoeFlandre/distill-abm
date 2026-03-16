@@ -1,7 +1,0 @@
-The population of male animals begins at approximately 125 individuals across all simulation runs. Over the initial 500 time steps, the number of males declines rapidly in all runs, with most populations falling to between 0 and 40 individuals by step 500, though the exact trajectory varies considerably between runs.
-
-From step 500 to approximately step 1000, the decline continues for those populations that persist, though at variable rates. By step 1000, the majority of populations have reached zero, while a subset maintains small numbers ranging from approximately 5 to 15 individuals.
-
-In the final phase beyond step 1000, most remaining populations gradually decline to extinction. While the majority of simulation runs conclude with zero males between steps 1000 and 1500, some runs exhibit prolonged persistence, with small populations of 1 to 5 individuals surviving until approximately step 2200 before finally reaching zero.
-
-These trends reflect the combined pressures of human hunting, demographic stochasticity, and environmental constraints operating within the model. The initial rapid decline corresponds to the onset of hunting pressure on a naive population, while the variability in extinction timing suggests the influence of stochastic demographic processes and potentially differing hunting efficiencies or environmental conditions across simulation runs. The prolonged persistence of some small populations indicates that demographic stochasticity can allow small groups of males to evade hunters for extended periods before eventual extinction.

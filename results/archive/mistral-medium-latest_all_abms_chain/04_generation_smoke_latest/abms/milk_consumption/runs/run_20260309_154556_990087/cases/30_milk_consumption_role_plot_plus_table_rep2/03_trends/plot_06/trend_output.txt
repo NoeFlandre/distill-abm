@@ -1,7 +1,0 @@
-The mean quantity of whole milk consumed by agents in the simulation starts at a high value of approximately 2654.81 units and exhibits a general decreasing trend over time. Initially, there is a sharp decline in the mean whole milk quantity, dropping significantly within the first few steps. This rapid decrease continues until around step 10, where the mean quantity reaches approximately 1000 units. 
-
-From steps 10 to 20, the rate of decline slows down, and the mean quantity stabilizes somewhat, fluctuating around a range of 700 to 800 units. During this period, there are minor peaks and valleys, indicating small oscillations in the consumption pattern. Specifically, there are notable points such as a peak at step 19 with a value of 773.9572 units and a valley at step 18 with a value of 760.0036 units. 
-
-After step 20, the mean quantity of whole milk continues to decrease but at a slower and more gradual rate. There are additional minor fluctuations, with a peak at step 27 with a value of 620.9759 units and a valley at step 26 with a value of 594.3464 units. The trend remains generally downward, reaching a low point of approximately 253.104 units by the final step. 
-
-Throughout the simulation, the mean quantity of whole milk consumed shows a consistent overall decline, with periods of stabilization and minor oscillations. The initial sharp decline suggests a significant shift away from whole milk consumption early in the simulation, followed by a more gradual reduction as the simulation progresses.

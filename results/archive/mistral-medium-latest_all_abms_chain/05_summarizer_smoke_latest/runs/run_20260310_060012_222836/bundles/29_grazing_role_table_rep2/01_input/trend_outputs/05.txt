@@ -1,7 +1,0 @@
-The average total number of livestock, including both healthy livestock and those that have been destocked, across all households shows distinct trends over the 100 time steps of the simulation. Initially, the number of livestock starts at 90 and exhibits a sharp decreasing trend until around time step 20, where the value drops significantly. This decreasing trend is statistically significant with a high negative Kendall tau and steep negative slope. 
-
-From time step 20 to around time step 55, the system stabilizes, and the number of livestock fluctuates around a lower value, with the minimum value of approximately 41 observed at time step 37. During this period, no significant trend is detected, indicating a phase of stabilization. 
-
-After time step 55, the trend reverses, and the number of livestock begins to increase gradually. This increasing trend continues until the end of the simulation at time step 100, with the value reaching approximately 47.55. The increasing trend is statistically significant, although the slope of the increase becomes less steep over time, indicating a gradual recovery. 
-
-The system exhibits strong oscillations, particularly noticeable in the early and middle phases of the simulation, suggesting periodic fluctuations in the number of livestock. The dominant period of these oscillations is around 49 time steps, indicating a cyclical pattern in the data. The inflection points at time steps 3 and 46 mark significant changes in the trend direction, further emphasizing the dynamic nature of the system.

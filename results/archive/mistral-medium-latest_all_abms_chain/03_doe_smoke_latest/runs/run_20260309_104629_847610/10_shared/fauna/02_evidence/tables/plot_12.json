@@ -1,5 +1,0 @@
-{
-  "reporter_pattern": "sum [energy] of animals with [species = 2]",
-  "series_path": "results/mistral_all_abms_chain/03_doe_smoke_latest/runs/run_20260309_104629_847610/10_shared/fauna/02_evidence/tables/plot_12_series.csv",
-  "summary_path": "results/mistral_all_abms_chain/03_doe_smoke_latest/runs/run_20260309_104629_847610/10_shared/fauna/02_evidence/tables/plot_12.txt"
-}

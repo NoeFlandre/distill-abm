@@ -1,8 +1,0 @@
-{
-  "abm": "milk_consumption",
-  "case_id": "26_milk_consumption_none_table_rep2",
-  "evidence_mode": "table",
-  "model": "mistral-medium-latest",
-  "prompt_variant": "none",
-  "repetition": 2
-}

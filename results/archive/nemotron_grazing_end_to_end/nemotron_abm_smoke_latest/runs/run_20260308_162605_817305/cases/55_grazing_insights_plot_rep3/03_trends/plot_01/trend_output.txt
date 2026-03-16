@@ -1,1 +1,0 @@
-The steps parameter shows that across all initial risk attitude values, agents make their decision at the exact same time step. The y-axis shows the initial risk attitude of each agent, ranging from approximately -0.105 to 0.1875. The mean initial risk attitude of all social learning agents is approximately -0.0020.

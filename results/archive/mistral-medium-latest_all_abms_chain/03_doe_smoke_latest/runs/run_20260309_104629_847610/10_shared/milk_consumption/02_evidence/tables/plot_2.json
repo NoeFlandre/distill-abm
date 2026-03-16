@@ -1,5 +1,0 @@
-{
-  "reporter_pattern": "mean-alt",
-  "series_path": "results/mistral_all_abms_chain/03_doe_smoke_latest/runs/run_20260309_104629_847610/10_shared/milk_consumption/02_evidence/tables/plot_2_series.csv",
-  "summary_path": "results/mistral_all_abms_chain/03_doe_smoke_latest/runs/run_20260309_104629_847610/10_shared/milk_consumption/02_evidence/tables/plot_2.txt"
-}

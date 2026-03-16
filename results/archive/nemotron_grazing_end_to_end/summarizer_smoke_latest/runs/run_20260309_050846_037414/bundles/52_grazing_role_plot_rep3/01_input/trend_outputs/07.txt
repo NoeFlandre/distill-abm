@@ -1,6 +1,0 @@
-{ "description": "Characteristic lines plot representing the Gini Coefficient Total Livestock Healthy with a Y-axis range of 0 to 0.09 and an X-Axis ranging from 0 to 100.",
-    "plotting_colormaps": [{
-        "color_value": "linen",
-        "value": "__all__",
-        "colormap": "plasma"
-    }]                                                                                                                                     }                    }

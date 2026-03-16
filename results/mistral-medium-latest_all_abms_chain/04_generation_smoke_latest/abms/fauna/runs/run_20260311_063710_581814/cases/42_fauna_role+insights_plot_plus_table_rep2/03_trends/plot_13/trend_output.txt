@@ -1,9 +1,0 @@
-The total energy of all animals in the simulation starts at a high value of approximately 16,666.67 units and exhibits a consistent decreasing trend over time, eventually reaching zero. The initial phase of the simulation shows a steep decline in total energy, dropping to around 4,000 units by approximately 500 time steps. This rapid decrease is followed by a more gradual decline, with notable inflection points indicating changes in the rate of energy reduction. 
-
-Key inflection points occur at time steps 309, 460, 513, 751, 830, 1284, 1356, 1469, 1657, 1683, 1707, 1708, 1709, 1747, 1762, 1886, 1935, 2040, 2156, and 2167. These points suggest shifts in the dynamics of energy depletion among the animals. The trend analysis using the rolling Mann-Kendall test confirms a consistent decreasing trend in total energy across multiple time windows, with significant decreases noted in each window. 
-
-The simulation also identifies several peaks and valleys in the total energy levels, although these fluctuations are relatively minor compared to the overall decreasing trend. The peaks and valleys suggest temporary stabilizations or slight recoveries in the total energy before continuing the downward trajectory. 
-
-The dominant period of oscillation in the energy levels is approximately 63 time steps, indicating a cyclical pattern within the broader trend of decline. This periodicity may reflect underlying environmental or behavioral cycles affecting the energy dynamics of the animals. 
-
-For decision-makers, the consistent decline in total energy highlights the vulnerability of the animal population under the given conditions. The inflection points and periods of oscillation provide insights into critical phases where interventions might be most effective. Understanding these trends can help in designing strategies to mitigate the factors contributing to the energy depletion and potential extinction of the animals.

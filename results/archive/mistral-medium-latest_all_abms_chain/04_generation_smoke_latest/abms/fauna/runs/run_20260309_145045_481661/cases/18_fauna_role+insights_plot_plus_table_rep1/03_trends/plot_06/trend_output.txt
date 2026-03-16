@@ -1,9 +1,0 @@
-The cumulative number of births among the prey animal population in the Megaherbivore Hunting Pressure Model (MHPM) exhibits distinct trends over the simulation period. Initially, the number of births remains at zero, indicating no births in the early stages of the simulation. This period is followed by a gradual increase in the number of births starting around 725 ticks, reflecting the beginning of reproductive activity among the prey population. 
-
-A significant increasing trend is observed from approximately 725 ticks to 1325 ticks, where the number of births rises steadily. This period suggests a phase of population growth and stabilization, where the prey animals are reproducing at a consistent rate. The peak number of births, around 5.6, is reached at approximately 1702 ticks, indicating the highest reproductive activity within the simulation timeframe. 
-
-Following this peak, there is a noticeable decline in the number of births starting around 1850 ticks. This decreasing trend continues until about 2050 ticks, suggesting a reduction in reproductive activity possibly due to environmental factors, hunting pressure, or other model dynamics affecting the prey population. The number of births stabilizes towards the end of the simulation, indicating a potential equilibrium or stabilization in the population dynamics. 
-
-The oscillation analysis reveals a dominant period of 50 ticks, suggesting regular fluctuations in the number of births. These oscillations could be attributed to seasonal variations or other cyclic factors influencing the reproductive behavior of the prey animals. 
-
-For decision-makers, these trends highlight critical periods in the simulation where reproductive activity peaks and declines. Understanding these patterns can inform strategies related to conservation efforts, hunting regulations, and environmental management to ensure the sustainability of the prey population within the modeled ecosystem.

@@ -1,9 +1,0 @@
-The population of female prey animals begins at 125 individuals. Over the course of approximately 2,312 time steps (roughly 6.3 years given the temporal scaling), the population undergoes a sustained decline to extinction.
-
-The decline is most rapid during the initial phase, with significant decreases occurring within the first 475 time steps. By approximately step 730 (around the second year), brief periods of population increase occur, reaching local peaks of approximately 6.5 individuals, though these temporary recoveries are insufficient to reverse the overall downward trajectory.
-
-After step 875, the population enters a terminal decline phase characterized by low absolute numbers, generally remaining below 5 individuals. The final extinction occurs at step 2,311, with the population reaching zero females.
-
-The decline exhibits cyclical fluctuations with a periodicity of approximately 63 time steps (roughly two months), superimposed on the overall decreasing trend. These oscillations reflect the interaction between seasonal environmental constraints, reproductive cycles (with a birth spacing interval of 730 time steps), and hunting pressure from 20 active foragers.
-
-For decision makers: The simulation results indicate that the current configuration of hunting pressure, environmental seasonality, and prey life history traits leads to rapid population collapse within approximately six years. The brief recovery periods observed around the second year suggest that reducing hunting intensity or enhancing environmental productivity during critical periods could potentially extend population persistence, though the current parameter set produces an unsustainable system resulting in certain extinction. The cyclical nature of the decline highlights the importance of seasonal management strategies if conservation is the goal.

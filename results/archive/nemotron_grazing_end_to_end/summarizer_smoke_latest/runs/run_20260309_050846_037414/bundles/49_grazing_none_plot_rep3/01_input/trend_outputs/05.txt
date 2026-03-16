@@ -1,5 +1,0 @@
-The chart portrays the variations in the metric mean livestock combined with the number of destocked households based on the varying time steps.
-
-During the initial time step, there is a prominent rise in values to approximately 90, immediately followed a downward trend to values of less than 40 by step 35.
-
-Through step around 50, there is a smooth rise to values between 45 and 50. This is followed by a plateau around 48 (during step 60) by all metrics except for a noticeable rise in the orange line. Another explosion happens in the metric throughout the rest of the steps to values above 60, up to about 62. A gradual flattening starts forming around 62 with a continued rise in values up to 61 steps onwards in all curves with the orange consistently staying above lower curves in values.

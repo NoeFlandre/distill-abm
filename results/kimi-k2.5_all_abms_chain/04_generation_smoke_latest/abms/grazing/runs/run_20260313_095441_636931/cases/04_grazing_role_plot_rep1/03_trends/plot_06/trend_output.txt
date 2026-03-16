@@ -1,9 +1,0 @@
-The time series reveals three distinct dynamic phases in the mean number of livestock destocked per household. 
-
-In the initial phase (time steps 0-5), the metric exhibits an abrupt surge from zero at initialization to peak values ranging between approximately 6.0 and 7.5 animals. This spike represents the immediate resource crisis triggered by the initial stocking rate of 90 animals exceeding the carrying capacity of the private pastures.
-
-During the transitional phase (time steps 5-40), the metric undergoes a general decline characterized by high volatility. Values decrease from the initial peak toward ranges between 0 and 2 animals, with substantial year-to-year fluctuation reflecting the high rainfall variability (rain-std = 100) and the learning process as households adapt their stocking decisions.
-
-In the stabilization phase (time steps 40-100), the metric converges to low baseline levels, though distinct trajectories emerge corresponding to the three learning strategies. One cluster stabilizes near zero destocking (approximately 0.0-0.2 animals), indicating successful adaptation to pasture conditions. A second cluster stabilizes in the range of 0.4-0.6 animals, representing moderate ongoing adjustment needs. A third trajectory remains elevated at approximately 1.0-1.2 animals throughout the final 60 time steps, suggesting persistent difficulty in matching stocking rates to resource availability.
-
-The persistent separation between these trajectories indicates that the baseline rule-of-thumb approach (E-RO) likely maintains higher destocking rates throughout the simulation, while the learning-by-doing (E-LBD) and social learning (E-RO-SL1) strategies achieve superior long-term outcomes with minimal destocking events. The high variability in the elevated trajectory suggests that without active learning, households remain vulnerable to rainfall stochasticity and continue experiencing periodic resource crises requiring livestock removal.

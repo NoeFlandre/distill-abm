@@ -1,8 +1,0 @@
-{
-  "abm": "fauna",
-  "case_id": "06_fauna_role_plot_plus_table_rep1",
-  "evidence_mode": "plot+table",
-  "model": "qwen/qwen3.5-27b",
-  "prompt_variant": "role",
-  "repetition": 1
-}

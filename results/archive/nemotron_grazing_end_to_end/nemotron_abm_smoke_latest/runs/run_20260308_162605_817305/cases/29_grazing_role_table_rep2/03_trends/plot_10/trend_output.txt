@@ -1,9 +1,0 @@
-The data table reveals temporal dynamics in the proportion of households adhering to the E-RO behavioral strategy across 29 simulation timesteps. In 14 of 41 runs, E-RO counts remain constant at 20 households throughout the simulation period. In the remaining 27 runs, E-RO populations exhibit variability beginning at timestep 15, with fluctuations ranging from 0 to 39 households.  
-
-Notable patterns include:  
-1. **Early stability**: From timesteps 0–14, all simulations maintain 20 E-RO households, reflecting the model's initial design with homogeneous behavioral groups.  
-2. **Mid-simulation divergence**: From timestep 15 onward, 27 runs show significant variance. In 8 runs, E-RO counts increase to maximum values of 27–32 households, correlating with lower rainfall variability in corresponding timesteps (implied by risk-adjusted decisions to maintain herd sizes).  
-3. **Crisis thresholds**: In 19 runs, E-RO populations decline sharply to 0–15 households. These drops align with timesteps showing extreme rainfall departures from the mean (200), where non-adaptive decision rules (E-RO's fixed strategies) likely led to overgrazing during droughts or underutilization during surpluses.  
-4. **Equilibrium maintenance**: 13 runs stabilize E-RO counts between 16–22 households mid-run, suggesting partial resilience when pasture resilience (governed by gr1=0.5 and gr2=0.1) buffers environmental stress.  
-
-These patterns illustrate the tension between fixed strategies and climate variability, with E-RO outcomes tightly coupled to ecological feedbacks in the absence of behavioral adaptation mechanisms.

@@ -1,8 +1,0 @@
-{
-  "abm": "milk_consumption",
-  "case_id": "19_milk_consumption_insights+example_plot_rep1",
-  "evidence_mode": "plot",
-  "model": "qwen/qwen3.5-27b",
-  "prompt_variant": "insights+example",
-  "repetition": 1
-}

@@ -1,6 +1,0 @@
-ABM,Summary,LLM,BLEU,METEOR,R-1,R-2,R-L,Reading ease
-grazing,bart,nvidia/nemotron-nano-12b-v2-vl:free,0.18,0.18,0.18,0.09,0.18,0.00
-grazing,bert,nvidia/nemotron-nano-12b-v2-vl:free,0.16,0.16,0.16,0.08,0.16,0.00
-grazing,longformer_ext,nvidia/nemotron-nano-12b-v2-vl:free,0.17,0.17,0.17,0.08,0.17,43.20
-grazing,none,nvidia/nemotron-nano-12b-v2-vl:free,0.10,0.10,0.10,0.05,0.10,0.00
-grazing,t5,nvidia/nemotron-nano-12b-v2-vl:free,0.17,0.17,0.17,0.09,0.17,0.00

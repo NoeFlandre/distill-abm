@@ -1,7 +1,0 @@
-The mean habit factor for skimmed and semi-skimmed milk exhibits a consistent upward trend over the 30 steps of the simulation. Initially, the mean habit factor starts at a value of approximately 1.0. For the first 5 steps, the factor remains relatively stable, showing only a slight increase. 
-
-Starting around step 5, the mean habit factor begins to rise more noticeably. By step 10, the factor has increased to around 1.1. This upward trend accelerates between steps 10 and 15, where the mean habit factor reaches approximately 1.2. The growth continues steadily, and by step 20, the factor is around 1.35. 
-
-From step 20 to step 30, the mean habit factor continues to increase at a consistent rate, reaching a value close to 1.6 by the end of the simulation. This trend indicates a strengthening habit factor for skimmed and semi-skimmed milk over time among the agents. 
-
-For decision makers, this trend suggests that interventions or marketing strategies aimed at promoting skimmed and semi-skimmed milk should consider the growing influence of habit formation. As consumers increasingly incorporate these milk types into their routines, the habit factor becomes a significant driver of sustained consumption. This insight can guide the timing and nature of promotional efforts, emphasizing the importance of early adoption phases where habits are initially formed.

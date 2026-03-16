@@ -1,5 +1,0 @@
-{
-  "reporter_pattern": "mean [alt-quantity] of turtles",
-  "series_path": "results/mistral-medium-latest_all_abms_chain/03_doe_smoke_latest/runs/run_20260311_035552_828910/10_shared/milk_consumption/02_evidence/tables/plot_7_series.csv",
-  "summary_path": "results/mistral-medium-latest_all_abms_chain/03_doe_smoke_latest/runs/run_20260311_035552_828910/10_shared/milk_consumption/02_evidence/tables/plot_7.txt"
-}

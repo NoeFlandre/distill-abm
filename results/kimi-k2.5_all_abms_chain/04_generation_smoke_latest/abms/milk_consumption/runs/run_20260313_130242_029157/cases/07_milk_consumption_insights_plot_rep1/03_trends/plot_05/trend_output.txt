@@ -1,5 +1,0 @@
-The cumulative count of total milk choices increases linearly from zero at step 0 to approximately 32,000 by step 32. Key intermediate values include roughly 10,000 choices at step 10, 20,000 choices at step 20, and 30,000 choices at step 30. The metric accumulates at a constant rate of exactly 1,000 choices per step throughout the entire simulation period.
-
-This linear pattern indicates that each of the 1,000 agents makes exactly one milk choice during every time step, reflecting a model structure where decision-making occurs uniformly across the agent population without variation in participation frequency.
-
-For decision makers, this uniform accumulation implies the model assumes continuous and consistent decision-making engagement among all consumers throughout the 1974-2005 period, suggesting that the theoretical framework treats milk choice as an active, recurring decision process occurring at regular intervals rather than a static or sporadically reconsidered behavior.

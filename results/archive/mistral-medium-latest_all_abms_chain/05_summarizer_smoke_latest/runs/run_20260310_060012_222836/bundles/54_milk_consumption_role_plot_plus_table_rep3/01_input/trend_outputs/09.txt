@@ -1,5 +1,0 @@
-The mean habit factor for skimmed and semi-skimmed milk consumption shows a clear trend over the simulation period. Initially, the habit factor starts at a baseline value of 1.0000. During the early steps, there is a slight increase, reaching approximately 1.0205 by the second step. This initial phase shows no significant trend. 
-
-Starting from the fifth step, the habit factor begins to increase more noticeably. By the fifteenth step, the habit factor has risen to around 1.2578, marking a significant upward trend. This increasing trend continues steadily through subsequent steps. 
-
-By the final step, the habit factor reaches its peak value of 1.5879. Throughout the simulation, the habit factor demonstrates a consistent upward trajectory, indicating a growing preference or habit formation towards skimmed and semi-skimmed milk over time. The data suggests that after an initial period of stability, there is a significant and steady increase in the habit factor, reflecting the agents' shifting consumption patterns.

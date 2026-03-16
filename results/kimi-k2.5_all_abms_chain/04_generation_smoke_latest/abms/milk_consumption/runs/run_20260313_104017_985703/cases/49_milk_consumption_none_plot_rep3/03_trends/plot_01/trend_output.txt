@@ -1,7 +1,0 @@
-At step 0, mean whole milk consumption begins at approximately 2,650 units. During the initial phase from step 0 to step 10, the metric undergoes a steep and continuous decline, falling to roughly 950–1,000 units by step 10. 
-
-From step 10 to step 18, the rate of decrease moderates considerably, with consumption declining more gradually to approximately 750 units by step 18. 
-
-Between step 18 and step 32, the trajectory exhibits a stepwise pattern characterized by intermittent periods of relative stability punctuated by sharp discrete drops. From step 18 to approximately step 25, consumption declines gradually to around 600–650 units, followed by a noticeable drop around step 26. By step 28, the value falls sharply to approximately 350–400 units, continuing to decline until reaching a final value of roughly 200–250 units at step 32.
-
-This trajectory reflects the simulated historical transition away from whole milk over the 1974–2005 period, with the steep early decline indicating rapid initial adoption of lower-fat alternatives, the moderating middle phase suggesting slowing transition rates among remaining consumers, and the final stepwise reductions implying threshold effects or discrete behavioral shifts in the diffusion process.

@@ -1,8 +1,0 @@
-{
-  "abm": "fauna",
-  "case_id": "41_fauna_role+insights_table_rep2",
-  "evidence_mode": "table",
-  "model": "mistral-medium-latest",
-  "prompt_variant": "role+insights",
-  "repetition": 2
-}

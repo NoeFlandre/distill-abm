@@ -1,5 +1,0 @@
-abm,reference_family,reference_path,reference_preview
-fauna,author,configs/ground_truth/fauna_scoring_ground_truth.txt,The agent-based model in this study investigates megaherbivore extinction influenced by human hunting pressure and environmental changes. Simulating an environment with grassland p
-grazing,author,configs/ground_truth/grazing_scoring_ground_truth.txt,The agent-based model used in this study aims to investigate the dynamics of household behaviors in a rangeland grazing system. The model examines how different behavioral strategi
-milk_consumption,author,configs/ground_truth/milk_scoring_ground_truth.txt,The agent-based model used in this study aims to replicate the adoption behaviors of milk consumption by the British public from 1974 to 2005. The model examines how milk choice de
-milk_consumption,modeler_ground_truth,configs/ground_truth/milk_modeler_ground_truth.txt,"The model investigates how perception, habit, and social influence shape individual decisions about milk type. It reproduces adoption behaviors of milk consumption by the British p"

@@ -1,1 +1,0 @@
-The average initial risk attitude of social learning agents remains constant at 0.0074 from time step 0 to time step 100. This static value indicates the metric records a fixed baseline parameter rather than a dynamic state influenced by the model's learning mechanisms or ecological feedbacks.

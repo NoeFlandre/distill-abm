@@ -1,7 +1,0 @@
-The mean livestock plus destock per household begins at 90 animals at step 0. Over the first 20 steps, it undergoes a rapid decline, falling to approximately 40–45 animals. This initial reduction reflects a destocking phase in which farmers adjust herd sizes downward in response to pressure on private pastures from the initial stocking level.
-
-Between steps 20 and 40, values converge and stabilize within a narrow range of 40–42 animals across all households. This convergence indicates a temporary equilibrium where reduced stocking rates allow pasture vegetation to stabilize, creating uniform conditions across the system regardless of learning strategy.
-
-After step 40, the trajectories diverge significantly. One group of households increases steadily, reaching approximately 62 animals by step 100. A second group rises to around 58–59 animals. Multiple intermediate groups stabilize between 45 and 50 animals, while conservative outcomes maintain levels near 40–44 animals for the remainder of the simulation.
-
-By step 100, final values span from roughly 41 to 62 animals, representing a 50 percent difference between the highest and lowest outcomes. Variance remains low during the initial destocking phase and convergence period, but increases markedly after step 40. This pattern suggests that while short-term crisis responses are highly uniform across learning types, long-term recovery capacities and stocking decisions diverge substantially based on how farmers process environmental feedback and neighbor information.

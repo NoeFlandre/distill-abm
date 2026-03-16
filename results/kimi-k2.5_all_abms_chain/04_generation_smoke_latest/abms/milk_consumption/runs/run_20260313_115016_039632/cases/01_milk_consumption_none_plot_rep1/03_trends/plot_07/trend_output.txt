@@ -1,7 +1,0 @@
-The mean weekly consumption of skimmed and semi-skimmed milk initiates at approximately zero at step 0. Across the first ten time steps, consumption increases rapidly and monotonically, reaching values ranging from 1,200 to 1,280 units by step 10. This initial growth phase represents a period of rapid adoption where agents transition from incumbent whole milk consumption to lower-fat alternatives.
-
-From step 10 through step 25, the system enters a plateau phase characterized by relative stability. During this interval, mean consumption fluctuates within a narrow band of approximately 1,180 to 1,250 units, with minor oscillations occurring around step 18 where values temporarily decrease to approximately 1,180 before recovering. This stabilization suggests that habit formation mechanisms and social influence processes have reached a temporary equilibrium within the agent population.
-
-Beginning at approximately step 25, a secondary growth phase commences, with consumption rising from roughly 1,220 units to reach values between 1,400 and 1,480 by step 32. This late-stage increase indicates continued diffusion of skimmed and semi-skimmed milk adoption throughout the social network.
-
-The trajectories across multiple simulation runs demonstrate high consistency, with all runs following the same three-phase pattern of rapid initial growth, extended plateau, and secondary growth, suggesting robust model behavior in replicating the historical transition from whole milk to lower-fat milk varieties.

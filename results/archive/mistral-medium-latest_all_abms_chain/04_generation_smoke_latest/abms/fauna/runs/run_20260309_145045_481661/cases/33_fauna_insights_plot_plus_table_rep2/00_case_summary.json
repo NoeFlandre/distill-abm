@@ -1,8 +1,0 @@
-{
-  "abm": "fauna",
-  "case_id": "33_fauna_insights_plot_plus_table_rep2",
-  "evidence_mode": "plot+table",
-  "model": "mistral-medium-latest",
-  "prompt_variant": "insights",
-  "repetition": 2
-}

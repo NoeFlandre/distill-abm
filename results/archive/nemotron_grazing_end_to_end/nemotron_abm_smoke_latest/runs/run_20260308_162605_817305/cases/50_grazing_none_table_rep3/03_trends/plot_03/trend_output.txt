@@ -1,9 +1,0 @@
-The data reveals a complex dynamic pattern in biomass across the simulation period. Initially, biomass remains stable at high levels (~90,000–91,000), indicating a period of equilibrium within the grazing system. This stability suggests effective resource management under the E-RO behavioral strategy in the absence of social learning (homog-behav-types=True) during the first phase.  
-
-A sharp decline begins around time step 4–5, with biomass dropping to ~89,000–85,000, reflecting a critical phase of resource depletion. This drop correlates with heightened climatic variability (global-rain?=True; rain-mean=200, rain-std=100), which exacerbates resource stress. Under E-RO's risk-aversion (risk-att-init=0.5) and satisficing behavior (satisficing-threshold=0), agents persist in moderate grazing pressure, potentially intensifying overgrazing during prolonged drought-like conditions.  
-
-From time step 20 onward, biomass rebounds gradually to ~90,500–93,000, plateauing during mid-simulation (~20–30). This stabilization suggests adaptive adjustments in herd management, possibly in response to biomass feedbacks or climatic resilience.  
-
-A marked upward trend emerges post-time step 30, culminating in a peak of ~128,000 by time step 29. This surge indicates recovery, likely driven by reduced grazing intensity after biomass rebounded from the trough, compounded by stochastic rainfall patterns enabling biomass regeneration. The absence of social learning (SL2-strategy-switch=False, E-RO-SL1 inactive) limits collective behavioral shifts, but risk-aware individual strategies under E-RO may have facilitated self-correction.  
-
-Overall, the trajectory underscores the interplay between climate risk, risk-aversion, and agent strategies in sustaining long-term pasture health within homogeneously managed systems.

@@ -1,5 +1,0 @@
-。
-
-The total number of milk choices made accumulates linearly throughout the simulation period. Starting from approximately zero at step 0, the cumulative count increases by roughly 1,000 choices per time step, reaching approximately 10,000 at step 10, 20,000 at step 20, 30,000 at step 30, and 32,000 by step 32.
-
-This linear trend indicates that consumption decisions occur at a constant rate across the virtual population of 1,000 agents, with each agent making exactly one choice per time step on average. The uniform accumulation demonstrates that participation in the milk market remains continuous and consistent throughout the 31-year simulation timeframe (1974–2005), regardless of the shifting preferences, habit formations, and social influences that determine which specific milk types agents select.

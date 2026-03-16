@@ -1,8 +1,0 @@
-{
-  "abm": "fauna",
-  "case_id": "70_fauna_all_three_plot_rep3",
-  "evidence_mode": "plot",
-  "model": "moonshotai/kimi-k2.5",
-  "prompt_variant": "all_three",
-  "repetition": 3
-}

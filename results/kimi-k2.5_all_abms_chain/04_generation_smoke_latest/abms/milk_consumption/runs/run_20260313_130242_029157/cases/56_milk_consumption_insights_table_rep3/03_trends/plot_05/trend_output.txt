@@ -1,7 +1,0 @@
-From 1974 to 2005, the cumulative number of milk choices made by the simulated British consumer population increases linearly and monotonically from zero at the outset to 32,000 by the final year. This steady accumulation occurs at a constant rate of exactly 1,000 decisions per year, reflecting that each of the 1,000 agents makes one consumption choice annually throughout the 32-year simulation period.
-
-This trend indicates that the model operationalizes decision-making as a regular, recurring process wherein every agent reevaluates their milk consumption preferences each year without fail. Rather than exhibiting sporadic or declining engagement over time, the agents maintain consistent annual reconsideration of their options, suggesting that factors such as habit strength, social influence, and environmental perceptions operate on choices that are ritualistically revisited rather than static behaviors maintained indefinitely.
-
-**Insights for Decision Makers**
-
-The uniform annual decision-making rhythm implies that public health interventions or marketing campaigns targeting milk consumption transitions have predictable, recurring opportunities to influence consumer behavior each year. Since the entire agent population reevaluates choices annually, policy windows remain consistently open throughout the decades, though the effectiveness of such interventions would depend on their ability to shift the content of decisions (which variety is selected) rather than the frequency of deliberation itself.

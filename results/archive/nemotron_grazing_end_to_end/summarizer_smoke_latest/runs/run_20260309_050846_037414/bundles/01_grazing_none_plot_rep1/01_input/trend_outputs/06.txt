@@ -1,1 +1,0 @@
-At step 0, all 3 scenarios start with 7 households destocked. At step 10, most of the lines converge at 1 household. Both at step 30 and 100, all 3 scenarios converge at approximately 0.03 households. Therefore, the trend is, first a decreasing then a stagnating one.
