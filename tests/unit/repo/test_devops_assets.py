@@ -62,8 +62,12 @@ def test_public_docs_surface_matches_publication_contract() -> None:
     readme = Path("README.md").read_text(encoding="utf-8")
     docs_index = Path("docs/README.md").read_text(encoding="utf-8")
     results_bucket = Path("docs/RESULTS_BUCKET.md").read_text(encoding="utf-8")
+    results_readme = Path("results/README.md").read_text(encoding="utf-8")
 
     assert "Published run outputs live in the Hugging Face results bucket, not in Git." in readme
     assert "The Git repository is publication-facing source code." in results_bucket
+    assert "uv run distill-abm sync-results-bucket --dry-run" in results_bucket
+    assert "hf sync --apply /tmp/distill_abm_bucket_cleanup_plan.jsonl" in results_bucket
+    assert "hf sync --apply /tmp/distill_abm_bucket_cleanup_plan.jsonl" in results_readme
     assert "AGENT_BACKLOG.md" not in docs_index
     assert "AGENT_WORKFLOW.md" not in docs_index
