@@ -67,3 +67,31 @@ Download back to a local mirror:
 ```bash
 hf sync hf://buckets/NoeFlandre/distill-abms-results ./results
 ```
+
+## Maintenance Checklist
+
+When updating this bucket later:
+
+1. Keep code changes in Git and result changes in `results/`.
+2. If you are unsure that the local mirror is complete, refresh it from the bucket first.
+3. Run the dry run and inspect `/tmp/distill_abm_results_sync_plan.jsonl`.
+4. Apply `uv run distill-abm sync-results-bucket` only after the dry run looks correct.
+5. If the local tree is intentionally incomplete, use `--no-delete` or `--allow-empty-source` explicitly instead of relying on the default destructive mode.
+
+To clean remote `.DS_Store` files and `.cache/**` clutter already in the bucket, build a targeted delete plan with:
+
+```bash
+hf sync /tmp/hf_bucket_cleanup_empty hf://buckets/NoeFlandre/distill-abms-results \
+  --delete \
+  --include '.DS_Store' \
+  --include '**/.DS_Store' \
+  --include '.cache/**' \
+  --include '**/.cache/**' \
+  --plan /tmp/distill_abm_bucket_cleanup_plan.jsonl
+```
+
+Then apply it with:
+
+```bash
+hf sync --apply /tmp/distill_abm_bucket_cleanup_plan.jsonl
+```

@@ -68,6 +68,66 @@ The command mirrors `./results` to `hf://buckets/NoeFlandre/distill-abms-results
 
 The main paper-facing entrypoint inside the bucket is `quantitative_master_overview/`, which collects the latest overview tables without requiring you to inspect each run directory manually.
 
+## Maintenance Workflow
+
+Use this sequence when you want to keep the bucket current without risking accidental deletion:
+
+1. Make sure the code is committed in Git separately from the results.
+2. Refresh the local results mirror if you are not certain your checkout is complete:
+
+```bash
+hf sync hf://buckets/NoeFlandre/distill-abms-results ./results
+```
+
+3. Run a dry run and save the plan:
+
+```bash
+uv run distill-abm sync-results-bucket --dry-run --plan-path /tmp/distill_abm_results_sync_plan.jsonl
+```
+
+4. Inspect the plan file before applying the sync.
+5. Apply the sync only after the dry run looks correct:
+
+```bash
+uv run distill-abm sync-results-bucket
+```
+
+6. If the local tree is intentionally partial, prefer `--no-delete` or explicitly acknowledge the state with `--allow-empty-source`.
+
+## Remote Cleanup
+
+To remove remote macOS/cache clutter already present in the bucket, use a targeted empty-source sync plan instead of a broad manual delete.
+
+Create an empty local directory:
+
+```bash
+mkdir -p /tmp/hf_bucket_cleanup_empty
+```
+
+Dry run the cleanup and save the delete plan:
+
+```bash
+hf sync /tmp/hf_bucket_cleanup_empty hf://buckets/NoeFlandre/distill-abms-results \
+  --delete \
+  --include '.DS_Store' \
+  --include '**/.DS_Store' \
+  --include '.cache/**' \
+  --include '**/.cache/**' \
+  --plan /tmp/distill_abm_bucket_cleanup_plan.jsonl
+```
+
+Apply the cleanup plan after inspection:
+
+```bash
+hf sync --apply /tmp/distill_abm_bucket_cleanup_plan.jsonl
+```
+
+Operational notes:
+
+- The repository keeps `results/README.md` as a local pointer file; the sync guard does not count that file as result data.
+- Apply-mode sync refuses to run with `--delete` when the local tree has no syncable result files after exclusions.
+- Use the bucket as the durable store for outputs and Git as the durable store for code and documentation.
+
 Equivalent raw CLI form:
 
 ```bash
