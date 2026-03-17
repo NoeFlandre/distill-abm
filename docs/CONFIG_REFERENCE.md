@@ -31,12 +31,30 @@ Provider-specific override:
 
 From `configs/models.yaml`:
 
+### Benchmark Models - Screening Stage (Fast, Low-Cost)
+
+These models are used for the initial screening/exploration phase:
+
+| ID | Provider | Model | Stage |
+|---|---|---|---|
+| `kimi_k2_5` | `openrouter` | `moonshotai/kimi-k2.5` | Screening |
+| `qwen3_5_27b` | `openrouter` | `qwen/qwen3.5-27b` | Screening |
+
+### Benchmark Models - Optimization Stage (High-Quality)
+
+These models are used for the final optimization/quality phase:
+
+| ID | Provider | Model | Stage |
+|---|---|---|---|
+| `gemini_3_1_pro_preview` | `openrouter` | `google/gemini-3.1-pro-preview` | Optimization |
+| `claude_opus_4_6` | `openrouter` | `anthropic/claude-opus-4.6` | Optimization |
+
+### Debug/Development Models
+
+These models are for development and testing only:
+
 | ID | Provider | Model |
 |---|---|---|
-| `kimi_k2_5` | `openrouter` | `moonshotai/kimi-k2.5` |
-| `gemini_3_1_pro_preview` | `openrouter` | `google/gemini-3.1-pro-preview` |
-| `qwen3_5_27b` | `openrouter` | `qwen/qwen3.5-27b` |
-| `claude_opus_4_6` | `openrouter` | `anthropic/claude-opus-4.6` |
 | `nemotron_nano_12b_v2_vl_free` | `openrouter` | `nvidia/nemotron-nano-12b-v2-vl:free` |
 | `mistral_large_2512` | `mistral` | `mistral-large-2512` |
 | `mistral_medium_debug` | `mistral` | `mistral-medium-latest` |
