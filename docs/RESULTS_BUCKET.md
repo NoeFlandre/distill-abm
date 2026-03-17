@@ -21,18 +21,29 @@ The bucket mirrors the local `results/` tree. The currently maintained top-level
 
 - `archive/`
 - `quantitative_master_overview/`
-- `pipeline/`
 - `side_studies/`
+
+**Screening Stage** (fast, low-cost exploration):
+
 - `kimi-k2.5_all_abms_chain/`
-- `mistral-medium-latest_all_abms_chain/`
-- `mistral-large-2512_optimization_all_abms_chain/`
+- `qwen3.5-27b_openrouter_all_abms_chain/`
+
+**Optimization Stage** (high-quality final runs):
+
 - `gemini-3.1-pro-preview_optimization_all_abms_chain/`
 - `claude-opus-4.6_optimization_all_abms_chain/`
-- `qwen3.5-27b_openrouter_all_abms_chain/`
-- `eval_qwen_mistral/`
+
+**Debug/Development** (not for benchmark):
+
+- `mistral-medium-latest_all_abms_chain/`
+- `mistral-large-2512_optimization_all_abms_chain/`
+
+**Cross-Model Evaluations**:
+
 - `eval_qwen_kimi/`
 - `eval_mistral_kimi/`
 - `eval_qwen_mistral_kimi/`
+- `eval_qwen_mistral/` (debug)
 
 ## Sync Commands
 

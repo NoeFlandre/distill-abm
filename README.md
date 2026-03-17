@@ -15,9 +15,14 @@ The main pipeline has six stages:
 
 Paper-facing benchmark runs are restricted to:
 
+**Screening Stage** (fast, low-cost exploration):
+
 1. `moonshotai/kimi-k2.5`
-2. `google/gemini-3.1-pro-preview`
-3. `qwen/qwen3.5-27b`
+2. `qwen/qwen3.5-27b`
+
+**Optimization Stage** (high-quality final runs):
+
+3. `google/gemini-3.1-pro-preview`
 4. `anthropic/claude-opus-4.6`
 
 All other configured models are for debugging and development purposes only.
