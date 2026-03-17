@@ -806,7 +806,7 @@ def smoke_optimization_gemini_chain(
     output_root: Annotated[
         Path,
         typer.Option(help="Root directory for the Gemini optimization chain."),
-    ] = Path("results/gemini-3.1-pro-preview_optimization_all_abms_chain"),
+    ] = Path("results/optimisation/gemini-3.1-pro-preview_optimization_all_abms_chain"),
     max_tokens: Annotated[
         int,
         typer.Option(help="Maximum output token budget for each call in the full-case suite smoke."),

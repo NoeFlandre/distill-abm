@@ -62,13 +62,10 @@ def test_gitignore_keeps_results_repo_lightweight() -> None:
     for retired_entry in [
         "!results/archive/**",
         "!results/quantitative_master_overview/**",
-        "!results/kimi-k2.5_all_abms_chain/**",
-        "!results/eval_qwen_kimi/**",
-        "!results/eval_mistral_kimi/**",
-        "!results/eval_qwen_mistral/**",
-        "!results/eval_qwen_mistral_kimi/**",
-        "!results/mistral-medium-latest_all_abms_chain/**",
-        "!results/qwen3.5-27b_openrouter_all_abms_chain/**",
+        "!results/side_studies/**",
+        "!results/screening/**",
+        "!results/optimisation/**",
+        "!results/debug/**",
     ]:
         assert retired_entry not in content
 

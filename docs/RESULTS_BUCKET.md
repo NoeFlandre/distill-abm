@@ -25,25 +25,22 @@ The bucket mirrors the local `results/` tree. The currently maintained top-level
 
 **Screening Stage** (fast, low-cost exploration):
 
-- `kimi-k2.5_all_abms_chain/`
-- `qwen3.5-27b_openrouter_all_abms_chain/`
+- `screening/kimi-k2.5_all_abms_chain/`
+- `screening/qwen3.5-27b_openrouter_all_abms_chain/`
+- `screening/eval_qwen_kimi/`
 
 **Optimization Stage** (high-quality final runs):
 
-- `gemini-3.1-pro-preview_optimization_all_abms_chain/`
-- `claude-opus-4.6_optimization_all_abms_chain/`
+- `optimisation/gemini-3.1-pro-preview_optimization_all_abms_chain/`
+- `optimisation/claude-opus-4.6_optimization_all_abms_chain/`
 
 **Debug/Development** (not for benchmark):
 
-- `mistral-medium-latest_all_abms_chain/`
-- `mistral-large-2512_optimization_all_abms_chain/`
-
-**Cross-Model Evaluations**:
-
-- `eval_qwen_kimi/`
-- `eval_mistral_kimi/`
-- `eval_qwen_mistral_kimi/`
-- `eval_qwen_mistral/` (debug)
+- `debug/mistral-medium-latest_all_abms_chain/`
+- `debug/mistral-large-2512_optimization_all_abms_chain/`
+- `debug/eval_qwen_mistral/`
+- `debug/eval_mistral_kimi/`
+- `debug/eval_qwen_mistral_kimi/`
 
 ## Sync Commands
 
