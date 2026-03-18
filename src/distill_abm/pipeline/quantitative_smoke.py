@@ -616,7 +616,7 @@ def _build_quantitative_records_from_source_row(
                 repetition=repetition,
                 reference_family=reference_family,
                 reference_path=reference_path,
-                summary_output_path=Path(source_row["summary_output_path"]),
+                summary_output_path=_resolve_results_artifact_path(Path(source_row["summary_output_path"])),
                 source_run_root=run_root,
                 success=False,
             )
@@ -671,6 +671,7 @@ def _build_multi_llm_record_id_component(llm_label: str) -> str:
 
 
 def _load_case_metadata_from_context_output(context_output_path: Path) -> dict[str, object]:
+    context_output_path = _resolve_results_artifact_path(context_output_path)
     case_dir = context_output_path.parent.parent
     run_root = case_dir.parent.parent
     case_summary_path = case_dir / "00_case_summary.json"
@@ -684,19 +685,43 @@ def _load_case_metadata_from_context_output(context_output_path: Path) -> dict[s
             "model": str(payload.get("model", "")),
             "run_root": run_root,
         }
-    report_path = run_root / "smoke_full_case_matrix_report.json"
+    report_path_candidates = (
+        run_root / "smoke_full_case_matrix_report.json",
+        run_root.parent / "current" / "smoke_full_case_matrix_report.json",
+    )
+    report_path = next((path for path in report_path_candidates if path.exists()), None)
+    if report_path is None:
+        raise FileNotFoundError(f"missing case summary and report for {context_output_path}")
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     for case in payload.get("cases", []):
-        if str(case.get("case_dir")) == str(case_dir):
+        report_case_dir = _resolve_results_artifact_path(Path(str(case.get("case_dir", ""))))
+        if report_case_dir == case_dir:
             return {
                 "evidence_mode": str(case["evidence_mode"]),
                 "prompt_variant": str(case["prompt_variant"]),
                 "repetition": int(case["repetition"]),
                 "model_id": str(case.get("model_id", "")),
                 "model": str(payload.get("model_id", "") or payload.get("model", "")),
-                "run_root": run_root,
+                "run_root": report_case_dir.parent.parent,
             }
     raise ValueError(f"could not resolve case metadata for {context_output_path}")
+
+
+def _resolve_results_artifact_path(path: Path) -> Path:
+    if path.exists():
+        return path
+    parts = path.parts
+    if len(parts) < 2 or parts[0] != "results":
+        return path
+    if parts[1] in {"screening", "optimisation", "debug", "archive", "side_studies"}:
+        return path
+
+    suffix = Path(*parts[1:])
+    for wrapper in ("screening", "optimisation", "debug"):
+        candidate = Path("results") / wrapper / suffix
+        if candidate.exists():
+            return candidate
+    return path
 
 
 def _read_summary_text(path: Path) -> str:

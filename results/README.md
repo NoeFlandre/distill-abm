@@ -15,17 +15,27 @@ runtime code is developed.
 The maintained top-level structure is:
 
 - `quantitative_master_overview/`: rolled-up latest quantitative tables (ANOVA, factorial, evidence, best-scores, prompt compression).
-- `kimi-k2.5_all_abms_chain/`: full single-LLM chain artifacts for Kimi runs.
-- `mistral-medium-latest_all_abms_chain/`: full single-LLM chain artifacts for Mistral runs.
-- `qwen3.5-27b_openrouter_all_abms_chain/`: full single-LLM chain artifacts for Qwen runs.
-- `gemini-3.1-pro-preview_optimization_all_abms_chain/`: optimization-chain artifacts for Gemini tuning.
-- `eval_qwen_mistral/`: cross-model quantitative comparison for Qwen vs Mistral.
-- `eval_qwen_kimi/`: cross-model quantitative comparison for Qwen vs Kimi.
-- `eval_mistral_kimi/`: cross-model quantitative comparison for Mistral vs Kimi.
-- `eval_qwen_mistral_kimi/`: three-way quantitative comparison table and rows.
-- `archive/`: frozen historical runs kept for reproducibility and audit.
-- `pipeline/`: pipeline-level review and progress artifacts used by execution workflows.
 - `side_studies/`: focused methodological side experiments and ad-hoc investigations.
+- `archive/`: frozen historical runs kept for reproducibility and audit.
+
+**Screening Stage** (fast, low-cost exploration):
+
+- `screening/kimi-k2.5_all_abms_chain/`: full single-LLM chain artifacts for Kimi runs.
+- `screening/qwen3.5-27b_openrouter_all_abms_chain/`: full single-LLM chain artifacts for Qwen runs.
+- `screening/eval_qwen_kimi/`: cross-model quantitative comparison for Qwen vs Kimi.
+
+**Optimization Stage** (high-quality final runs):
+
+- `optimisation/gemini-3.1-pro-preview_optimization_all_abms_chain/`: full single-LLM chain artifacts for Gemini runs.
+- `optimisation/claude-opus-4.6_optimization_all_abms_chain/`: full single-LLM chain artifacts for Claude runs.
+
+**Debug/Development** (not for benchmark):
+
+- `debug/mistral-medium-latest_all_abms_chain/`: full single-LLM chain artifacts for Mistral runs.
+- `debug/mistral-large-2512_optimization_all_abms_chain/`: optimization-chain artifacts for Mistral runs.
+- `debug/eval_qwen_mistral/`: cross-model quantitative comparison for Qwen vs Mistral.
+- `debug/eval_mistral_kimi/`: cross-model quantitative comparison for Mistral vs Kimi.
+- `debug/eval_qwen_mistral_kimi/`: three-way quantitative comparison table and rows.
 
 Each chain folder typically contains numbered smoke phases:
 

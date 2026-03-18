@@ -229,6 +229,188 @@ def _write_prompt_compression_summary(matrix_root: Path, *, final_tiers: list[in
     )
 
 
+def test_load_case_metadata_from_context_output_resolves_wrapper_backed_results_paths(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    missing_context_output = Path(
+        "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/"
+        "grazing/runs/run_20260312_123500_479488/cases/01_grazing_none_plot_rep1/02_context/context_output.txt"
+    )
+    wrapper_context_output = (
+        tmp_path
+        / "results"
+        / "screening"
+        / "qwen3.5-27b_openrouter_all_abms_chain"
+        / "04_generation_smoke_latest"
+        / "abms"
+        / "grazing"
+        / "runs"
+        / "run_20260312_123500_479488"
+        / "cases"
+        / "01_grazing_none_plot_rep1"
+        / "02_context"
+        / "context_output.txt"
+    )
+    _write_text(wrapper_context_output, "context")
+    _write_text(
+        wrapper_context_output.parent.parent.parent.parent.parent / "current" / "smoke_full_case_matrix_report.json",
+        json.dumps(
+            {
+                "cases": [
+                    {
+                        "case_dir": str(
+                            Path(
+                                "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/"
+                                "grazing/runs/run_20260312_123500_479488/cases/01_grazing_none_plot_rep1"
+                            )
+                        ),
+                        "case_id": "01_grazing_none_plot_rep1",
+                        "abm": "grazing",
+                        "evidence_mode": "plot",
+                        "prompt_variant": "none",
+                        "repetition": 1,
+                        "model_id": "qwen/qwen3.5-27b",
+                    }
+                ],
+                "model_id": "qwen/qwen3.5-27b",
+            }
+        ),
+    )
+
+    metadata = quantitative_smoke_module._load_case_metadata_from_context_output(missing_context_output)
+
+    assert metadata["evidence_mode"] == "plot"
+    assert metadata["prompt_variant"] == "none"
+    assert metadata["repetition"] == 1
+    assert metadata["model_id"] == "qwen/qwen3.5-27b"
+    assert metadata["run_root"] == Path(
+        "results/screening/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/"
+        "grazing/runs/run_20260312_123500_479488"
+    )
+
+
+def test_load_quantitative_source_records_resolves_wrapper_backed_summary_paths(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    source_root = (
+        tmp_path
+        / "results"
+        / "screening"
+        / "qwen3.5-27b_openrouter_all_abms_chain"
+        / "05_summarizer_smoke_latest"
+        / "runs"
+        / "run_20260312_153523_845549"
+    )
+    case_id = "01_grazing_none_plot_rep1"
+    case_dir = (
+        source_root
+        / "bundles"
+        / case_id
+        / "02_summaries"
+    )
+    _write_text(
+        source_root / "review.csv",
+        "\n".join(
+            [
+                "bundle_id,case_id,abm,mode,success,context_output_path,summary_output_path",
+                ",".join(
+                    [
+                        case_id,
+                        case_id,
+                        "grazing",
+                        "bart",
+                        "True",
+                        "results/qwen3.5-27b_openrouter_all_abms_chain/04_generation_smoke_latest/abms/"
+                        "grazing/runs/run_20260312_123500_479488/cases/01_grazing_none_plot_rep1/02_context/context_output.txt",
+                        "results/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/"
+                        "run_20260312_153523_845549/bundles/01_grazing_none_plot_rep1/02_summaries/bart.txt",
+                    ]
+                ),
+            ]
+        )
+        + "\n",
+    )
+    _write_text(
+        source_root
+        / "bundles"
+        / case_id
+        / "02_summaries"
+        / "bart.txt",
+        "summary",
+    )
+    _write_text(
+        tmp_path
+        / "results"
+        / "screening"
+        / "qwen3.5-27b_openrouter_all_abms_chain"
+        / "04_generation_smoke_latest"
+        / "abms"
+        / "grazing"
+        / "runs"
+        / "run_20260312_123500_479488"
+        / "cases"
+        / case_id
+        / "00_case_summary.json",
+        json.dumps(
+            {
+                "case_id": case_id,
+                "abm": "grazing",
+                "evidence_mode": "plot",
+                "prompt_variant": "none",
+                "repetition": 1,
+                "model_id": "qwen/qwen3.5-27b",
+                "model": "qwen/qwen3.5-27b",
+            }
+        ),
+    )
+    _write_text(
+        tmp_path
+        / "results"
+        / "screening"
+        / "qwen3.5-27b_openrouter_all_abms_chain"
+        / "04_generation_smoke_latest"
+        / "abms"
+        / "grazing"
+        / "runs"
+        / "run_20260312_123500_479488"
+        / "cases"
+        / case_id
+        / "02_context"
+        / "context_output.txt",
+        "context",
+    )
+
+    monkeypatch.setattr(
+        quantitative_smoke_module,
+        "resolve_quantitative_reference_paths",
+        lambda _abm: {
+            "author": Path("author.txt"),
+            "modeler": Path("modeler.txt"),
+            "gpt5.2_short": Path("gpt5.2_short.txt"),
+            "gpt5.2_long": Path("gpt5.2_long.txt"),
+        },
+    )
+    records = quantitative_smoke_module._load_quantitative_source_records(
+        (source_root,),
+        require_source_llm_label=False,
+        include_llm_in_record_id=False,
+    )
+
+    assert len(records) == 4
+    assert all(
+        record.record.summary_output_path
+        == Path(
+            "results/screening/qwen3.5-27b_openrouter_all_abms_chain/05_summarizer_smoke_latest/runs/"
+            "run_20260312_153523_845549/bundles/01_grazing_none_plot_rep1/02_summaries/bart.txt"
+        )
+        for record in records
+    )
+
+
 def test_derive_prompt_flags() -> None:
     assert _derive_prompt_flags("none") == {"role": False, "insights": False, "example": False}
     assert _derive_prompt_flags("role+insights") == {"role": True, "insights": True, "example": False}
@@ -518,6 +700,7 @@ def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> Non
     assert result.factorial_csv_path.parent.name == "combined"
     assert result.optimal_csv_path.parent.name == "combined"
     assert (result.run_root / "author").exists() is True
+    assert (result.run_root / "modeler").exists() is True
     assert (result.run_root / "gpt5.2_short").exists() is True
     assert (result.run_root / "gpt5.2_long").exists() is True
     assert (result.run_root / "overview").exists() is True
@@ -528,8 +711,8 @@ def test_run_quantitative_smoke_writes_analysis_artifacts(tmp_path: Path) -> Non
         "factorial_table.md",
     ]
     rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
-    assert len(rows) == 60
-    assert {row["reference_family"] for row in rows} == {"author", "gpt5.2_short", "gpt5.2_long"}
+    assert len(rows) == 80
+    assert {row["reference_family"] for row in rows} == {"author", "modeler", "gpt5.2_short", "gpt5.2_long"}
     assert rows[0]["evidence"]
     assert rows[0]["prompt"]
     assert rows[0]["summarizer"]
@@ -566,8 +749,14 @@ def test_run_quantitative_smoke_writes_best_score_table(tmp_path: Path) -> None:
     assert {"Reference family", "ABM", "Summary", "LLM", "BLEU", "METEOR", "R-1", "R-2", "R-L", "Reading ease"} == set(
         rows[0].keys()
     )
-    assert {row["Reference family"] for row in rows} == {"author", "gpt5.2_short", "gpt5.2_long"}
+    assert {row["Reference family"] for row in rows} == {"author", "modeler", "gpt5.2_short", "gpt5.2_long"}
     assert {row["Summary"] for row in rows if row["Reference family"] == "author"} == {
+        "bart",
+        "bert",
+        "t5",
+        "longformer_ext",
+    }
+    assert {row["Summary"] for row in rows if row["Reference family"] == "modeler"} == {
         "bart",
         "bert",
         "t5",
@@ -600,8 +789,14 @@ def test_run_quantitative_smoke_filters_evaluation_outputs_by_reference_compatib
     anova_markdown = result.anova_table_markdown_path.read_text(encoding="utf-8")
     overview_factorial_markdown = result.factorial_table_markdown_path.read_text(encoding="utf-8")
 
-    assert len(raw_rows) == 60
+    assert len(raw_rows) == 80
     assert {row["Summary"] for row in best_score_rows if row["Reference family"] == "author"} == {
+        "bart",
+        "bert",
+        "t5",
+        "longformer_ext",
+    }
+    assert {row["Summary"] for row in best_score_rows if row["Reference family"] == "modeler"} == {
         "bart",
         "bert",
         "t5",
@@ -623,6 +818,8 @@ def test_run_quantitative_smoke_filters_evaluation_outputs_by_reference_compatib
     assert any(not row["Summarizer"] for row in factorial_rows)
     assert long_factorial_rows
     assert "Summarizer" not in long_factorial_rows[0]
+    assert "modeler" in anova_markdown
+    assert "modeler" in overview_factorial_markdown
     assert "gpt5.2_long" in anova_markdown
     assert "gpt5.2_long" in overview_factorial_markdown
 
@@ -1087,7 +1284,7 @@ def test_run_quantitative_smoke_includes_modeler_only_for_supported_abms(tmp_pat
     for row in rows:
         by_abm.setdefault(row["abm"], set()).add(row["reference_family"])
 
-    assert by_abm["grazing"] == {"author", "gpt5.2_short", "gpt5.2_long"}
+    assert by_abm["grazing"] == {"author", "modeler", "gpt5.2_short", "gpt5.2_long"}
     assert by_abm["milk_consumption"] == {"author", "modeler", "gpt5.2_short", "gpt5.2_long"}
 
 
@@ -1113,7 +1310,7 @@ def test_run_quantitative_smoke_multi_llm_merges_sources_without_record_id_colli
 
     rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
     assert result.success is True
-    assert len(rows) == 120
+    assert len(rows) == 160
     assert {row["llm"] for row in rows} == {"mistral-medium-latest", "qwen/qwen3.5-27b"}
     assert len({row["record_id"] for row in rows}) == len(rows)
     assert all("__llm_" in row["record_id"] for row in rows)
@@ -1153,7 +1350,7 @@ def test_run_quantitative_smoke_multi_llm_reuses_existing_single_llm_quantitativ
 
     rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
     assert result.success is True
-    assert len(rows) == 120
+    assert len(rows) == 160
     assert {row["llm"] for row in rows} == {"mistral-medium-latest", "qwen/qwen3.5-27b"}
 
 
@@ -1186,8 +1383,8 @@ def test_run_quantitative_smoke_multi_llm_supports_mixed_quantitative_and_summar
 
     rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
     assert result.success is True
-    assert len(rows) == 120
-    assert score_calls == 60
+    assert len(rows) == 160
+    assert score_calls == 80
 
 
 def test_run_quantitative_smoke_multi_llm_keeps_distinct_ids_for_punctuation_variant_labels(tmp_path: Path) -> None:
