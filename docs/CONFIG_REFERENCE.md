@@ -91,4 +91,5 @@ Additional configured references:
 | `milk_consumption` | `gpt5.2_short` | `data/summaries/gpt5.2/milk_gpt5.2_short_ground_truth.txt` |
 | `milk_consumption` | `gpt5.2_long` | `data/summaries/gpt5.2/milk_gpt5.2_long_ground_truth.txt` |
 | `fauna` | `modeler` | `data/summaries/modelers/fauna_modeler_ground_truth.txt` |
+| `grazing` | `modeler` | `data/summaries/modelers/grazing_modeler_ground_truth.txt` |
 | `milk_consumption` | `modeler` | `data/summaries/modelers/milk_modeler_ground_truth.txt` |

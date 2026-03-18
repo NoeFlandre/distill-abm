@@ -122,6 +122,7 @@ ground_truth:
   grazing: /tmp/grazing.txt
   milk_consumption: /tmp/milk.txt
 modeler_ground_truth:
+  grazing: /tmp/grazing-modeler.txt
   milk_consumption: /tmp/milk-modeler.txt
 gpt5.2_short_ground_truth:
   fauna: /tmp/fauna-gpt5-short.txt
@@ -142,6 +143,7 @@ human_reference_dir: /tmp/human-reference
     assert settings.ground_truth.grazing == "/tmp/grazing.txt"
     assert settings.ground_truth.milk_consumption == "/tmp/milk.txt"
     assert settings.modeler_ground_truth is not None
+    assert settings.modeler_ground_truth.grazing == "/tmp/grazing-modeler.txt"
     assert settings.modeler_ground_truth.milk_consumption == "/tmp/milk-modeler.txt"
     assert settings.gpt5_2_short_ground_truth is not None
     assert settings.gpt5_2_short_ground_truth.fauna == "/tmp/fauna-gpt5-short.txt"

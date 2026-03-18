@@ -20,12 +20,15 @@ def test_load_experiment_settings_config() -> None:
     assert settings.modeler_ground_truth is not None
     assert settings.modeler_ground_truth.milk_consumption is not None
     assert settings.modeler_ground_truth.fauna is not None
-    assert settings.modeler_ground_truth.grazing is None
+    assert settings.modeler_ground_truth.grazing is not None
     assert settings.modeler_ground_truth.fauna.endswith("fauna_modeler_ground_truth.txt")
+    assert settings.modeler_ground_truth.grazing.endswith("grazing_modeler_ground_truth.txt")
     assert settings.modeler_ground_truth.milk_consumption.endswith("milk_modeler_ground_truth.txt")
     assert Path(settings.modeler_ground_truth.fauna).exists()
+    assert Path(settings.modeler_ground_truth.grazing).exists()
     assert Path(settings.modeler_ground_truth.milk_consumption).exists()
     assert "data/summaries/modelers/" in settings.modeler_ground_truth.fauna
+    assert "data/summaries/modelers/" in settings.modeler_ground_truth.grazing
     assert "data/summaries/modelers/" in settings.modeler_ground_truth.milk_consumption
 
     assert settings.gpt5_2_short_ground_truth is not None
