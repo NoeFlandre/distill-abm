@@ -12,6 +12,7 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TypedDict
 
 import pandas as pd
 from pydantic import BaseModel, Field
@@ -177,6 +178,14 @@ class QuantitativeSmokeResult(BaseModel):
     failed_record_ids: list[str] = Field(default_factory=list)
     record_count: int = 0
     reference_roots: dict[str, Path] = Field(default_factory=dict)
+
+
+class OverviewTablePaths(TypedDict):
+    anova_table_markdown_path: Path
+    evidence_summary_table_markdown_path: Path
+    prompt_compression_summary_markdown_path: Path | None
+    factorial_table_markdown_path: Path
+    optimal_table_markdown_path: Path
 
 
 @dataclass(frozen=True)
@@ -1038,7 +1047,7 @@ def _write_overview_tables(
     scratch_root: Path,
     analyze_factorial_anova_fn: Callable[[Path, Path, int], pd.DataFrame | None],
     build_factorial_input_frame_fn: Callable[[list[dict[str, str]]], pd.DataFrame],
-) -> dict[str, Path]:
+) -> OverviewTablePaths:
     overview_root.mkdir(parents=True, exist_ok=True)
     anova_table_markdown_path = overview_root / "anova_table.md"
     evidence_summary_table_markdown_path = overview_root / "evidence_summary_table.md"
