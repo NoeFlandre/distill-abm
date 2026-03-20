@@ -1,6 +1,6 @@
 # distill-abm
 
-![Overview of the distill-abm pipeline](docs/assets/overview.png)
+![Overview of the distill-abm pipeline](docs/assets/overview-readme-v2.png)
 
 *PDF source: [docs/assets/overview.pdf](docs/assets/overview.pdf)*
 
