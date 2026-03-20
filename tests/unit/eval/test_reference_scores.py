@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from types import ModuleType
 
 import pytest
 
@@ -102,9 +103,19 @@ def test_compute_scores_recovers_from_nltk_fraction_normalize_compatibility(
     class _FakeRougeModule:
         RougeScorer = _FakeRougeScorer
 
+    fake_nltk_module = ModuleType("nltk")
+    fake_translate_module = ModuleType("nltk.translate")
+    fake_bleu_module = _FakeBleuModule()
+    fake_meteor_module = _FakeMeteorModule()
+    fake_translate_module.bleu_score = fake_bleu_module  # type: ignore[attr-defined]
+    fake_translate_module.meteor_score = fake_meteor_module  # type: ignore[attr-defined]
+    fake_nltk_module.translate = fake_translate_module  # type: ignore[attr-defined]
+
     monkeypatch.setitem(sys.modules, "textstat", _FakeTextStat())
-    monkeypatch.setitem(sys.modules, "nltk.translate.bleu_score", _FakeBleuModule())
-    monkeypatch.setitem(sys.modules, "nltk.translate.meteor_score", _FakeMeteorModule())
+    monkeypatch.setitem(sys.modules, "nltk", fake_nltk_module)
+    monkeypatch.setitem(sys.modules, "nltk.translate", fake_translate_module)
+    monkeypatch.setitem(sys.modules, "nltk.translate.bleu_score", fake_bleu_module)
+    monkeypatch.setitem(sys.modules, "nltk.translate.meteor_score", fake_meteor_module)
     monkeypatch.setitem(sys.modules, "rouge_score", type("_RougePackage", (), {"rouge_scorer": _FakeRougeModule()})())
 
     scores = compute_scores("the cat sat", "cat sat")
