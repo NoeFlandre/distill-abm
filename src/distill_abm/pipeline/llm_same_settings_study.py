@@ -304,7 +304,11 @@ def _winner_label(row: pd.Series) -> str:
     if not winner_labels:
         return ""
     best_value = row.max()
-    winners = [str(column).rsplit("_", 2)[0] for column, value in row.items() if pd.notna(value) and value == best_value]
+    winners = [
+        str(column).rsplit("_", 2)[0]
+        for column, value in row.items()
+        if pd.notna(value) and value == best_value
+    ]
     return ",".join(winners)
 
 

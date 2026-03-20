@@ -8,7 +8,6 @@ from pathlib import Path
 
 import pytest
 
-import distill_abm.pipeline.full_case_matrix_smoke as full_case_matrix_smoke
 import distill_abm.pipeline.full_case_smoke as full_case_smoke
 from distill_abm.llm.adapters.base import LLMAdapter, LLMResponse
 from distill_abm.pipeline.full_case_matrix_smoke import (
