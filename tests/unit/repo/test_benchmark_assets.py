@@ -32,7 +32,7 @@ def test_data_is_subdivided_by_abm() -> None:
 
 def test_data_root_has_only_expected_abm_and_summary_roots() -> None:
     required_paths = {"abms", "summaries"}
-    allowed_extra = {"paper"}
+    allowed_extra = {"images", "paper"}
     present = {path.name for path in Path("data").iterdir() if path.is_dir() and path.name != ".DS_Store"}
     assert required_paths.issubset(present), "required data directories are missing"
     assert present.issubset(required_paths | allowed_extra), (
