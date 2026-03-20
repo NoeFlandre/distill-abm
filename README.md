@@ -8,6 +8,8 @@
 
 `distill-abm` is the publication-facing repository for the ABM-to-LLM distillation pipeline used in the accompanying paper. The repository contains code, configs, tests, and minimal documentation. Published run outputs live in the [Hugging Face results bucket](https://huggingface.co/buckets/NoeFlandre/distill-abms-results), not in Git.
 
+The associated manuscript, _Distilling the Complexity of Agent-Based Simulations into Textual Explanations via Large Language Models_, studies how multimodal LLMs can convert NetLogo ABM artifacts and simulation outputs into executive-style reports for non-modeling experts.
+
 ## Scope
 
 The main pipeline has six stages:
@@ -18,6 +20,12 @@ The main pipeline has six stages:
 4. optionally summarize those narratives
 5. score outputs against reference texts
 6. produce quantitative summary tables
+
+The paper evaluates this pipeline on three peer-reviewed ABMs:
+
+1. megafaunal hunting pressure (`fauna`)
+2. milk adoption (`milk_consumption`)
+3. resilience of pastoral systems (`grazing`)
 
 Paper-facing benchmark runs are restricted to:
 
@@ -34,6 +42,15 @@ Paper-facing benchmark runs are restricted to:
 All other configured models are for debugging and development purposes only.
 
 Supported summarizers are `bart`, `bert`, `t5`, and `longformer_ext`.
+
+Paper-level evaluation compares outputs against four reference families:
+
+1. author-written summaries
+2. independent modeler summaries
+3. GPT-5.2 short summaries
+4. GPT-5.2 long reports
+
+The manuscript’s main deployment recommendation is to prefer abstractive summarizers (`bart` or `t5`). In the optimization stage, `anthropic/claude-opus-4.6` is the strongest overall performer, while `qwen/qwen3.5-27b` is the strongest open-weight cost-efficient option.
 
 ## Canonical Setup
 
@@ -108,6 +125,8 @@ Results store:
 
 - bucket URI: `hf://buckets/NoeFlandre/distill-abms-results`
 - bucket web UI: `https://huggingface.co/buckets/NoeFlandre/distill-abms-results`
+
+For the paper’s retained prompt settings, prefer `--evidence-mode plot` with examples enabled and avoid role/insight prompt inflation unless you are explicitly reproducing a broader screening study.
 
 ## Repository Layout
 
