@@ -1,5 +1,11 @@
 # distill-abm
 
+![Overview of the distill-abm pipeline](docs/assets/overview.png)
+
+*PDF source: [docs/assets/overview.pdf](docs/assets/overview.pdf)*
+
+`distill-abm` is a reproducible research pipeline for converting agent-based model artifacts into evidence-backed LLM summaries, evaluations, and publication-ready reports.
+
 `distill-abm` is the publication-facing repository for the ABM-to-LLM distillation pipeline used in the accompanying paper. The repository contains code, configs, tests, and minimal documentation. Published run outputs live in the [Hugging Face results bucket](https://huggingface.co/buckets/NoeFlandre/distill-abms-results), not in Git.
 
 ## Scope
