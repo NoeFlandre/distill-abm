@@ -27,6 +27,8 @@ Provider-specific override:
 | `text_source_mode` | `summary_only` |
 | `summarizers` | `bart, bert, t5, longformer_ext` |
 
+These are runtime defaults, not the manuscript's retained best-performing paper configuration.
+
 ## Canonical Model Registry
 
 From `configs/models.yaml`:
@@ -60,6 +62,22 @@ These models are for development and testing only:
 | `mistral_medium_debug` | `mistral` | `mistral-medium-latest` |
 
 The paper-facing benchmark roster is the subset documented in the root `README.md`.
+
+Paper-facing benchmark ABMs:
+
+- `fauna` - megafaunal hunting pressure
+- `grazing` - resilience of pastoral systems
+- `milk_consumption` - milk adoption
+
+Paper-facing retained configuration after screening:
+
+- evidence mode: `plot`
+- prompt examples: enabled
+- role instructions: disabled
+- extra insight instructions: disabled
+- recommended deployment summarizers: `bart`, `t5`
+- strongest proprietary deployment model in the paper: `claude_opus_4_6`
+- strongest open-weight deployment model in the paper: `qwen3_5_27b`
 
 ## Summarizer Runtimes
 

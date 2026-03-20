@@ -7,6 +7,11 @@
 3. `distill_abm.eval` computes lexical metrics and downstream DOE or ANOVA summaries.
 4. `results/` stores generated artifacts locally, while the Hugging Face bucket is the durable publication-facing results store.
 
+The manuscript-level workflow uses this runtime in two experimental stages:
+
+1. a screening stage over prompt factors, evidence modes, summarizers, ABMs, and low-cost benchmark LLMs
+2. an optimization stage that reuses the retained settings with stronger deployment-oriented LLMs
+
 ## Data Flow
 
 The main `run` workflow follows this order:
@@ -23,6 +28,8 @@ The main `run` workflow follows this order:
 10. write reports, metadata, and debug traces
 
 `table` evidence means statistical evidence derived from the plot-relevant simulation series, not a raw CSV dump.
+
+At the paper level, the evaluated reference families are author summaries, modeler summaries, GPT-5.2 short summaries, and GPT-5.2 long reports.
 
 ## Major Modules
 
@@ -43,6 +50,7 @@ The main `run` workflow follows this order:
 - end-to-end run orchestration
 - smoke workflows and multi-stage audit runs
 - report writing, metadata, and run-separated artifact layout
+- DOE-style screening and optimization support for paper-facing benchmark studies
 
 ### `src/distill_abm/ingest/`
 
@@ -64,6 +72,7 @@ The main `run` workflow follows this order:
 - lexical metrics
 - reference scoring
 - DOE and factorial analysis
+- quantitative outputs used for ANOVA and variance-contribution reporting
 
 ### `src/distill_abm/llm/`
 
