@@ -80,5 +80,8 @@ def test_execute_smoke_optimization_gemini_chain_resolves_stage_run_roots(tmp_pa
     assert captured["full_case_ingest_root"] == output_root / "01_ingest_smoke_latest" / "runs" / "run_ingest"
     assert captured["full_case_viz_root"] == output_root / "02_viz_smoke_latest" / "runs" / "run_viz"
     assert captured["doe_prompt_variants"] == ("example",)
-    assert captured["summarizer_source_root"] == output_root / "04_full_case_suite_smoke_latest" / "runs" / "run_full_case"
+    assert (
+        captured["summarizer_source_root"]
+        == output_root / "04_full_case_suite_smoke_latest" / "runs" / "run_full_case"
+    )
     assert captured["quantitative_source_root"] == output_root / "05_summarizer_smoke_latest"

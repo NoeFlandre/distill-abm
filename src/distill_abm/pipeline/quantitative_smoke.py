@@ -979,7 +979,10 @@ def _write_analysis_bundle(
             encoding="utf-8",
         )
     else:
-        factorial_table_markdown_path.write_text(_render_factorial_markdown_table(normalized_factorial), encoding="utf-8")
+        factorial_table_markdown_path.write_text(
+            _render_factorial_markdown_table(normalized_factorial),
+            encoding="utf-8",
+        )
         factorial_table_latex_path.write_text(_render_factorial_latex_table(normalized_factorial), encoding="utf-8")
 
     optimal_rows = _build_optimal_score_rows(evaluation_record_rows)

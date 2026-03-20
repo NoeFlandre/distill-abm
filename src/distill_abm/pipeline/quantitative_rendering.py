@@ -90,7 +90,13 @@ def render_optimal_markdown_table(rows: list[dict[str, str]]) -> str:
     body = [
         "| "
         + " | ".join(
-            [row["Reference family"], row["ABM"], row["Summary"], row["LLM"], *(row[metric] for metric in METRIC_COLUMN_NAMES)]
+            [
+                row["Reference family"],
+                row["ABM"],
+                row["Summary"],
+                row["LLM"],
+                *(row[metric] for metric in METRIC_COLUMN_NAMES),
+            ]
         )
         + " |"
         for row in rows

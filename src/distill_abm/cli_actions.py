@@ -50,8 +50,6 @@ from distill_abm.eval.qualitative_runner import QualitativeMetric
 from distill_abm.ingest.netlogo_workflow import run_ingest_workflow
 from distill_abm.pipeline.doe_smoke import (
     CANONICAL_DOE_MODEL_IDS,
-    CANONICAL_EVIDENCE_MODES,
-    CANONICAL_REPETITIONS,
     DoESmokeAbmInput,
     DoESmokeModelSpec,
     canonical_prompt_variants,
