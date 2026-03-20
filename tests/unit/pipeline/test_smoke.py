@@ -7,6 +7,7 @@ import pandas as pd
 import pytest
 
 from distill_abm.configs.models import PromptsConfig
+from distill_abm.eval.metrics import SummaryScores
 from distill_abm.llm.adapters.base import LLMAdapter, LLMRequest, LLMResponse
 from distill_abm.pipeline import smoke as smoke_module
 from distill_abm.pipeline.smoke import (
@@ -30,6 +31,23 @@ class SmokeFakeAdapter(LLMAdapter):
         return LLMResponse(provider="fake", model=request.model, text=f"resp-{self.calls}", raw={})
 
 
+def _fake_summary_scores(reference: str, candidate: str) -> SummaryScores:
+    _ = (reference, candidate)
+    return SummaryScores(
+        token_f1=0.5,
+        precision=0.5,
+        recall=0.5,
+        bleu=0.1,
+        meteor=0.2,
+        rouge1=0.3,
+        rouge2=0.2,
+        rouge_l=0.3,
+        flesch_reading_ease=42.0,
+        reference_length=3,
+        candidate_length=2,
+    )
+
+
 def test_default_smoke_cases_cover_full_matrix() -> None:
     cases = default_smoke_cases()
     assert len(cases) == 6
@@ -49,6 +67,7 @@ def test_default_branch_smoke_cases_cover_three_variants() -> None:
 
 def test_run_qwen_smoke_suite_writes_matrix_and_reports(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("distill_abm.pipeline.run.score_summary", _fake_summary_scores)
     csv_path = tmp_path / "sim.csv"
     csv_path.write_text("tick;mean-incum-1;mean-incum-2\n0;1;2\n1;2;3\n", encoding="utf-8")
     params = tmp_path / "params.txt"
