@@ -15,7 +15,9 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
+from fractions import Fraction
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
@@ -45,14 +47,20 @@ def compute_scores(ground_truth: str, summary: str) -> ReferenceScores:
 
 def _compute_with_external_metrics(ground_truth: str, summary: str) -> ReferenceScores:
     import textstat
-    from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
+    from nltk.translate import bleu_score as nltk_bleu_score
     from nltk.translate.meteor_score import meteor_score
     from rouge_score import rouge_scorer
 
     gt_tokens = ground_truth.split()
     summary_tokens = summary.split()
-    smoothing_function = SmoothingFunction().method4
-    bleu = sentence_bleu([gt_tokens], summary_tokens, smoothing_function=smoothing_function)
+    smoothing_function = nltk_bleu_score.SmoothingFunction().method4
+    bleu = _compute_bleu_score(
+        gt_tokens=gt_tokens,
+        summary_tokens=summary_tokens,
+        sentence_bleu=nltk_bleu_score.sentence_bleu,
+        smoothing_function=smoothing_function,
+        bleu_module=nltk_bleu_score,
+    )
     meteor = meteor_score([gt_tokens], summary_tokens)
     scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
     rouge = scorer.score(ground_truth, summary)
@@ -65,6 +73,41 @@ def _compute_with_external_metrics(ground_truth: str, summary: str) -> Reference
         rouge_l=rouge["rougeL"].fmeasure,
         flesch_reading_ease=flesch,
     )
+
+
+def _compute_bleu_score(
+    gt_tokens: list[str],
+    summary_tokens: list[str],
+    sentence_bleu: Callable[..., float],
+    smoothing_function: Callable[..., object],
+    bleu_module: Any,
+) -> float:
+    try:
+        return sentence_bleu([gt_tokens], summary_tokens, smoothing_function=smoothing_function)
+    except TypeError as exc:
+        # NLTK BLEU can fail on newer Python fractions implementations because it
+        # still passes a private `_normalize` argument. Patch only that known case.
+        if "_normalize" not in str(exc):
+            raise
+
+    original_fraction = getattr(bleu_module, "Fraction", None)
+
+    def _compat_fraction(
+        numerator: int = 0,
+        denominator: int | None = None,
+        _normalize: bool = True,
+    ) -> Fraction:
+        _ = _normalize
+        if denominator is None:
+            return Fraction(numerator)
+        return Fraction(numerator, denominator)
+
+    bleu_module.Fraction = _compat_fraction
+    try:
+        return sentence_bleu([gt_tokens], summary_tokens, smoothing_function=smoothing_function)
+    finally:
+        if original_fraction is not None:
+            bleu_module.Fraction = original_fraction
 
 
 def _compute_fallback_scores(ground_truth: str, summary: str) -> ReferenceScores:

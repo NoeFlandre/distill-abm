@@ -94,7 +94,20 @@ def _analyze_metric(
     if total <= 0:
         return []
     output_metric = reverse_map.get(metric, metric)
-    return _anova_rows(anova, total, output_metric)
+    rows = _anova_rows(anova, total, output_metric)
+    if rows:
+        return rows
+
+    # Some minimal one-factor inputs can produce an ANOVA table that is valid but
+    # still yields no emitted rows through the primary path. Recompute using the
+    # deterministic fallback decomposition so smoke DOE artifacts remain available.
+    fallback = _fallback_anova(analysis, metric, varying_factors, max_interaction_order)
+    if fallback.empty:
+        return []
+    fallback_total = float(fallback["sum_sq"].sum())
+    if fallback_total <= 0:
+        return []
+    return _anova_rows(fallback, fallback_total, output_metric)
 
 
 def _fit_anova(
