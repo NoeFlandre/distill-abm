@@ -1,8 +1,8 @@
 import pytest
 
 from distill_abm.eval import reference_scores as reference_scores_module
-from distill_abm.eval.reference_scores import ReferenceScores
 from distill_abm.eval.metrics import score_summary
+from distill_abm.eval.reference_scores import ReferenceScores
 
 
 def _stub_reference_scores() -> ReferenceScores:
@@ -16,9 +16,16 @@ def _stub_reference_scores() -> ReferenceScores:
     )
 
 
+def _patch_reference_scores(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "distill_abm.eval.metrics.compute_scores",
+        lambda reference, candidate: _stub_reference_scores(),
+    )
+
+
 def test_score_summary_basic_overlap(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that basic token overlap is calculated correctly."""
-    monkeypatch.setattr("distill_abm.eval.metrics.compute_scores", lambda reference, candidate: _stub_reference_scores())
+    _patch_reference_scores(monkeypatch)
     scores = score_summary(reference="the cat sat on the mat", candidate="cat sat on mat")
     assert 0.0 <= scores.token_f1 <= 1.0
     assert scores.reference_length == 6
@@ -35,7 +42,7 @@ def test_score_summary_basic_overlap(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_score_summary_identical(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that identical strings give perfect scores."""
-    monkeypatch.setattr("distill_abm.eval.metrics.compute_scores", lambda reference, candidate: _stub_reference_scores())
+    _patch_reference_scores(monkeypatch)
     scores = score_summary("test string", "test string")
     assert scores.precision == 1.0
     assert scores.recall == 1.0
@@ -44,7 +51,7 @@ def test_score_summary_identical(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_score_summary_no_overlap(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that strings with no overlap give zero scores."""
-    monkeypatch.setattr("distill_abm.eval.metrics.compute_scores", lambda reference, candidate: _stub_reference_scores())
+    _patch_reference_scores(monkeypatch)
     scores = score_summary("abc", "def")
     assert scores.precision == 0.0
     assert scores.recall == 0.0
@@ -53,7 +60,7 @@ def test_score_summary_no_overlap(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_score_summary_empty_candidate(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that an empty candidate string gives zero scores."""
-    monkeypatch.setattr("distill_abm.eval.metrics.compute_scores", lambda reference, candidate: _stub_reference_scores())
+    _patch_reference_scores(monkeypatch)
     scores = score_summary("abc", "")
     assert scores.precision == 0.0
     assert scores.recall == 0.0
@@ -63,7 +70,7 @@ def test_score_summary_empty_candidate(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_score_summary_empty_reference(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that an empty reference string gives zero scores."""
-    monkeypatch.setattr("distill_abm.eval.metrics.compute_scores", lambda reference, candidate: _stub_reference_scores())
+    _patch_reference_scores(monkeypatch)
     scores = score_summary("", "abc")
     assert scores.precision == 0.0
     assert scores.recall == 0.0
@@ -73,7 +80,7 @@ def test_score_summary_empty_reference(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_score_summary_case_insensitive(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that scoring is case-insensitive."""
-    monkeypatch.setattr("distill_abm.eval.metrics.compute_scores", lambda reference, candidate: _stub_reference_scores())
+    _patch_reference_scores(monkeypatch)
     scores = score_summary("THE CAT", "the cat")
     assert scores.token_f1 == 1.0
 

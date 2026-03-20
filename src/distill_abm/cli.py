@@ -25,14 +25,14 @@ from distill_abm.cli_actions import (
     execute_smoke_full_case_matrix_command,
     execute_smoke_full_case_suite_command,
     execute_smoke_ingest_command,
-    execute_smoke_optimization_gemini_chain_command,
     execute_smoke_local_qwen_command,
+    execute_smoke_optimization_gemini_chain_command,
     execute_smoke_quantitative_command,
     execute_smoke_quantitative_multi_llm_command,
     execute_smoke_qwen_command,
     execute_smoke_summarizers_command,
-    execute_sync_results_bucket_command,
     execute_smoke_viz_command,
+    execute_sync_results_bucket_command,
     execute_validate_workspace_command,
 )
 from distill_abm.cli_defaults import (
@@ -72,12 +72,12 @@ from distill_abm.llm.factory import create_adapter
 from distill_abm.pipeline.doe_smoke import (
     run_doe_smoke_suite,
 )
+from distill_abm.pipeline.exploitation_factor_study import run_exploitation_factor_study
 from distill_abm.pipeline.full_case_matrix_smoke import run_full_case_matrix_smoke
 from distill_abm.pipeline.full_case_smoke import run_full_case_smoke
 from distill_abm.pipeline.full_case_suite_smoke import run_full_case_suite_smoke
-from distill_abm.pipeline.local_qwen_sample_smoke import run_local_qwen_sample_smoke
-from distill_abm.pipeline.exploitation_factor_study import run_exploitation_factor_study
 from distill_abm.pipeline.llm_same_settings_study import run_llm_same_settings_study
+from distill_abm.pipeline.local_qwen_sample_smoke import run_local_qwen_sample_smoke
 from distill_abm.pipeline.quantitative_smoke import (
     run_quantitative_smoke,
     run_quantitative_smoke_multi_llm,
@@ -118,11 +118,11 @@ __all__ = [
     "smoke_local_qwen",
     "smoke_optimization_gemini_chain",
     "smoke_quantitative",
-    "study_llm_same_settings",
-    "study_exploitation_factors",
     "smoke_qwen",
     "smoke_summarizers",
     "smoke_viz",
+    "study_exploitation_factors",
+    "study_llm_same_settings",
     "sync_results_bucket",
     "validate_workspace",
 ]
@@ -813,7 +813,10 @@ def smoke_optimization_gemini_chain(
     ] = 32768,
     resume: Annotated[
         bool,
-        typer.Option("--resume/--no-resume", help="Reuse successful stage outputs and rerun only failed or missing work."),
+        typer.Option(
+            "--resume/--no-resume",
+            help="Reuse successful stage outputs and rerun only failed or missing work.",
+        ),
     ] = True,
 ) -> None:
     """Run the fixed-factor Gemini optimization chain across the standard six smoke stages."""
@@ -857,7 +860,12 @@ def smoke_optimization_gemini_chain(
 def sync_results_bucket(
     source_root: Annotated[
         Path,
-        typer.Option(exists=True, file_okay=False, dir_okay=True, help="Local results directory to mirror to the bucket."),
+        typer.Option(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            help="Local results directory to mirror to the bucket.",
+        ),
     ] = Path("results"),
     bucket_uri: Annotated[
         str,

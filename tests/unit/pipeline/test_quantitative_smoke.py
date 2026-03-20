@@ -306,12 +306,6 @@ def test_load_quantitative_source_records_resolves_wrapper_backed_summary_paths(
         / "run_20260312_153523_845549"
     )
     case_id = "01_grazing_none_plot_rep1"
-    case_dir = (
-        source_root
-        / "bundles"
-        / case_id
-        / "02_summaries"
-    )
     _write_text(
         source_root / "review.csv",
         "\n".join(
@@ -782,7 +776,9 @@ def test_run_quantitative_smoke_filters_evaluation_outputs_by_reference_compatib
 
     raw_rows = list(csv.DictReader(result.quantitative_rows_path.open(encoding="utf-8")))
     best_score_rows = list(csv.DictReader(result.optimal_csv_path.open(encoding="utf-8")))
-    factorial_rows = list(csv.DictReader((result.factorial_csv_path.parent / "factorial_input.csv").open(encoding="utf-8")))
+    factorial_rows = list(
+        csv.DictReader((result.factorial_csv_path.parent / "factorial_input.csv").open(encoding="utf-8"))
+    )
     long_factorial_rows = list(
         csv.DictReader((result.run_root / "gpt5.2_long" / "factorial_input.csv").open(encoding="utf-8"))
     )

@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pandas as pd
 
-TOKEN_PATTERN = re.compile(r"[^\W_]+(?:['’][^\W_]+)*", re.UNICODE)
+TOKEN_PATTERN = re.compile(r"[^\W_]+(?:['\u2019][^\W_]+)*", re.UNICODE)
 
 
 def remove_sentences_with_www(text: str) -> str:

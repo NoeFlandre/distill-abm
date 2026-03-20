@@ -176,7 +176,11 @@ def _build_shared_keys(frames: list[pd.DataFrame]) -> pd.DataFrame:
         return pd.DataFrame(columns=COMPARISON_KEY_COLUMNS)
     shared = frames[0].loc[:, COMPARISON_KEY_COLUMNS].drop_duplicates()
     for frame in frames[1:]:
-        shared = shared.merge(frame.loc[:, COMPARISON_KEY_COLUMNS].drop_duplicates(), on=list(COMPARISON_KEY_COLUMNS), how="inner")
+        shared = shared.merge(
+            frame.loc[:, COMPARISON_KEY_COLUMNS].drop_duplicates(),
+            on=list(COMPARISON_KEY_COLUMNS),
+            how="inner",
+        )
     return shared.reset_index(drop=True)
 
 
@@ -224,7 +228,17 @@ def _build_master_comparison(rows: pd.DataFrame) -> pd.DataFrame:
 
 def _build_metric_summary(rows: pd.DataFrame) -> pd.DataFrame:
     if rows.empty:
-        return pd.DataFrame(columns=["metric", "model_label", "mean_score", "median_score", "min_score", "max_score", "observations"])
+        return pd.DataFrame(
+            columns=[
+                "metric",
+                "model_label",
+                "mean_score",
+                "median_score",
+                "min_score",
+                "max_score",
+                "observations",
+            ]
+        )
     melted = rows.melt(
         id_vars=["model_label", *COMPARISON_KEY_COLUMNS],
         value_vars=list(METRIC_COLUMN_NAMES),
@@ -299,7 +313,10 @@ def _render_markdown_report(
         "# Optimization Same-Settings LLM Comparison",
         "",
         "This side study reuses existing quantitative artifacts only.",
-        "Gemini defines the allowed settings slice; all comparison models are filtered to that same slice before comparison.",
+        (
+            "Gemini defines the allowed settings slice; all comparison models are filtered "
+            "to that same slice before comparison."
+        ),
         "",
         "## Inputs",
         "",

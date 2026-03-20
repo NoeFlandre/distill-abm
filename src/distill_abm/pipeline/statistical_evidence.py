@@ -564,12 +564,10 @@ def _render_mann_kendall(payload: dict[str, object]) -> list[str]:
         if not isinstance(window, dict):
             continue
         lines.append(
-            (
-                f"- rolling Mann-Kendall window {index}: start={int(window['start_index'])} "
-                f"end={int(window['end_index'])} trend={window['trend']} "
-                f"tau={float(window['tau']):.3f} slope={float(window['slope']):.3f} "
-                f"p={float(window['p']):.3f} significant={window['significant']}"
-            )
+            f"- rolling Mann-Kendall window {index}: start={int(window['start_index'])} "
+            f"end={int(window['end_index'])} trend={window['trend']} "
+            f"tau={float(window['tau']):.3f} slope={float(window['slope']):.3f} "
+            f"p={float(window['p']):.3f} significant={window['significant']}"
         )
     return lines
 
