@@ -285,7 +285,7 @@ def _process_bundle(
 
     mode_results: list[SummarizerModeResult] = []
     if source_validation_error is None:
-        all_modes = cast(tuple[SummarizerSmokeMode, ...], ("none",) + selected_summarizer_modes)
+        all_modes = cast(tuple[SummarizerSmokeMode, ...], ("none", *selected_summarizer_modes))
         for mode in all_modes:
             output_path = summary_dir / f"{mode}.txt"
             raw_output_path = None if mode == "none" else raw_summary_dir / f"{mode}.txt"
