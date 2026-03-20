@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import csv
 import json
+import logging
 import shutil
 import time
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 from pydantic import BaseModel, Field
 
@@ -28,6 +29,7 @@ from distill_abm.summarize.postprocess import postprocess_summary
 from distill_abm.utils import detect_placeholder_signals
 
 SummarizerSmokeMode = Literal["none", "bart", "bert", "t5", "longformer_ext"]
+ConfiguredSummarizerSmokeMode = Literal["bart", "bert", "t5", "longformer_ext"]
 
 
 class ValidatedSmokeBundle(BaseModel):
@@ -126,7 +128,7 @@ def run_summarizer_smoke(
     include_abms: tuple[str, ...] | None = None,
     validated_bundles: tuple[ValidatedSmokeBundle, ...] | None = None,
     summarizer_modes: tuple[SummarizerId, ...] | None = None,
-    summarizer_fns: dict[SummarizerSmokeMode, Callable[[str], str]] | None = None,
+    summarizer_fns: dict[ConfiguredSummarizerSmokeMode, Callable[[str], str]] | None = None,
 ) -> SummarizerSmokeResult:
     """Run all summarizers over validated full-case text bundles and persist review artifacts."""
     started_at = datetime.now(UTC)
@@ -138,14 +140,15 @@ def run_summarizer_smoke(
     previous_run_root = _resolve_previous_summarizer_run_root(output_root=output_root, current_run_id=run_id)
     logger = get_logger(__name__)
     attached_run_log_path = attach_json_log_file(run_log_path(run_root))
+    available_modes: tuple[ConfiguredSummarizerSmokeMode, ...] = ("bart", "bert", "t5", "longformer_ext")
     resolved_summarizers = summarizer_fns or {
         "bart": summarize_with_bart,
         "bert": summarize_with_bert,
         "t5": summarize_with_t5,
         "longformer_ext": summarize_with_longformer_ext,
     }
-    selected_summarizer_modes = summarizer_modes or tuple(
-        mode for mode in ("bart", "bert", "t5", "longformer_ext") if mode in resolved_summarizers
+    selected_summarizer_modes: tuple[ConfiguredSummarizerSmokeMode, ...] = summarizer_modes or tuple(
+        mode for mode in available_modes if mode in resolved_summarizers
     )
     missing_modes = [mode for mode in selected_summarizer_modes if mode not in resolved_summarizers]
     if missing_modes:
@@ -223,9 +226,9 @@ def _process_bundle(
     run_root: Path,
     previous_run_root: Path | None,
     resume: bool,
-    logger: object,
-    resolved_summarizers: dict[SummarizerSmokeMode, Callable[[str], str]],
-    selected_summarizer_modes: tuple[SummarizerId, ...],
+    logger: logging.Logger,
+    resolved_summarizers: dict[ConfiguredSummarizerSmokeMode, Callable[[str], str]],
+    selected_summarizer_modes: tuple[ConfiguredSummarizerSmokeMode, ...],
     bundle_results: list[SummarizerBundleResult],
     review_rows: list[dict[str, str]],
     failed_bundle_ids: list[str],
@@ -282,7 +285,8 @@ def _process_bundle(
 
     mode_results: list[SummarizerModeResult] = []
     if source_validation_error is None:
-        for mode in ("none", *selected_summarizer_modes):
+        all_modes = cast(tuple[SummarizerSmokeMode, ...], ("none",) + selected_summarizer_modes)
+        for mode in all_modes:
             output_path = summary_dir / f"{mode}.txt"
             raw_output_path = None if mode == "none" else raw_summary_dir / f"{mode}.txt"
             existing_result = _load_resumable_mode_result(

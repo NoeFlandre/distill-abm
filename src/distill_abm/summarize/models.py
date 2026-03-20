@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import TYPE_CHECKING, Any, Protocol, cast
 
 from distill_abm.summarize.reference_text import chunk_text
 
@@ -109,7 +110,9 @@ class _TransformerBertExtractiveModel:
     def _embed(self, texts: list[str]) -> torch.Tensor:
         import torch
 
-        encoded = self.tokenizer(
+        tokenizer = cast(Callable[..., dict[str, torch.Tensor]], self.tokenizer)
+        model = cast(Callable[..., Any], self.model)
+        encoded = tokenizer(
             texts,
             padding=True,
             truncation=True,
@@ -118,13 +121,13 @@ class _TransformerBertExtractiveModel:
         )
         encoded = {key: value.to(self.device) for key, value in encoded.items()}
         with torch.no_grad():
-            outputs = self.model(**encoded)
+            outputs = model(**encoded)
         hidden_state = outputs.last_hidden_state
         attention_mask = encoded["attention_mask"].unsqueeze(-1)
         masked_hidden_state = hidden_state * attention_mask
         token_counts = attention_mask.sum(dim=1).clamp(min=1)
         pooled = masked_hidden_state.sum(dim=1) / token_counts
-        return pooled.cpu()
+        return cast(torch.Tensor, pooled.cpu())
 
 
 def _split_sentences(text: str) -> list[str]:

@@ -414,8 +414,8 @@ def test_default_validated_smoke_bundles_skips_live_case_with_empty_accepted_out
 
 def test_run_summarizer_smoke_watch_mode_processes_bundle_when_it_appears(
     tmp_path: Path,
-    monkeypatch,
-) -> None:  # type: ignore[no-untyped-def]
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     source_root = tmp_path / "suite"
     output_root = tmp_path / "summaries"
     run_root = source_root / "abms" / "fauna" / "runs" / "run_live"

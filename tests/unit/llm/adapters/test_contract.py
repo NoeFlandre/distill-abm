@@ -332,7 +332,10 @@ def test_fetch_openrouter_endpoint_quantizations_retries_after_failure_ttl_expir
         return {} if calls["count"] == 1 else {"alibaba": "bf16"}
 
     monkeypatch.setattr(openrouter_adapter_module, "_request_openrouter_endpoint_quantizations", _fake_request)
-    monkeypatch.setattr(openrouter_adapter_module.time, "monotonic", lambda: clock["value"])
+    monkeypatch.setattr(
+        "distill_abm.llm.adapters.openrouter_adapter.time.monotonic",
+        lambda: clock["value"],
+    )
 
     first = openrouter_adapter_module._fetch_openrouter_endpoint_quantizations(
         model="qwen/qwen3.5-27b",

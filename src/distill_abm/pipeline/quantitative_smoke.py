@@ -1096,7 +1096,9 @@ def _write_overview_tables(
     return {
         "anova_table_markdown_path": anova_table_markdown_path,
         "evidence_summary_table_markdown_path": evidence_summary_table_markdown_path,
-        "prompt_compression_summary_markdown_path": resolved_prompt_compression_summary_markdown_path,
+        "prompt_compression_summary_markdown_path": (
+            resolved_prompt_compression_summary_markdown_path or prompt_compression_summary_markdown_path
+        ),
         "factorial_table_markdown_path": factorial_table_markdown_path,
         "optimal_table_markdown_path": optimal_table_markdown_path,
     }
