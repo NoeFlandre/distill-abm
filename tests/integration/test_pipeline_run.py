@@ -230,9 +230,12 @@ def test_run_pipeline_summary_only_scores_and_traces_cleaned_summary(
     assert scored_candidates[0] == "Signal rises steadily."
     assert scored_candidates[-1] == "Signal rises steadily."
 
+    assert result.metadata_path is not None
     metadata = json.loads(result.metadata_path.read_text(encoding="utf-8"))
+    trace_path = metadata["debug_trace"]["summarization_trace_path"]
+    assert isinstance(trace_path, str)
     summarization_trace = json.loads(
-        Path(metadata["debug_trace"]["summarization_trace_path"]).read_text(encoding="utf-8")
+        Path(trace_path).read_text(encoding="utf-8")
     )
     assert summarization_trace["trend_summary_text"] == "Signal rises steadily."
     assert summarization_trace["summarizer_outputs"] == [

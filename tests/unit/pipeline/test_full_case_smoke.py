@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 import distill_abm.pipeline.full_case_matrix_smoke as full_case_matrix_smoke
+import distill_abm.pipeline.full_case_smoke as full_case_smoke
 from distill_abm.llm.adapters.base import LLMAdapter, LLMResponse
 from distill_abm.pipeline.full_case_matrix_smoke import (
     DEFAULT_MATRIX_PASS_WAIT_SECONDS,
@@ -627,6 +628,8 @@ def test_run_full_case_matrix_smoke_reuses_identical_context_across_cases(tmp_pa
     )
 
     assert result.success is True
+    assert result.observability_csv_path is not None
+    assert result.observability_summary_json_path is not None
     assert len(result.cases) == 2
     assert adapter._calls == 3
     context_outputs = [
@@ -771,6 +774,8 @@ def test_run_full_case_matrix_smoke_observability_excludes_reused_previous_run_r
         resume_existing=True,
     )
 
+    assert resumed.observability_csv_path is not None
+    assert resumed.observability_summary_json_path is not None
     rows = list(csv.DictReader(resumed.observability_csv_path.open(encoding="utf-8")))
     assert len(rows) == 2
     assert {row["reused_from_previous_run"] for row in rows} == {"true"}
@@ -827,6 +832,8 @@ def test_run_full_case_matrix_smoke_observability_preserves_failed_context_reque
     )
 
     assert result.success is False
+    assert result.observability_csv_path is not None
+    assert result.observability_summary_json_path is not None
     rows = list(csv.DictReader(result.observability_csv_path.open(encoding="utf-8")))
     assert len(rows) == 1
     row = rows[0]
@@ -906,6 +913,8 @@ def test_run_full_case_matrix_smoke_observability_excludes_shared_context_reuse_
         resume_existing=True,
     )
 
+    assert resumed.observability_csv_path is not None
+    assert resumed.observability_summary_json_path is not None
     rows = list(csv.DictReader(resumed.observability_csv_path.open(encoding="utf-8")))
     assert len(rows) == 4
     context_rows = {row["case_id"]: row for row in rows if row["request_kind"] == "context"}
@@ -967,15 +976,19 @@ def test_run_full_case_matrix_smoke_parallel_resumed_case_blocks_new_context_req
     )
     assert first_run.success is True
 
-    original_is_context_accepted = full_case_matrix_smoke._is_context_accepted
+    original_is_context_accepted = full_case_smoke._is_context_accepted
 
-    def delayed_is_context_accepted(*, context_dir: Path, validation_state: dict[str, object]) -> bool:
+    def delayed_is_context_accepted(
+        *,
+        context_dir: Path,
+        validation_state: full_case_smoke.FullCaseValidationState,
+    ) -> bool:
         is_accepted = original_is_context_accepted(context_dir=context_dir, validation_state=validation_state)
         if is_accepted and (context_dir / "context_output.txt").exists():
             time.sleep(0.2)
         return is_accepted
 
-    monkeypatch.setattr(full_case_matrix_smoke, "_is_context_accepted", delayed_is_context_accepted)
+    monkeypatch.setattr(full_case_smoke, "_is_context_accepted", delayed_is_context_accepted)
 
     adapter = _ConcurrentAdapter()
     resumed = run_full_case_matrix_smoke(
@@ -1005,6 +1018,8 @@ def test_run_full_case_matrix_smoke_parallel_resumed_case_blocks_new_context_req
     assert resumed.success is True
     assert adapter._calls == 1
 
+    assert resumed.observability_csv_path is not None
+    assert resumed.observability_summary_json_path is not None
     rows = list(csv.DictReader(resumed.observability_csv_path.open(encoding="utf-8")))
     context_rows = {row["case_id"]: row for row in rows if row["request_kind"] == "context"}
     assert context_rows["01_grazing_role_plot_rep1"]["context_materialization_source"] == "resumed_previous_run"

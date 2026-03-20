@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import cast
 
 import pandas as pd
 from pydantic import BaseModel
@@ -79,7 +80,10 @@ def run_llm_same_settings_study(
 
     anchor_rows, anchor_run_root, anchor_label = _load_quantitative_rows(anchor_source_root)
     filtered_anchor = _filter_candidate_rows(anchor_rows)
-    allowed_keys = filtered_anchor.loc[:, COMPARISON_KEY_COLUMNS].drop_duplicates().reset_index(drop=True)
+    allowed_keys = cast(
+        pd.DataFrame,
+        filtered_anchor.loc[:, COMPARISON_KEY_COLUMNS].drop_duplicates().reset_index(drop=True),
+    )
 
     filtered_frames: list[pd.DataFrame] = [_restrict_to_allowed_keys(filtered_anchor, allowed_keys)]
     source_run_roots = {anchor_label: anchor_run_root}
@@ -181,7 +185,7 @@ def _build_shared_keys(frames: list[pd.DataFrame]) -> pd.DataFrame:
             on=list(COMPARISON_KEY_COLUMNS),
             how="inner",
         )
-    return shared.reset_index(drop=True)
+    return cast(pd.DataFrame, shared.reset_index(drop=True))
 
 
 def _build_master_comparison(rows: pd.DataFrame) -> pd.DataFrame:
@@ -195,12 +199,13 @@ def _build_master_comparison(rows: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(columns=columns)
 
     master = rows.loc[:, ["prompt", "model_label", *COMPARISON_KEY_COLUMNS, *METRIC_COLUMN_NAMES]].copy()
-    prompt_frame = (
+    prompt_frame = cast(
+        pd.DataFrame,
         master.groupby(list(COMPARISON_KEY_COLUMNS), as_index=False)["prompt"]
         .first()
-        .reset_index(drop=True)
+        .reset_index(drop=True),
     )
-    result = prompt_frame.copy()
+    result: pd.DataFrame = prompt_frame.copy()
     for metric in METRIC_COLUMN_NAMES:
         metric_slug = METRIC_SLUGS[metric]
         pivoted = master.pivot_table(
@@ -295,11 +300,11 @@ def _build_metric_win_summary(rows: pd.DataFrame) -> pd.DataFrame:
 
 
 def _winner_label(row: pd.Series) -> str:
-    winner_labels = [column.rsplit("_", 2)[0] for column, value in row.items() if pd.notna(value)]
+    winner_labels = [str(column).rsplit("_", 2)[0] for column, value in row.items() if pd.notna(value)]
     if not winner_labels:
         return ""
     best_value = row.max()
-    winners = [column.rsplit("_", 2)[0] for column, value in row.items() if pd.notna(value) and value == best_value]
+    winners = [str(column).rsplit("_", 2)[0] for column, value in row.items() if pd.notna(value) and value == best_value]
     return ",".join(winners)
 
 

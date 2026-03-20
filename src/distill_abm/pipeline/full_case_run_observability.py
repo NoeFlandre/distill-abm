@@ -101,13 +101,17 @@ def _int_string(value: object) -> str:
     if isinstance(value, bool) or value is None or value == "":
         return ""
     try:
-        return str(int(value))
+        return str(int(str(value)))
     except (TypeError, ValueError):
         return ""
 
 
 def _bool_string(value: bool) -> str:
     return "true" if value else "false"
+
+
+def _as_dict(value: object) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
 
 
 def _row_paths(*, case_dir: Path, plot_index: str, trend_output_path: str) -> tuple[Path, Path, Path, Path]:
@@ -155,7 +159,7 @@ def _synthetic_context_review_row(*, case_dir: Path, case_error: str | None) -> 
     error_path = context_dir / "error.txt"
     error_text = error_path.read_text(encoding="utf-8").strip() if error_path.exists() else (case_error or "")
     validation_state = _load_json(case_dir / "validation_state.json")
-    context_state = validation_state.get("context") if isinstance(validation_state.get("context"), dict) else {}
+    context_state = _as_dict(validation_state.get("context"))
     validation_status = _stringify(context_state.get("status") or ("retry" if error_text else "accepted"))
     return {
         "plot_index": "context",
@@ -193,11 +197,11 @@ def _build_observability_row(
     )
     request_payload = _load_json(request_json_path)
     trace_payload = _load_json(trace_json_path)
-    request_block = trace_payload.get("request") if isinstance(trace_payload.get("request"), dict) else request_payload
-    response_block = trace_payload.get("response") if isinstance(trace_payload.get("response"), dict) else {}
-    runtime_block = response_block.get("runtime") if isinstance(response_block.get("runtime"), dict) else {}
-    usage_block = response_block.get("usage") if isinstance(response_block.get("usage"), dict) else {}
-    metadata_block = request_block.get("metadata") if isinstance(request_block.get("metadata"), dict) else {}
+    request_block = _as_dict(trace_payload.get("request")) or request_payload
+    response_block = _as_dict(trace_payload.get("response"))
+    runtime_block = _as_dict(response_block.get("runtime"))
+    usage_block = _as_dict(response_block.get("usage"))
+    metadata_block = _as_dict(request_block.get("metadata"))
     stride = _int_string(metadata_block.get("table_downsample_stride"))
     compression_tier = str(max(int(stride) - 1, 0)) if stride else ""
     reused_from_previous_run_by_path = not _path_written_in_current_run(

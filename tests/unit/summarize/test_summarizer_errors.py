@@ -1,14 +1,28 @@
 """Tests for summarizer error paths when dependencies are missing."""
 
+from typing import cast
+
 import pytest
 
 from distill_abm.summarize.models import (
     BartSummarizerRunner,
+    BertModelLike,
     BertSummarizerRunner,
     LongformerExtSummarizerRunner,
     SummarizationError,
     T5SummarizerRunner,
+    TokenizerLike,
 )
+
+
+class FakeTokenizer:
+    def encode(self, text: str, truncation: bool = False, add_special_tokens: bool = True) -> list[int]:
+        _ = (truncation, add_special_tokens)
+        return [ord(ch) for ch in text]
+
+    def decode(self, ids: list[int], skip_special_tokens: bool = False) -> str:
+        _ = skip_special_tokens
+        return "".join(chr(i) for i in ids)
 
 
 def test_bart_runner_raises_summarization_error_on_missing_transformers(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -57,20 +71,13 @@ def test_bert_runner_falls_back_when_legacy_backend_breaks(monkeypatch: pytest.M
 
     monkeypatch.setattr("builtins.__import__", mock_import)
     runner = BertSummarizerRunner()
-    runner._build_transformers_runtime = lambda: ("bert-fallback", None)  # type: ignore[method-assign]
-    runner._model = lambda text, min_length, max_length: f"fallback::{text}"  # type: ignore[assignment]
-    runner._tokenizer = None  # type: ignore[assignment]
-
-    class FakeTokenizer:
-        def encode(self, text: str, truncation: bool = False, add_special_tokens: bool = True) -> list[int]:
-            _ = (truncation, add_special_tokens)
-            return [ord(ch) for ch in text]
-
-        def decode(self, ids: list[int], skip_special_tokens: bool = False) -> str:
-            _ = skip_special_tokens
-            return "".join(chr(i) for i in ids)
-
-    runner._build_transformers_runtime = lambda: (runner._model, FakeTokenizer())  # type: ignore[method-assign]
+    fake_model = cast(BertModelLike, lambda text, min_length, max_length: f"fallback::{text}")
+    runner._model = fake_model
+    runner._tokenizer = None
+    runner._build_transformers_runtime = lambda: (  # type: ignore[method-assign]
+        fake_model,
+        cast(TokenizerLike, FakeTokenizer()),
+    )
     out = runner.summarize("ABCDE", max_input_length=2)
 
     assert out == "fallback::AB fallback::CD fallback::E"

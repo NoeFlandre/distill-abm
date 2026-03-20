@@ -147,7 +147,7 @@ def parse_structured_smoke_text(*, raw_text: str, trace: Mapping[str, object], p
         except Exception as exc:
             parse_error = exc
     if parsed is None:
-        exc = parse_error if parse_error is not None else ValueError("empty structured smoke response")
+        parse_failure = parse_error if parse_error is not None else ValueError("empty structured smoke response")
         thinking_text = extract_thinking_text(trace)
         done_reason = raw_payload_dict.get("done_reason")
         eval_count = raw_payload_dict.get("eval_count")
@@ -160,17 +160,17 @@ def parse_structured_smoke_text(*, raw_text: str, trace: Mapping[str, object], p
                     ),
                     trace=trace,
                     prompt=prompt,
-                ) from exc
+                ) from parse_failure
             raise StructuredSmokeResponseError(
                 "model returned only thinking without a final structured response",
                 trace=trace,
                 prompt=prompt,
-            ) from exc
+            ) from parse_failure
         raise StructuredSmokeResponseError(
             "model did not return valid structured JSON for the smoke output",
             trace=trace,
             prompt=prompt,
-        ) from exc
+        ) from parse_failure
     done_reason = raw_payload_dict.get("done_reason")
     if done_reason == "length":
         raise StructuredSmokeResponseError(

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import cast
 
 import pandas as pd
 
@@ -345,8 +346,9 @@ def test_invoke_structured_smoke_text_retries_without_response_format_on_openrou
     assert "structured_output_schema" in adapter.requests[0].metadata
     assert "structured_output_schema" not in adapter.requests[1].metadata
     assert 'Return only a valid JSON object with exactly one key' in adapter.requests[1].user_prompt()
-    assert trace["structured_output_fallback"]["triggered"] is True
-    assert trace["structured_output_fallback"]["fallback_mode"] == "prompted_json_without_response_format"
+    fallback = cast(dict[str, object], trace["structured_output_fallback"])
+    assert fallback["triggered"] is True
+    assert fallback["fallback_mode"] == "prompted_json_without_response_format"
 
 
 def test_invoke_structured_smoke_text_retries_without_response_format_on_openrouter_provider_error() -> None:
@@ -365,8 +367,9 @@ def test_invoke_structured_smoke_text_retries_without_response_format_on_openrou
     assert len(adapter.requests) == 2
     assert "structured_output_schema" in adapter.requests[0].metadata
     assert "structured_output_schema" not in adapter.requests[1].metadata
-    assert trace["structured_output_fallback"]["triggered"] is True
-    assert "Internal Server Error" in trace["structured_output_fallback"]["reason"]
+    fallback = cast(dict[str, object], trace["structured_output_fallback"])
+    assert fallback["triggered"] is True
+    assert "Internal Server Error" in str(fallback["reason"])
 
 
 def test_run_local_qwen_sample_smoke_resume_reuses_successful_case(tmp_path: Path) -> None:
