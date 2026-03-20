@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+
 import pytest
 
 from distill_abm.eval.reference_scores import ReferenceScores, compute_scores
@@ -47,3 +49,66 @@ def test_compute_scores_does_not_hide_metric_runtime_failures(
 
     with pytest.raises(ValueError, match="bad metric state"):
         compute_scores("the cat sat", "cat sat")
+
+
+def test_compute_scores_recovers_from_nltk_fraction_normalize_compatibility(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class _FakeTextStat:
+        @staticmethod
+        def flesch_reading_ease(summary: str) -> float:
+            _ = summary
+            return 42.0
+
+    class _FakeSmoothingFunction:
+        def method4(self) -> object:
+            return object()
+
+    class _FakeBleuModule:
+        def __init__(self) -> None:
+            self.Fraction = object()
+            self.SmoothingFunction = _FakeSmoothingFunction
+
+        def sentence_bleu(self, *args: object, **kwargs: object) -> float:
+            _ = args, kwargs
+            fraction = self.Fraction
+            if callable(fraction):
+                fraction(1, 2, _normalize=False)
+                return 0.75
+            raise TypeError("Fraction.__new__() got an unexpected keyword argument '_normalize'")
+
+    class _FakeMeteorModule:
+        @staticmethod
+        def meteor_score(*args: object, **kwargs: object) -> float:
+            _ = args, kwargs
+            return 0.5
+
+    class _FakeRougeScore:
+        def __init__(self, fmeasure: float) -> None:
+            self.fmeasure = fmeasure
+
+    class _FakeRougeScorer:
+        def __init__(self, metrics: list[str], use_stemmer: bool) -> None:
+            _ = metrics, use_stemmer
+
+        def score(self, ground_truth: str, summary: str) -> dict[str, _FakeRougeScore]:
+            _ = ground_truth, summary
+            return {
+                "rouge1": _FakeRougeScore(0.4),
+                "rouge2": _FakeRougeScore(0.3),
+                "rougeL": _FakeRougeScore(0.2),
+            }
+
+    class _FakeRougeModule:
+        RougeScorer = _FakeRougeScorer
+
+    monkeypatch.setitem(sys.modules, "textstat", _FakeTextStat())
+    monkeypatch.setitem(sys.modules, "nltk.translate.bleu_score", _FakeBleuModule())
+    monkeypatch.setitem(sys.modules, "nltk.translate.meteor_score", _FakeMeteorModule())
+    monkeypatch.setitem(sys.modules, "rouge_score", type("_RougePackage", (), {"rouge_scorer": _FakeRougeModule()})())
+
+    scores = compute_scores("the cat sat", "cat sat")
+
+    assert scores.bleu == 0.75
+    assert scores.meteor == 0.5
+    assert scores.rouge1 == 0.4

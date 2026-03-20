@@ -61,6 +61,25 @@ def test_analyze_factorial_anova_includes_string_dtype_prompt_factors(tmp_path: 
     assert {"Summarizer", "Evidence", "Role", "Insights", "Example"}.issubset(set(result["Feature"]))
 
 
+def test_analyze_factorial_anova_handles_single_varying_factor(tmp_path: Path) -> None:
+    frame = pd.DataFrame(
+        {
+            "Model": ["Qwen", "Qwen", "Qwen", "Qwen"],
+            "WithExamples": ["Yes", "No", "Yes", "No"],
+            "BLEU": [0.4, 0.2, 0.45, 0.25],
+        }
+    )
+    source = tmp_path / "single_factor_input.csv"
+    out = tmp_path / "single_factor_output.csv"
+    frame.to_csv(source, index=False)
+
+    result = analyze_factorial_anova(source, out, max_interaction_order=2)
+
+    assert result is not None
+    assert out.exists()
+    assert "WithExamples" in set(result["Feature"])
+
+
 def test_analyze_factorial_anova_returns_none_for_unreadable_csv(tmp_path: Path) -> None:
     """Test that analyze_factorial_anova returns None for unreadable CSV path."""
     unreadable_path = tmp_path / "nonexistent.csv"
