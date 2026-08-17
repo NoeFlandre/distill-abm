@@ -10,6 +10,8 @@
 
 The associated manuscript, _Distilling the Complexity of Agent-Based Simulations into Textual Explanations via Large Language Models_, studies how multimodal LLMs can convert NetLogo ABM artifacts and simulation outputs into executive-style reports for non-modeling experts.
 
+Paper: https://www.mdpi.com/2504-2289/10/4/121
+
 ## Scope
 
 The main pipeline has six stages:
