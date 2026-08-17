@@ -1,113 +1,105 @@
-# Configuration Reference
+# Configuration reference
 
-## LLM Request Defaults
+Configuration is YAML-backed and validated with Pydantic models before it reaches the pipeline. Paths are resolved relative to the repository unless a command option supplies an explicit alternative.
 
-From `configs/runtime_defaults.yaml`:
+## Configuration files
 
-| Parameter | Default |
-|---|---|
-| `temperature` | `1.0` |
-| `max_tokens` | `1000` |
-| `max_retries` | `2` |
-| `retry_backoff_seconds` | `2.0` |
+| File | Responsibility |
+| --- | --- |
+| `configs/models.yaml` | Provider adapters, model aliases, and model identifiers. |
+| `configs/runtime_defaults.yaml` | LLM request defaults, pipeline defaults, smoke defaults, and DOE output paths. |
+| `configs/prompts.yaml` | Context, trend, summarization, qualitative-evaluation, and prompt-feature templates. |
+| `configs/experiment_settings.yaml` | Reference-text families and scoring paths for each ABM. |
+| `configs/evaluation.yaml` | Reference-metric and token-F1 switches. |
+| `configs/logging.yaml` | Structured logging behavior. |
+| `configs/abms/*.yaml` | ABM names, metrics, plot descriptions, NetLogo reporters, and fallback assets. |
 
-Provider-specific override:
+Use the CLI's path options when experimenting with a copy. Do not edit the tracked defaults merely to provide local credentials or machine-specific paths.
 
-- `mistral` requests use `temperature=0.2`
-- other configured providers keep the runtime default `temperature=1.0`
-- the Gemini optimization smoke chain therefore runs at `temperature=1.0`
+## Runtime defaults
 
-## Pipeline Defaults
+The current defaults in `configs/runtime_defaults.yaml` are:
 
-| Parameter | Default |
-|---|---|
-| `provider` | `openrouter` |
-| `model` | `moonshotai/kimi-k2.5` |
-| `evidence_mode` | `plot+table` |
-| `text_source_mode` | `summary_only` |
-| `summarizers` | `bart, bert, t5, longformer_ext` |
+| Setting | Value |
+| --- | --- |
+| Provider | `openrouter` |
+| Default model | `moonshotai/kimi-k2.5` |
+| Evidence mode | `plot+table` |
+| Text source mode | `summary_only` |
+| Summarizers | `bart`, `bert`, `t5`, `longformer_ext` |
+| Temperature | `1.0` |
+| Maximum output tokens | `1000` |
+| Retries | `2` |
+| Retry backoff | `2.0` seconds |
 
-These are runtime defaults, not the manuscript's retained best-performing paper configuration.
+These are runtime defaults, not a guarantee that every paper-facing run used the same factors. Record the effective settings in the generated metadata when reproducing a result.
 
-## Canonical Model Registry
+## Model registry and policy
 
-From `configs/models.yaml`:
+The registry uses a stable alias for each provider/model pair:
 
-### Benchmark Models - Screening Stage (Fast, Low-Cost)
+| Alias | Provider | Model | Intended use |
+| --- | --- | --- | --- |
+| `kimi_k2_5` | OpenRouter | `moonshotai/kimi-k2.5` | Screening |
+| `qwen3_5_27b` | OpenRouter | `qwen/qwen3.5-27b` | Screening |
+| `gemini_3_1_pro_preview` | OpenRouter | `google/gemini-3.1-pro-preview` | Optimization |
+| `claude_opus_4_6` | OpenRouter | `anthropic/claude-opus-4.6` | Optimization |
+| `nemotron_nano_12b_v2_vl_free` | OpenRouter | `nvidia/nemotron-nano-12b-v2-vl:free` | Debug/development |
+| `mistral_large_2512` | Mistral | `mistral-large-2512` | Debug/development |
+| `mistral_medium_debug` | Mistral | `mistral-medium-latest` | Debug/development |
+| `mistral_small_2506` | Mistral | `mistral-small-2506` | Debug/development |
+| `ministral_14b_2512` | Mistral | `ministral-14b-2512` | Debug/development |
+| `magistral_medium_2509` | Mistral | `magistral-medium-2509` | Debug/development |
 
-These models are used for the initial screening/exploration phase:
+The CLI accepts a registry alias through `--model-id`. Benchmark-oriented commands reject debug models unless `--allow-debug-model` is explicitly supplied. Treat that flag as a development escape hatch, not as a benchmark configuration.
 
-| ID | Provider | Model | Stage |
-|---|---|---|---|
-| `kimi_k2_5` | `openrouter` | `moonshotai/kimi-k2.5` | Screening |
-| `qwen3_5_27b` | `openrouter` | `qwen/qwen3.5-27b` | Screening |
+## ABM presets
 
-### Benchmark Models - Optimization Stage (High-Quality)
+Each `configs/abms/<name>.yaml` file defines the metric pattern, metric description, plot descriptions, NetLogo experiment settings, reporters, plot ordering, and fallback CSV/plot assets. The current presets are:
 
-These models are used for the final optimization/quality phase:
+| ABM | Primary signal |
+| --- | --- |
+| `fauna` | Species-abundance dynamics across repeated fauna simulations. |
+| `grazing` | Grazing pressure and vegetation-regeneration dynamics. |
+| `milk_consumption` | Milk-adoption dynamics. |
 
-| ID | Provider | Model | Stage |
-|---|---|---|---|
-| `gemini_3_1_pro_preview` | `openrouter` | `google/gemini-3.1-pro-preview` | Optimization |
-| `claude_opus_4_6` | `openrouter` | `anthropic/claude-opus-4.6` | Optimization |
+Use `distill-abm describe-abm --help` to inspect the command options for resolving one preset without running inference.
 
-### Debug/Development Models
+## Summarizers
 
-These models are for development and testing only:
+The optional `summarizers` dependency installs the local transformer runtimes used by these names:
 
-| ID | Provider | Model |
-|---|---|---|
-| `nemotron_nano_12b_v2_vl_free` | `openrouter` | `nvidia/nemotron-nano-12b-v2-vl:free` |
-| `mistral_large_2512` | `mistral` | `mistral-large-2512` |
-| `mistral_medium_debug` | `mistral` | `mistral-medium-latest` |
+| Name | Runtime model | Typical role |
+| --- | --- | --- |
+| `bart` | `sshleifer/distilbart-cnn-12-6` | Abstractive summary. |
+| `bert` | `bert-base-uncased` | Extractive summary. |
+| `t5` | `t5-small` | Abstractive summary. |
+| `longformer_ext` | `allenai/led-base-16384` | Long-context extractive-style summary. |
 
-The paper-facing benchmark roster is the subset documented in the root `README.md`.
+Install the optional runtime only when you need it:
 
-Paper-facing benchmark ABMs:
+```bash
+uv sync --frozen --extra dev --extra summarizers
+```
 
-- `fauna` - megafaunal hunting pressure
-- `grazing` - resilience of pastoral systems
-- `milk_consumption` - milk adoption
+## Reference families
 
-Paper-facing retained configuration after screening:
+`configs/experiment_settings.yaml` maps each ABM to:
 
-- evidence mode: `plot`
-- prompt examples: enabled
-- role instructions: disabled
-- extra insight instructions: disabled
-- recommended deployment summarizers: `bart`, `t5`
-- strongest proprietary deployment model in the paper: `claude_opus_4_6`
-- strongest open-weight deployment model in the paper: `qwen3_5_27b`
+- author-written scoring references;
+- independent modeler references;
+- GPT-5.2 short references;
+- GPT-5.2 long references.
 
-## Summarizer Runtimes
+Reference files live under `data/summaries/`. Keep them immutable when reproducing a published comparison; change the configuration explicitly if you are running a new study.
 
-| Summarizer | Model | Defaults |
-|---|---|---|
-| `bart` | `sshleifer/distilbart-cnn-12-6` | `max_input=1024, min=50, max=100` |
-| `bert` | `bert-base-uncased` | `max_input=512, min=100, max=150` |
-| `t5` | `t5-small` | `max_input=1024, min=40, max=120` |
-| `longformer_ext` | `allenai/led-base-16384` | `max_input=2048, min=64, max=180` |
+## Provider credentials
 
-## Reference Text Mapping
+The adapters read credentials from environment variables:
 
-Primary author references from `configs/experiment_settings.yaml`:
+| Provider | Environment variable |
+| --- | --- |
+| OpenRouter | `OPENROUTER_API_KEY` |
+| Mistral | `MISTRAL_API_KEY` |
 
-| ABM | Reference File |
-|---|---|
-| `fauna` | `data/summaries/authors/fauna_scoring_ground_truth.txt` |
-| `grazing` | `data/summaries/authors/grazing_scoring_ground_truth.txt` |
-| `milk_consumption` | `data/summaries/authors/milk_scoring_ground_truth.txt` |
-
-Additional configured references:
-
-| ABM | Reference Family | Reference File |
-|---|---|---|
-| `fauna` | `gpt5.2_short` | `data/summaries/gpt5.2/fauna_gpt5.2_short_ground_truth.txt` |
-| `fauna` | `gpt5.2_long` | `data/summaries/gpt5.2/fauna_gpt5.2_long_ground_truth.txt` |
-| `grazing` | `gpt5.2_short` | `data/summaries/gpt5.2/grazing_gpt5.2_short_ground_truth.txt` |
-| `grazing` | `gpt5.2_long` | `data/summaries/gpt5.2/grazing_gpt5.2_long_ground_truth.txt` |
-| `milk_consumption` | `gpt5.2_short` | `data/summaries/gpt5.2/milk_gpt5.2_short_ground_truth.txt` |
-| `milk_consumption` | `gpt5.2_long` | `data/summaries/gpt5.2/milk_gpt5.2_long_ground_truth.txt` |
-| `fauna` | `modeler` | `data/summaries/modelers/fauna_modeler_ground_truth.txt` |
-| `grazing` | `modeler` | `data/summaries/modelers/grazing_modeler_ground_truth.txt` |
-| `milk_consumption` | `modeler` | `data/summaries/modelers/milk_modeler_ground_truth.txt` |
+Credentials should be supplied by the shell or a secret manager. They should not be placed in YAML, source files, result artifacts, or issue comments.

@@ -1,100 +1,58 @@
-# Architecture
+# Pipeline and architecture
 
-## End-To-End Flow
+## End-to-end flow
 
-1. `distill_abm.cli` parses the command and resolves model and ABM presets.
-2. `distill_abm.pipeline.run.run_pipeline` orchestrates evidence generation, context generation, trend generation, optional summarization, scoring, and metadata.
-3. `distill_abm.eval` computes lexical metrics and downstream DOE or ANOVA summaries.
-4. `results/` stores generated artifacts locally, while the Hugging Face bucket is the durable publication-facing results store.
+The main `run` command follows a deterministic sequence around an external model call:
 
-The manuscript-level workflow uses this runtime in two experimental stages:
+1. Resolve runtime defaults, model policy, ABM configuration, prompts, and scoring references.
+2. Load and normalize the simulation CSV, parameter text, and documentation text.
+3. Generate the configured plot and optional statistical evidence.
+4. Build a context prompt and request the model's context explanation.
+5. Build one or more trend prompts from the context and selected evidence.
+6. Request trend explanations and optionally summarize them locally.
+7. Score selected and full-text outputs against configured references.
+8. Write reports, metadata, prompt signatures, traces, and artifact manifests.
 
-1. a screening stage over prompt factors, evidence modes, summarizers, ABMs, and low-cost benchmark LLMs
-2. an optimization stage that reuses the retained settings with stronger deployment-oriented LLMs
+The `plot`, `table`, and `plot+table` evidence modes are experimental inputs. A table is derived statistical evidence for the plotted series; it is not a raw dump of the input CSV.
 
-## Data Flow
+## Module boundaries
 
-The main `run` workflow follows this order:
+| Package | Responsibility |
+| --- | --- |
+| `distill_abm.cli` | Typer command definitions, option validation, and public workflow routing. |
+| `distill_abm.cli_actions` | Command execution, path resolution, model aliases, and result formatting. |
+| `distill_abm.configs` | Pydantic-validated YAML loading and runtime-default resolution. |
+| `distill_abm.ingest` | CSV normalization and NetLogo documentation/parameter extraction. |
+| `distill_abm.viz` | Ordered plot generation and visualization smoke checks. |
+| `distill_abm.pipeline` | End-to-end runs, smoke suites, resumability, reports, monitoring, and studies. |
+| `distill_abm.summarize` | Optional BART, BERT, T5, and Longformer-based summarization. |
+| `distill_abm.eval` | Lexical/reference scoring, qualitative evaluation, DOE, and ANOVA utilities. |
+| `distill_abm.llm` | OpenRouter, Mistral, and compatible adapter contracts. |
+| `distill_abm.run_viewer*` | Static review-viewer payloads and HTML generation for case-based runs. |
 
-1. load the simulation CSV and ABM-specific defaults
-2. generate the plot artifact
-3. derive statistical evidence for `table` or `plot+table` modes
-4. build the context prompt from parameters and documentation
-5. call the selected LLM for context generation
-6. build the trend prompt from context plus plot and optional table evidence
-7. call the selected LLM for trend generation
-8. optionally summarize the generated trend text
-9. score the selected output against configured references
-10. write reports, metadata, and debug traces
+## Evidence and artifact lifecycle
 
-`table` evidence means statistical evidence derived from the plot-relevant simulation series, not a raw CSV dump.
+The standard pipeline output directory contains the core artifacts:
 
-At the paper level, the evaluated reference families are author summaries, modeler summaries, GPT-5.2 short summaries, and GPT-5.2 long reports.
+| Artifact | Purpose |
+| --- | --- |
+| `plot_*.png` | Plot evidence selected for prompting and review. |
+| `stats_table.csv` | Statistical evidence when table output is enabled. |
+| `report.csv` | Structured generated text and scores. |
+| `pipeline_run_metadata.json` | Inputs, settings, references, signatures, selected artifacts, and run provenance. |
+| `debug_trace/` | Request/response traces and runtime details for inspection. |
+| `manifests/` | Artifact records used by resumable execution and review tooling. |
 
-## Major Modules
+Case-based smoke workflows use run-separated directories under `runs/run_<timestamp>/`. They maintain pointers such as `latest_run.txt`, structured JSONL logs, manifests, review CSVs, and, where applicable, a static `review.html` viewer. A run can be reused only when its signature and required artifacts still match.
 
-### `src/distill_abm/cli.py`
+## Operational boundaries
 
-- CLI entrypoint and public workflow routing
-- benchmark-model policy enforcement
-- read-only inspection and results-bucket sync commands
+- Configuration is validated before it is used to build prompts or run an experiment.
+- Benchmark and debug model policy is enforced at the CLI boundary.
+- Provider credentials are read from environment variables; they are not stored in YAML or result artifacts by design.
+- NetLogo and API-backed execution can be slow or costly. Use ingest, visualization, and DOE smoke stages to validate prerequisites before real inference.
+- Results are generated artifacts, not source-controlled code. See [Results and synchronization](RESULTS_BUCKET.md) for the publication boundary.
 
-### `src/distill_abm/cli_actions.py`
+## Research workflow stages
 
-- command-level argument resolution
-- model alias resolution from `configs/models.yaml`
-- ABM preset application from `configs/abms/*.yaml`
-
-### `src/distill_abm/pipeline/`
-
-- end-to-end run orchestration
-- smoke workflows and multi-stage audit runs
-- report writing, metadata, and run-separated artifact layout
-- DOE-style screening and optimization support for paper-facing benchmark studies
-
-### `src/distill_abm/ingest/`
-
-- CSV ingestion and NetLogo preprocessing
-- extraction of ABM documentation, parameters, and code artifacts
-
-### `src/distill_abm/viz/`
-
-- repeated-simulation plotting
-- statistical evidence generation used by table-style prompts
-
-### `src/distill_abm/summarize/`
-
-- summarizer backends for `bart`, `bert`, `t5`, and `longformer_ext`
-- text normalization and postprocessing helpers
-
-### `src/distill_abm/eval/`
-
-- lexical metrics
-- reference scoring
-- DOE and factorial analysis
-- quantitative outputs used for ANOVA and variance-contribution reporting
-
-### `src/distill_abm/llm/`
-
-- provider adapters
-- provider-specific request defaults
-
-## Stable Artifact Surfaces
-
-The main run writes:
-
-- `plot_*.png`
-- `stats_table.csv`
-- `report.csv`
-- `pipeline_run_metadata.json`
-- `debug_trace/`
-
-Case-based smoke workflows use run-separated output roots under `runs/run_<timestamp>/` together with `latest_run.txt` and `run.log.jsonl`.
-
-## Configuration Sources
-
-- `configs/models.yaml` - model aliases and provider routing
-- `configs/runtime_defaults.yaml` - request defaults and pipeline defaults
-- `configs/experiment_settings.yaml` - scoring-reference mappings
-- `configs/prompts.yaml` - prompt templates and style features
-- `configs/abms/*.yaml` - ABM presets and plotting configuration
+The paper-facing workflow is organized as a screening stage over prompt, evidence, and summarizer factors followed by an optimization stage using retained settings and stronger deployment-oriented models. The CLI exposes these stages through focused smoke, quantitative, and study commands; it does not make a smoke run equivalent to a published benchmark result.

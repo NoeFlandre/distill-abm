@@ -1,32 +1,36 @@
 ## Summary
+
 - What changed and why.
 
-## Traceability
-- Paper section(s):
-- Traceability IDs from `docs/TRACEABILITY_MATRIX.md`:
+## Behavioral impact
 
-## Behavioral Impact
 - [ ] No behavior change
 - [ ] Behavior intentionally changed (describe below)
 
-## Reproducibility Impact
+## Reproducibility impact
+
 - [ ] No reproducibility impact
-- [ ] Reproducibility artifacts/schema updated (describe below)
+- [ ] Inputs, configuration, or artifact schema changed (describe below)
 
 ## Validation
+
 - Commands run:
 - Results observed:
-- Any intentionally skipped checks and why:
+- Intentionally skipped checks and why:
 
 ## Documentation
-- [ ] README updated
-- [ ] Architecture docs updated
-- [ ] Hyperparameter/runtime docs updated
 
-## Legacy Surface Scan
-- [ ] Confirmed no active notebook/legacy compatibility dependency introduced
-- [ ] Ran `uv run pytest tests/unit/repo/test_legacy_surface_scan.py`
+- [ ] README or MkDocs pages updated when the public behavior changed
+- [ ] `uv run mkdocs build --strict` passed when documentation changed
+- [ ] Configuration or artifact documentation updated when applicable
 
-## Notes for Reviewer
+## Repository hygiene
+
+- [ ] No secrets, credentials, or machine-specific paths were added
+- [ ] No generated results or immutable benchmark inputs were changed unintentionally
+- [ ] No retired or legacy surface was reintroduced
+
+## Notes for reviewer
+
 - Risks:
 - Rollback plan:

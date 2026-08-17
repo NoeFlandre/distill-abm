@@ -48,13 +48,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Test coverage for CLI error paths (missing files, analyze-doe failures)
-- Test coverage for LLM adapter error handling (missing API keys, completion failures)
-- Direct factory tests for `create_adapter` function
-- CHANGELOG.md for version tracking
+- MkDocs Material documentation site with a strict local build and GitHub Pages workflow.
 
 ### Changed
-- Improved test coverage across multiple modules
+- Reworked the root README and technical pages into a concise public documentation structure.
+- Updated the citation metadata and pull-request checklist for the 1.0.0 project surface.
 
 ## [0.1.0] - 2025-03-13
 
@@ -72,4 +70,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Various bug fixes and improvements (see git history)
 
+[1.0.0]: https://github.com/NoeFlandre/distill-abm/releases/tag/v1.0.0
 [0.1.0]: https://github.com/NoeFlandre/distill-abm/releases/tag/v0.1.0

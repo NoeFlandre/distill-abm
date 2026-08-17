@@ -19,7 +19,6 @@ dist/
 archive/
 results/*
 Results/
-!results/README.md
 results/**/.DS_Store
 !tests/fixtures/notebook_parity/archive_assets/**
 *.log

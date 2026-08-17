@@ -2,175 +2,48 @@
 
 ![Overview of the distill-abm pipeline](docs/assets/overview-readme-v2.png)
 
-*PDF source: [docs/assets/overview.pdf](docs/assets/overview.pdf)*
+`distill-abm` is a reproducible research pipeline that turns agent-based model (ABM) artifacts and simulation outputs into evidence-backed language-model reports. It ingests model context, creates plots and statistical evidence, generates trend narratives, optionally summarizes them, and scores the resulting text against reference material.
 
-`distill-abm` is a reproducible research pipeline for converting agent-based model artifacts into evidence-backed LLM summaries, evaluations, and publication-ready reports.
+The project supports three paper-facing ABMs:
 
-`distill-abm` is the publication-facing repository for the ABM-to-LLM distillation pipeline used in the accompanying paper. The repository contains code, configs, tests, and minimal documentation. Published run outputs live in the [Hugging Face results bucket](https://huggingface.co/buckets/NoeFlandre/distill-abms-results), not in Git.
+- `fauna` — megafaunal hunting pressure;
+- `milk_consumption` — milk adoption;
+- `grazing` — pastoral-system resilience.
 
-The associated manuscript, _Distilling the Complexity of Agent-Based Simulations into Textual Explanations via Large Language Models_, studies how multimodal LLMs can convert NetLogo ABM artifacts and simulation outputs into executive-style reports for non-modeling experts.
+The repository stores source code, configuration, tests, benchmark inputs, and documentation. Generated outputs are kept in the [Hugging Face results bucket](https://huggingface.co/buckets/NoeFlandre/distill-abms-results).
 
-Paper: https://www.mdpi.com/2504-2289/10/4/121
+## Quick start
 
-## Scope
-
-The main pipeline has six stages:
-
-1. ingest ABM parameters and documentation
-2. generate simulation plots and statistical evidence
-3. generate trend narratives from the evidence
-4. optionally summarize those narratives
-5. score outputs against reference texts
-6. produce quantitative summary tables
-
-The paper evaluates this pipeline on three peer-reviewed ABMs:
-
-1. megafaunal hunting pressure (`fauna`)
-2. milk adoption (`milk_consumption`)
-3. resilience of pastoral systems (`grazing`)
-
-Paper-facing benchmark runs are restricted to:
-
-**Screening Stage** (fast, low-cost exploration):
-
-1. `moonshotai/kimi-k2.5`
-2. `qwen/qwen3.5-27b`
-
-**Optimization Stage** (high-quality final runs):
-
-3. `google/gemini-3.1-pro-preview`
-4. `anthropic/claude-opus-4.6`
-
-All other configured models are for debugging and development purposes only.
-
-Supported summarizers are `bart`, `bert`, `t5`, and `longformer_ext`.
-
-Paper-level evaluation compares outputs against four reference families:
-
-1. author-written summaries
-2. independent modeler summaries
-3. GPT-5.2 short summaries
-4. GPT-5.2 long reports
-
-The manuscript’s main deployment recommendation is to prefer abstractive summarizers (`bart` or `t5`). In the optimization stage, `anthropic/claude-opus-4.6` is the strongest overall performer, while `qwen/qwen3.5-27b` is the strongest open-weight cost-efficient option.
-
-## Canonical Setup
-
-The supported setup path is local `uv` on Python 3.11.
+Requirements: Python 3.11+, [`uv`](https://docs.astral.sh/uv/), and a local checkout.
 
 ```bash
 uv sync --frozen --extra dev
+uv run distill-abm quality-gate --scope static --json
 ```
 
-Assumptions:
-
-- tested on macOS and Linux with Python 3.11
-- NetLogo workflows require a local NetLogo installation
-- API-backed workflows require provider credentials such as `OPENROUTER_API_KEY`
-
-Runtime notes:
-
-- `uv run pytest` currently completes in about one minute in this workspace
-- NetLogo and API-backed runs are slower and depend on local hardware, provider latency, and model choice
-- provider defaults and model aliases are documented in [docs/CONFIG_REFERENCE.md](docs/CONFIG_REFERENCE.md)
-
-## Canonical Commands
-
-Validate the local workspace without calling any benchmark LLM:
-
-```bash
-uv run distill-abm validate-workspace --json
-```
-
-Fetch published results from the Hugging Face bucket:
-
-```bash
-hf sync hf://buckets/NoeFlandre/distill-abms-results ./results
-```
-
-Sync a complete local `results/` tree back to the bucket:
-
-```bash
-uv run distill-abm sync-results-bucket
-```
-
-Run the main pipeline on one input bundle:
+To run the pipeline, provide one simulation CSV, one parameter file, and one documentation file:
 
 ```bash
 uv run distill-abm run \
-  --csv-path data/samples/sim.csv \
-  --parameters-path data/samples/params.txt \
-  --documentation-path data/samples/docs.txt \
+  --csv-path /path/to/simulation.csv \
+  --parameters-path /path/to/parameters.txt \
+  --documentation-path /path/to/documentation.txt \
   --model-id kimi_k2_5 \
-  --evidence-mode plot+table \
-  --text-source-mode summary_only \
-  --summarizer bart --summarizer bert --summarizer t5 --summarizer longformer_ext
+  --abm fauna
 ```
 
-Run the standard fixed-factor optimization smoke chain:
-
-```bash
-uv run distill-abm smoke-optimization-gemini-chain \
-  --netlogo-home /path/to/NetLogo
-```
-
-## Results And Reproduction
-
-The publication contract is:
-
-1. set up the repository with `uv`
-2. fetch the frozen results bucket into `./results`
-3. inspect `results/quantitative_master_overview/`
-4. rerun selected workflows only if you need to regenerate local artifacts
-
-Results store:
-
-- bucket URI: `hf://buckets/NoeFlandre/distill-abms-results`
-- bucket web UI: `https://huggingface.co/buckets/NoeFlandre/distill-abms-results`
-
-For the paper’s retained prompt settings, prefer `--evidence-mode plot` with examples enabled and avoid role/insight prompt inflation unless you are explicitly reproducing a broader screening study.
-
-## Repository Layout
-
-```text
-src/distill_abm/        package source
-configs/                runtime, model, prompt, and ABM configs
-data/abms/              benchmark ABM assets and local fallback artifacts
-data/summaries/         reference texts used for scoring
-docs/                   focused reader-facing technical documentation
-results/README.md       pointer to the external published results store
-tests/                  automated tests
-```
-
-## Architecture
-
-The main runtime boundaries are:
-
-- `distill_abm.cli`: CLI entrypoint and workflow routing
-- `distill_abm.ingest`: CSV and NetLogo ingestion
-- `distill_abm.viz`: simulation plots and statistical evidence generation
-- `distill_abm.pipeline`: pipeline orchestration, smokes, suites, and reports
-- `distill_abm.summarize`: summarizer runners and text cleanup
-- `distill_abm.eval`: lexical metrics, reference scoring, DOE, and ANOVA utilities
-- `distill_abm.llm`: provider adapters and request defaults
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the current runtime flow and module map.
+API-backed workflows require the credential for the selected provider. NetLogo workflows also require a local NetLogo installation. Do not place credentials in configuration files or commits.
 
 ## Documentation
 
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- [docs/RESULTS_BUCKET.md](docs/RESULTS_BUCKET.md)
-- [docs/CONFIG_REFERENCE.md](docs/CONFIG_REFERENCE.md)
+Read the [full documentation](https://noeflandre.github.io/distill-abm/) for installation details, architecture, CLI workflows, configuration, result synchronization, development, and citation.
 
-## Citation
+The source documentation is also available in [`docs/`](docs/README.md). The overview diagram source is [`docs/assets/overview.pdf`](docs/assets/overview.pdf).
 
-If you use this repository, cite the software record in [CITATION.cff](CITATION.cff). The accompanying manuscript is titled _Distilling the Complexity of Agent-Based Simulations into Textual Explanations via Large Language Models_.
+## Research context
 
-## Verification
+The associated manuscript, [*Distilling the Complexity of Agent-Based Simulations into Textual Explanations via Large Language Models*](https://www.mdpi.com/2504-2289/10/4/121), evaluates evidence modes, prompt factors, summarizers, and model choices across the three ABMs. The model registry distinguishes paper-facing benchmark models from debug and development models; see the [configuration reference](https://noeflandre.github.io/distill-abm/CONFIG_REFERENCE/).
 
-```bash
-uv run pytest
-uv run ruff check .
-uv run mypy src tests
-uv build
-```
+## Citation and license
+
+If you use this repository, cite the software record in [CITATION.cff](CITATION.cff). The project is released under the [MIT License](LICENSE).

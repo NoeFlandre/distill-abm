@@ -51,7 +51,6 @@ def test_gitignore_keeps_results_repo_lightweight() -> None:
     content = gitignore.read_text(encoding="utf-8")
     assert "results/*" in content
     assert "Results/" in content
-    assert "!results/README.md" in content
     assert "*.swp" in content
     assert "*.swo" in content
     assert "*~" in content
@@ -74,7 +73,6 @@ def test_public_docs_surface_matches_publication_contract() -> None:
     readme = Path("README.md").read_text(encoding="utf-8")
     docs_index = Path("docs/README.md").read_text(encoding="utf-8")
     results_bucket = Path("docs/RESULTS_BUCKET.md").read_text(encoding="utf-8")
-    results_readme = Path("results/README.md").read_text(encoding="utf-8")
     citation = Path("CITATION.cff").read_text(encoding="utf-8")
 
     assert "Hugging Face results bucket" in readme
@@ -82,7 +80,6 @@ def test_public_docs_surface_matches_publication_contract() -> None:
     assert "The Git repository is publication-facing source code." in results_bucket
     assert "uv run distill-abm sync-results-bucket --dry-run" in results_bucket
     assert "hf sync --apply /tmp/distill_abm_bucket_cleanup_plan.jsonl" in results_bucket
-    assert "hf sync --apply /tmp/distill_abm_bucket_cleanup_plan.jsonl" in results_readme
     assert "ARCHITECTURE.md" in docs_index
     assert "RESULTS_BUCKET.md" in docs_index
     assert "CONFIG_REFERENCE.md" in docs_index
