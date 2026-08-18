@@ -20,6 +20,7 @@ from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import (
     create_run_root,
     find_previous_run_root,
+    full_case_matrix_report_path,
     prepare_output_root,
     read_active_run_lock,
     read_latest_run_pointer,
@@ -104,7 +105,7 @@ def default_validated_smoke_bundles(
     suite_abms_root = source_root / "abms"
     if suite_abms_root.exists():
         return _discover_full_case_suite_bundles(source_root=source_root, include_abms=include_abms)
-    matrix_report_path = source_root / "smoke_full_case_matrix_report.json"
+    matrix_report_path = full_case_matrix_report_path(source_root)
     if matrix_report_path.exists():
         bundles = _discover_full_case_matrix_bundles(source_root, matrix_report_path)
         return _filter_bundles_by_abm(bundles, include_abms=include_abms)
@@ -592,7 +593,7 @@ def _discover_full_case_suite_bundles(
         if run_root is None:
             missing_abms.append(abm)
             continue
-        report_path = run_root / "smoke_full_case_matrix_report.json"
+        report_path = full_case_matrix_report_path(run_root)
         abm_bundles: tuple[ValidatedSmokeBundle, ...] = ()
         if report_path.exists():
             abm_bundles = _discover_full_case_matrix_bundles(run_root, report_path)

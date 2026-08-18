@@ -57,6 +57,7 @@ from distill_abm.pipeline.run_artifact_contracts import (
     LATEST_RUN_POINTER_FILENAME,
     create_run_root,
     find_previous_run_root,
+    full_case_matrix_report_path,
     prepare_output_root,
     read_latest_run_pointer,
     resolve_run_root,
@@ -698,8 +699,8 @@ def _load_case_metadata_from_context_output(context_output_path: Path) -> dict[s
             "run_root": run_root,
         }
     report_path_candidates = (
-        run_root / "smoke_full_case_matrix_report.json",
-        run_root.parent / "current" / "smoke_full_case_matrix_report.json",
+        full_case_matrix_report_path(run_root),
+        full_case_matrix_report_path(run_root.parent / "current"),
     )
     report_path = next((path for path in report_path_candidates if path.exists()), None)
     if report_path is None:
