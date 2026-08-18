@@ -25,9 +25,7 @@ from distill_abm.pipeline.local_qwen_sample_response import (
 from distill_abm.pipeline.local_qwen_sample_smoke import (
     _invoke_structured_smoke_text,
     _validate_case_inputs,
-    _write_json,
     _write_optional_thinking,
-    _write_text,
 )
 from distill_abm.pipeline.prompt_compression_artifacts import (
     PROMPT_COMPRESSION_SUMMARY_FILENAME,
@@ -37,6 +35,8 @@ from distill_abm.pipeline.prompt_compression_artifacts import (
     write_prompt_compression_run_summary,
 )
 from distill_abm.pipeline.run_artifact_contracts import case_summary_path, validation_state_path
+from distill_abm.pipeline.smoke_io import write_json as _write_json
+from distill_abm.pipeline.smoke_io import write_text as _write_text
 from distill_abm.pipeline.statistical_evidence import build_statistical_evidence, render_evidence_artifacts
 
 EvidenceMode = Literal["plot", "table", "plot+table"]

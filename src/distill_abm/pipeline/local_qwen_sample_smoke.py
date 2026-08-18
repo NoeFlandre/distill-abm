@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import csv
 import hashlib
-import json
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
@@ -54,6 +53,8 @@ from distill_abm.pipeline.run_artifact_contracts import (
 from distill_abm.pipeline.run_artifact_contracts import (
     viewer_html_path as viewer_html_contract_path,
 )
+from distill_abm.pipeline.smoke_io import write_json as _write_json
+from distill_abm.pipeline.smoke_io import write_text as _write_text
 from distill_abm.pipeline.statistical_evidence import build_statistical_evidence, render_evidence_artifacts
 from distill_abm.run_viewer import render_run_viewer
 from distill_abm.structured_logging import attach_json_log_file
@@ -669,14 +670,6 @@ def _validate_case_inputs(input_bundle: LocalQwenCaseInput) -> None:
         raise ValueError(f"placeholder-like text detected in parameters: {input_bundle.parameters_path}")
     if detect_placeholder_signals(input_bundle.plot_description):
         raise ValueError("placeholder-like text detected in plot description")
-
-
-def _write_text(path: Path, text: str) -> None:
-    path.write_text(text, encoding="utf-8")
-
-
-def _write_json(path: Path, payload: object) -> None:
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
 
 
 def _write_optional_thinking(path: Path, trace: dict[str, object]) -> None:

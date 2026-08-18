@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from distill_abm.pipeline.smoke_io import copy_if_exists, dedupe_rows, read_csv_rows, write_csv_rows
+from distill_abm.pipeline.smoke_io import (
+    copy_if_exists,
+    dedupe_rows,
+    read_csv_rows,
+    write_csv_rows,
+    write_json,
+    write_text,
+)
 
 
 def test_write_and_read_csv_rows_round_trip(tmp_path: Path) -> None:
@@ -12,6 +19,22 @@ def test_write_and_read_csv_rows_round_trip(tmp_path: Path) -> None:
     write_csv_rows(path, rows, ("a", "b"))
 
     assert read_csv_rows(path) == rows
+
+
+def test_write_text_preserves_utf8_content(tmp_path: Path) -> None:
+    path = tmp_path / "content.txt"
+
+    write_text(path, "Résumé")
+
+    assert path.read_text(encoding="utf-8") == "Résumé"
+
+
+def test_write_json_preserves_sorted_pretty_payload(tmp_path: Path) -> None:
+    path = tmp_path / "payload.json"
+
+    write_json(path, {"z": 1, "a": "value"})
+
+    assert path.read_text(encoding="utf-8") == '{\n  "a": "value",\n  "z": 1\n}'
 
 
 def test_dedupe_rows_keeps_first_unique_key(tmp_path: Path) -> None:

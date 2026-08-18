@@ -48,9 +48,7 @@ from distill_abm.pipeline.local_qwen_sample_response import (
 from distill_abm.pipeline.local_qwen_sample_smoke import (
     _context_cache_key,
     _invoke_structured_smoke_text,
-    _write_json,
     _write_optional_thinking,
-    _write_text,
 )
 from distill_abm.pipeline.prompt_compression_artifacts import (
     PromptCompressionAttempt,
@@ -69,6 +67,8 @@ from distill_abm.pipeline.run_artifact_contracts import (
 from distill_abm.pipeline.run_artifact_contracts import (
     run_log_path as run_log_contract_path,
 )
+from distill_abm.pipeline.smoke_io import write_json as _write_json
+from distill_abm.pipeline.smoke_io import write_text as _write_text
 from distill_abm.run_viewer import render_run_viewer
 from distill_abm.structured_logging import attach_json_log_file
 
