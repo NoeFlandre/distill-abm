@@ -10,6 +10,7 @@ from typing import cast
 import pytest
 
 from distill_abm.llm.adapters.base import LLMAdapter
+from distill_abm.pipeline import full_case_suite_current_view as current_view_module
 from distill_abm.pipeline.full_case_matrix_smoke import FullCaseMatrixCaseSpec
 from distill_abm.pipeline.full_case_smoke import FullCaseSmokeInput
 from distill_abm.pipeline.full_case_suite_current_view import sync_stable_abm_current_view
@@ -20,6 +21,7 @@ from distill_abm.pipeline.full_case_suite_progress import (
 )
 from distill_abm.pipeline.full_case_suite_smoke import run_full_case_suite_smoke
 from distill_abm.pipeline.local_qwen_monitor import LocalQwenCaseSnapshot, LocalQwenMonitorSnapshot
+from distill_abm.pipeline.smoke_io import copy_if_exists as real_copy_if_exists
 
 
 class _Adapter(LLMAdapter):
@@ -941,6 +943,37 @@ def test_sync_stable_abm_current_view_returns_typed_paths(tmp_path: Path) -> Non
     assert stable_paths.report_json_path == abm_output_root / "current" / "smoke_full_case_matrix_report.json"
     assert stable_paths.report_markdown_path == abm_output_root / "current" / "smoke_full_case_matrix_report.md"
     assert stable_paths.review_csv_path == abm_output_root / "current" / "request_review.csv"
+
+
+def test_sync_stable_abm_current_view_delegates_artifact_copying(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    abm_output_root = tmp_path / "suite" / "abms" / "fauna"
+    run_root = abm_output_root / "runs" / "run_1"
+    run_root.mkdir(parents=True, exist_ok=True)
+    source_paths = (
+        run_root / "run.log.jsonl",
+        run_root / "smoke_full_case_matrix_report.json",
+        run_root / "smoke_full_case_matrix_report.md",
+        run_root / "request_review.csv",
+    )
+    for path in source_paths:
+        path.write_text("artifact", encoding="utf-8")
+    copied_paths: list[tuple[Path, Path]] = []
+
+    def recording_copy(source: Path | None, destination: Path) -> None:
+        if source is None:
+            raise AssertionError("current-view sources are always concrete paths")
+        copied_paths.append((source, destination))
+        real_copy_if_exists(source, destination)
+
+    monkeypatch.setattr(current_view_module, "copy_if_exists", recording_copy, raising=False)
+
+    sync_stable_abm_current_view(abm_output_root=abm_output_root, run_root=run_root)
+
+    current_root = abm_output_root / "current"
+    expected_paths = tuple((source, current_root / source.name) for source in source_paths)
+    assert tuple(copied_paths) == expected_paths
 
 
 def test_refresh_progress_abm_snapshot_preserves_progress_on_nested_snapshot_value_error(

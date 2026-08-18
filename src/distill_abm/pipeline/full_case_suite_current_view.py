@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
 from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, run_log_path
+from distill_abm.pipeline.smoke_io import copy_if_exists
 
 
 @dataclass(frozen=True)
@@ -39,7 +39,6 @@ def sync_stable_abm_current_view(*, abm_output_root: Path, run_root: Path) -> St
         (run_root / "request_review.csv", stable_paths.review_csv_path),
     )
     for source_path, destination_path in source_paths:
-        if source_path.exists():
-            shutil.copy2(source_path, destination_path)
+        copy_if_exists(source_path, destination_path)
     latest_run_pointer_path(abm_output_root).write_text(str(run_root), encoding="utf-8")
     return stable_paths
