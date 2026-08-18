@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from distill_abm.pipeline.run_artifact_contracts import (
+    full_case_matrix_report_markdown_path,
     full_case_matrix_report_path,
     run_log_path,
     write_latest_run_pointer,
@@ -33,13 +34,13 @@ def sync_stable_abm_current_view(*, abm_output_root: Path, run_root: Path) -> St
         run_root=run_root,
         run_log_path=current_root / "run.log.jsonl",
         report_json_path=full_case_matrix_report_path(current_root),
-        report_markdown_path=current_root / "smoke_full_case_matrix_report.md",
+        report_markdown_path=full_case_matrix_report_markdown_path(current_root),
         review_csv_path=current_root / "request_review.csv",
     )
     source_paths = (
         (run_log_path(run_root), stable_paths.run_log_path),
         (full_case_matrix_report_path(run_root), stable_paths.report_json_path),
-        (run_root / "smoke_full_case_matrix_report.md", stable_paths.report_markdown_path),
+        (full_case_matrix_report_markdown_path(run_root), stable_paths.report_markdown_path),
         (run_root / "request_review.csv", stable_paths.review_csv_path),
     )
     for source_path, destination_path in source_paths:

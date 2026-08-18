@@ -19,6 +19,7 @@ VIEWER_HTML_FILENAME = "review.html"
 ACTIVE_RUN_LOCK_FILENAME = ".active_run_lock.json"
 SAMPLED_SMOKE_REPORT_FILENAME = "smoke_local_qwen_report.json"
 FULL_CASE_MATRIX_REPORT_FILENAME = "smoke_full_case_matrix_report.json"
+FULL_CASE_MATRIX_REPORT_MARKDOWN_FILENAME = "smoke_full_case_matrix_report.md"
 INGEST_SMOKE_REPORT_FILENAME = "ingest_smoke_report.json"
 VIZ_SMOKE_REPORT_FILENAME = "viz_smoke_report.json"
 DOE_SMOKE_REPORT_FILENAME = "doe_smoke_report.json"
@@ -109,6 +110,10 @@ def sampled_smoke_report_path(run_root: Path) -> Path:
 
 def full_case_matrix_report_path(run_root: Path) -> Path:
     return run_root / FULL_CASE_MATRIX_REPORT_FILENAME
+
+
+def full_case_matrix_report_markdown_path(run_root: Path) -> Path:
+    return run_root / FULL_CASE_MATRIX_REPORT_MARKDOWN_FILENAME
 
 
 def ingest_smoke_report_path(run_root: Path) -> Path:

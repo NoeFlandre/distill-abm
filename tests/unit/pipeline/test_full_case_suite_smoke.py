@@ -968,6 +968,28 @@ def test_sync_stable_abm_current_view_uses_report_path_contract(
     assert current_report_path.read_text(encoding="utf-8") == "{}"
 
 
+def test_sync_stable_abm_current_view_uses_markdown_report_path_contract(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    abm_output_root = tmp_path / "suite" / "abms" / "fauna"
+    run_root = abm_output_root / "runs" / "run_1"
+    run_root.mkdir(parents=True, exist_ok=True)
+    report_filename = "contract-managed-report.md"
+    (run_root / report_filename).write_text("report", encoding="utf-8")
+    monkeypatch.setattr(
+        current_view_module,
+        "full_case_matrix_report_markdown_path",
+        lambda root: root / report_filename,
+        raising=False,
+    )
+
+    stable_paths = sync_stable_abm_current_view(abm_output_root=abm_output_root, run_root=run_root)
+
+    current_report_path = abm_output_root / "current" / report_filename
+    assert stable_paths.report_markdown_path == current_report_path
+    assert current_report_path.read_text(encoding="utf-8") == "report"
+
+
 def test_sync_stable_abm_current_view_delegates_artifact_copying(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
