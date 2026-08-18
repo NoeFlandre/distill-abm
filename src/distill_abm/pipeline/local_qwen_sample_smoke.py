@@ -43,8 +43,8 @@ from distill_abm.pipeline.prompt_compression_artifacts import (
 from distill_abm.pipeline.run_artifact_contracts import (
     case_summary_path,
     create_run_root,
-    latest_report_pointer_path,
     sampled_smoke_report_path,
+    write_latest_report_pointer,
     write_latest_run_pointer,
 )
 from distill_abm.pipeline.run_artifact_contracts import (
@@ -445,7 +445,7 @@ def run_local_qwen_sample_smoke(
     viewer_html_path = render_run_viewer(run_root)
     result.viewer_html_path = viewer_html_path
     _write_json(report_json_path, result.model_dump(mode="json"))
-    _write_text(latest_report_pointer_path(output_root), str(report_json_path))
+    write_latest_report_pointer(output_root=output_root, report_path=report_json_path)
     return result
 
 

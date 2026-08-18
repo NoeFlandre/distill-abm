@@ -86,6 +86,11 @@ def latest_report_pointer_path(output_root: Path) -> Path:
     return output_root / LATEST_REPORT_POINTER_FILENAME
 
 
+def write_latest_report_pointer(*, output_root: Path, report_path: Path) -> None:
+    """Point an output root at its newest report JSON file."""
+    latest_report_pointer_path(output_root).write_text(str(report_path), encoding="utf-8")
+
+
 def active_run_lock_path(output_root: Path) -> Path:
     return output_root / ACTIVE_RUN_LOCK_FILENAME
 

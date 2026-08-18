@@ -26,6 +26,7 @@ from distill_abm.pipeline.run_artifact_contracts import (
     validation_state_path,
     viewer_html_path,
     viz_smoke_report_path,
+    write_latest_report_pointer,
     write_latest_run_pointer,
 )
 
@@ -64,6 +65,14 @@ def test_run_artifact_contracts_create_run_root_and_update_latest_pointer(tmp_pa
     assert run_root == tmp_path / "runs" / run_id
     assert run_root.is_dir()
     assert latest_run_pointer_path(tmp_path).read_text(encoding="utf-8") == str(run_root)
+
+
+def test_write_latest_report_pointer_updates_report_path(tmp_path: Path) -> None:
+    report_path = tmp_path / "runs" / "run_1" / "smoke_local_qwen_report.json"
+
+    write_latest_report_pointer(output_root=tmp_path, report_path=report_path)
+
+    assert latest_report_pointer_path(tmp_path).read_text(encoding="utf-8") == str(report_path)
 
 
 def test_resolve_run_root_uses_latest_run_pointer(tmp_path: Path) -> None:
