@@ -40,6 +40,8 @@ from distill_abm.pipeline.prompt_compression_artifacts import (
 from distill_abm.pipeline.run_artifact_contracts import (
     acquire_active_run_lock,
     create_run_root,
+    latest_run_pointer_path,
+    read_latest_run_pointer,
     release_active_run_lock,
     run_log_path,
     write_latest_run_pointer,
@@ -317,7 +319,9 @@ def run_full_case_suite_smoke(
                         resume_existing=resume_existing,
                         on_case_completed=live_case_progress_callback,
                     )
-                    latest_abm_run = Path((abm_output_root / "latest_run.txt").read_text(encoding="utf-8").strip())
+                    latest_abm_run = read_latest_run_pointer(abm_output_root)
+                    if latest_abm_run is None:
+                        raise FileNotFoundError(latest_run_pointer_path(abm_output_root))
                     observability_csv_path = getattr(matrix_result, "observability_csv_path", None)
                     if observability_csv_path is None:
                         candidate = latest_abm_run / RUN_OBSERVABILITY_FILENAME

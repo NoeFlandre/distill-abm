@@ -54,9 +54,11 @@ from distill_abm.pipeline.quantitative_rendering import (
 )
 from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import (
+    LATEST_RUN_POINTER_FILENAME,
     create_run_root,
     find_previous_run_root,
     prepare_output_root,
+    read_latest_run_pointer,
     resolve_run_root,
     run_log_path,
     write_latest_run_pointer,
@@ -1536,10 +1538,12 @@ def _write_global_quantitative_master_overview(*, output_root: Path) -> None:
 
 def _discover_latest_quantitative_runs(results_root: Path) -> list[tuple[str, Path]]:
     discovered: list[tuple[str, Path]] = []
-    for latest_run_path in sorted(results_root.rglob("latest_run.txt")):
+    for latest_run_path in sorted(results_root.rglob(LATEST_RUN_POINTER_FILENAME)):
         output_root = latest_run_path.parent
-        value = latest_run_path.read_text(encoding="utf-8").strip()
-        run_root = Path(value)
+        run_root = read_latest_run_pointer(output_root)
+        if run_root is None:
+            continue
+        value = str(run_root)
         if not run_root.is_absolute():
             run_root = Path(value) if value.startswith("results/") else output_root / "runs" / value
         if not (run_root / QUANTITATIVE_REPORT_FILENAME).exists():

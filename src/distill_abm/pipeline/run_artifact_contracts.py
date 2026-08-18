@@ -59,6 +59,15 @@ def latest_run_pointer_path(output_root: Path) -> Path:
     return output_root / LATEST_RUN_POINTER_FILENAME
 
 
+def read_latest_run_pointer(output_root: Path) -> Path | None:
+    """Read the latest run pointer if it exists and contains a path."""
+    latest_run_path = latest_run_pointer_path(output_root)
+    if not latest_run_path.exists():
+        return None
+    latest_text = latest_run_path.read_text(encoding="utf-8").strip()
+    return Path(latest_text) if latest_text else None
+
+
 def create_run_root(*, output_root: Path, started_at: datetime) -> tuple[str, Path]:
     """Create one timestamped run directory and return its id and path."""
     output_root.mkdir(parents=True, exist_ok=True)
@@ -178,9 +187,5 @@ def release_active_run_lock(*, output_root: Path, run_id: str) -> None:
 
 def resolve_run_root(path: Path) -> Path:
     """Resolve either a concrete run directory or a root containing a latest-run pointer."""
-    latest_run_path = latest_run_pointer_path(path)
-    if latest_run_path.exists():
-        latest_text = latest_run_path.read_text(encoding="utf-8").strip()
-        if latest_text:
-            return Path(latest_text)
-    return path
+    latest_run_root = read_latest_run_pointer(path)
+    return latest_run_root if latest_run_root is not None else path

@@ -18,6 +18,7 @@ from distill_abm.pipeline.run_artifact_contracts import (
     latest_report_pointer_path,
     latest_run_pointer_path,
     prepare_output_root,
+    read_latest_run_pointer,
     resolve_run_root,
     run_log_path,
     runs_root_path,
@@ -122,3 +123,21 @@ def test_prepare_output_root_preserves_existing_output_root_when_resuming(tmp_pa
 
     assert output_root.is_dir()
     assert stale_path.read_text(encoding="utf-8") == "stale"
+
+
+def test_read_latest_run_pointer_returns_stored_run_root(tmp_path: Path) -> None:
+    run_root = tmp_path / "runs" / "run_1"
+    run_root.mkdir(parents=True)
+    write_latest_run_pointer(output_root=tmp_path, run_root=run_root)
+
+    assert read_latest_run_pointer(tmp_path) == run_root
+
+
+def test_read_latest_run_pointer_returns_none_when_pointer_is_missing(tmp_path: Path) -> None:
+    assert read_latest_run_pointer(tmp_path) is None
+
+
+def test_read_latest_run_pointer_returns_none_when_pointer_is_blank(tmp_path: Path) -> None:
+    latest_run_pointer_path(tmp_path).write_text("  \n", encoding="utf-8")
+
+    assert read_latest_run_pointer(tmp_path) is None

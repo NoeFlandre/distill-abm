@@ -22,6 +22,7 @@ from distill_abm.pipeline.run_artifact_contracts import (
     find_previous_run_root,
     prepare_output_root,
     read_active_run_lock,
+    read_latest_run_pointer,
     run_log_path,
     write_latest_run_pointer,
 )
@@ -587,11 +588,10 @@ def _discover_full_case_suite_bundles(
     missing_abms: list[str] = []
     for abm in target_abms:
         abm_root = abms_root / abm
-        latest_run_path = abm_root / "latest_run.txt"
-        if not latest_run_path.exists():
+        run_root = read_latest_run_pointer(abm_root)
+        if run_root is None:
             missing_abms.append(abm)
             continue
-        run_root = Path(latest_run_path.read_text(encoding="utf-8").strip())
         report_path = run_root / "smoke_full_case_matrix_report.json"
         abm_bundles: tuple[ValidatedSmokeBundle, ...] = ()
         if report_path.exists():
