@@ -14,7 +14,11 @@ from pydantic import BaseModel, Field
 from distill_abm.ingest.csv_ingest import load_simulation_csv
 from distill_abm.ingest.netlogo_steps import NetLogoLinkProtocol
 from distill_abm.ingest.netlogo_workflow import run_netlogo_experiment
-from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, run_log_path
+from distill_abm.pipeline.run_artifact_contracts import (
+    create_run_root,
+    run_log_path,
+    write_latest_run_pointer,
+)
 from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
 from distill_abm.viz.plots import MetricPlotBundle, plot_metric_bundle_to_path
 
@@ -149,11 +153,8 @@ def run_viz_smoke_suite(
 ) -> VizSmokeSuiteResult:
     """Run NetLogo simulations and generate the ordered plot PNGs used before LLM inference."""
     started_at = datetime.now(UTC)
-    output_root.mkdir(parents=True, exist_ok=True)
-    run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
-    run_root = output_root / "runs" / run_id
-    run_root.mkdir(parents=True, exist_ok=True)
-    latest_run_pointer_path(output_root).write_text(str(run_root), encoding="utf-8")
+    run_id, run_root = create_run_root(output_root=output_root, started_at=started_at)
+    write_latest_run_pointer(output_root=output_root, run_root=run_root)
     attached_run_log_path = attach_json_log_file(run_log_path(run_root))
     logger = get_logger(__name__)
     selected_stages = _select_stages(default_viz_smoke_stages(specs), stage_ids)

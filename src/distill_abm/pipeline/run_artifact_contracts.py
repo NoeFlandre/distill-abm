@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 
 from pydantic import BaseModel
@@ -36,6 +37,20 @@ def runs_root_path(output_root: Path) -> Path:
 
 def latest_run_pointer_path(output_root: Path) -> Path:
     return output_root / LATEST_RUN_POINTER_FILENAME
+
+
+def create_run_root(*, output_root: Path, started_at: datetime) -> tuple[str, Path]:
+    """Create one timestamped run directory and return its id and path."""
+    output_root.mkdir(parents=True, exist_ok=True)
+    run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
+    run_root = runs_root_path(output_root) / run_id
+    run_root.mkdir(parents=True, exist_ok=True)
+    return run_id, run_root
+
+
+def write_latest_run_pointer(*, output_root: Path, run_root: Path) -> None:
+    """Point an output root at its newest run directory."""
+    latest_run_pointer_path(output_root).write_text(str(run_root), encoding="utf-8")
 
 
 def latest_report_pointer_path(output_root: Path) -> Path:

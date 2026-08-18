@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from pathlib import Path
 
 from distill_abm.pipeline.run_artifact_contracts import (
@@ -10,6 +11,7 @@ from distill_abm.pipeline.run_artifact_contracts import (
     VALIDATION_STATE_FILENAME,
     VIZ_SMOKE_REPORT_FILENAME,
     case_summary_path,
+    create_run_root,
     doe_smoke_report_path,
     ingest_smoke_report_path,
     latest_report_pointer_path,
@@ -21,6 +23,7 @@ from distill_abm.pipeline.run_artifact_contracts import (
     validation_state_path,
     viewer_html_path,
     viz_smoke_report_path,
+    write_latest_run_pointer,
 )
 
 
@@ -46,6 +49,18 @@ def test_run_artifact_contracts_build_standard_paths(tmp_path: Path) -> None:
     assert doe_smoke_report_path(run_root) == run_root / DOE_SMOKE_REPORT_FILENAME
     assert case_summary_path(case_dir) == case_dir / "00_case_summary.json"
     assert validation_state_path(case_dir) == case_dir / "validation_state.json"
+
+
+def test_run_artifact_contracts_create_run_root_and_update_latest_pointer(tmp_path: Path) -> None:
+    started_at = datetime(2026, 8, 18, 12, 34, 56, 789123, tzinfo=UTC)
+
+    run_id, run_root = create_run_root(output_root=tmp_path, started_at=started_at)
+    write_latest_run_pointer(output_root=tmp_path, run_root=run_root)
+
+    assert run_id == "run_20260818_123456_789123"
+    assert run_root == tmp_path / "runs" / run_id
+    assert run_root.is_dir()
+    assert latest_run_pointer_path(tmp_path).read_text(encoding="utf-8") == str(run_root)
 
 
 def test_resolve_run_root_uses_latest_run_pointer(tmp_path: Path) -> None:

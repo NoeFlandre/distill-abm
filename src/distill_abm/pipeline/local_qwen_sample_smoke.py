@@ -43,9 +43,10 @@ from distill_abm.pipeline.prompt_compression_artifacts import (
 )
 from distill_abm.pipeline.run_artifact_contracts import (
     case_summary_path,
+    create_run_root,
     latest_report_pointer_path,
-    latest_run_pointer_path,
     sampled_smoke_report_path,
+    write_latest_run_pointer,
 )
 from distill_abm.pipeline.run_artifact_contracts import (
     run_log_path as run_log_contract_path,
@@ -187,11 +188,8 @@ def run_local_qwen_sample_smoke(
 ) -> LocalQwenSampleSmokeResult:
     """Run a minimal real local-Qwen smoke across sampled DOE-style cases."""
     started_at = datetime.now(UTC)
-    output_root.mkdir(parents=True, exist_ok=True)
-    run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
-    run_root = output_root / "runs" / run_id
-    run_root.mkdir(parents=True, exist_ok=True)
-    _write_text(latest_run_pointer_path(output_root), str(run_root))
+    run_id, run_root = create_run_root(output_root=output_root, started_at=started_at)
+    write_latest_run_pointer(output_root=output_root, run_root=run_root)
     previous_run_root = resolve_previous_run_root(output_root=output_root, current_run_id=run_id)
     run_log_path = attach_json_log_file(run_log_contract_path(run_root))
     selected_cases = cases or default_local_qwen_sample_cases()

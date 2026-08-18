@@ -54,9 +54,10 @@ from distill_abm.pipeline.quantitative_rendering import (
 )
 from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import (
-    latest_run_pointer_path,
+    create_run_root,
     resolve_run_root,
     run_log_path,
+    write_latest_run_pointer,
 )
 from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
 
@@ -246,10 +247,8 @@ def _run_quantitative_smoke_impl(
     """Core scoring flow shared by the single-LLM and multi-LLM quantitative smokes."""
     started_at = datetime.now(UTC)
     _prepare_output_root(output_root, resume=resume)
-    run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
-    run_root = output_root / "runs" / run_id
-    run_root.mkdir(parents=True, exist_ok=True)
-    latest_run_pointer_path(output_root).write_text(str(run_root), encoding="utf-8")
+    run_id, run_root = create_run_root(output_root=output_root, started_at=started_at)
+    write_latest_run_pointer(output_root=output_root, run_root=run_root)
     previous_run_root = _resolve_previous_quantitative_run_root(output_root=output_root, current_run_id=run_id)
     logger = get_logger(__name__)
     attached_run_log_path = attach_json_log_file(run_log_path(run_root))

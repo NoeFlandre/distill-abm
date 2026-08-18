@@ -40,9 +40,10 @@ from distill_abm.pipeline.prompt_compression_artifacts import (
 )
 from distill_abm.pipeline.run_artifact_contracts import (
     acquire_active_run_lock,
-    latest_run_pointer_path,
+    create_run_root,
     release_active_run_lock,
     run_log_path,
+    write_latest_run_pointer,
 )
 from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
 
@@ -196,12 +197,9 @@ def run_full_case_suite_smoke(
     started_at = datetime.now(UTC)
     _validate_suite_inputs(abm_inputs=abm_inputs, cases_by_abm=cases_by_abm)
     _validate_adapter_environment(adapter=adapter)
-    output_root.mkdir(parents=True, exist_ok=True)
-    run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
-    run_root = output_root / "runs" / run_id
-    run_root.mkdir(parents=True, exist_ok=True)
+    run_id, run_root = create_run_root(output_root=output_root, started_at=started_at)
     acquire_active_run_lock(output_root=output_root, run_id=run_id, run_root=run_root)
-    _write_text(latest_run_pointer_path(output_root), str(run_root))
+    write_latest_run_pointer(output_root=output_root, run_root=run_root)
     log_path = attach_json_log_file(run_log_path(run_root))
     progress_path = output_root / SUITE_PROGRESS_FILENAME
     log_event(

@@ -17,7 +17,12 @@ from pydantic import BaseModel, Field
 from distill_abm.configs.models import SummarizerId
 from distill_abm.pipeline.local_qwen_sample_response import validate_structured_smoke_text_content
 from distill_abm.pipeline.report_writers import write_model_report_files
-from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, read_active_run_lock, run_log_path
+from distill_abm.pipeline.run_artifact_contracts import (
+    create_run_root,
+    read_active_run_lock,
+    run_log_path,
+    write_latest_run_pointer,
+)
 from distill_abm.structured_logging import attach_json_log_file, get_logger, log_event
 from distill_abm.summarize.models import (
     summarize_with_bart,
@@ -133,10 +138,8 @@ def run_summarizer_smoke(
     """Run all summarizers over validated full-case text bundles and persist review artifacts."""
     started_at = datetime.now(UTC)
     _prepare_output_root(output_root, resume=resume)
-    run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
-    run_root = output_root / "runs" / run_id
-    run_root.mkdir(parents=True, exist_ok=True)
-    latest_run_pointer_path(output_root).write_text(str(run_root), encoding="utf-8")
+    run_id, run_root = create_run_root(output_root=output_root, started_at=started_at)
+    write_latest_run_pointer(output_root=output_root, run_root=run_root)
     previous_run_root = _resolve_previous_summarizer_run_root(output_root=output_root, current_run_id=run_id)
     logger = get_logger(__name__)
     attached_run_log_path = attach_json_log_file(run_log_path(run_root))

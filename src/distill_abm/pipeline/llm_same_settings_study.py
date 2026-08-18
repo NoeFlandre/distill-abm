@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 from distill_abm.pipeline.quantitative_rendering import METRIC_COLUMN_NAMES
 from distill_abm.pipeline.report_writers import write_model_report_files
-from distill_abm.pipeline.run_artifact_contracts import latest_run_pointer_path, resolve_run_root
+from distill_abm.pipeline.run_artifact_contracts import create_run_root, resolve_run_root, write_latest_run_pointer
 
 __all__ = [
     "LlmSameSettingsStudyResult",
@@ -73,10 +73,8 @@ def run_llm_same_settings_study(
 ) -> LlmSameSettingsStudyResult:
     """Compare multiple LLMs after restricting all of them to the anchor model's settings."""
     started_at = datetime.now(UTC)
-    run_id = started_at.strftime("run_%Y%m%d_%H%M%S_%f")
-    run_root = output_root / "runs" / run_id
-    run_root.mkdir(parents=True, exist_ok=True)
-    latest_run_pointer_path(output_root).write_text(str(run_root), encoding="utf-8")
+    run_id, run_root = create_run_root(output_root=output_root, started_at=started_at)
+    write_latest_run_pointer(output_root=output_root, run_root=run_root)
 
     anchor_rows, anchor_run_root, anchor_label = _load_quantitative_rows(anchor_source_root)
     filtered_anchor = _filter_candidate_rows(anchor_rows)
