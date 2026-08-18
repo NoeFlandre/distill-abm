@@ -35,6 +35,18 @@ def runs_root_path(output_root: Path) -> Path:
     return output_root / "runs"
 
 
+def find_previous_run_root(*, output_root: Path, current_run_id: str) -> Path | None:
+    """Return the newest prior run directory under the standard runs root."""
+    runs_root = runs_root_path(output_root)
+    if not runs_root.exists():
+        return None
+    candidates = sorted(
+        (path for path in runs_root.iterdir() if path.is_dir() and path.name != current_run_id),
+        reverse=True,
+    )
+    return candidates[0] if candidates else None
+
+
 def latest_run_pointer_path(output_root: Path) -> Path:
     return output_root / LATEST_RUN_POINTER_FILENAME
 

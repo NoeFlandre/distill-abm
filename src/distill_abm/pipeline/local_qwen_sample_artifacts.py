@@ -7,23 +7,14 @@ import shutil
 from collections.abc import Mapping
 from pathlib import Path
 
-from distill_abm.pipeline.run_artifact_contracts import CASE_SUMMARY_FILENAME
+from distill_abm.pipeline.run_artifact_contracts import CASE_SUMMARY_FILENAME, find_previous_run_root
 
 
 def resolve_previous_run_root(*, output_root: Path, current_run_id: str) -> Path | None:
     """Return the most recent previous run root, including legacy flat layouts."""
-    runs_root = output_root / "runs"
-    if not runs_root.exists():
-        legacy_cases_root = output_root / "cases"
-        if legacy_cases_root.exists():
-            return output_root
-        return None
-    candidates = sorted(
-        (path for path in runs_root.iterdir() if path.is_dir() and path.name != current_run_id),
-        reverse=True,
-    )
-    if candidates:
-        return candidates[0]
+    previous_run_root = find_previous_run_root(output_root=output_root, current_run_id=current_run_id)
+    if previous_run_root is not None:
+        return previous_run_root
     legacy_cases_root = output_root / "cases"
     if legacy_cases_root.exists():
         return output_root

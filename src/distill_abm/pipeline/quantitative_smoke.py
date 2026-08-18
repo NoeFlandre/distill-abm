@@ -55,6 +55,7 @@ from distill_abm.pipeline.quantitative_rendering import (
 from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import (
     create_run_root,
+    find_previous_run_root,
     resolve_run_root,
     run_log_path,
     write_latest_run_pointer,
@@ -1621,11 +1622,4 @@ def _prepare_output_root(output_root: Path, *, resume: bool) -> None:
 
 
 def _resolve_previous_quantitative_run_root(*, output_root: Path, current_run_id: str) -> Path | None:
-    runs_root = output_root / "runs"
-    if not runs_root.exists():
-        return None
-    candidates = sorted(
-        (path for path in runs_root.iterdir() if path.is_dir() and path.name != current_run_id),
-        reverse=True,
-    )
-    return candidates[0] if candidates else None
+    return find_previous_run_root(output_root=output_root, current_run_id=current_run_id)

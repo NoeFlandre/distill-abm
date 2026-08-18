@@ -60,6 +60,7 @@ from distill_abm.pipeline.run_artifact_contracts import (
     FULL_CASE_MATRIX_REPORT_FILENAME,
     case_summary_path,
     create_run_root,
+    find_previous_run_root,
     validation_state_path,
     viewer_html_path,
     write_latest_run_pointer,
@@ -962,14 +963,7 @@ def _write_case_review_csv(path: Path, rows: list[dict[str, str]]) -> None:
 
 
 def _resolve_previous_run_root(*, output_root: Path, current_run_id: str) -> Path | None:
-    runs_root = output_root / "runs"
-    if not runs_root.exists():
-        return None
-    candidates = sorted(
-        (path for path in runs_root.iterdir() if path.is_dir() and path.name != current_run_id),
-        reverse=True,
-    )
-    return candidates[0] if candidates else None
+    return find_previous_run_root(output_root=output_root, current_run_id=current_run_id)
 
 
 def _render_report(result: FullCaseMatrixSmokeResult) -> str:

@@ -13,6 +13,7 @@ from distill_abm.pipeline.run_artifact_contracts import (
     case_summary_path,
     create_run_root,
     doe_smoke_report_path,
+    find_previous_run_root,
     ingest_smoke_report_path,
     latest_report_pointer_path,
     latest_run_pointer_path,
@@ -73,3 +74,18 @@ def test_resolve_run_root_uses_latest_run_pointer(tmp_path: Path) -> None:
 
 def test_resolve_run_root_returns_candidate_when_no_pointer(tmp_path: Path) -> None:
     assert resolve_run_root(tmp_path) == tmp_path
+
+
+def test_find_previous_run_root_returns_newest_directory_excluding_current(tmp_path: Path) -> None:
+    older_run_root = tmp_path / "runs" / "run_20260818_100000_000000"
+    newer_run_root = tmp_path / "runs" / "run_20260818_110000_000000"
+    current_run_root = tmp_path / "runs" / "run_20260818_120000_000000"
+    older_run_root.mkdir(parents=True)
+    newer_run_root.mkdir()
+    current_run_root.mkdir()
+
+    assert find_previous_run_root(output_root=tmp_path, current_run_id=current_run_root.name) == newer_run_root
+
+
+def test_find_previous_run_root_returns_none_without_prior_runs(tmp_path: Path) -> None:
+    assert find_previous_run_root(output_root=tmp_path, current_run_id="run_current") is None

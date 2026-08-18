@@ -19,6 +19,7 @@ from distill_abm.pipeline.local_qwen_sample_response import validate_structured_
 from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import (
     create_run_root,
+    find_previous_run_root,
     read_active_run_lock,
     run_log_path,
     write_latest_run_pointer,
@@ -481,14 +482,9 @@ def _prepare_output_root(output_root: Path, *, resume: bool) -> None:
 
 
 def _resolve_previous_summarizer_run_root(*, output_root: Path, current_run_id: str) -> Path | None:
-    runs_root = output_root / "runs"
-    if runs_root.exists():
-        candidates = sorted(
-            (path for path in runs_root.iterdir() if path.is_dir() and path.name != current_run_id),
-            reverse=True,
-        )
-        if candidates:
-            return candidates[0]
+    previous_run_root = find_previous_run_root(output_root=output_root, current_run_id=current_run_id)
+    if previous_run_root is not None:
+        return previous_run_root
     legacy_bundles_root = output_root / "bundles"
     if legacy_bundles_root.exists():
         return output_root
