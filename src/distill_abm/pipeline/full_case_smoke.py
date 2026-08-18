@@ -27,7 +27,7 @@ from distill_abm.pipeline.local_qwen_sample_smoke import (
     _validate_case_inputs,
     _write_optional_thinking,
 )
-from distill_abm.pipeline.parallelism import resolve_provider_worker_count
+from distill_abm.pipeline.parallelism import DEFAULT_MAX_PARALLEL_TRENDS, resolve_provider_worker_count
 from distill_abm.pipeline.prompt_compression_artifacts import (
     PROMPT_COMPRESSION_SUMMARY_FILENAME,
     PromptCompressionAttempt,
@@ -105,7 +105,7 @@ class _TrendExecutionResult(BaseModel):
     error: str | None = None
 
 
-MAX_PARALLEL_TRENDS = 6
+MAX_PARALLEL_TRENDS = DEFAULT_MAX_PARALLEL_TRENDS
 
 
 def resolve_parallel_trend_workers(provider: str) -> int:
