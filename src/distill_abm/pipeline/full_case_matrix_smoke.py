@@ -50,6 +50,7 @@ from distill_abm.pipeline.local_qwen_sample_smoke import (
     _invoke_structured_smoke_text,
     _write_optional_thinking,
 )
+from distill_abm.pipeline.parallelism import resolve_provider_worker_count
 from distill_abm.pipeline.prompt_compression_artifacts import (
     PromptCompressionAttempt,
     build_prompt_compression_run_entry,
@@ -137,10 +138,7 @@ MAX_PARALLEL_CASES = 3
 
 def resolve_parallel_case_workers(provider: str) -> int:
     """Return a provider-aware matrix case worker count."""
-
-    if provider.strip().lower() == "mistral":
-        return 1
-    return MAX_PARALLEL_CASES
+    return resolve_provider_worker_count(provider, default_workers=MAX_PARALLEL_CASES)
 
 
 class _MatrixTrendExecutionResult(BaseModel):

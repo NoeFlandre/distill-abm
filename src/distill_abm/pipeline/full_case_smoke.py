@@ -27,6 +27,7 @@ from distill_abm.pipeline.local_qwen_sample_smoke import (
     _validate_case_inputs,
     _write_optional_thinking,
 )
+from distill_abm.pipeline.parallelism import resolve_provider_worker_count
 from distill_abm.pipeline.prompt_compression_artifacts import (
     PROMPT_COMPRESSION_SUMMARY_FILENAME,
     PromptCompressionAttempt,
@@ -109,10 +110,7 @@ MAX_PARALLEL_TRENDS = 6
 
 def resolve_parallel_trend_workers(provider: str) -> int:
     """Return a provider-aware trend worker count."""
-
-    if provider.strip().lower() == "mistral":
-        return 1
-    return MAX_PARALLEL_TRENDS
+    return resolve_provider_worker_count(provider, default_workers=MAX_PARALLEL_TRENDS)
 
 
 def run_full_case_smoke(
