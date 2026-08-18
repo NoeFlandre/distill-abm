@@ -21,6 +21,7 @@ from distill_abm.pipeline.full_case_suite_progress import (
 )
 from distill_abm.pipeline.full_case_suite_smoke import run_full_case_suite_smoke
 from distill_abm.pipeline.local_qwen_monitor import LocalQwenCaseSnapshot, LocalQwenMonitorSnapshot
+from distill_abm.pipeline.run_artifact_contracts import write_latest_run_pointer as real_write_latest_run_pointer
 from distill_abm.pipeline.smoke_io import copy_if_exists as real_copy_if_exists
 
 
@@ -974,6 +975,25 @@ def test_sync_stable_abm_current_view_delegates_artifact_copying(
     current_root = abm_output_root / "current"
     expected_paths = tuple((source, current_root / source.name) for source in source_paths)
     assert tuple(copied_paths) == expected_paths
+
+
+def test_sync_stable_abm_current_view_delegates_latest_pointer_writing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    abm_output_root = tmp_path / "suite" / "abms" / "fauna"
+    run_root = abm_output_root / "runs" / "run_1"
+    run_root.mkdir(parents=True, exist_ok=True)
+    written_pointers: list[tuple[Path, Path]] = []
+
+    def recording_pointer(*, output_root: Path, run_root: Path) -> None:
+        written_pointers.append((output_root, run_root))
+        real_write_latest_run_pointer(output_root=output_root, run_root=run_root)
+
+    monkeypatch.setattr(current_view_module, "write_latest_run_pointer", recording_pointer, raising=False)
+
+    sync_stable_abm_current_view(abm_output_root=abm_output_root, run_root=run_root)
+
+    assert written_pointers == [(abm_output_root, run_root)]
 
 
 def test_refresh_progress_abm_snapshot_preserves_progress_on_nested_snapshot_value_error(
