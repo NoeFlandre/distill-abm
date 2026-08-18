@@ -17,6 +17,7 @@ from distill_abm.pipeline.run_artifact_contracts import (
     ingest_smoke_report_path,
     latest_report_pointer_path,
     latest_run_pointer_path,
+    prepare_output_root,
     resolve_run_root,
     run_log_path,
     runs_root_path,
@@ -89,3 +90,35 @@ def test_find_previous_run_root_returns_newest_directory_excluding_current(tmp_p
 
 def test_find_previous_run_root_returns_none_without_prior_runs(tmp_path: Path) -> None:
     assert find_previous_run_root(output_root=tmp_path, current_run_id="run_current") is None
+
+
+def test_prepare_output_root_creates_missing_output_root(tmp_path: Path) -> None:
+    output_root = tmp_path / "results"
+
+    prepare_output_root(output_root, resume=False)
+
+    assert output_root.is_dir()
+
+
+def test_prepare_output_root_clears_existing_output_root_without_resume(tmp_path: Path) -> None:
+    output_root = tmp_path / "results"
+    output_root.mkdir()
+    stale_path = output_root / "stale.txt"
+    stale_path.write_text("stale", encoding="utf-8")
+
+    prepare_output_root(output_root, resume=False)
+
+    assert output_root.is_dir()
+    assert not stale_path.exists()
+
+
+def test_prepare_output_root_preserves_existing_output_root_when_resuming(tmp_path: Path) -> None:
+    output_root = tmp_path / "results"
+    output_root.mkdir()
+    stale_path = output_root / "stale.txt"
+    stale_path.write_text("stale", encoding="utf-8")
+
+    prepare_output_root(output_root, resume=True)
+
+    assert output_root.is_dir()
+    assert stale_path.read_text(encoding="utf-8") == "stale"

@@ -56,6 +56,7 @@ from distill_abm.pipeline.report_writers import write_model_report_files
 from distill_abm.pipeline.run_artifact_contracts import (
     create_run_root,
     find_previous_run_root,
+    prepare_output_root,
     resolve_run_root,
     run_log_path,
     write_latest_run_pointer,
@@ -1616,9 +1617,7 @@ def _render_markdown_report(result: QuantitativeSmokeResult) -> str:
 
 
 def _prepare_output_root(output_root: Path, *, resume: bool) -> None:
-    if output_root.exists() and not resume:
-        shutil.rmtree(output_root)
-    output_root.mkdir(parents=True, exist_ok=True)
+    prepare_output_root(output_root, resume=resume)
 
 
 def _resolve_previous_quantitative_run_root(*, output_root: Path, current_run_id: str) -> Path | None:

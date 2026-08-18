@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 from datetime import datetime
 from pathlib import Path
 
@@ -45,6 +46,13 @@ def find_previous_run_root(*, output_root: Path, current_run_id: str) -> Path | 
         reverse=True,
     )
     return candidates[0] if candidates else None
+
+
+def prepare_output_root(output_root: Path, *, resume: bool) -> None:
+    """Prepare an output root, clearing prior artifacts unless resuming."""
+    if output_root.exists() and not resume:
+        shutil.rmtree(output_root)
+    output_root.mkdir(parents=True, exist_ok=True)
 
 
 def latest_run_pointer_path(output_root: Path) -> Path:
